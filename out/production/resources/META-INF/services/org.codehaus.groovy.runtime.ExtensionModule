@@ -1,0 +1,4 @@
+moduleName=BELs Java Enhancer
+moduleVersion=1.0-bel-java
+extensionClasses=DateExtension
+//staticExtensionClasses=support.StaticStringExtension

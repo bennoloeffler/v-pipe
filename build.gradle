@@ -1,0 +1,76 @@
+/*
+ * User guide available at https://docs.gradle.org/4.0/userguide/tutorial_groovy_projects.html
+ */
+
+//apply plugin: 'idea'
+//apply plugin: 'groovy'
+//apply plugin: 'edu.sc.seis.launch4j'
+
+plugins {
+    id 'idea'
+    id 'groovy'
+    id 'edu.sc.seis.launch4j' version '2.4.6'
+}
+
+repositories {
+    mavenCentral()
+}
+
+
+dependencies {
+    implementation 'joda-time:joda-time:2.10.6'
+    implementation 'org.codehaus.groovy:groovy-all:2.4.10'
+    testCompile 'junit:junit:4.12'
+}
+
+launch4j {
+    mainClassName = 'Main'
+    headerType='console'
+    bundledJrePath='jre'
+}
+
+/**
+ * set that to local copy
+ */
+def jre = "jre"
+def jrePath = "C:\\Program Files\\Java\\jdk1.8.0_172\\$jre"
+def tempDist = "$buildDir/dist/v-pipe"
+
+task copyExeLibsJRE {
+    dependsOn createExe
+
+    description "copies jre, exe and lib to $tempDist"
+    group "v-pipe"
+
+    doFirst {
+        delete tempDist
+        mkdir tempDist
+    }
+    doLast {
+        copy {
+            from "$buildDir/launch4j"
+            into tempDist
+        }
+        //if(!new File("$buildDir/dist/v-pipe/$jre").exists()) {
+        copy {
+            println"copy JRE... may take a while ($jrePath)"
+            println"to ($tempDist)"
+            from jrePath
+            into "$tempDist/$jre"
+        }
+        //}
+    }
+}
+
+task createDistribution(type: Zip) {
+    description 'creates the v-pipe zip distribution'
+    group "v-pipe"
+    dependsOn copyExeLibsJRE
+    from "$buildDir/dist"
+}
+
+
+
+
+
+
