@@ -1,10 +1,12 @@
+package core
+
 import org.joda.time.DateTime
 
 class ProjectDataWriter {
 
     static def FILE_NAME = "Department-Load-Result.txt"
 
-    static void writeToFile(ProjectDataToLoadTransformer tr, File f) {
+    static void writeToFile(ProjectDataToLoadCalculator tr, File f) {
         def stringMapMap = tr.calcDepartmentWeekLoad()
         if(f==null) {
             f = new File(FILE_NAME)

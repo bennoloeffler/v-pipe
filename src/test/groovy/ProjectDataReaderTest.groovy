@@ -1,5 +1,8 @@
+import core.ProjectDataReader
+import core.TaskInProject
+
 /**
- * Test reading different formats and separators for TaskInProject-Data
+ * Test reading different formats and separators for core.TaskInProject-Data
  */
 class ProjectDataReaderTest extends GroovyTestCase {
 

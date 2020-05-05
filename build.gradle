@@ -24,7 +24,7 @@ dependencies {
 }
 
 launch4j {
-    mainClassName = 'Main'
+    mainClassName = 'core.Main'
     headerType='console'
     bundledJrePath='jre'
 }

@@ -1,14 +1,14 @@
-import static HelperFunctions.*
+import extensions.DateHelperFunctions
 
 class HelperFunctionsTest extends GroovyTestCase {
 
-    def assertWeek(String dateddmmyyyy, String yyyy_wxx) {
-        def sw = getWeekYearStr(sToD(dateddmmyyyy))
+    def static assertWeek(String dateddmmyyyy, String yyyy_wxx) {
+        def sw = dateddmmyyyy.toDate().getWeekYearStr()
         assert sw == yyyy_wxx
     }
 
-    def assertMonth(String dateddmmyyyy, String yyyy_mxx) {
-        def sw = getMonthYearStr(sToD(dateddmmyyyy))
+    def static assertMonth(String dateddmmyyyy, String yyyy_mxx) {
+        def sw = dateddmmyyyy.toDate().getMonthYearStr()
         assert sw == yyyy_mxx
     }
 
@@ -59,29 +59,29 @@ class HelperFunctionsTest extends GroovyTestCase {
     }
 
     void testDToS() {
-        assert "01.01.2020" == dToS(Date.parse("dd.MM.yyyy", "1.1.2020"))
+        assert "01.01.2020" == (Date.parse("dd.MM.yyyy", "1.1.2020")).toString()
         shouldFail {
-            dToS(null)
+            DateHelperFunctions._dToS(null)
         }
     }
 
     void testSToD() {
-        assert Date.parse("dd.MM.yyyy", "1.1.2020") == sToD("1.1.2020")
+        assert Date.parse("dd.MM.yyyy", "1.1.2020") == "1.1.2020".toDate()
 
         shouldFail {
-            sToD(null)
+            DateHelperFunctions._sToD(null)
         }
 
         //shouldFail { // but Date parser evaluates to 1.1.2021
-        def ha =   sToD("1.13.2020")
+        def ha =   "1.13.2020".toDate()
         //}
     }
 
     void testGetStartOfWeek () {
-        assert sToD( "20.4.2020") == getStartOfWeek(sToD("25.4.2020"))
+        assert "20.4.2020".toDate() == "25.4.2020".toDate().getStartOfWeek()
     }
 
     void testGetStartOfMonth () {
-        assert sToD( "1.4.2020") == getStartOfMonth(sToD("25.4.2020"))
+        assert "1.4.2020".toDate() == "25.4.2020".toDate().getStartOfMonth()
     }
 }

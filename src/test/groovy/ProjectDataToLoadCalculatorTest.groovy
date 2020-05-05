@@ -1,18 +1,19 @@
-import static HelperFunctions.*
+import core.ProjectDataToLoadCalculator
+import core.TaskInProject
 
-class ProjectDataToLoadTransformerTest extends GroovyTestCase {
+class ProjectDataToLoadCalculatorTest extends GroovyTestCase {
 
-    ProjectDataToLoadTransformer tr
+    ProjectDataToLoadCalculator tr
     TaskInProject t1p1, t2p1, t1p2, t2p2, t3p1
 
     void setUp() {
         super.setUp()
-        tr = new ProjectDataToLoadTransformer()
-        t1p1 = t("p1", "5.1.2020", "10.1.2020", "d1", 20.0)
-        t2p1 = t("p1", "8.1.2020", "9.1.2020", "d2", 20.0)
-        t1p2 = t("p2", "5.1.2020", "10.1.2020", "d1", 20.0)
-        t2p2 = t("p2", "8.1.2020", "9.1.2020", "d2", 20.0)
-        t3p1 = t("p3", "8.2.2020", "9.2.2020", "d3", 20.0)
+        tr = new ProjectDataToLoadCalculator()
+        t1p1 = TestDataHelper.t("p1", "5.1.2020", "10.1.2020", "d1", 20.0)
+        t2p1 = TestDataHelper.t("p1", "8.1.2020", "9.1.2020", "d2", 20.0)
+        t1p2 = TestDataHelper.t("p2", "5.1.2020", "10.1.2020", "d1", 20.0)
+        t2p2 = TestDataHelper.t("p2", "8.1.2020", "9.1.2020", "d2", 20.0)
+        t3p1 = TestDataHelper.t("p3", "8.2.2020", "9.2.2020", "d3", 20.0)
         tr.taskList = [t1p1, t2p1, t1p2, t2p2,t3p1]
     }
 
@@ -31,11 +32,11 @@ class ProjectDataToLoadTransformerTest extends GroovyTestCase {
     }
 
     void testGetStartOfTasks() {
-        assert tr.startOfTasks == sToD('5.1.2020')
+        assert tr.startOfTasks == '5.1.2020'.toDate()
     }
 
     void testGetEndOfTasks() {
-        assert tr.endOfTasks == sToD('9.2.2020')
+        assert tr.endOfTasks == '9.2.2020'.toDate()
     }
 
     void testCalcDepartmentWeekLoad() {

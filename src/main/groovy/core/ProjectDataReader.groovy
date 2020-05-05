@@ -1,5 +1,9 @@
+package core
+
+import extensions.DateHelperFunctions
+
 /**
- * reads data lines into a list of TaskInProject
+ * reads data lines into a list of core.TaskInProject
  * Default file name: Projekt-Start-End-Abt-Capa.txt
  * This reflects the order of the data fields.
  * Start and End are Dates, formatted like: dd.MM.yyyy
@@ -13,7 +17,7 @@ class ProjectDataReader {
     static final def SEPARATOR_ALL = /[;,]+\s*|\s+/ // every whitespace, semicolon or comma
     static final def SEPARATOR_SC = /\s*[;,]+\s*/ // can read data with whitespace
     static def SEPARATOR = SEPARATOR_ALL
-    static def SILENT = false
+    static def SILENT = true
 
     static List<TaskInProject> getDataFromFile() {
         List<TaskInProject> taskList = []
@@ -30,16 +34,15 @@ class ProjectDataReader {
                     SILENT?:println("$i split-data: " + strings)
                     def tip = new TaskInProject(
                             project: strings[0],
-                            starting: HelperFunctions.sToD(strings[1]),
-                            ending: HelperFunctions.sToD(strings[2]),
+                            starting: strings[1].toDate(),
+                            ending: strings[2].toDate(),
                             department: strings[3],
                             capacityNeeded: Double.parseDouble(strings[4])
                     )
                     taskList << tip
                     SILENT?:println("$i task-data:  " + tip)
                 } catch (Exception e) {
-                    System.err << ("DATA-ERROR: Reading data-file faild. Reason: " + e.getMessage())
-                    throw e
+                    throw new VpipeException("DATA-ERROR: Reading data-file $FILE_NAME faild. Reason: ${e.getMessage()}")
                 }
             }
         }

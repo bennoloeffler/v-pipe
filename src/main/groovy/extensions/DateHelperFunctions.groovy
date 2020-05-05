@@ -1,6 +1,13 @@
+package extensions
+
 import org.joda.time.DateTime
 
-class HelperFunctions {
+/**
+ * Implementation of helper functions.
+ * For good accessibility, they are added to Date and String.
+ * See DateExtension StringExtension.
+ */
+class DateHelperFunctions {
 
     static Calendar cal = Calendar.getInstance()
 
@@ -9,7 +16,7 @@ class HelperFunctions {
      * @param d
      * @return monday
      */
-    static Date getStartOfWeek(Date d) {
+    static Date _getStartOfWeek(Date d) {
         def dt = new DateTime(d)
         def startOfWeek = dt.withDayOfWeek(1)
         startOfWeek.toDate()
@@ -20,7 +27,7 @@ class HelperFunctions {
      * @param d
      * @return the first of the month
      */
-    static Date getStartOfMonth(Date d) {
+    static Date _getStartOfMonth(Date d) {
         def dt = new DateTime(d)
         def startOfMonth = dt.withDayOfMonth(1)
         startOfMonth.toDate()
@@ -29,9 +36,9 @@ class HelperFunctions {
     /**
      * Creates a unique, sortable key for weeks of year based on days d: e.g. "2020-W11"
      * @param d Date
-     * @return String like "2020-W1", with the last days after week 52 in 2019 looking like "2020-W1"
+     * @return String like "2020-W01", with the last days after week 52 in 2019 looking like "2020-W01"
      */
-    static def getWeekYearStr(Date d) {
+    static def _getWeekYearStr(Date d) {
         cal.setTime(d)
         int year = cal.get(Calendar.YEAR)
         int month = cal.get(Calendar.MONTH)
@@ -48,9 +55,9 @@ class HelperFunctions {
     /**
      * Creates a unique, sortable key for months of year based on days d: e.g. "2020-M3"
      * @param d Date
-     * @return String like "2020-M11", where 0..Jan, 11..Dec
+     * @return String like "2020-M11", where 1..Jan, 12..Dec
      */
-    static def getMonthYearStr(Date d) {
+    static def _getMonthYearStr(Date d) {
         cal.setTime(d)
         int year = cal.get(Calendar.YEAR)
         int month = cal.get(Calendar.MONTH) + 1
@@ -61,7 +68,7 @@ class HelperFunctions {
      * @param d
      * @return "dd.MM.yyyy" (01.01.2020)
      */
-    static String dToS(Date d) {
+    static String _dToS(Date d) {
         assert d != null
         d.format("dd.MM.yyyy")
     }
@@ -70,30 +77,11 @@ class HelperFunctions {
      * @param s "dd.MM.yyyy"
      * @return Date
      */
-    static Date sToD(String s) {
+    static Date _sToD(String s) {
         assert s != null
         Date.parse("dd.MM.yyyy", s)
     }
 
-
-    /**
-     * Factory for TaskInProject, mainly for testing
-     * @param pro
-     * @param sta "dd.MM.yyyy"
-     * @param end "dd.MM.yyyy"
-     * @param dep
-     * @param cap
-     * @return
-     */
-    static TaskInProject t(pro, sta, end, dep, cap) {
-        new TaskInProject(
-                project: pro,
-                starting: sToD(sta),
-                ending: sToD(end),
-                department: dep,
-                capacityNeeded: cap
-        )
-    }
 }
 
 

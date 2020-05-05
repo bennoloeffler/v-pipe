@@ -1,10 +1,12 @@
+import core.ProjectDataWriter
+
 class ProjectDataWriterTest extends GroovyTestCase {
 
     void testWriteToFile() {
 
-        def tr = ProjectDataToLoadTransformer.getPopulatedTransformer()
+        def tr = TestDataHelper.getPopulatedCalculator()
         //def load = tr.calcDepartmentWeekLoad()
-        //File f = new File(ProjectDataReader.FILE_NAME)
+        //File f = new File(core.ProjectDataReader.FILE_NAME)
         //f.delete()
         ProjectDataWriter.writeToFile(tr, null)
 

@@ -1,11 +1,11 @@
+package core
+
 import groovy.transform.Immutable
 import org.joda.time.*
 
-import static HelperFunctions.*
-
 /**
  * Represents one entry of a dataset that models a multi-project situation.
- * A TaskInProject belongs to a project, has a start, an end, belongs to a department und needs a certain amount of capacity.
+ * A core.TaskInProject belongs to a project, has a start, an end, belongs to a department und needs a certain amount of capacity.
  * The model assumes, that capacity consumption is distributed evenly between start and end.
  * Start and end are days. Start is included - end is EXCLUDED.
  */
@@ -19,7 +19,7 @@ class TaskInProject {
     double capacityNeeded
 
     /**
-     * in order to print Date properly. The AST does not call the DateExtension
+     * in order to print Date properly. The AST does not call the extensions.DateExtension
      * @return one line with whitespaces
      */
     @Override
@@ -32,7 +32,7 @@ class TaskInProject {
      * The end days of the intervals are excluded.
      * @param intervalStart
      * @param intervalEnd
-     * @return
+     * @return overlap of the interval with this task in days
      */
     long getDaysOverlap(Date intervalStart, Date intervalEnd) {
         assert starting < ending
@@ -45,6 +45,17 @@ class TaskInProject {
         double millisOverlap = intersection.toDuration().getMillis()
         double millisPerDay = 24 * 60 * 60 * 1000
         return Math.round(millisOverlap / millisPerDay)
+    }
+
+    /**
+     * Format of Strings: dd.MM.yyyy
+     * just an abbrevation for getDaysOverlap(Date intervalStart, Date intervalEnd)
+     * @param intervalStart
+     * @param intervalEnd
+     * @return overlap of the interval with this task in days
+     */
+    long getDaysOverlap(String intervalStart, String intervalEnd) {
+        getDaysOverlap(intervalStart.toDate(), intervalEnd.toDate())
     }
 
     /**
@@ -76,10 +87,10 @@ class TaskInProject {
         assert capacityNeeded > 0
 
         def resultMap = [:]
-        Date week = getStartOfWeek(starting)
+        Date week = starting.getStartOfWeek()
         while(week < ending) {
             def capNeededInThatWeek = getCapaNeeded(week, week + 7)
-            def key = getWeekYearStr(week)
+            def key = week.getWeekYearStr()
             resultMap[key] = capNeededInThatWeek
             week += 7
         }
