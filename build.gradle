@@ -68,6 +68,11 @@ task copyExeLibsJRE {
             into tempDist
         }
 
+        copy {
+            from "Auswertung Beispiel.xlsx"
+            into tempDist
+        }
+
         //if(!new File("$buildDir/dist/v-pipe/$jre").exists()) {
         copy {
             println"copy JRE... may take a while ($jrePath)"
