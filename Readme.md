@@ -79,26 +79,24 @@ Z.B.
 ## Realease
 6.5.2020 `0.1.0-Vor-Ruhlamat`
 
-##### Main Features
-1. v-pipe bemerkt Veränderungen in den Datenfiles und  
-erzeugt die Ausgangsdaten bei Änderungen neu.
-2. Projekt-Verschiebung ist möglich.
 
 ##### Features
-1. Lesen von Projekt-Start-End-Abt-Kapa.txt   
-2. Lesen von Projekt-Verschiebung.txt  
-3. Schreiben von Department-Load-Result.txt
-4. Automatisches Neu-Generieren der Ergebnisse, wenn Datendateien sich ändern.   
+
+Release 0.1.0  
+
+- Readme.md :-)
+- Beispiel-Dateien.
+- Lesen von Projekt-Verschiebung.txt  
+- Automatisches Neu-Generieren der Ergebnisse, wenn Datendateien sich ändern.   
+
+Release 0.0
+- Lesen von Projekt-Start-End-Abt-Kapa.txt   
+- Schreiben von Department-Load-Result.txt
 
 ##### Bugs fixed
-1. Department-Load-Result.txt ist ne Sparce-Matrix
+- Department-Load-Result.txt ist ne Sparce-Matrix
 
-## History
-
-25.4.2020 `0.0-Idee-bei-Ruhlamat`  
-
-**Features**  
-Lesen von Projekt-Start-End-Abt-Capa.txt  
   
-**Bugs**  
-Department-Load-Result.txt ist ne Sparce-Matrix  
+## Bekannte Bugs  
+
+keine
