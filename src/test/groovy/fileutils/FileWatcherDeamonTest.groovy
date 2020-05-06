@@ -15,6 +15,7 @@ class FileWatcherDeamonTest extends GroovyTestCase {
         assert !f.exists()
 
         def fwd = new FileWatcherDeamon(f.path)
+        fwd.startReceivingEvents()
         sleep(100)
 
         assert fwd.path.toString() == TEST_PATH
@@ -30,6 +31,7 @@ class FileWatcherDeamonTest extends GroovyTestCase {
 
     void testStartReceivingEventsAndIsRunning() {
         def fwd = new FileWatcherDeamon(TEST_PATH)
+        fwd.startReceivingEvents()
         sleep(100)
         assert fwd.isRunning()
         fwd.stopReceivingEvents()
@@ -44,6 +46,7 @@ class FileWatcherDeamonTest extends GroovyTestCase {
         f.delete() // just in case it survived last test
 
         def fwd = new FileWatcherDeamon(TEST_PATH)
+        fwd.startReceivingEvents()
         sleep(100)
         f.createNewFile()
         sleep(300)
@@ -71,6 +74,7 @@ class FileWatcherDeamonTest extends GroovyTestCase {
         (0..5).each {tf(it).delete()} // new File('data/0test.xt').delete()
 
         def fwd = new FileWatcherDeamon(TEST_PATH)
+        fwd.startReceivingEvents()
         sleep(100) // give FileWatcherDeamon chance to start up
 
         //
@@ -134,6 +138,7 @@ class FileWatcherDeamonTest extends GroovyTestCase {
         (0..5).each {tf(it).delete()} // new File('data/0test.xt').delete()
 
         def fwd = new FileWatcherDeamon(TEST_PATH)
+        fwd.startReceivingEvents()
         //fwd.setFilter(["0test.txt", '1test.txt'])
         fwd.setFilter([/[01].*/, "someOtherFilterThatNeverMatches", 'andAnother.*'])
         sleep(100) // give FileWatcherDeamon chance to start up

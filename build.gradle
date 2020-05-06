@@ -33,7 +33,8 @@ launch4j {
  * set that to local copy
  */
 def jre = "jre"
-def jrePath = "C:\\Program Files\\Java\\jdk1.8.0_172\\$jre"
+//def jrePath = "C:\\Program Files\\Java\\jdk1.8.0_172\\$jre"
+def jrePath = "C:\\Program Files\\Java\\jre1.8.0_201"
 def tempDist = "$buildDir/dist/v-pipe"
 
 task copyExeLibsJRE {
@@ -51,6 +52,22 @@ task copyExeLibsJRE {
             from "$buildDir/launch4j"
             into tempDist
         }
+
+        copy {
+            from "Projekt-Start-End-Abt-Kapa.txt"
+            into tempDist
+        }
+
+        copy {
+            from "Projekt-Verschiebung.txt"
+            into tempDist
+        }
+
+        copy {
+            from "Readme.md"
+            into tempDist
+        }
+
         //if(!new File("$buildDir/dist/v-pipe/$jre").exists()) {
         copy {
             println"copy JRE... may take a while ($jrePath)"

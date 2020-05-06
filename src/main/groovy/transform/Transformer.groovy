@@ -36,4 +36,10 @@ abstract class Transformer {
         assert description
         return description
     }
+
+    /**
+     * hint, that config may have changed and to urgently re-read it before next operation
+     * @return
+     */
+    abstract def updateConfiguration()
 }

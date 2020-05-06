@@ -12,9 +12,9 @@ class ProjectDataWriter {
             f = new File(FILE_NAME)
         }
         if(f.exists()) {
-            println("output file exists: " + FILE_NAME)
+            //println("output file exists: " + FILE_NAME)
             def tmpFileName = new DateTime().toString("yyyy-MM-dd HH.mm.ss  ") + FILE_NAME
-            println("appending data-time: " + FILE_NAME)
+            //println("appending data-time: " + FILE_NAME)
             f = new File(tmpFileName)
             f.createNewFile()
         }

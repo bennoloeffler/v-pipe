@@ -1,6 +1,7 @@
 package core
 
-import extensions.DateHelperFunctions
+
+import fileutils.FileDataReaderSupport
 
 /**
  * reads data lines into a list of core.TaskInProject
@@ -11,12 +12,9 @@ import extensions.DateHelperFunctions
  * Default separator: any number of spaces, tabs, commas, semicolons (SEPARATOR_ALL)
  * If whitespace is in project names or department names, semicolon or comma is needed (SEPARATOR_SC)
  */
-class ProjectDataReader {
+class ProjectDataReader  {
 
-    static def FILE_NAME = "Projekt-Start-End-Abt-Capa.txt"
-    static final def SEPARATOR_ALL = /[;,]+\s*|\s+/ // every whitespace, semicolon or comma
-    static final def SEPARATOR_SC = /\s*[;,]+\s*/ // can read data with whitespace
-    static def SEPARATOR = SEPARATOR_ALL
+    static def FILE_NAME = "Projekt-Start-End-Abt-Kapa.txt"
     static def SILENT = true
 
     static List<TaskInProject> getDataFromFile() {
@@ -29,8 +27,8 @@ class ProjectDataReader {
                     i++
                     String line = it.trim()
                     SILENT?:println("\n$i raw-data:   " + line)
-                    String[] strings = line.split(SEPARATOR)
-                    if(strings.size() != 5) throw new RuntimeException("\ndataline $i:\n$line\ndid not find 5 separated data fields SEPARATOR = "+SEPARATOR)
+                    String[] strings = line.split(FileDataReaderSupport.SEPARATOR)
+                    if(strings.size() != 5) throw new RuntimeException("\ndataline $i:\n$line\ndid not find 5 separated data fields SEPARATOR = "+FileDataReaderSupport.SEPARATOR)
                     SILENT?:println("$i split-data: " + strings)
                     def tip = new TaskInProject(
                             project: strings[0],

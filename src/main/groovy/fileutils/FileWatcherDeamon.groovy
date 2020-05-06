@@ -61,7 +61,6 @@ class FileWatcherDeamon {
         }
         //println(path.toAbsolutePath().toString())
 
-        startReceivingEvents()
     }
 
     /**
@@ -101,7 +100,7 @@ class FileWatcherDeamon {
             //
 
             running = true
-            log.info("started FileWatcher: ${path.toAbsolutePath()}")
+            println("started FileWatcher: ${path.toAbsolutePath()}") // TODO
             watchService = FileSystems.getDefault().newWatchService()
             path.register(
                     watchService,
@@ -147,7 +146,6 @@ class FileWatcherDeamon {
                     }
 
                 }
-                log.
                 sleep(200)
                 //reset is invoked to put the key back to ready state
                 boolean valid = key.reset()
@@ -157,7 +155,7 @@ class FileWatcherDeamon {
                     throw new VpipeException("FileWatcherDeamon did not get the watch key any more... giving up")
                 }
             }
-            log.info("Stopped FileWatcher: ${path.toAbsolutePath()}" )
+            println("Stopped FileWatcher: ${path.toAbsolutePath()}" ) // TODO
             key.cancel()
         }
     }

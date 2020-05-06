@@ -41,6 +41,6 @@ class DateShiftTransformerTest extends GroovyTestCase {
         def msg = shouldFail VpipeException, {
             def list = dst.transform()
         }
-        assert msg == "ERROR: did not find project elements to shift for 5 days for project: p3"
+        assert msg == "ERROR: did not find project elements to shift for project: p3"
     }
 }

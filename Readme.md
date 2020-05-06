@@ -1,22 +1,30 @@
+
 # v-pipe
 
 Das V&S Pipeline-Werkzeug liest ein Datenfile  
-mit einer Projektlandschaft ein und erzeugt  
-eine Übersicht über die Abteilungen und  
-deren Belastungen.  
-Es gibt verschiedene Optionen, Szenarien zu modellieren.
+mit einer Projektlandschaft ein und erzeugt eine  
+Übersicht der Belastung aller beteiligten Abteilungen.  
+Es gibt verschiedene Optionen, Projekte zu verschieben  
+und Belastungs-Szenarien zu modellieren.
+
 
 ## Installation
-Die Distribution ist ein v-pipe.zip.  
-Dieses Zip-File entpacken - ideal nach: c:\v-pipe  
-Dort liegen dann
 
-`c:\v-pipe\v-pipe.exe // der Starter`  
-`c:\v-pipe\lib         // ein paar Java-Bibliotheken`  
-`c:\v-pipe\jre         // eine Java-Laufzeit-Umgebung`    
+Die Distribution ist ein v-pipe.zip.  
+Dieses Zip-File entpacken - ideal in das Verzeichnis:  
+`c:\v-pipe`  
+
+Dort liegen dann die Verzeichnisse und Dateien:
+
+- `c:\v-pipe\v-pipe.exe // der Starter`  
+- `c:\v-pipe\lib        // ein paar Java-Bibliotheken`  
+- `c:\v-pipe\jre        // eine Java-Laufzeit-Umgebung`    
+
 
 ## Anwendung
+
 #### Start von v-pipe:  
+
 `Windows-Taste` und tippen: `c m d + Enter-Taste`  
 Das startet einen Kommando-Zeilen-Prompt.  
 Dort navigieren in das v-pipe-Verzeichnis.  
@@ -69,9 +77,28 @@ Z.B.
 
 
 ## Realease
-`0.8`
+6.5.2020 `0.1.0-Vor-Ruhlamat`
+
+##### Main Features
+1. v-pipe bemerkt Veränderungen in den Datenfiles und  
+erzeugt die Ausgangsdaten bei Änderungen neu.
+2. Projekt-Verschiebung ist möglich.
+
 ##### Features
-##### Bugs
+1. Lesen von Projekt-Start-End-Abt-Kapa.txt   
+2. Lesen von Projekt-Verschiebung.txt  
+3. Schreiben von Department-Load-Result.txt
+4. Automatisches Neu-Generieren der Ergebnisse, wenn Datendateien sich ändern.   
+
+##### Bugs fixed
+1. Department-Load-Result.txt ist ne Sparce-Matrix
 
 ## History
 
+25.4.2020 `0.0-Idee-bei-Ruhlamat`  
+
+**Features**  
+Lesen von Projekt-Start-End-Abt-Capa.txt  
+  
+**Bugs**  
+Department-Load-Result.txt ist ne Sparce-Matrix  

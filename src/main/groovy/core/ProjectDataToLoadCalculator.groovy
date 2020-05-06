@@ -31,7 +31,7 @@ class ProjectDataToLoadCalculator {
     /**
      * @return List of Strings with all projectNames found in
      */
-    def getAllProjects() {
+    List<String> getAllProjects() {
         (taskList*.project).unique()
     }
 
@@ -98,5 +98,15 @@ class ProjectDataToLoadCalculator {
         load as Map<String, Map<String, Double>>
     }
 
+    /**
+     * hint, that config may have changed and to urgently re-read it before next operation
+     * @return
+     */
+    def updateConfiguration() {
+        taskList = ProjectDataReader.dataFromFile
+        transformers.each() {
+            it.updateConfiguration()
+        }
+    }
 
 }

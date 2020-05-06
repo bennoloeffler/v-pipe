@@ -10,7 +10,6 @@ import groovy.transform.InheritConstructors
 
 import java.util.logging.SimpleFormatter
 
-import static java.util.logging.Level.*
 
 
 /**
@@ -46,6 +45,27 @@ class CustomLevel extends Level {
 
     static {
 
+        //System.setProperty("java.util.logging.config.fil", "logging.properties")
+
+
+
+        Logger log = Logger.getGlobal()
+        System.setProperty("java.util.logging.SimpleFormatter.format",
+                '%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS %4$-6s %5$s%6$s%n')
+        //SimpleFormatter formatter = new SimpleFormatter()
+
+
+        //FileHandler fh = new FileHandler("log/v-pipe.log")
+        //fh.setFormatter(formatter)
+        //log.addHandler(fh)
+
+        //ConsoleHandler ch = new ConsoleHandler()
+        //ch.setFormatter(formatter)
+        //log.addHandler(ch)
+        //ch.level = FINEST
+
+        //def handlers = Logger.getGlobal().getHandlers()
+        //Logger.getGlobal().setLevel(Level.WARNING)
 
 
         // Intercept (using methodMissing)
@@ -83,7 +103,6 @@ class CustomLevel extends Level {
         //ch.level = FINEST
 
         def handlers = Logger.getGlobal().getHandlers()
-        Logger.getGlobal().
         Logger.getGlobal().setLevel(Level.FINEST)
         //log.level = FINEST
         //def level = log.getLevel()
