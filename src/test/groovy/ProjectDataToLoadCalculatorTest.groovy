@@ -50,12 +50,37 @@ class ProjectDataToLoadCalculatorTest extends GroovyTestCase {
         // p1-d2           20
         // p2-d3           20
         //
-        def load = tr.calcDepartmentWeekLoad()
+        def load = tr.calcDepartmentLoad(TaskInProject.WeekOrMonth.WEEK)
         assert load['d1']['2020-W01'] == 8
         assert load['d1']['2020-W02'] == 32
         assert load['d2']['2020-W02'] == 40
     }
 
+    void testCalcDepartmentMonthLoad() {
+
+        // date    5  6  7  8  9  10
+        // load
+        // p1-d1   4  4  4  4  4
+        // p2-d1   4  4  4  4  4
+        // p1-d2           20
+        // p2-d3           20
+        //
+
+        tr.taskList << TestDataHelper.t("p4", "1.1.2020", "1.2.2021", "d4", 31+29+31+30+31+30+31+31+30+31+30+31+31)
+
+        def load = tr.calcDepartmentLoad(TaskInProject.WeekOrMonth.MONTH)
+        assert load['d1']['2020-M01'] == 40
+        assert load['d2']['2020-M01'] == 40
+        assert load['d3']['2020-M02'] == 20
+
+        assert load['d4']['2020-M01'] == 31
+        assert load['d4']['2020-M02'] == 29
+        assert load['d4']['2020-M03'] == 31
+        assert load['d4']['2020-M04'] == 30
+
+
+
+    }
     void testCalcDepartmentWeekLoadSparse() {
 
         // date    5  6  7  8  9  10       9.2
@@ -66,13 +91,13 @@ class ProjectDataToLoadCalculatorTest extends GroovyTestCase {
         // p2-d2           20
         // p3-d3                            20
         //[W1       ][W2            ][...][W6  ]
-        def load = tr.calcDepartmentWeekLoad()
+        def load = tr.calcDepartmentLoad(TaskInProject.WeekOrMonth.WEEK)
         assert load['d1']['2020-W01'] == 8
         assert load['d1']['2020-W02'] == 32
         assert load['d2']['2020-W02'] == 40
         assert load['d3']['2020-W06'] == 20
 
-        def timeKeys = tr.getFullSeriesOfTimeKeys()
+        def timeKeys = tr.getFullSeriesOfTimeKeys(TaskInProject.WeekOrMonth.WEEK)
         assert timeKeys.size() == 6
         assert timeKeys[0] == "2020-W01"
         assert timeKeys[5] == "2020-W06"
@@ -96,7 +121,7 @@ class ProjectDataToLoadCalculatorTest extends GroovyTestCase {
         ProjectDataToLoadCalculator pt = new ProjectDataToLoadCalculator()
         pt.transformers << new DateShiftTransformer(pt)
         pt.updateConfiguration()
-        def load = pt.calcDepartmentWeekLoad()
+        def load = pt.calcDepartmentLoad(TaskInProject.WeekOrMonth.WEEK)
 
 
         assert load['d1']['2020-W02'] == null
@@ -123,7 +148,7 @@ class ProjectDataToLoadCalculatorTest extends GroovyTestCase {
         ProjectDataToLoadCalculator pt = new ProjectDataToLoadCalculator()
         pt.transformers << new DateShiftTransformer(pt)
         pt.updateConfiguration()
-        def load = pt.calcDepartmentWeekLoad()
+        def load = pt.calcDepartmentLoad(TaskInProject.WeekOrMonth.WEEK)
 
 
         assert load['d1']['2020-W02'] == 20

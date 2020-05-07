@@ -1,5 +1,7 @@
 import core.TaskInProject
 
+import static core.TaskInProject.WeekOrMonth.WEEK
+
 class TaskInProjectTest extends GroovyTestCase {
 
     // CUT
@@ -57,13 +59,13 @@ class TaskInProjectTest extends GroovyTestCase {
     }
 
     void testGetCapaMap () {
-        Map<String, Double> map = t1.getCapaDemandSplitInWeeks()
+        Map<String, Double> map = t1.getCapaDemandSplitIn(WEEK)
         // t1 = ("p1", "5.1.2020", "10.1.2020", "d1", 20.0)
         assert map != null
         assert map["2020-W01"] == 4
         assert map["2020-W02"] == 16
 
-        map = t2.getCapaDemandSplitInWeeks()
+        map = t2.getCapaDemandSplitIn(WEEK)
         // t1 = ("p1", "5.1.2020", "10.1.2020", "d1", 20.0)
         assert map != null
         assert map["2020-W05"] == 20

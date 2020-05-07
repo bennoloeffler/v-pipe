@@ -1,6 +1,6 @@
 import core.ProjectDataReader
 import core.TaskInProject
-import fileutils.FileDataReaderSupport
+import fileutils.FileSupport
 
 /**
  * Test reading different formats and separators for core.TaskInProject-Data
@@ -72,9 +72,9 @@ class ProjectDataReaderTest extends GroovyTestCase {
             p1, 01.01.2020,\t20.01.2020;\t\t d1, 20.5\n
             p1 \t;  01.01.2020;    20.01.2020;    dep 2   , 20\n""")
 
-        FileDataReaderSupport.SEPARATOR = FileDataReaderSupport.SEPARATOR_SC
+        FileSupport.SEPARATOR = FileSupport.SEPARATOR_SC
         List<TaskInProject> data = ProjectDataReader.getDataFromFile()
-        FileDataReaderSupport.SEPARATOR = FileDataReaderSupport.SEPARATOR_ALL
+        FileSupport.SEPARATOR = FileSupport.SEPARATOR_ALL
 
         assert data?.size() == 2
         assert data[1].department == "dep 2" // ATTENTION: removing all surounding spaces!

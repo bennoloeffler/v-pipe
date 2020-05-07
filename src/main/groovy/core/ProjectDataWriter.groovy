@@ -1,26 +1,33 @@
 package core
 
-import org.joda.time.DateTime
+import fileutils.FileSupport
+
+import static core.TaskInProject.WeekOrMonth.WEEK
+
 
 class ProjectDataWriter {
 
-    static def FILE_NAME = "Department-Load-Result.txt"
+    static def FILE_NAME_WEEK = 'Abteilungs-Kapazitäts-Belastung-Woche.txt'
+    static def FILE_NAME_MONTH = 'Abteilungs-Kapazitäts-Belastung-Monat.txt'
+    static String BACKUP_FILE
 
-    static void writeToFile(ProjectDataToLoadCalculator tr, File f) {
-        def stringMapMap = tr.calcDepartmentWeekLoad()
-        if(f==null) {
-            f = new File(FILE_NAME)
+    static void writeToFile(ProjectDataToLoadCalculator tr, TaskInProject.WeekOrMonth weekOrMonth) {
+
+        def stringMapMap = tr.calcDepartmentLoad(weekOrMonth)
+
+        def fn = weekOrMonth == WEEK ? FILE_NAME_WEEK : FILE_NAME_MONTH
+        File f = new File(fn)
+        if(f.exists()) { // BACKUP
+            BACKUP_FILE = FileSupport.backupFileName(f.toString())
+            f.renameTo(BACKUP_FILE)
         }
-        if(f.exists()) {
-            //println("output file exists: " + FILE_NAME)
-            def tmpFileName = new DateTime().toString("yyyy-MM-dd HH.mm.ss  ") + FILE_NAME
-            //println("appending data-time: " + FILE_NAME)
-            f = new File(tmpFileName)
-            f.createNewFile()
-        }
+
+        f = new File(fn)
+        f.createNewFile()
+
 
         // normalize a maps to contain all time-keys
-        List<String> allTimeKeys = tr.getFullSeriesOfTimeKeys()
+        List<String> allTimeKeys = tr.getFullSeriesOfTimeKeys(weekOrMonth)
         f << "DEP\t"+allTimeKeys.join("\t") + "\n"
 
         stringMapMap.each {dep, loadMap ->

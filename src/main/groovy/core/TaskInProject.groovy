@@ -1,5 +1,6 @@
 package core
 
+import groovy.time.TimeCategory
 import groovy.transform.Immutable
 import org.joda.time.*
 
@@ -63,7 +64,8 @@ class TaskInProject {
      */
     double getCapaPerDay() {
         long days = ending - starting
-        capacityNeeded / days
+        double r = capacityNeeded / days
+        return r
     }
 
     /**
@@ -72,27 +74,43 @@ class TaskInProject {
      * @return the capacity, the task is spending in the interval
      */
     double getCapaNeeded(Date intervalStart, Date intervalEnd) {
-        getDaysOverlap(intervalStart, intervalEnd) * getCapaPerDay()
+        double perDay = getDaysOverlap(intervalStart, intervalEnd) * getCapaPerDay()
+        return perDay
     }
 
+    enum WeekOrMonth {WEEK, MONTH}
     /**
      * returns a map with YYYY-MX or YYYY-WX - Keys and the corresponding capacity split
      * The end days of the intervals are excluded.
-     * @param intervalStart
-     * @param intervalEnd
-     * @return
+     * @param weeks = true means weeks, false means split in months
+     * @return map of [ W01:13.7, W04:4] for weeks (or [M1:17, M3,19.5] for months)
      */
-    Map<String, Double> getCapaDemandSplitInWeeks() {
+    Map<String, Double> getCapaDemandSplitIn(WeekOrMonth weekOrMonth) {
         assert starting < ending
         assert capacityNeeded > 0
 
         def resultMap = [:]
-        Date week = starting.getStartOfWeek()
-        while(week < ending) {
-            def capNeededInThatWeek = getCapaNeeded(week, week + 7)
-            def key = week.getWeekYearStr()
-            resultMap[key] = capNeededInThatWeek
-            week += 7
+        if(weekOrMonth == WeekOrMonth.WEEK) {
+            Date week = starting.getStartOfWeek()
+            while (week < ending) {
+                double capNeededInThatWeek = getCapaNeeded(week, week + 7)
+                def key = week.getWeekYearStr()
+                resultMap[key] = capNeededInThatWeek
+                week += 7
+            }
+        } else {
+            Date month = starting.getStartOfMonth()
+            Date nextMonth
+
+            while (month < ending) {
+                use(TimeCategory) {
+                    nextMonth = month + 1.month
+                }
+                def capNeededInThatMonth = getCapaNeeded(month, nextMonth)
+                def key = month.getMonthYearStr()
+                resultMap[key] = capNeededInThatMonth
+                month = nextMonth
+            }
         }
         return resultMap as Map<String, Double>
     }

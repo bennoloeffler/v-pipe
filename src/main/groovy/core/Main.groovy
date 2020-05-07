@@ -4,6 +4,9 @@ import fileutils.FileEvent
 import fileutils.FileWatcherDeamon
 import transform.DateShiftTransformer
 
+import javax.swing.DesktopManager
+import java.awt.Desktop
+
 
 // TODO: to 15 min groovy
 // https://e.printstacktrace.blog/groovy-regular-expressions-the-definitive-guide/
@@ -15,11 +18,13 @@ import transform.DateShiftTransformer
  */
 class  Main {
 
-    static VERSION_STRING ='0.1.0-Vor-Ruhlamat'
+    static VERSION_STRING ='0.2.0-Monats-Belastung'
 
     static void main(String[] args) {
 
         println "starting v-pipe-release: $VERSION_STRING"
+
+        openBrowserWithHelp()
 
         // TODO: add levels... https://signalw.github.io/2019/04/09/study-notes-an-example-of-intercept-cache-invoke-in-groovy.html
         // https://mrhaki.blogspot.com/2011/04/groovy-goodness-inject-logging-using.html
@@ -35,7 +40,7 @@ class  Main {
             if(args && args[0].contains('-s')) { // single mode
                 println "V-PIPE going to read file: " + ProjectDataReader.FILE_NAME // todo
                 processData()
-                println "V-PIPE finished writing file: " + ProjectDataWriter.FILE_NAME // todo
+                println "V-PIPE finished writing files: " + ProjectDataWriter.FILE_NAME_WEEK + ' (und -Monat )' // todo
 
             } else { // deamon mode
 
@@ -81,6 +86,14 @@ class  Main {
         ProjectDataToLoadCalculator pt = new ProjectDataToLoadCalculator()
         pt.transformers << new DateShiftTransformer(pt)
         pt.updateConfiguration()
-        ProjectDataWriter.writeToFile(pt, null)
+        ProjectDataWriter.writeToFile(pt, TaskInProject.WeekOrMonth.WEEK)
+        ProjectDataWriter.writeToFile(pt, TaskInProject.WeekOrMonth.MONTH)
+    }
+
+    static def openBrowserWithHelp() {
+        if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+            String path = new File("Referenz.html").absolutePath.replace('\\', ('/'))
+            Desktop.getDesktop().browse(new URI("file:/$path"))
+        }
     }
 }

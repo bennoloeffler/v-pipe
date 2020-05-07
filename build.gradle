@@ -69,6 +69,16 @@ task copyExeLibsJRE {
         }
 
         copy {
+            from "Readme.html.url"
+            into tempDist
+        }
+
+        copy {
+            from "Referenz.html"
+            into tempDist
+        }
+
+        copy {
             from "Auswertung Beispiel.xlsx"
             into tempDist
         }

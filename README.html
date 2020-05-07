@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>v-pipe README.html</title>
+
+<style>
+    body {
+    font-family: Helvetica, arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: white;
+    padding: 30px;
+    color: #333;
+    }
+
+    body > *:first-child {
+    margin-top: 0 !important;
+    }
+
+    body > *:last-child {
+    margin-bottom: 0 !important;
+    }
+
+    a {
+    color: #4183C4;
+    text-decoration: none;
+    }
+
+    a.absent {
+    color: #cc0000;
+    }
+
+    a.anchor {
+    display: block;
+    padding-left: 30px;
+    margin-left: -30px;
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+    margin: 20px 0 10px;
+    padding: 0;
+    font-weight: bold;
+    -webkit-font-smoothing: antialiased;
+    cursor: text;
+    position: relative;
+    }
+
+    h2:first-child, h1:first-child, h1:first-child + h2, h3:first-child, h4:first-child, h5:first-child, h6:first-child {
+    margin-top: 0;
+    padding-top: 0;
+    }
+
+    h1:hover a.anchor, h2:hover a.anchor, h3:hover a.anchor, h4:hover a.anchor, h5:hover a.anchor, h6:hover a.anchor {
+    text-decoration: none;
+    }
+
+    h1 tt, h1 code {
+    font-size: inherit;
+    }
+
+    h2 tt, h2 code {
+    font-size: inherit;
+    }
+
+    h3 tt, h3 code {
+    font-size: inherit;
+    }
+
+    h4 tt, h4 code {
+    font-size: inherit;
+    }
+
+    h5 tt, h5 code {
+    font-size: inherit;
+    }
+
+    h6 tt, h6 code {
+    font-size: inherit;
+    }
+
+    h1 {
+    font-size: 28px;
+    color: black;
+    }
+
+    h2 {
+    font-size: 24px;
+    border-bottom: 1px solid #cccccc;
+    color: black;
+    }
+
+    h3 {
+    font-size: 18px;
+    }
+
+    h4 {
+    font-size: 16px;
+    }
+
+    h5 {
+    font-size: 14px;
+    }
+
+    h6 {
+    color: #777777;
+    font-size: 14px;
+    }
+
+    p, blockquote, ul, ol, dl, li, table, pre {
+    margin: 15px 0;
+    }
+
+    hr {
+    border: 0 none;
+    color: #cccccc;
+    height: 4px;
+    padding: 0;
+    }
+
+    body > h2:first-child {
+    margin-top: 0;
+    padding-top: 0;
+    }
+
+    body > h1:first-child {
+    margin-top: 0;
+    padding-top: 0;
+    }
+
+    body > h1:first-child + h2 {
+    margin-top: 0;
+    padding-top: 0;
+    }
+
+    body > h3:first-child, body > h4:first-child, body > h5:first-child, body > h6:first-child {
+    margin-top: 0;
+    padding-top: 0;
+    }
+
+    a:first-child h1, a:first-child h2, a:first-child h3, a:first-child h4, a:first-child h5, a:first-child h6 {
+    margin-top: 0;
+    padding-top: 0;
+    }
+
+    h1 p, h2 p, h3 p, h4 p, h5 p, h6 p {
+    margin-top: 0;
+    }
+
+    li p.first {
+    display: inline-block;
+    }
+
+    ul, ol {
+    padding-left: 30px;
+    }
+
+    ul :first-child, ol :first-child {
+    margin-top: 0;
+    }
+
+    ul :last-child, ol :last-child {
+    margin-bottom: 0;
+    }
+
+    dl {
+    padding: 0;
+    }
+
+    dl dt {
+    font-size: 14px;
+    font-weight: bold;
+    font-style: italic;
+    padding: 0;
+    margin: 15px 0 5px;
+    }
+
+    dl dt:first-child {
+    padding: 0;
+    }
+
+    dl dt > :first-child {
+    margin-top: 0;
+    }
+
+    dl dt > :last-child {
+    margin-bottom: 0;
+    }
+
+    dl dd {
+    margin: 0 0 15px;
+    padding: 0 15px;
+    }
+
+    dl dd > :first-child {
+    margin-top: 0;
+    }
+
+    dl dd > :last-child {
+    margin-bottom: 0;
+    }
+
+    blockquote {
+    border-left: 4px solid #dddddd;
+    padding: 0 15px;
+    color: #777777;
+    }
+
+    blockquote > :first-child {
+    margin-top: 0;
+    }
+
+    blockquote > :last-child {
+    margin-bottom: 0;
+    }
+
+    table {
+    padding: 0;
+    }
+    table tr {
+    border-top: 1px solid #cccccc;
+    background-color: white;
+    margin: 0;
+    padding: 0;
+    }
+
+    table tr:nth-child(2n) {
+    background-color: #f8f8f8;
+    }
+
+    table tr th {
+    font-weight: bold;
+    border: 1px solid #cccccc;
+    text-align: left;
+    margin: 0;
+    padding: 6px 13px;
+    }
+
+    table tr td {
+    border: 1px solid #cccccc;
+    text-align: left;
+    margin: 0;
+    padding: 6px 13px;
+    }
+
+    table tr th :first-child, table tr td :first-child {
+    margin-top: 0;
+    }
+
+    table tr th :last-child, table tr td :last-child {
+    margin-bottom: 0;
+    }
+
+    img {
+    max-width: 100%;
+    }
+
+    span.frame {
+    display: block;
+    overflow: hidden;
+    }
+
+    span.frame > span {
+    border: 1px solid #dddddd;
+    display: block;
+    float: left;
+    overflow: hidden;
+    margin: 13px 0 0;
+    padding: 7px;
+    width: auto;
+    }
+
+    span.frame span img {
+    display: block;
+    float: left;
+    }
+
+    span.frame span span {
+    clear: both;
+    color: #333333;
+    display: block;
+    padding: 5px 0 0;
+    }
+
+    span.align-center {
+    display: block;
+    overflow: hidden;
+    clear: both;
+    }
+
+    span.align-center > span {
+    display: block;
+    overflow: hidden;
+    margin: 13px auto 0;
+    text-align: center;
+    }
+
+    span.align-center span img {
+    margin: 0 auto;
+    text-align: center;
+    }
+
+    span.align-right {
+    display: block;
+    overflow: hidden;
+    clear: both;
+    }
+
+    span.align-right > span {
+    display: block;
+    overflow: hidden;
+    margin: 13px 0 0;
+    text-align: right;
+    }
+
+    span.align-right span img {
+    margin: 0;
+    text-align: right;
+    }
+
+    span.float-left {
+    display: block;
+    margin-right: 13px;
+    overflow: hidden;
+    float: left;
+    }
+
+    span.float-left span {
+    margin: 13px 0 0;
+    }
+
+    span.float-right {
+    display: block;
+    margin-left: 13px;
+    overflow: hidden;
+    float: right;
+    }
+
+    span.float-right > span {
+    display: block;
+    overflow: hidden;
+    margin: 13px auto 0;
+    text-align: right;
+    }
+
+    code, tt {
+    margin: 0 2px;
+    padding: 0 5px;
+    white-space: nowrap;
+    border: 1px solid #eaeaea;
+    background-color: #f8f8f8;
+    border-radius: 3px;
+    }
+
+    pre code {
+    margin: 0;
+    padding: 0;
+    white-space: pre;
+    border: none;
+    background: transparent;
+    }
+
+    .highlight pre {
+    background-color: #f8f8f8;
+    border: 1px solid #cccccc;
+    font-size: 13px;
+    line-height: 19px;
+    overflow: auto;
+    padding: 6px 10px;
+    border-radius: 3px;
+    }
+
+    pre {
+    background-color: #f8f8f8;
+    border: 1px solid #cccccc;
+    font-size: 13px;
+    line-height: 19px;
+    overflow: auto;
+    padding: 6px 10px;
+    border-radius: 3px;
+    }
+
+    pre code, pre tt {
+    background-color: transparent;
+    border: none;
+    }
+    </style>
+</head>
+<body>
+
+<br/>
+<h1 id="wow0" class="wow_head">v-pipe Betriebsanleitung</h1>
+<br/>
+<!-- Hier einfügen und am Ende
+</body>
+</html>
+
+und Block-Anchor hoch, X und Pfeil raus.
+Und  list-style-type: none; rein
+
+NICHT KLICKBAR. NICHT!
+
+-->
+
+
+<!-- -->
+<h2 id="wow1" class="wow_head">v-pipe</h2>
+<p>Das V&amp;S Pipeline-Werkzeug liest Daten-Dateien<br>mit einer Projektlandschaft ein und erzeugt eine<br>Übersicht der Belastung aller beteiligten Abteilungen.<br>Es gibt die Möglichkeit, Projekte zu verschieben<br>und Portfolio-Szenarien zu modellieren.</p>
+<h2 id="wow2" class="wow_head">Installation</h2>
+<p>Die Distribution ist ein <code>v-pipe.zip</code>.<br>Dieses Zip-File entpacken - ideal in das Verzeichnis:<br><code>c:\v-pipe</code>
+    In Win10 braucht man dazu keinen "Zipper". Zipfile ablegen.<br>Per Explorer (WIN+E) das v-pipe.zip 'öffnen'. Einfach draufklicken.<br>Inhalte werden wie ein File-System angezeigt.<br>Oberes Verzeichnis (<code>v-pipe</code>) per Copy&amp;Paste mit CTRL-C 'kopieren'<br>und nach C: per CTRL-V entpacken.<br>Fertig.</p>
+<p>In C:\v-pipe liegen dann die Verzeichnisse und Dateien:</p>
+<ul>
+    <li><code>README.html</code> (Link zur Betriebsanleitung auf Github)</li>
+    <li><code>Readme.md</code> (diese Betriebsanleitung als Markdown - falls offline)<br>Markdown-Plugin für Chrome installieren...<br><a href="https://t.ly/xB5M">MarkdownPreviewPlus</a><br>in den Einstellungen des Plugins unter<br>Einstellungen/Erweiterungen/MarkdownPreviewPlus:<br>Option: <em>Zugriff auf Datei-URLs zulassen</em> aktivieren </li>
+    <li><code>c:\v-pipe\v-pipe.exe</code> (der Starter - Doppelklick und los geht's.)  </li>
+    <li><code>c:\v-pipe\lib</code> (ein paar Java-Bibliotheken. Finger weg ;-))  </li>
+    <li><code>c:\v-pipe\jre</code> (eine Java-Laufzeit-Umgebung. Nicht anfassen...)    </li>
+    <li><code>Projekt-Start-End-Abt-Kapa.txt</code> (Beispiel-Datei: hier wird gearbeitet!)</li>
+    <li><code>Projekt-Verschiebung.txt</code> (Beispiel-Datei: hier spielen und arbeiten!)</li>
+</ul>
+<h2 id="wow3" class="wow_head">Anwendung</h2>
+<h3 id="wow3_1" class="wow_head">Start von v-pipe</h3>
+<p>Einfach Doppelklick auf v-pipe.exe. Das startet den<br>Deamon-Mode: v-pipe lauert jetzt auf Veränderungen<br>der Daten-Dateien und zeigt Fehlermeldungen oder rechnet.  </p>
+<p><strong>Alternative:</strong>
+    <code>Windows-Taste</code> und tippen: <code>cmd + ENTER-Taste</code><br>Das startet einen Kommando-Zeilen-Prompt.<br>Dort navigieren in das v-pipe-Verzeichnis.<br>Also je nach Installations-Verzeichnis: <code>cd \v-pipe</code><br>Dort Programms durch tippen von<br><code>v-pipe + ENTER-Taste</code> starten.  </p>
+<p>Jetzt kann das Fenster zur Seite geschoben werden.<br>Wann immer die Grunddaten neu erzeugt, verändert oder<br>gelöscht werden, rechnet v-pipe und erzeugt<br>die Ergebnis-Dateien neu.</p>
+<h3 id="wow3_2" class="wow_head">Ablage der Arbeits-Dateien</h3>
+<p>Alle Arbeits-Dateien (Grunddaten und Ergebnise der Berechnungen)<br>werden im Installations-Verzeichnis abgelegt.
+    Also z.B.: <code>c:\v-pipe</code></p>
+<h3 id="wow3_3" class="wow_head">Daten-Dateien</h3>
+<p><code>Projekt-Start-End-Abt-Capa.txt</code><br>enthält beispielsweise<br><code>Projekt-1-Neu-Ulm 20.05.2020 31.5.2020 Abt3 45.6</code><br><code>Projekt-1-Neu-Ulm 12.06.2020 31.6.2020 Abt4 45.6</code><br><code>Projekt-1 15.06.2020 19.6.2020 Abt3.3 45.6</code><br><code>P2 20.04.2020 12.6.2020 Abt3 5.6</code><br><code>P2 20.06.2020 31.7.2020 Abt3 4</code>  </p>
+<p>Datei enthält alle Projekte mit allen Tasks,<br>deren Zuordnung zu Abteilungen und die<br>notwendige Kapazität als 'Komma-Zahl mit PUNKT' - z.B.: 14.2<br>Komma, Strichpunkt, Tab, Leerzeichen sind Trennzeichen.<br>KEINE Leerzeichen in den Projekt- und Abteilungs-Bezeichnungen.
+    Falls dort welche sind: Ersetzen mit Unterstrich = _</p>
+<p><code>Projekt-Verschiebung.txt</code><br>enthält beispielsweise<br><code>P2 14</code><br><code>Projekt1 -21</code>  </p>
+<p>Datei enthält die Verschiebung der Projekte in Tagen.<br>Es müssen nicht alle Projekte aufgeführt sein.<br>Nur die Verschobenen.<br><code>+</code> bedeutet: Verscheibung in die Zukunft.<br>P2 wird um 2 Wochen geschoben.<br>Der 31.7.2020 wird duch <code>14</code> zum 14.8.2020<br>Projekt-1-Neu-Ulm wird durch <code>-21</code> vorgezogen:<br>Aus 31.6.2020 wird 10.6.2020.  </p>
+<h3 id="wow3_4" class="wow_head">Ergebnis-Dateien</h3>
+<p>Die Belastung der Abteilungen liegt in:<br><code>Abteilungs-Kapazitäts-Belastung-Woche.txt</code><br>und<br><code>Abteilungs-Kapazitäts-Belastung-Monat.txt</code>  </p>
+<h3 id="wow3_5" class="wow_head">Überschreiben von Ergebnissen</h3>
+<p>Ergebnis-Dateien werden nie überschrieben.<br>Wann immer eine Ergebnisdatei schon existiert,<br>wird ein Backup mit Datum und Uhrzeit erstellt.<br>Z.B.<br><code>Abteilungs-Kapazitäts-Belastung backup vom 2020-05-05 09.31.59.txt</code><br>Die aktuellsten Ergebnisse liegen also immer in<br><code>Abteilungs-Kapazitäts-Belastung.txt</code></p>
+<h3 id="wow3_6" class="wow_head">Terminfester</h3>
+<p>Alle Termin-Fenster-Angaben sind hinten offene Intervalle.<br>D.h. der letzte Tag des Intervalls gehört nicht zum Intervall dazu.<br>Die zwei Intervalle<br>20.10.2020 25.10.2020<br>und<br>25.10.2020 30.10.2020<br>überlappen keinen Augenblick! Das erste endet im letzten Augenblick<br>VOR dem 25.10.2020. Insofern reicht es genau bis zum 25.10.<br>Das zweite beginnt mit dem ersten Augenblick des 25.<br>D.h. Das erste Intervall besteht aus den ganzen Tagen:<br>20 21 22 23 24 - also 5 Tage. Das zweite aus 25 26 27 28 29.<br>Beide Intervalle hintereinander umfassen 10 kontinuierliche Tage.<br>Der 20.10. gehört dazu. Der 30.10. nicht!</p>
+<h2 id="wow4" class="wow_head">Realease</h2>
+<h3 id="wow4_1" class="wow_head">Features</h3>
+<p>2020-05-07 <code>0.2.0-Monats-Belastung</code></p>
+<ul>
+    <li>Monats-Auswertung auch... Abteilungs-Kapazitäts-Belastung-Woche.txt und -Monat.txt</li>
+    <li>Abteilungs-Kapazitäts-Belastung.txt enthält immer die aktuelle Ergebnisse.<br>Fall Überschreiben droht wird vor dem Überschreiben eine Backup-Datei erzeugt.</li>
+</ul>
+<p>2020-05-06 <code>0.1.0-Vor-Ruhlamat</code>  </p>
+<ul>
+    <li>Readme.md :-)</li>
+    <li>Beispiel-Dateien.</li>
+    <li>Lesen von Projekt-Verschiebung.txt  </li>
+    <li>Automatisches Neu-Generieren der Ergebnisse, wenn Datendateien sich ändern.   </li>
+</ul>
+<p>2020-04-25 <code>0.0</code></p>
+<ul>
+    <li>Lesen von Projekt-Start-End-Abt-Kapa.txt   </li>
+    <li>Schreiben von Department-Load-Result.txt</li>
+</ul>
+<h3 id="wow4_2" class="wow_head">Bugs fixed</h3>
+<ul>
+    <li>Department-Load-Result.txt ist ne Sparce-Matrix</li>
+</ul>
+<h3 id="wow4_3" class="wow_head">Bekannte Bugs und Feature-Requests</h3>
+<h4 id="wow4_3_1" class="wow_head">Bugs</h4>
+<ul>
+    <li>keine ;-)</li>
+</ul>
+<h4 id="wow4_3_2" class="wow_head">Features (zukünftig, angedacht)</h4>
+<p>wären nützlich - Nützlichkeit in absteigender Reihenfolge:  </p>
+<ul>
+    <li>beim öffnen von v-pipe im deamon-mode geht ein Browser mit hilfe auf<br>(essentials zu den Daten-Formaten)</li>
+    <li>read by Json-Format:<br><a href="http://docs.groovy-lang.org/2.4.0/html/gapi/groovy/json/JsonSlurper.html">http://docs.groovy-lang.org/2.4.0/html/gapi/groovy/json/JsonSlurper.html</a></li>
+    <li>Logging mit einfacher Konfigurierbarkeit durch Property-File</li>
+    <li>File-Polling in Excel (2s-readIfNewerThan10Sec and Paste) -<br>damit es eine Online-Visualisierung gibt.</li>
+    <li>Darstellung des Projektportfolios (kritischen Pfade, Staffelung, Kapa-Peaks)</li>
+    <li>Modellierung der Integrations-Phase und Staffelung auf Basis von<br>"Max-Projekte" oder "Max-Kapa-Pro-Woche"</li>
+    <li>Kapazitäts-Belastung auf Basis der Daten-Datei Abteilungs-Kapazitäts-Angebot.txt</li>
+    <li>Ausgabe der Kapa-Belastung in der Ergebnis-Datei Abteilungs-Prozent-Auslastung.txt</li>
+</ul>
+<h2 id="wow5" class="wow_head">Feedback</h2>
+<p>an: <a href="mailto:benno.loeffler@gmx.de">benno.loeffler@gmx.de</a></p>
+</body>
+</html>

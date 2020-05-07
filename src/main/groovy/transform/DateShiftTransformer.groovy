@@ -2,7 +2,7 @@ package transform
 
 import core.TaskInProject
 import core.VpipeException
-import fileutils.FileDataReaderSupport
+import fileutils.FileSupport
 
 /**
  * Can move all the starting and ending of core.TaskInProject.
@@ -69,10 +69,10 @@ class DateShiftTransformer extends Transformer {
     @Override
     def updateConfiguration() {
         projectDayShift = [:]
-        List<String[]> lines = FileDataReaderSupport.getDataLinesSplitTrimmed(FILE_NAME)
+        List<String[]> lines = FileSupport.getDataLinesSplitTrimmed(FILE_NAME)
         lines.each { line ->
             def errMsg = {"Lesen von Datei $FILE_NAME fehlgeschlagen. Datensatz: ${line}"}
-            if(line?.length != 2) {
+            if(line?.size() != 2) {
                 throw new VpipeException(errMsg())
             }
             try {

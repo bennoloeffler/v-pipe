@@ -1,7 +1,7 @@
 package core
 
 
-import fileutils.FileDataReaderSupport
+import fileutils.FileSupport
 
 /**
  * reads data lines into a list of core.TaskInProject
@@ -27,8 +27,8 @@ class ProjectDataReader  {
                     i++
                     String line = it.trim()
                     SILENT?:println("\n$i raw-data:   " + line)
-                    String[] strings = line.split(FileDataReaderSupport.SEPARATOR)
-                    if(strings.size() != 5) throw new RuntimeException("\ndataline $i:\n$line\ndid not find 5 separated data fields SEPARATOR = "+FileDataReaderSupport.SEPARATOR)
+                    String[] strings = line.split(FileSupport.SEPARATOR)
+                    if(strings.size() != 5) throw new RuntimeException("\ndataline $i:\n$line\ndid not find 5 separated data fields SEPARATOR = "+FileSupport.SEPARATOR)
                     SILENT?:println("$i split-data: " + strings)
                     def tip = new TaskInProject(
                             project: strings[0],
