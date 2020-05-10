@@ -6,7 +6,11 @@ class FileSupport {
     final static String SEPARATOR_ALL = /\s*[;,]+\s*|\s+/ // every whitespace, semicolon or comma
     final static String SEPARATOR_SC = /\s*[;,]+\s*/ // can read data with whitespace
     static String SEPARATOR = SEPARATOR_ALL
+    static String BACKUP_DIR = "backup"
 
+    static {
+        checkBackupDir()
+    }
 
 /**
  * @param fileName
@@ -39,6 +43,12 @@ class FileSupport {
         assert fileName
         assert fileName[-4] == "."
         assert fileName.length() > 4
-        fileName[0..-5] + " backup von " + new DateTime().toString("yyyy-MM-dd HH.mm.ss") + fileName[-4..-1]
+
+        BACKUP_DIR + "/" + fileName[0..-5] + " backup von " + new DateTime().toString("yyyy-MM-dd HH.mm.ss") + fileName[-4..-1]
+    }
+
+    static def checkBackupDir() {
+        def f = new File(FileSupport.BACKUP_DIR)
+        if(!f.exists() && !f.isDirectory()) {f.mkdir()}
     }
 }

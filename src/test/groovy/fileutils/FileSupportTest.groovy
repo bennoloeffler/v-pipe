@@ -60,6 +60,7 @@ class FileSupportTest extends GroovyTestCase {
         def fn = "T 3.3.2020.txt"
 
         def r = FileSupport.backupFileName(fn)
+        r = r[7..-1]
 
         assert r.length()==fn.length()+ 31
         assert r[0..9] == fn[0..9] // first 10

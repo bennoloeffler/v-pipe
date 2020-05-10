@@ -100,7 +100,7 @@ class FileWatcherDeamon {
             //
 
             running = true
-            println("started FileWatcher: ${path.toAbsolutePath()}") // TODO
+            //println("started FileWatcher: ${path.toAbsolutePath()}") // TODO
             watchService = FileSystems.getDefault().newWatchService()
             path.register(
                     watchService,
@@ -155,7 +155,7 @@ class FileWatcherDeamon {
                     throw new VpipeException("FileWatcherDeamon did not get the watch key any more... giving up")
                 }
             }
-            println("Stopped FileWatcher: ${path.toAbsolutePath()}" ) // TODO
+            //println("Stopped FileWatcher: ${path.toAbsolutePath()}" ) // TODO
             key.cancel()
         }
     }

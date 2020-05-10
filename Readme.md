@@ -12,12 +12,17 @@ und Portfolio-Szenarien zu modellieren.
 Die Distribution ist ein `v-pipe.zip`.  
 Dieses Zip-File entpacken - ideal in das Verzeichnis:  
 `c:\v-pipe`
-In Win10 braucht man dazu keinen "Zipper". Zipfile ablegen.  
-Per Explorer (WIN+E) das v-pipe.zip 'öffnen'. Einfach draufklicken.  
-Inhalte werden wie ein File-System angezeigt.  
-Oberes Verzeichnis (`v-pipe`) per Copy&Paste mit CTRL-C 'kopieren'  
-und nach C: per CTRL-V entpacken.  
+In Win10 braucht man dazu keinen "Zipper".  
+1. Zipfile v-pipe-release-xyz.zip 'irgendwo' ablegen.  
+2. Per Explorer (WIN+E) das v-pipe.zip 'irgendwo öffnen'.
+Einfach im Explorer einmal draufklicken.  
+3. Inhalte werden wie ein File-System angezeigt.  
+4. Oberes Verzeichnis (`v-pipe`) per Copy&Paste mit CTRL-C 'kopieren'  
+und nach C: einfügen. Also im Explorer auf C: klicken und per CTRL-V entpacken.  
 Fertig.
+5. Das klappt auch für einen Programm-Update.  
+eigene Datein-Dateien werden nicht überschrieben.  
+Backup schadet trotzdem nicht.
 
 In C:\v-pipe liegen dann die Verzeichnisse und Dateien:
 
@@ -28,11 +33,14 @@ Markdown-Plugin für Chrome installieren...
 in den Einstellungen des Plugins unter  
 Einstellungen/Erweiterungen/MarkdownPreviewPlus:  
 Option: *Zugriff auf Datei-URLs zulassen* aktivieren 
-- `c:\v-pipe\v-pipe.exe` (der Starter - Doppelklick und los geht's.)  
-- `c:\v-pipe\lib` (ein paar Java-Bibliotheken. Finger weg ;-))  
-- `c:\v-pipe\jre` (eine Java-Laufzeit-Umgebung. Nicht anfassen...)    
-- `Projekt-Start-End-Abt-Kapa.txt` (Beispiel-Datei: hier wird gearbeitet!)
-- `Projekt-Verschiebung.txt` (Beispiel-Datei: hier spielen und arbeiten!)
+- `v-pipe.exe` (der Starter - Doppelklick und los geht's.)  
+- `lib` (ein paar Java-Bibliotheken. Finger weg ;-))  
+- `jre` (eine Java-Laufzeit-Umgebung. Nicht anfassen...)
+- `bsp-daten` (alle Daten-Dateien als funktionierende Beispiele)    
+    - `Projekt-Start-End-Abt-Kapa.txt` (Grunddaten: Alle Tasks)
+    - `Projekt-Verschiebung.txt` (Optional: Projekte schieben)
+    - `Integrations-Phasen.txt` (Optional: Projekte staffeln)
+    - `v-pipe-Auswertung.xlsx` (Vorlage für Visualisierung)
 
 
 ## Anwendung
@@ -64,26 +72,28 @@ Also z.B.: `c:\v-pipe`
 ### Daten-Dateien
 
 `Projekt-Start-End-Abt-Capa.txt`  
-enthält beispielsweise   
+**Grunddaten (erforderlich):** alle Tasks aller Projekte  
+Enthält beispielsweise:   
 `Projekt-1-Neu-Ulm 20.05.2020 31.5.2020 Abt3 45.6`  
 `Projekt-1-Neu-Ulm 12.06.2020 31.6.2020 Abt4 45.6`  
 `Projekt-1 15.06.2020 19.6.2020 Abt3.3 45.6`  
 `P2 20.04.2020 12.6.2020 Abt3 5.6`  
 `P2 20.06.2020 31.7.2020 Abt3 4`  
 
-Datei enthält alle Projekte mit allen Tasks,  
+**Bedeutung:** Datei enthält alle Projekte mit allen Tasks,  
 deren Zuordnung zu Abteilungen und die  
 notwendige Kapazität als 'Komma-Zahl mit PUNKT' - z.B.: 14.2  
 Komma, Strichpunkt, Tab, Leerzeichen sind Trennzeichen.  
-KEINE Leerzeichen in den Projekt- und Abteilungs-Bezeichnungen.
+KEINE Leerzeichen in den Projekt- und Abteilungs-Bezeichnungen.  
 Falls dort welche sind: Ersetzen mit Unterstrich = _
 
 `Projekt-Verschiebung.txt`  
-enthält beispielsweise  
+**Grunddaten (optional):** Verschiebung aller Tasks einzelner Projekte  
+Enthält beispielsweise:  
 `P2 14`  
 `Projekt1 -21`  
 
-Datei enthält die Verschiebung der Projekte in Tagen.  
+**Bedeutung:** Datei enthält die Verschiebung der Projekte in Tagen.  
 Es müssen nicht alle Projekte aufgeführt sein.   
 Nur die Verschobenen.  
 `+` bedeutet: Verscheibung in die Zukunft.  
@@ -91,6 +101,19 @@ P2 wird um 2 Wochen geschoben.
 Der 31.7.2020 wird duch `14` zum 14.8.2020  
 Projekt-1-Neu-Ulm wird durch `-21` vorgezogen:   
 Aus 31.6.2020 wird 10.6.2020.  
+
+
+`Integrations-Phasen.txt`
+**Grunddaten (optional):** Integrations-Phasen aller Projekte für Staffelung  
+Enthält beispielsweise:  
+6  
+p1 15.1.2020 18.1.2020 2  
+p2 30.3.2020 1.4.2020 1  
+**Bedeutung:** Die erste Zeile stellt die Anzahl der Slots  
+in der Integrationsphase dar. Die Integrationsphasen von p1, p2 etc. sind  
+untereinander aufgeführt. Die Zahl am Ende jeder Zeile ist der Bedarf an Slots.  
+Dieser ist in der Regel 1 und maximal gleich der Anzahl der Slots.  
+
 
 ### Ergebnis-Dateien
 Die Belastung der Abteilungen liegt in:  
@@ -108,6 +131,11 @@ Z.B.
 Die aktuellsten Ergebnisse liegen also immer in  
 `Abteilungs-Kapazitäts-Belastung.txt`
 
+### Ablage der Backup-Dateien
+Alle Dateien, die überschrieben werden müssten, werden abgelegt in:   
+Also z.B.: `c:\v-pipe\backup`
+
+
 ### Terminfester 
 Alle Termin-Fenster-Angaben sind hinten offene Intervalle.  
 D.h. der letzte Tag des Intervalls gehört nicht zum Intervall dazu.  
@@ -123,17 +151,37 @@ D.h. Das erste Intervall besteht aus den ganzen Tagen:
 Beide Intervalle hintereinander umfassen 10 kontinuierliche Tage.  
 Der 20.10. gehört dazu. Der 30.10. nicht!
 
+### Optionen 
+
+-s  
+Single-Run-Mode. Nur ein Rechendurchgang. Kein laufender Deamon,  
+der auf veränderte Dateien reagiert.  
+
+-m  
+Multi-Instance-Mode. Mehrere v-pipe.exe können gleichzeitig laufen.  
+Das ist nur hilfreich, wenn in unterschiedlichen Verzeichnissen  
+gleichzeitig gearbeitet werden soll.
+
 ## Realease
 
 ### Features
 
-2020-05-07 `0.2.0-Monats-Belastung`
+2020-05-10 `0.3.0-Pipeliner`
+- Pipeliner - lesen von Integrations-Phasen.txt
+- Browser mit Hilfe nur beim ersten Start
+- Beispiel-Daten in Ordner bsp-daten, damit Update keine Daten zerstört
 
-- beim öffnen von v-pipe im deamon-mode geht ein Browser mit hilfe auf   
+2020-05-07 `0.2.0-Monats-Belastung`
+- Option -s startet im Single-Modus = kein Deamon.  
+Nur ein Durchlauf.
+- Option -m startet im Multi-Instance-Modus.  
+Es können mehrere v-pipes gleichzeitig laufen.  
+Das ist nur vernünftig in verschiedenen Verzeichnissen!  
+- beim öffnen von v-pipe im deamon-mode geht beim Start ein Browser mit Hilfe auf   
 (essentials zu den Daten-Formaten)
 - Monats-Auswertung auch... Abteilungs-Kapazitäts-Belastung-Woche.txt und -Monat.txt
 - Abteilungs-Kapazitäts-Belastung.txt enthält immer die aktuelle Ergebnisse.  
- Fall Überschreiben droht wird vor dem Überschreiben eine Backup-Datei erzeugt.
+ Falls Überschreiben droht wird vor dem Überschreiben eine Backup-Datei erzeugt.
 
 2020-05-06 `0.1.0-Vor-Ruhlamat`  
 - Readme.md :-)
@@ -153,23 +201,25 @@ Der 20.10. gehört dazu. Der 30.10. nicht!
 
 #### Bugs  
  
-- keine ;-)
+- Es scheint so, als ob v-pipe beim ersten Start zweimal nacheinander startet.  
+bzw. als ob kurz nach dem Start ein Neustart erfolgt. Harmlos, aber irritierend.
 
 #### Features (zukünftig, angedacht) 
 
 wären nützlich - Nützlichkeit in absteigender Reihenfolge:  
 
-
-- read by Json-Format:   
-http://docs.groovy-lang.org/2.4.0/html/gapi/groovy/json/JsonSlurper.html
--  Logging mit einfacher Konfigurierbarkeit durch Property-File
+- Ordentliche Beispiel-Dateien in Verzeichnis "data-examples"
+- Kommentare in Datenfiles erlauben //
 - File-Polling in Excel (2s-readIfNewerThan10Sec and Paste) -   
 damit es eine Online-Visualisierung gibt.
 - Darstellung des Projektportfolios (kritischen Pfade, Staffelung, Kapa-Peaks)
-- Modellierung der Integrations-Phase und Staffelung auf Basis von  
- "Max-Projekte" oder "Max-Kapa-Pro-Woche"
+- Logging mit einfacher Konfigurierbarkeit durch Property-File  
+- Option Kommando-Zeile: Arbeitsverzeichnnis - eines oder mehrere  
 - Kapazitäts-Belastung auf Basis der Daten-Datei Abteilungs-Kapazitäts-Angebot.txt
 - Ausgabe der Kapa-Belastung in der Ergebnis-Datei Abteilungs-Prozent-Auslastung.txt
+- read by Json-Format:   
+http://docs.groovy-lang.org/2.4.0/html/gapi/groovy/json/JsonSlurper.html
+- verzeichnis help für Doku (bis auf Referenz.html)
 
 ## Feedback
 an: [benno.loeffler@gmx.de](mailto:benno.loeffler@gmx.de)

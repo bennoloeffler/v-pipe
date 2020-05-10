@@ -1,5 +1,8 @@
+package testdata
+
 import core.ProjectDataToLoadCalculator
 import core.TaskInProject
+import transform.PipelineOriginalElement
 
 class TestDataHelper {
 
@@ -35,5 +38,9 @@ class TestDataHelper {
                 department: dep,
                 capacityNeeded: cap
         )
+    }
+
+    static def pe(pr, s, e, c) {
+        new PipelineOriginalElement(project: pr, startDate: s, endDate: e, pipelineSlotsNeeded: c)
     }
 }

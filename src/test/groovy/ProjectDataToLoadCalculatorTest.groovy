@@ -1,6 +1,6 @@
-import core.ProjectDataReader
 import core.ProjectDataToLoadCalculator
 import core.TaskInProject
+import testdata.TestDataHelper
 import transform.DateShiftTransformer
 
 class ProjectDataToLoadCalculatorTest extends GroovyTestCase {
@@ -106,7 +106,7 @@ class ProjectDataToLoadCalculatorTest extends GroovyTestCase {
     void testUpdateConfiguration() {
 
 
-        def f = new File(ProjectDataReader.FILE_NAME)
+        def f = new File(ProjectDataToLoadCalculator.FILE_NAME)
         f.delete()
         f.createNewFile()
         f << "p1 6.1.2020 12.1.2020 d1 20\n"
@@ -135,7 +135,7 @@ class ProjectDataToLoadCalculatorTest extends GroovyTestCase {
     void testUpdateConfigurationWithNoDateShiftTransformerData() {
 
 
-        def f = new File(ProjectDataReader.FILE_NAME)
+        def f = new File(ProjectDataToLoadCalculator.FILE_NAME)
         f.delete()
         f.createNewFile()
         f << "p1 6.1.2020 12.1.2020 d1 20\n"

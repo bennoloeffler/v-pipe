@@ -1,6 +1,7 @@
 package transform
 
 import core.TaskInProject
+import core.VpipeDataException
 import core.VpipeException
 import fileutils.FileSupport
 
@@ -59,7 +60,9 @@ class DateShiftTransformer extends Transformer {
         */
         projectDayShift.keySet().each {
             if(! plc.getProject(it)) {
-                throw new VpipeException("ERROR: did not find project elements to shift for project: $it")
+                throw new VpipeDataException("Es gibt keine Projektdaten,\n"+
+                        "um das Projekt $it zu verschieben.\n"+
+                        "Ursache in $FILE_NAME")
             }
         }
         if (description == "Dates transformed:\n") {description+"none..."}
@@ -71,16 +74,16 @@ class DateShiftTransformer extends Transformer {
         projectDayShift = [:]
         List<String[]> lines = FileSupport.getDataLinesSplitTrimmed(FILE_NAME)
         lines.each { line ->
-            def errMsg = {"Lesen von Datei $FILE_NAME fehlgeschlagen. Datensatz: ${line}"}
+            def errMsg = {"Lesen von Datei $FILE_NAME fehlgeschlagen.\nDatensatz: ${line}"}
             if(line?.size() != 2) {
-                throw new VpipeException(errMsg())
+                throw new VpipeDataException(errMsg()+"\nJede Zeile braucht zwei Einträge")
             }
             try {
                 def project = line[0]
                 def days = line[1] as Integer
                 projectDayShift[project] = days
             } catch (Exception e) {
-                throw new VpipeException(errMsg() + '  Vermutung... Der Tagesversatz ist keine Ganz-Zahl.', e)
+                throw new VpipeDataException(errMsg() + '\nVermutung... Der Tagesversatz ist keine Ganz-Zahl.', e)
             }
         }
     }

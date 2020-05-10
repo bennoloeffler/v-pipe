@@ -394,25 +394,56 @@
     </style>
 </head>
 <body>
-<h1>v-pipe - Schnell-Übersicht</h1>
+<h1>v-pipe - Schnell-Start und Referenz</h1>
+
 <ul>
-    <li><b>Keine Leerzeichen in den Daten!</b> Leerzeichen, Kommas, Strichpunkte und Tabulatoren sind Trennzeichen.</li>
-    <li>Daten-Dateien liegen alle im Installationsverzeichnis.</li>
-    <li>Bei Problemen: RTFM... Betriebsanleitung hier... <a href="https://github.com/bennoloeffler/v-pipe/blob/master/Readme.md">README.md</a></li>
+    <li><a href="https://youtube.com/leidernochnicht.mp4">Quickstart-Video</a></li>
+    <li>Daten-Dateien sucht v-pipe direkt im Installationsverzeichnis.</li>
+    <li>Beispiel-Dateien liegen alle im Verzeichnis bsp-dateien.<br/>Hochkopieren ins Installationsverzeichnis,<br/>
+        v-pipe.exe doppelklicken und los-probieren = Datendateien editieren.</li>
+    <li><b>Keine Leerzeichen in den Projekt- und Abteilungs-Namen</b> in den Daten-Dateien!<br/> Leerzeichen, Kommas, Strichpunkte und Tabulatoren sind Trennzeichen.</li>
+    <li>v-pipe -s = Single-Run-Mode ON = Deamon-Mode OFF = ein Rechendurchlauf und Ende</a></li>
+    <li>v-pipe -m = Multi-Instance-Mode ON = mehrere Deamons können gleichzeitig laufen</a></li>
+    <li>Bei Problemen: RTFM... <b>Betriebsanleitung</b> hier... <a href="https://github.com/bennoloeffler/v-pipe/blob/master/Readme.md">README.md</a></li>
 </ul>
 <h4>Projekt-Start-End-Abt-Kapa.txt</h4>
-(Grunddaten der Tasks in den Projekten)<br/>
+(<b>Grunddaten:</b> Tasks der Projekte mit Kapa-Bedarf in Abteilungen)<br/>
 p1 6.1.2020 12.1.2020 a1 20<br/>
 p1 13.1.2020 19.1.2020 a2 20<br/>
 p2 6.3.2020 14.3.2020 a1 20.7<br>
-p2 13.2.2020 19.4.2020 a2 2.5<br/>
+p2 30.3.2020 3.4.2020 a2 10<br/>
 <b>Bedeutung:</b> Projekt p1 und Projekt p2 mit jeweils<br/>
 einem Task in der Abteilung a1 und a2 und der jeweilige Kapabedarf dort.<br/>
-<br/>
 
 <h4>Projekt-Verschiebung.txt</h4>
-(Format der Termin-Verschiebung ganzer Projekte)<br/>
+(<b>Grunddaten (optional):</b> Termin-Verschiebung ganzer Projekte zur Szenarienbildung)<br/>
 p1 7<br/>
 <b>Bedeutung:</b> Projekt p1 schiebt sich um 7 Tage<br/>
+
+<h4>Integrations-Phasen.txt</h4>
+(<b>Grunddaten (optional):</b> Integrations-Phasen für Staffelung)<br/>
+6<br/>
+p1 15.1.2020 18.1.2020 2<br/>
+p2 30.3.2020 1.4.2020 1<br/>
+<b>Bedeutung:</b> Die erste Zeile stellt die Anzahl der Slots<br/>
+in der Integrationsphase dar. Die Integrationsphasen von p1, p2 etc. sind<br/>
+untereinander aufgeführt. Die Zahl am Ende jeder Zeile ist der Bedarf an Slots.<br/>
+Dieser ist in der Regel 1 und maximal gleich der Anzahl der Slots.<br/>
+
+<h4>Abteilungs-Kapazitäts-Belastung-Monat.txt</h4>
+(<b>Ergebnis:</b> Belastung der Abteilungen in Monats-Raster)<br/>
+DEP 2020-M01 2020-M02 2020-M03 2020-M04<br/>
+a1 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 20,0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0,0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 20,7 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0,0<br/>
+a2 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 20,0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0,0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 5,0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5,0<br/>
+<b>Bedeutung:</b> Abteilung a1 braucht im Jan 20 im Feb 0 <br/>
+im März 20,7 und im April 0 Kapa-Einheiten.<br/>
+Trennzeichen: <b>Tab</b><br/>
+Dezimalzahlen: <b>mit Komma</b><br/>
+Warum? Damit per <b>Copy&Paste in Excel</b> kopiert werden kann<br/>
+und Zellen mit Zahlen entstehen.
+
+<h4>Abteilungs-Kapazitäts-Belastung-Woche.txt</h4>
+(<b>Ergebnis:</b> Belastung der Abteilungen in Wochen-Raster)<br/>
+Identisch zum Monats-Belastung. Allerdings mit 2020-<b>W</b>01
 </body>
 </html>

@@ -5,7 +5,15 @@ class FileWatcherDeamonTest extends GroovyTestCase {
     def TEST_PATH = 'data\\test'
     def TEST_FILE = 'test.txt'
 
+    static def FAST_TEST = true
+    static {
+        FAST_TEST = true
+        println(FAST_TEST?"\n\nV O R S I C H T: FileWatcherDeamonTest is off \n\n":"")
+    }
+
     void testCreateDirAndGetPath() {
+        if(FAST_TEST) {return}
+
         File f = new File(TEST_PATH)
         if(f.exists() && f.isDirectory()) {
             def done = f.deleteDir()
@@ -30,6 +38,8 @@ class FileWatcherDeamonTest extends GroovyTestCase {
     }
 
     void testStartReceivingEventsAndIsRunning() {
+        if(FAST_TEST) {return}
+
         def fwd = new FileWatcherDeamon(TEST_PATH)
         fwd.startReceivingEvents()
         sleep(100)
@@ -40,6 +50,8 @@ class FileWatcherDeamonTest extends GroovyTestCase {
     }
 
     void testExtractEvents() {
+        if(FAST_TEST) {return}
+
 
         def testFileStr = "$TEST_PATH/$TEST_FILE"
         def f = new File(testFileStr)
@@ -70,6 +82,8 @@ class FileWatcherDeamonTest extends GroovyTestCase {
     }
 
     void testLiveCycle() {
+        if(FAST_TEST) {return}
+
 
         (0..5).each {tf(it).delete()} // new File('data/0test.xt').delete()
 
@@ -135,6 +149,8 @@ class FileWatcherDeamonTest extends GroovyTestCase {
      * only get two notifications - ignore everything else...
      */
     void testSetFilter() {
+        if(FAST_TEST) {return}
+
         (0..5).each {tf(it).delete()} // new File('data/0test.xt').delete()
 
         def fwd = new FileWatcherDeamon(TEST_PATH)

@@ -1,10 +1,10 @@
 package core
 
+import fileutils.FileSupport
 import groovy.time.TimeCategory
 import groovy.transform.ToString
 import transform.Transformer
 
-import static core.TaskInProject.WeekOrMonth.MONTH
 import static core.TaskInProject.WeekOrMonth.WEEK
 
 /**
@@ -16,6 +16,12 @@ import static core.TaskInProject.WeekOrMonth.WEEK
 @ToString
 class ProjectDataToLoadCalculator {
 
+    /**
+     * from where to read data
+     */
+    public static def FILE_NAME = "Projekt-Start-End-Abt-Kapa.txt"
+    static def SILENT = true // during reading: show all data read?
+
     List<Transformer> transformers = []
 
 
@@ -23,6 +29,7 @@ class ProjectDataToLoadCalculator {
      * Data of all projects
      */
     List<TaskInProject> taskList = []
+
 
     /**
      * @param project
@@ -60,6 +67,14 @@ class ProjectDataToLoadCalculator {
 
         Date s = getStartOfTasks()
         Date e = getEndOfTasks()
+
+        use(TimeCategory) {
+            if(e - s > 20.years) {
+                throw new VpipeDataException("Dauer von Anfang bis Ende\n"+
+                        "der Tasks zu lange ( > 20 Jahre ): ${s.toString()} bis ${e.toString()}")
+            }
+        }
+
         def result = []
 
         if (weekOrMonth == WEEK) {
@@ -120,11 +135,71 @@ class ProjectDataToLoadCalculator {
      * @return
      */
     def updateConfiguration() {
-        taskList = ProjectDataReader.dataFromFile
+        taskList = dataFromFile
         transformers.each() {
             it.updateConfiguration()
         }
     }
 
+
+    /**
+     * reads data lines into a list of core.TaskInProject
+     * Default file name: Projekt-Start-End-Abt-Capa.txt
+     * This reflects the order of the data fields.
+     * Start and End are Dates, formatted like: dd.MM.yyyy
+     * Capa is capacityNeededByThisTask and is a float (NO comma - but point for decimal numbers)
+     * Default separator: any number of spaces, tabs, commas, semicolons (SEPARATOR_ALL)
+     * If whitespace is in project names or department names, semicolon or comma is needed (SEPARATOR_SC)
+     */
+    static List<TaskInProject> getDataFromFile() {
+        List<TaskInProject> taskList = []
+        def i = 0 // count the lines
+        SILENT?:println("\nstart reading data file:   " + FILE_NAME)
+        def errMsg = {""}
+        def f = new File(FILE_NAME).eachLine {
+            if(it.trim()) {
+                try {
+                    i++
+                    String line = it.trim()
+                    SILENT?:println("\n$i raw-data:   " + line)
+                    String[] strings = line.split(FileSupport.SEPARATOR)
+                    errMsg = {"$FILE_NAME\nZeile $i: $line\nZerlegt: $strings\n"}
+                    if(strings.size() != 5){
+                        throw new VpipeDataException(errMsg() +
+                            "Keine 5 Daten-Felder gefunden mit Regex-SEPARATOR = "+FileSupport.SEPARATOR +
+                            "\nSoll-Format: 'Projekt-Name Task-Start Task-Ende Abteilungs-Name Kapa-Bedarf'")}
+                    SILENT?:println("$i split-data: " + strings)
+
+                    Date start = strings[1].toDate()
+                    Date end = strings[2].toDate()
+                    if( ! start.before(end)) {
+                        throw new VpipeDataException(errMsg() + "Start (${start.toString()}) liegt nicht vor Ende: (${end.toString()})")
+                    }
+                    use (TimeCategory) {
+                        if (end - start > 20.years) {
+                            throw new VpipeDataException(errMsg() + "Task zu lang! ${start.toString()} " +
+                                    "bis ${end.toString()}\nist mehr als 20 Jahre")
+                        }
+                    }
+
+                    def tip = new TaskInProject(
+                            project: strings[0],
+                            starting: strings[1].toDate(),
+                            ending: strings[2].toDate(),
+                            department: strings[3],
+                            capacityNeeded: Double.parseDouble(strings[4])
+                    )
+                    taskList << tip
+                    SILENT?:println("$i task-data:  " + tip)
+                } catch (VpipeDataException v) {
+                    throw v
+                } catch (Exception e) {
+                    throw new VpipeDataException(errMsg() + "\nVermutlich Fehler beim parsen von \nDatum (--> 22.4.2020) oder Kommazahl (--> 4.5 Punkt statt Komma!)\n Grund: ${e.getMessage()}")
+                }
+            }
+        }
+        if( ! taskList){throw new VpipeDataException("$FILE_NAME enthält keine Daten")}
+        return taskList
+    }
 
 }

@@ -2,9 +2,11 @@ package core
 
 import fileutils.FileEvent
 import fileutils.FileWatcherDeamon
+import fileutils.StartOnlyOneInstance
+import groovy.time.TimeDuration
 import transform.DateShiftTransformer
+import transform.PipelineTransformer
 
-import javax.swing.DesktopManager
 import java.awt.Desktop
 
 
@@ -13,83 +15,134 @@ import java.awt.Desktop
 //
 
 /**
- * reads from standard file: Projekt-Start-End-Abt-Capa.txt (see core.ProjectDataReader)
- * writes to standarf file: Department-Load-Result.txt (see core.ProjectDataWriter)
+ * Starting point of v-pipe.
+ * see Readme.md
  */
 class  Main {
 
-    static VERSION_STRING ='0.2.0-Monats-Belastung'
+    static VERSION_STRING ='0.3.0-Pipeliner'
 
     static void main(String[] args) {
 
-        println "starting v-pipe-release: $VERSION_STRING"
+        //
+        // parse args
+        //
+        def argsStr = args.join(" ")
+        def singleRunMode = false // instead: Deamon is default
+        def multiInstanceMode = false // instead SingleInstance is default
+        if(argsStr.contains("-s")) {singleRunMode=true}
+        if(argsStr.contains("-m")) {multiInstanceMode = true}
 
-        openBrowserWithHelp()
+        println "\n\nv-pipe  (release: $VERSION_STRING)\n\n"
 
-        // TODO: add levels... https://signalw.github.io/2019/04/09/study-notes-an-example-of-intercept-cache-invoke-in-groovy.html
-        // https://mrhaki.blogspot.com/2011/04/groovy-goodness-inject-logging-using.html
-        //FileHandler handler = new FileHandler("v-pipe.log", true)
-        //handler.setFormatter(new SimpleFormatter())
-        //log.addHandler(handler)
+        //
+        // only one instance - typically...
+        //
+        if( ! multiInstanceMode ) { StartOnlyOneInstance.checkStart() }
 
+        //
+        // Browser with quickstart-hints
+        //
+        def fs = new File("ersterStart.md")
+        if(fs.exists()) {
+            openBrowserWithHelp()
+            fs.delete()
+        }
 
-
+        //
+        // do the job...
+        //
         try {
 
             // args from apache commons
-            if(args && args[0].contains('-s')) { // single mode
-                println "V-PIPE going to read file: " + ProjectDataReader.FILE_NAME // todo
+            if(singleRunMode) { // single mode
+                println "Daten lesen: $ProjectDataToLoadCalculator.FILE_NAME und $DateShiftTransformer.FILE_NAME" // todo
                 processData()
-                println "V-PIPE finished writing files: " + ProjectDataWriter.FILE_NAME_WEEK + ' (und -Monat )' // todo
+                println "E R F O L G :   Ergebnisse geschrieben. " + ProjectDataWriter.FILE_NAME_WEEK + ' (und -Monat )' // todo
 
             } else { // deamon mode
 
                 def fwd = new FileWatcherDeamon(".")
-                fwd.filter = [ProjectDataReader.FILE_NAME, DateShiftTransformer.FILE_NAME]
+                fwd.filter = [ProjectDataToLoadCalculator.FILE_NAME, DateShiftTransformer.FILE_NAME, PipelineTransformer.FILE_NAME]
 
                 while(true) {
                     try {
-                        boolean pdfExists = new File(ProjectDataReader.FILE_NAME).exists()
-                        if (pdfExists) {
-                            println 'Found file changes. Going to processing data...'
+                        File projectDataFile = new File(ProjectDataToLoadCalculator.FILE_NAME)
+                        if (projectDataFile.exists()) {
+                            println 'Daten lesen, rechnen und schreiben...'
+                            long startProcessing = System.currentTimeMillis()
                             processData()
-                            println ("Processing finished at time " + new Date().format("hh:mm:ss"))
+                            long endProcessing = System.currentTimeMillis()
+                            def d = new TimeDuration(0,0,0, endProcessing-startProcessing as int)
+                            println ("Fertig nach: " + d.toString())
+                            println '\nE R F O L G :-)    jetzt warte ich, bis sich etwas ändert.'
+                        } else {
+                            println "Datei ${projectDataFile.absolutePath} existiert (noch) nicht. Ich warte..."
                         }
-                        println 'waiting for file changes...'
 
+                        //
+                        // File listener running? No? Start...
+                        //
                         List<FileEvent> fileEvents = null
                         if (!fwd.isRunning()) {
                             fwd.startReceivingEvents()
                         }
+
+
+                        //
+                        // Polling loop of v-pipe
+                        //
+                        def lastSecond = 0
+                        def lastMinute = 0
                         while (!fileEvents) {
                             fileEvents = fwd.extractEvents()
                             sleep(200)
+                            if (System.currentTimeSeconds() - lastSecond > 1) {
+                                print '.'
+                                lastSecond=System.currentTimeSeconds()
+
+                                if (System.currentTimeSeconds() - lastMinute > 120) {
+                                    println ''
+                                    lastMinute=System.currentTimeSeconds()
+                                }
+                            }
+
                         }
 
-                    }catch(VpipeException e) {
-                        println "ERROR: " + e.getMessage()
+                    }catch(VpipeDataException e) {
+                        println "\nD A T E N - F E H L E R :\n" + e.getMessage()
                        sleep(5000)
                     } catch(Exception e) {
-                        println "java Exception: " + e.getMessage()
+                        println "PROBLEM - erst nach der Behebung wird gerechnet...:\n" + e.getMessage()
+                        e.printStackTrace()
                         //todo logile
                         sleep(5000)
                     }
                 }
 
             }
-        } catch (VpipeException e) {
-            println("ERROR: " + e.getMessage()) // todo
+        } catch (VpipeDataException e) {
+            println("D A T E N - F E H L E R :  erst nach der Behebung wird gerechnet...: \n" + e.getMessage()) // todo
         }
     }
 
+
+    /**
+     * one processing loop
+     */
     private static void processData() {
         ProjectDataToLoadCalculator pt = new ProjectDataToLoadCalculator()
         pt.transformers << new DateShiftTransformer(pt)
+        pt.transformers << new PipelineTransformer(pt)
         pt.updateConfiguration()
         ProjectDataWriter.writeToFile(pt, TaskInProject.WeekOrMonth.WEEK)
         ProjectDataWriter.writeToFile(pt, TaskInProject.WeekOrMonth.MONTH)
     }
 
+
+    /**
+     * first start: show browser with Quick-Start
+     */
     static def openBrowserWithHelp() {
         if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
             String path = new File("Referenz.html").absolutePath.replace('\\', ('/'))

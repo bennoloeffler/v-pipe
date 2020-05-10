@@ -36,6 +36,7 @@ def jre = "jre"
 //def jrePath = "C:\\Program Files\\Java\\jdk1.8.0_172\\$jre"
 def jrePath = "C:\\Program Files\\Java\\jre1.8.0_201"
 def tempDist = "$buildDir/dist/v-pipe"
+def exampleDir = "$tempDist/bsp-daten"
 
 task copyExeLibsJRE {
     dependsOn createExe
@@ -46,6 +47,11 @@ task copyExeLibsJRE {
     doFirst {
         delete tempDist
         mkdir tempDist
+
+        def fs = new File("ersterStart.md")
+        fs.delete()
+        fs.createNewFile()
+        fs << "ein Hinweis für v-pipe, dass der erste Start noch bevorsteht"
     }
     doLast {
         copy {
@@ -54,13 +60,23 @@ task copyExeLibsJRE {
         }
 
         copy {
-            from "Projekt-Start-End-Abt-Kapa.txt"
-            into tempDist
+            from "bsp-daten/Projekt-Start-End-Abt-Kapa.txt"
+            into exampleDir
         }
 
         copy {
-            from "Projekt-Verschiebung.txt"
-            into tempDist
+            from "bsp-daten/Projekt-Verschiebung.txt"
+            into exampleDir
+        }
+
+        copy {
+            from "bsp-daten/Integrations-Phasen.txt"
+            into exampleDir
+        }
+
+        copy {
+            from "bsp-daten/v-pipe-Auswertung.xlsx"
+            into exampleDir
         }
 
         copy {
@@ -79,7 +95,12 @@ task copyExeLibsJRE {
         }
 
         copy {
-            from "Auswertung Beispiel.xlsx"
+            from "bsp-daten/v-pipe-Auswertung.xlsx"
+            into exampleDir
+        }
+
+        copy {
+            from "ersterStart.md"
             into tempDist
         }
 
