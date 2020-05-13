@@ -1,4 +1,4 @@
-package fileutils
+package utils
 
 class FileWatcherDeamonTest extends GroovyTestCase {
 

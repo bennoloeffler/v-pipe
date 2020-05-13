@@ -3,7 +3,7 @@ package transform
 import core.TaskInProject
 import core.VpipeDataException
 import core.VpipeException
-import fileutils.FileSupport
+import utils.FileSupport
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import groovy.transform.Immutable

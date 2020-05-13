@@ -1,4 +1,4 @@
-package fileutils
+package utils
 
 import core.VpipeException
 import groovy.transform.Immutable
@@ -7,7 +7,6 @@ import groovy.util.logging.Log
 
 import java.nio.file.*
 
-import static fileutils.EventType.*
 import static java.nio.file.StandardWatchEventKinds.*
 
 /**

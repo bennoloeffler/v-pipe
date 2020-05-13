@@ -1,6 +1,6 @@
 import core.ProjectDataToLoadCalculator
 import core.TaskInProject
-import fileutils.FileSupport
+import utils.FileSupport
 
 /**
  * Test reading different formats and separators for core.TaskInProject-Data

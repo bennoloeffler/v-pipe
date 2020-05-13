@@ -1,4 +1,4 @@
-package fileutils
+package utils
 
 import java.nio.channels.FileChannel
 import java.nio.channels.FileLock
@@ -16,7 +16,7 @@ class StartOnlyOneInstance {
         FileLock fl=channel.tryLock();
         if(fl==null) {
             println("F E H L E R:   Es kann nur einen geben!\nVermutlich war das ein Versehen oder ein technisches Problem.\n"+
-                    "Gehen Sie zu Task-Manager Zweiter V-Pipe-Prozess startet nur mit Start-Option -m\n")
+                    "Gehen Sie zu Task-Manager Zweiter V-Pipe-Prozess startet nur mit Start-Option -model\n")
             sleep(10*1000)
             System.exit(0)
         }

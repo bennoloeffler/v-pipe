@@ -1,9 +1,11 @@
 package core
 
-import fileutils.FileSupport
+import groovy.transform.CompileStatic
+import utils.FileSupport
 import groovy.time.TimeCategory
 import groovy.transform.ToString
 import transform.Transformer
+import utils.RunTimer
 
 import static core.TaskInProject.WeekOrMonth.WEEK
 
@@ -19,7 +21,7 @@ class ProjectDataToLoadCalculator {
     /**
      * from where to read data
      */
-    public static def FILE_NAME = "Projekt-Start-End-Abt-Kapa.txt"
+    public static String FILE_NAME = "Projekt-Start-End-Abt-Kapa.txt"
     static def SILENT = true // during reading: show all data read?
 
     List<Transformer> transformers = []
@@ -106,9 +108,12 @@ class ProjectDataToLoadCalculator {
      */
     Map<String, Map<String, Double>> calcDepartmentLoad(TaskInProject.WeekOrMonth weekOrMonth) {
 
+        def t = new RunTimer()
         transformers.each {
             taskList = it.transform()
         }
+        t.stop("Transformers")
+        t.go()
 
         def load = [:]
         taskList.each {
@@ -127,6 +132,7 @@ class ProjectDataToLoadCalculator {
 
             }
         }
+        t.stop("getCapaDemandSplitIn ($weekOrMonth)")
         load as Map<String, Map<String, Double>>
     }
 
@@ -151,6 +157,7 @@ class ProjectDataToLoadCalculator {
      * Default separator: any number of spaces, tabs, commas, semicolons (SEPARATOR_ALL)
      * If whitespace is in project names or department names, semicolon or comma is needed (SEPARATOR_SC)
      */
+    //@CompileStatic
     static List<TaskInProject> getDataFromFile() {
         List<TaskInProject> taskList = []
         def i = 0 // count the lines

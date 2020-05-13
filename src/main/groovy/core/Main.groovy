@@ -1,8 +1,6 @@
 package core
 
-import fileutils.FileEvent
-import fileutils.FileWatcherDeamon
-import fileutils.StartOnlyOneInstance
+import utils.*
 import groovy.time.TimeDuration
 import transform.DateShiftTransformer
 import transform.PipelineTransformer
@@ -31,7 +29,7 @@ class  Main {
         def singleRunMode = false // instead: Deamon is default
         def multiInstanceMode = false // instead SingleInstance is default
         if(argsStr.contains("-s")) {singleRunMode=true}
-        if(argsStr.contains("-m")) {multiInstanceMode = true}
+        if(argsStr.contains("-model")) {multiInstanceMode = true}
 
         println "\n\nv-pipe  (release: $VERSION_STRING)\n\n"
 

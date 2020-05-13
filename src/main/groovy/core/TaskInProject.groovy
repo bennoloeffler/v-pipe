@@ -1,8 +1,12 @@
 package core
 
+import extensions.DateHelperFunctions
 import groovy.time.TimeCategory
+import groovy.transform.CompileStatic
 import groovy.transform.Immutable
 import org.joda.time.*
+
+import static extensions.DateHelperFunctions.*
 
 /**
  * Represents one entry of a dataset that models a multi-project situation.
@@ -35,6 +39,7 @@ class TaskInProject {
      * @param intervalEnd
      * @return overlap of the interval with this task in days
      */
+    @CompileStatic
     long getDaysOverlap(Date intervalStart, Date intervalEnd) {
         assert starting < ending
         assert intervalStart < intervalEnd
@@ -45,7 +50,7 @@ class TaskInProject {
         // this is due to the fact, that leap seconds kill days otherwise
         double millisOverlap = intersection.toDuration().getMillis()
         double millisPerDay = 24 * 60 * 60 * 1000
-        return Math.round(millisOverlap / millisPerDay)
+        return Math.round((millisOverlap / millisPerDay)as double)
     }
 
     /**
@@ -73,6 +78,7 @@ class TaskInProject {
      * @param intervalEnd
      * @return the capacity, the task is spending in the interval
      */
+    @CompileStatic
     double getCapaNeeded(Date intervalStart, Date intervalEnd) {
         double perDay = getDaysOverlap(intervalStart, intervalEnd) * getCapaPerDay()
         return perDay
@@ -85,29 +91,34 @@ class TaskInProject {
      * @param weeks = true means weeks, false means split in months
      * @return map of [ W01:13.7, W04:4] for weeks (or [M1:17, M3,19.5] for months)
      */
+    @CompileStatic
     Map<String, Double> getCapaDemandSplitIn(WeekOrMonth weekOrMonth) {
         assert starting < ending
         assert capacityNeeded > 0
 
         def resultMap = [:]
         if(weekOrMonth == WeekOrMonth.WEEK) {
-            Date week = starting.getStartOfWeek()
+            Date week = _getStartOfWeek(starting)//starting.getStartOfWeek() // not possible because of static comp
             while (week < ending) {
                 double capNeededInThatWeek = getCapaNeeded(week, week + 7)
-                def key = week.getWeekYearStr()
+                def key = _getWeekYearStr(week)//week.getWeekYearStr() // not possible because of static comp
                 resultMap[key] = capNeededInThatWeek
                 week += 7
             }
         } else {
-            Date month = starting.getStartOfMonth()
+            Date month = _getStartOfMonth(starting)//starting.getStartOfMonth() // not possible because of static comp
             Date nextMonth
 
             while (month < ending) {
-                use(TimeCategory) {
-                    nextMonth = month + 1.month
-                }
+                //use(TimeCategory) { // not possible because of static comp
+                    Calendar c = Calendar.getInstance()
+                    c.setTime(month)
+                    c.add(Calendar.MONTH, 1)
+                    nextMonth = c.getTime()
+                    //nextMonth = month + 1.month // not possible because of static comp
+                //}
                 def capNeededInThatMonth = getCapaNeeded(month, nextMonth)
-                def key = month.getMonthYearStr()
+                def key = _getMonthYearStr(month) //month.getMonthYearStr() // not possible because of static comp
                 resultMap[key] = capNeededInThatMonth
                 month = nextMonth
             }

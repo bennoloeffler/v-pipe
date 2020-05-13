@@ -63,8 +63,13 @@ class TaskInProjectTest extends GroovyTestCase {
         Map<String, Double> map = t1.getCapaDemandSplitIn(WEEK)
         // t1 = ("p1", "5.1.2020", "10.1.2020", "d1", 20.0)
         assert map != null
-        assert map["2020-W01"] == 4
-        assert map["2020-W02"] == 16
+        println(map)
+        def e = map.entrySet()
+        def k = e[0].key
+
+        def v = map[k] // TODO: FIX ???
+        assert map["2020-W01"] == 4.0
+        assert map["2020-W02"] == 16.0
 
         map = t2.getCapaDemandSplitIn(WEEK)
         // t1 = ("p1", "5.1.2020", "10.1.2020", "d1", 20.0)

@@ -1,4 +1,4 @@
-package fileutils
+package utils
 
 class FileSupportTest extends GroovyTestCase {
 

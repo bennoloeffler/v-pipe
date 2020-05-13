@@ -1,6 +1,7 @@
 package core
 
-import fileutils.FileSupport
+import utils.FileSupport
+import utils.RunTimer
 
 import static core.TaskInProject.WeekOrMonth.WEEK
 
@@ -25,11 +26,13 @@ class ProjectDataWriter {
         f = new File(fn)
         f.createNewFile()
 
-
+        def t = new RunTimer()
         // normalize a maps to contain all time-keys
         List<String> allTimeKeys = tr.getFullSeriesOfTimeKeys(weekOrMonth)
         f << "DEP\t"+allTimeKeys.join("\t") + "\n"
+        t.stop("getFullSeriesOfTimeKeys($weekOrMonth)")
 
+        t.go()
         stringMapMap.each {dep, loadMap ->
             f << dep
             allTimeKeys.each { String timeKey ->
@@ -42,6 +45,7 @@ class ProjectDataWriter {
             }
             f <<"\n"
         }
+        t.stop("writeToFile")
     }
 }
 
