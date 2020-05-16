@@ -39,7 +39,7 @@ class TaskInProject {
      * @param intervalEnd
      * @return overlap of the interval with this task in days
      */
-    @CompileStatic
+    //@CompileStatic
     long getDaysOverlap(Date intervalStart, Date intervalEnd) {
         assert starting < ending
         assert intervalStart < intervalEnd
@@ -78,7 +78,7 @@ class TaskInProject {
      * @param intervalEnd
      * @return the capacity, the task is spending in the interval
      */
-    @CompileStatic
+    //@CompileStatic
     double getCapaNeeded(Date intervalStart, Date intervalEnd) {
         double perDay = getDaysOverlap(intervalStart, intervalEnd) * getCapaPerDay()
         return perDay
@@ -91,12 +91,12 @@ class TaskInProject {
      * @param weeks = true means weeks, false means split in months
      * @return map of [ W01:13.7, W04:4] for weeks (or [M1:17, M3,19.5] for months)
      */
-    @CompileStatic
+    //@CompileStatic
     Map<String, Double> getCapaDemandSplitIn(WeekOrMonth weekOrMonth) {
         assert starting < ending
-        assert capacityNeeded > 0
-
+        //assert capacityNeeded > 0
         def resultMap = [:]
+        if (capacityNeeded==0){return resultMap as Map<String, Double>}
         if(weekOrMonth == WeekOrMonth.WEEK) {
             Date week = _getStartOfWeek(starting)//starting.getStartOfWeek() // not possible because of static comp
             while (week < ending) {

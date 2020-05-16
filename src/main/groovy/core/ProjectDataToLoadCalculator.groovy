@@ -1,6 +1,7 @@
 package core
 
 import groovy.transform.CompileStatic
+import groovy.transform.Memoized
 import utils.FileSupport
 import groovy.time.TimeCategory
 import groovy.transform.ToString
@@ -37,6 +38,8 @@ class ProjectDataToLoadCalculator {
      * @param project
      * @return List of all Tasks with project name project
      */
+    //@Memoized
+    //@CompileStatic
     List<TaskInProject> getProject(String project) {
         taskList.findAll {it.project == project}
     }
@@ -44,6 +47,7 @@ class ProjectDataToLoadCalculator {
     /**
      * @return List of Strings with all projectNames found in
      */
+    @Memoized
     List<String> getAllProjects() {
         (taskList*.project).unique()
     }
@@ -51,6 +55,7 @@ class ProjectDataToLoadCalculator {
     /**
      * @return the minimum time of all tasks
      */
+    @Memoized
     Date getStartOfTasks() {
         (taskList*.starting).min()
     }
@@ -58,6 +63,7 @@ class ProjectDataToLoadCalculator {
     /**
      * @return the maximum time of all tasks
      */
+    @Memoized
     Date getEndOfTasks() {
         (taskList*.ending).max()
     }
@@ -65,6 +71,7 @@ class ProjectDataToLoadCalculator {
     /**
      * @return even if data is sparce, deliver continous list of timekey strings. Every week.
      */
+    @Memoized
     List<String> getFullSeriesOfTimeKeys(TaskInProject.WeekOrMonth weekOrMonth) {
 
         Date s = getStartOfTasks()
@@ -94,7 +101,8 @@ class ProjectDataToLoadCalculator {
                 }
             }
         }
-        return result.sort()
+        result.sort()
+        result
     }
 
 

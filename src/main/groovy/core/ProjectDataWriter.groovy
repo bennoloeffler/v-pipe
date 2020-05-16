@@ -33,18 +33,21 @@ class ProjectDataWriter {
         t.stop("getFullSeriesOfTimeKeys($weekOrMonth)")
 
         t.go()
+        StringBuffer loads = new StringBuffer()
         stringMapMap.each {dep, loadMap ->
-            f << dep
+            //f << dep
+            loads << dep
             allTimeKeys.each { String timeKey ->
                 if (loadMap[timeKey]) {
                     def commaNumber = String.format("%.1f", loadMap[timeKey])
-                    f << "\t" +  commaNumber
+                    loads << "\t" +  commaNumber
                 } else {
-                    f << "\t0,0"
+                    loads << "\t0,0"
                 }
             }
-            f <<"\n"
+            loads <<"\n"
         }
+        f << loads.toString()
         t.stop("writeToFile")
     }
 }

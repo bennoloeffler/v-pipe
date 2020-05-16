@@ -18,7 +18,7 @@ import java.awt.Desktop
  */
 class  Main {
 
-    static VERSION_STRING ='0.3.0-Pipeliner'
+    static VERSION_STRING ='0.3.1-Pipeliner-Performance'
 
     static void main(String[] args) {
 

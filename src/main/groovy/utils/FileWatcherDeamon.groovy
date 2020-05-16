@@ -8,6 +8,7 @@ import groovy.util.logging.Log
 import java.nio.file.*
 
 import static java.nio.file.StandardWatchEventKinds.*
+import static utils.EventType.*
 
 /**
  * make the FileEvents a little bit more verbose

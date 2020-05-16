@@ -166,6 +166,10 @@ gleichzeitig gearbeitet werden soll.
 
 ### Features
 
+2020-05-13 `0.3.1-Pipeliner`
+- Performance besser beim schreiben  
+ (größer 40s --> deutlich kleiner 10s mit Ruhlamat-Daten)
+
 2020-05-10 `0.3.0-Pipeliner`
 - Pipeliner - lesen von Integrations-Phasen.txt
 - Browser mit Hilfe nur beim ersten Start
@@ -203,6 +207,7 @@ Das ist nur vernünftig in verschiedenen Verzeichnissen!
  
 - Es scheint so, als ob v-pipe beim ersten Start zweimal nacheinander startet.  
 bzw. als ob kurz nach dem Start ein Neustart erfolgt. Harmlos, aber irritierend.
+- beim löschen von Datenfiles fehlt ein DELETE. util-packages Problem
 
 #### Features (zukünftig, angedacht) 
 
