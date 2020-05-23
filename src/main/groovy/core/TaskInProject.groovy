@@ -3,7 +3,9 @@ package core
 import extensions.DateHelperFunctions
 import groovy.time.TimeCategory
 import groovy.transform.CompileStatic
+import groovy.transform.EqualsAndHashCode
 import groovy.transform.Immutable
+import groovy.transform.TupleConstructor
 import org.joda.time.*
 
 import static extensions.DateHelperFunctions.*
@@ -14,8 +16,12 @@ import static extensions.DateHelperFunctions.*
  * The model assumes, that capacity consumption is distributed evenly between start and end.
  * Start and end are days. Start is included - end is EXCLUDED.
  */
-@Immutable
+//@Immutable
+@TupleConstructor
+@EqualsAndHashCode
 class TaskInProject {
+
+    enum WeekOrMonth {WEEK, MONTH}
 
     String project
     Date starting
@@ -84,7 +90,6 @@ class TaskInProject {
         return perDay
     }
 
-    enum WeekOrMonth {WEEK, MONTH}
     /**
      * returns a map with YYYY-MX or YYYY-WX - Keys and the corresponding capacity split
      * The end days of the intervals are excluded.

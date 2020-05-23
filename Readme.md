@@ -33,7 +33,8 @@ Markdown-Plugin für Chrome installieren...
 in den Einstellungen des Plugins unter  
 Einstellungen/Erweiterungen/MarkdownPreviewPlus:  
 Option: *Zugriff auf Datei-URLs zulassen* aktivieren 
-- `v-pipe.exe` (der Starter - Doppelklick und los geht's.)  
+- `v-pipe.exe` (der Starter - Doppelklick und los geht's.)
+- `v-pipe-gui.exe` (visuelle Darstellung - Doppelklick und los.)  
 - `lib` (ein paar Java-Bibliotheken. Finger weg ;-))  
 - `jre` (eine Java-Laufzeit-Umgebung. Nicht anfassen...)
 - `bsp-daten` (alle Daten-Dateien als funktionierende Beispiele)    
@@ -50,6 +51,7 @@ Option: *Zugriff auf Datei-URLs zulassen* aktivieren
 Einfach Doppelklick auf v-pipe.exe. Das startet den  
 Deamon-Mode: v-pipe lauert jetzt auf Veränderungen  
 der Daten-Dateien und zeigt Fehlermeldungen oder rechnet.  
+Mit v-pipe-exe bekommt man die Daten schnell konsistent.
 
 **Alternative:** 
 `Windows-Taste` und tippen: `cmd + ENTER-Taste`  
@@ -114,6 +116,75 @@ in der Integrationsphase dar. Die Integrationsphasen von p1, p2 etc. sind
 untereinander aufgeführt. Die Zahl am Ende jeder Zeile ist der Bedarf an Slots.  
 Dieser ist in der Regel 1 und maximal gleich der Anzahl der Slots.  
 
+`Abteilungs-Kapazitäts-Angebot.txt`
+**Grunddaten (optional):** Kapazitäts-Angebot aller Abteilungen für Auswertung  
+Enthält beispielsweise:  
+
+{
+    "Kapa_Gesamt": {
+    
+       "Feiertage": ["1.1.2020", "1.6.2020"],
+       
+       "Kapa_Profil": {
+          "2020-23": 80, // in Prozent!
+          "2020-24": 60,
+          "2020-25": 80
+       }
+       
+},
+   
+   "Abteilungen": {   
+      
+      "Konstruktion": {
+
+          "Kapa": {
+             "gelb": 140,
+             "rot": 190
+          },
+
+          "Kapa_Profil": {
+             "2020-23": 100,
+             "2020-24": { "gelb": 140, "rot": 250 },
+             "2020-25": 80,
+             "2020-26": { "gelb": 140, "rot": 190 },
+             "2020-27": 100
+          }
+      },
+
+      "Montage": {
+
+         "Kapa": {
+            "gelb": 240,
+            "rot": 490
+         },
+
+         "Kapa_Profil": {
+         }
+      },
+
+      "IBN": {
+         "Kapa": {
+            "gelb": 340,
+            "rot": 500
+         }
+      }
+   }
+}
+
+
+
+**Bedeutung:** Kapa_Gesamt beinhaltet Feiertage und ein Kapa_Profil  
+in Prozent. Der Abschnitt Abteilungen beinhaltet Abteilungsnamen und  
+darunter jeweils zwei Infos:  
+`Kapa`: rote und gelbe Kapazitätsgrenze. Diese Einteilung dient lediglich der   
+Visualisierung.  
+`Kapa_Profil`: Dort kann das Kapa-Profil der Gesamt-Firma  
+(in KWs und Prozent) überschrieben werden.  
+Kapazitäts-Sprünge werden so beschrieben:  
+`"2020-24": { "gelb": 140, "rot": 250 }`  
+Das Kapa_Profil ist optional.  
+Die Syntax der Datei ist JSON.  
+
 
 ### Ergebnis-Dateien
 Die Belastung der Abteilungen liegt in:  
@@ -166,6 +237,12 @@ gleichzeitig gearbeitet werden soll.
 
 ### Features
 
+TODO: 2020-05-XX `0.4.0-GUI-Pipeliner`
+- Belastung beim bearbeiten visualisieren, editieren.
+
+TODO: 2020-05-XX `0.4.0-GUI-Pipeliner`
+- Pipeline visualisieren, editieren. Ergebnisse speiche.
+
 2020-05-13 `0.3.1-Pipeliner`
 - Performance besser beim schreiben  
  (größer 40s --> deutlich kleiner 10s mit Ruhlamat-Daten)
@@ -213,13 +290,19 @@ bzw. als ob kurz nach dem Start ein Neustart erfolgt. Harmlos, aber irritierend.
 
 wären nützlich - Nützlichkeit in absteigender Reihenfolge:  
 
-- Ordentliche Beispiel-Dateien in Verzeichnis "data-examples"
-- Kommentare in Datenfiles erlauben //
+- Pipelining ohne "quetschen" - mit Löchen, die Termin-orientiert entstehen.  
+Also mäßige Auslastung. Dafür wäre es praktisch, 3 "Staffelungen" zu haben:
+1.) OPTION FILL PIPELINE: _tight (also ohne Lücken), 2: _gap (also mit Lücken, wenn Termine dazu führen) 
+2.) OPTION SORT_PROJECTS: sort_in_file, sort_pipeline_end_date, sort_project_end_date,  
+_search_latest (search the next one, that is latest compared to its delivery date)
+3:) vernünftig scheint: _gap und _search_latest 
+- Kommentare in Datenfiles erlauben. Solche: //
 - File-Polling in Excel (2s-readIfNewerThan10Sec and Paste) -   
 damit es eine Online-Visualisierung gibt.
 - Darstellung des Projektportfolios (kritischen Pfade, Staffelung, Kapa-Peaks)
 - Logging mit einfacher Konfigurierbarkeit durch Property-File  
-- Option Kommando-Zeile: Arbeitsverzeichnnis - eines oder mehrere  
+- Start Option Kommando-Zeile: Arbeitsverzeichnnis - eines oder mehrere
+- Start Optionen auch in Konfig-File ablegbar - inbesondere Arbeitsverzeichnisse  
 - Kapazitäts-Belastung auf Basis der Daten-Datei Abteilungs-Kapazitäts-Angebot.txt
 - Ausgabe der Kapa-Belastung in der Ergebnis-Datei Abteilungs-Prozent-Auslastung.txt
 - read by Json-Format:   

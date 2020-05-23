@@ -38,7 +38,7 @@ class DateHelperFunctions {
      * @param d Date
      * @return String like "2020-W01", with the last days after week 52 in 2019 looking like "2020-W01"
      */
-    static def _getWeekYearStr(Date d) {
+    static String _getWeekYearStr(Date d) {
         cal.setTime(d)
         int year = cal.get(Calendar.YEAR)
         int month = cal.get(Calendar.MONTH)
@@ -57,7 +57,7 @@ class DateHelperFunctions {
      * @param d Date
      * @return String like "2020-M11", where 1..Jan, 12..Dec
      */
-    static def _getMonthYearStr(Date d) {
+    static String _getMonthYearStr(Date d) {
         cal.setTime(d)
         int year = cal.get(Calendar.YEAR)
         int month = cal.get(Calendar.MONTH) + 1
@@ -82,6 +82,23 @@ class DateHelperFunctions {
         Date.parse("dd.MM.yyyy", s)
     }
 
+
+    /**
+     * @param s "yyyy-Www" 2020-W01
+     * @return Date
+     */
+    static Date _wToD(String s) {
+        assert s != null
+        int year = s[0..3].toInteger()
+        int week = s[6..7].toInteger()
+
+        cal.setTimeInMillis(0)
+        cal.set(Calendar.YEAR, year)
+        cal.set(Calendar.WEEK_OF_YEAR, week)
+
+        _getStartOfWeek(cal.getTime())
+
+    }
 }
 
 

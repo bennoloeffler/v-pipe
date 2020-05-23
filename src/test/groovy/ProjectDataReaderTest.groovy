@@ -28,7 +28,7 @@ class ProjectDataReaderTest extends GroovyTestCase {
             p3 31.12.2020 20.01.2021 d2 20\n
             p3 01.01.2020 20.01.2020 d1 20\n""")
 
-        List<TaskInProject> data = ProjectDataToLoadCalculator.getDataFromFile()
+        List<TaskInProject> data = ProjectDataToLoadCalculator.getDataFromFileStatic()
 
         assert data?.size() == 5
         assert data[4].department == "d1"
@@ -40,7 +40,7 @@ class ProjectDataReaderTest extends GroovyTestCase {
             p3 31.12.2020;20.01.2021 d2 20\n
             p3 01.01.2020 20.01.2020; d1 20\n""")
 
-        List<TaskInProject> data = ProjectDataToLoadCalculator.getDataFromFile()
+        List<TaskInProject> data = ProjectDataToLoadCalculator.getDataFromFileStatic()
         assert data?.size() == 3
     }
 
@@ -50,7 +50,7 @@ class ProjectDataReaderTest extends GroovyTestCase {
             p1 01.01.2020 20.01.2020 d2 20,5\n""")
 
         def msg = shouldFail {
-            List<TaskInProject> data = ProjectDataToLoadCalculator.getDataFromFile()
+            List<TaskInProject> data = ProjectDataToLoadCalculator.getDataFromFileStatic()
         }
         assert msg.contains("Keine 5 Daten-Felder gefunden mit Regex-SEPARATOR")
     }
@@ -60,7 +60,7 @@ class ProjectDataReaderTest extends GroovyTestCase {
             p1 01.01.2020\t20.01.2020;\t\t d1 20.5\n
             p1 01.01.2020    20.01.2020; d2, 20\n""")
 
-        List<TaskInProject> data = ProjectDataToLoadCalculator.getDataFromFile()
+        List<TaskInProject> data = ProjectDataToLoadCalculator.getDataFromFileStatic()
         assert data?.size() == 2
     }
 
@@ -73,7 +73,7 @@ class ProjectDataReaderTest extends GroovyTestCase {
             p1 \t;  01.01.2020;    20.01.2020;    dep 2   , 20\n""")
 
         FileSupport.SEPARATOR = FileSupport.SEPARATOR_SC
-        List<TaskInProject> data = ProjectDataToLoadCalculator.getDataFromFile()
+        List<TaskInProject> data = ProjectDataToLoadCalculator.getDataFromFileStatic()
         FileSupport.SEPARATOR = FileSupport.SEPARATOR_ALL
 
         assert data?.size() == 2

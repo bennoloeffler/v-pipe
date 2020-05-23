@@ -13,4 +13,13 @@ class StringExtension {
     static Date toDate(String s) {
         return DateHelperFunctions._sToD(s)
     }
+
+    /**
+     * @param s e.g. "2020-W02"
+     * @return Date
+     */
+    static Date toDateFromYearWeek(String s) {
+        return DateHelperFunctions._wToD(s)
+    }
+
 }

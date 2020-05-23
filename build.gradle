@@ -29,18 +29,24 @@ launch4j {
     bundledJrePath='jre'
 }
 
+task createGui(type: edu.sc.seis.launch4j.tasks.Launch4jLibraryTask) {
+    outfile = 'v-pipe-gui.exe'
+    mainClassName = 'gui.VpipeGui'
+}
+
 /**
  * set that to local copy
  */
 def jre = "jre"
-def jrePath = "C:\\Program Files\\Java\\jdk1.8.0_172\\$jre"
-//def jrePath = "C:\\Program Files\\Java\\jre1.8.0_201"
+//def jrePath = "C:\\Program Files\\Java\\jdk1.8.0_172\\$jre"
+def jrePath = "C:\\Program Files\\Java\\jre1.8.0_201"
 def tempDist = "$buildDir/dist/v-pipe"
 def exampleDir = "$tempDist/bsp-daten"
 
 task copyExeLibsJRE {
-    dependsOn createExe
-
+    //dependsOn createExe, createGui
+    dependsOn createAllExecutables
+    
     description "copies jre, exe and lib to $tempDist"
     group "v-pipe"
 
@@ -60,6 +66,12 @@ task copyExeLibsJRE {
         }
 
         copy {
+            from "bsp-daten"
+            into exampleDir
+        }
+
+/*
+        copy {
             from "bsp-daten/Projekt-Start-End-Abt-Kapa.txt"
             into exampleDir
         }
@@ -78,7 +90,7 @@ task copyExeLibsJRE {
             from "bsp-daten/v-pipe-Auswertung.xlsx"
             into exampleDir
         }
-
+*/
         copy {
             from "Readme.md"
             into tempDist
@@ -93,12 +105,12 @@ task copyExeLibsJRE {
             from "Referenz.html"
             into tempDist
         }
-
+/*
         copy {
             from "bsp-daten/v-pipe-Auswertung.xlsx"
             into exampleDir
         }
-
+*/
         copy {
             from "ersterStart.md"
             into tempDist

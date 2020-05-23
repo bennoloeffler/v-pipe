@@ -18,22 +18,18 @@ import java.util.logging.Logger;
  */
 class RunTimer {
 
+    boolean silent
     boolean running
     long start
     long end
     long diff
-    Logger log
 
-    RunTimer() {
-        go()
+    RunTimer(boolean silent = false) {
+        start()
+        this.silent = silent
     }
 
-    RunTimer(Logger log) {
-        this.log = log
-        go()
-    }
-
-    void go() {
+    void start() {
         assert(!running)
         running=true
         start = System.currentTimeMillis()
@@ -44,30 +40,24 @@ class RunTimer {
     }
 
     void stop(String explanation) {
-        assert(running)
+        assert( running )
         end = System.currentTimeMillis()
-        running=false
-        diff = end-start
-        String text="DURATION"
-        if(explanation!=null && !"".equals(explanation)) {
-            text+=" of "+explanation
+        running = false
+        diff = end - start
+        String text = "DURATION"
+        if(explanation) {
+            text += " of " + explanation
         }
-        text+=":  "+ readableTime(diff)
+        text += ":  " + readableTime( diff )
 
-        if(log == null) {
-            System.out.println(text)
-        } else {
-            log.info(text)
-        }
-
+        if( ! silent ) { println( text ) }
     }
 
     static String readableTime(long millis) {
-        long min =  millis / (1000 * 60)
+        long min =  (millis / (1000 * 60))
         long sec =  (millis % (1000 *60)) / 1000
         long ms = millis % 1000
         return "" + min + " : " + sec + " : " + ms + " ( min : sec : ms )"
-
     }
 
 }

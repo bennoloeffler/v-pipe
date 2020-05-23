@@ -1,12 +1,13 @@
 package core
 
+import gui.VpipeGui
+import transform.CapaTransformer
 import utils.*
 import groovy.time.TimeDuration
 import transform.DateShiftTransformer
 import transform.PipelineTransformer
 
 import java.awt.Desktop
-
 
 // TODO: to 15 min groovy
 // https://e.printstacktrace.blog/groovy-regular-expressions-the-definitive-guide/
@@ -18,7 +19,7 @@ import java.awt.Desktop
  */
 class  Main {
 
-    static VERSION_STRING ='0.3.1-Pipeliner-Performance'
+    static VERSION_STRING ='0.4.0-GUI-Pipeliner'
 
     static void main(String[] args) {
 
@@ -28,8 +29,10 @@ class  Main {
         def argsStr = args.join(" ")
         def singleRunMode = false // instead: Deamon is default
         def multiInstanceMode = false // instead SingleInstance is default
+        def commandLineMode = false
         if(argsStr.contains("-s")) {singleRunMode=true}
-        if(argsStr.contains("-model")) {multiInstanceMode = true}
+        if(argsStr.contains("-m")) {multiInstanceMode = true}
+        if(argsStr.contains("-c")) {commandLineMode = true}
 
         println "\n\nv-pipe  (release: $VERSION_STRING)\n\n"
 
@@ -56,12 +59,16 @@ class  Main {
             if(singleRunMode) { // single mode
                 println "Daten lesen: $ProjectDataToLoadCalculator.FILE_NAME und $DateShiftTransformer.FILE_NAME" // todo
                 processData()
-                println "E R F O L G :   Ergebnisse geschrieben. " + ProjectDataWriter.FILE_NAME_WEEK + ' (und -Monat )' // todo
+                println "E R F O L G :   Ergebnisse geschrieben. " + ProjectDataToLoadCalculator.FILE_NAME_WEEK + ' (und -Monat )' // todo
 
             } else { // deamon mode
 
+                Thread t = Thread.start {
+                    //VpipeGui.main(null)
+                }
+
                 def fwd = new FileWatcherDeamon(".")
-                fwd.filter = [ProjectDataToLoadCalculator.FILE_NAME, DateShiftTransformer.FILE_NAME, PipelineTransformer.FILE_NAME]
+                fwd.filter = [ProjectDataToLoadCalculator.FILE_NAME, DateShiftTransformer.FILE_NAME, PipelineTransformer.FILE_NAME, CapaTransformer.FILE_NAME]
 
                 while(true) {
                     try {
@@ -109,12 +116,12 @@ class  Main {
 
                     }catch(VpipeDataException e) {
                         println "\nD A T E N - F E H L E R :\n" + e.getMessage()
-                       sleep(5000)
+                       sleep(10000)
                     } catch(Exception e) {
                         println "PROBLEM - erst nach der Behebung wird gerechnet...:\n" + e.getMessage()
                         e.printStackTrace()
                         //todo logile
-                        sleep(5000)
+                        sleep(10000)
                     }
                 }
 
@@ -132,9 +139,10 @@ class  Main {
         ProjectDataToLoadCalculator pt = new ProjectDataToLoadCalculator()
         pt.transformers << new DateShiftTransformer(pt)
         pt.transformers << new PipelineTransformer(pt)
+        pt.transformers << new CapaTransformer(pt)
         pt.updateConfiguration()
-        ProjectDataWriter.writeToFile(pt, TaskInProject.WeekOrMonth.WEEK)
-        ProjectDataWriter.writeToFile(pt, TaskInProject.WeekOrMonth.MONTH)
+        ProjectDataToLoadCalculator.writeToFileStatic(pt, TaskInProject.WeekOrMonth.WEEK)
+        ProjectDataToLoadCalculator.writeToFileStatic(pt, TaskInProject.WeekOrMonth.MONTH)
     }
 
 

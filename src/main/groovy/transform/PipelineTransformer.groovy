@@ -14,7 +14,7 @@ import groovy.transform.InheritConstructors
  */
 @Immutable
 //@ToString
-class PipelineOriginalElement {
+class  PipelineOriginalElement {
     String project
     Date startDate
     Date endDate

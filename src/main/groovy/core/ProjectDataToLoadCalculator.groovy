@@ -1,14 +1,12 @@
 package core
 
-import groovy.transform.CompileStatic
-import groovy.transform.Memoized
+import core.TaskInProject.WeekOrMonth
 import utils.FileSupport
 import groovy.time.TimeCategory
 import groovy.transform.ToString
 import transform.Transformer
 import utils.RunTimer
 
-import static core.TaskInProject.WeekOrMonth.WEEK
 
 /**
  * this does the raw data calculation:
@@ -17,7 +15,7 @@ import static core.TaskInProject.WeekOrMonth.WEEK
  * 3. now you may get the departments and the loads per week
  */
 @ToString
-class ProjectDataToLoadCalculator {
+class ProjectDataToLoadCalculator implements TaskListPortfolioAccessor {
 
     /**
      * from where to read data
@@ -25,85 +23,15 @@ class ProjectDataToLoadCalculator {
     public static String FILE_NAME = "Projekt-Start-End-Abt-Kapa.txt"
     static def SILENT = true // during reading: show all data read?
 
+    /**
+     * to where to write
+     */
+    public static def FILE_NAME_WEEK = 'Abteilungs-Kapazitäts-Belastung-Woche.txt'
+    public static def FILE_NAME_MONTH = 'Abteilungs-Kapazitäts-Belastung-Monat.txt'
+    public static String BACKUP_FILE
+
     List<Transformer> transformers = []
 
-
-    /**
-     * Data of all projects
-     */
-    List<TaskInProject> taskList = []
-
-
-    /**
-     * @param project
-     * @return List of all Tasks with project name project
-     */
-    //@Memoized
-    //@CompileStatic
-    List<TaskInProject> getProject(String project) {
-        taskList.findAll {it.project == project}
-    }
-
-    /**
-     * @return List of Strings with all projectNames found in
-     */
-    @Memoized
-    List<String> getAllProjects() {
-        (taskList*.project).unique()
-    }
-
-    /**
-     * @return the minimum time of all tasks
-     */
-    @Memoized
-    Date getStartOfTasks() {
-        (taskList*.starting).min()
-    }
-
-    /**
-     * @return the maximum time of all tasks
-     */
-    @Memoized
-    Date getEndOfTasks() {
-        (taskList*.ending).max()
-    }
-
-    /**
-     * @return even if data is sparce, deliver continous list of timekey strings. Every week.
-     */
-    @Memoized
-    List<String> getFullSeriesOfTimeKeys(TaskInProject.WeekOrMonth weekOrMonth) {
-
-        Date s = getStartOfTasks()
-        Date e = getEndOfTasks()
-
-        use(TimeCategory) {
-            if(e - s > 20.years) {
-                throw new VpipeDataException("Dauer von Anfang bis Ende\n"+
-                        "der Tasks zu lange ( > 20 Jahre ): ${s.toString()} bis ${e.toString()}")
-            }
-        }
-
-        def result = []
-
-        if (weekOrMonth == WEEK) {
-            s = s.getStartOfWeek()
-            while (s < e) {
-                result << s.getWeekYearStr()
-                s += 7
-            }
-        } else {
-            s = s.getStartOfMonth()
-            while (s < e) {
-                result << s.getMonthYearStr()
-                use(TimeCategory) {
-                    s = s + 1.month
-                }
-            }
-        }
-        result.sort()
-        result
-    }
 
 
     /**
@@ -116,12 +44,12 @@ class ProjectDataToLoadCalculator {
      */
     Map<String, Map<String, Double>> calcDepartmentLoad(TaskInProject.WeekOrMonth weekOrMonth) {
 
-        def t = new RunTimer()
+        def t = new RunTimer(true)
         transformers.each {
             taskList = it.transform()
         }
         t.stop("Transformers")
-        t.go()
+        t.start()
 
         def load = [:]
         taskList.each {
@@ -140,7 +68,7 @@ class ProjectDataToLoadCalculator {
 
             }
         }
-        t.stop("getCapaDemandSplitIn ($weekOrMonth)")
+        t.stop("calcDepartmentLoad ($weekOrMonth)")
         load as Map<String, Map<String, Double>>
     }
 
@@ -149,10 +77,19 @@ class ProjectDataToLoadCalculator {
      * @return
      */
     def updateConfiguration() {
-        taskList = dataFromFile
+        taskList = dataFromFileStatic
         transformers.each() {
             it.updateConfiguration()
         }
+    }
+
+
+    def readFromFile() {
+        taskList = getDataFromFileStatic()
+    }
+
+    def writeToFile(WeekOrMonth weekOrMonth) {
+        writeToFileStatic(this, weekOrMonth)
     }
 
 
@@ -165,12 +102,14 @@ class ProjectDataToLoadCalculator {
      * Default separator: any number of spaces, tabs, commas, semicolons (SEPARATOR_ALL)
      * If whitespace is in project names or department names, semicolon or comma is needed (SEPARATOR_SC)
      */
-    //@CompileStatic
-    static List<TaskInProject> getDataFromFile() {
+    static List<TaskInProject> getDataFromFileStatic() {
+        def t = new RunTimer(true)
         List<TaskInProject> taskList = []
         def i = 0 // count the lines
         SILENT?:println("\nstart reading data file:   " + FILE_NAME)
-        def errMsg = {""}
+        def errMsg ={""}
+        //String all = new File(FILE_NAME).text
+        //all.eachLine {
         def f = new File(FILE_NAME).eachLine {
             if(it.trim()) {
                 try {
@@ -213,8 +152,57 @@ class ProjectDataToLoadCalculator {
                 }
             }
         }
+        t.stop("reading file $FILE_NAME")
         if( ! taskList){throw new VpipeDataException("$FILE_NAME enthält keine Daten")}
         return taskList
+    }
+
+
+    /**
+     *
+     * @param tr
+     * @param weekOrMonth
+     */
+    static void writeToFileStatic(ProjectDataToLoadCalculator tr, WeekOrMonth weekOrMonth) {
+
+        def t = new RunTimer(true)
+
+        Map<String, Map<String, Double>> stringMapMap = tr.calcDepartmentLoad(weekOrMonth)
+
+        def fn = weekOrMonth == TaskInProject.WeekOrMonth.WEEK ? FILE_NAME_WEEK : FILE_NAME_MONTH
+        File f = new File(fn)
+        if(f.exists()) { // BACKUP
+            BACKUP_FILE = FileSupport.backupFileName(f.toString())
+            f.renameTo(BACKUP_FILE)
+        }
+
+        f = new File(fn)
+        f.createNewFile()
+        t.stop("backupfile $BACKUP_FILE and new file $fn")
+        t.start()
+
+        // normalize a maps to contain all time-keys
+        List<String> allTimeKeys = tr.getFullSeriesOfTimeKeys(weekOrMonth)
+        f << "DEP\t"+allTimeKeys.join("\t") + "\n"
+        t.stop("getFullSeriesOfTimeKeys($weekOrMonth)")
+
+        t.start()
+        StringBuffer loads = new StringBuffer()
+        stringMapMap.each {dep, loadMap ->
+            //f << dep
+            loads << dep
+            allTimeKeys.each { String timeKey ->
+                if (loadMap[timeKey]) {
+                    def commaNumber = String.format("%.1f", loadMap[timeKey])
+                    loads << "\t" +  commaNumber
+                } else {
+                    loads << "\t0,0"
+                }
+            }
+            loads <<"\n"
+        }
+        f << loads.toString()
+        t.stop("writeToFileStatic $fn")
     }
 
 }
