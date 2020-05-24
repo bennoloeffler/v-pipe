@@ -73,5 +73,10 @@ trait GridModel {
      * @return the row which is to be marked as "now" in the view
      */
     abstract int getNowX()
+
+    /**
+     * @return as it says
+     */
+    abstract List<String> getProjectNames()
 }
 

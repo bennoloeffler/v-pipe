@@ -38,9 +38,13 @@ class GridProjectPanel extends JPanel implements MouseWheelListener, MouseMotion
 
     LoadGridPanel lp // notify that one when grid or model changed...
 
+    ProjectDataToLoadCalculator dc
+
     GridModel model
     int grid
     int borderWidth
+    int nameWidth
+
 
     /**
      * the cursor - modeled as position in grid
@@ -98,6 +102,7 @@ class GridProjectPanel extends JPanel implements MouseWheelListener, MouseMotion
             grid += inc!=0?inc:1 // min one tic bigger
             if(grid < 10){grid=10}
             if(grid > 400){grid=400}
+            nameWidth = grid *3
             lp?.setGridWidth(grid)
             invalidateAndRepaint()
         } else {
@@ -224,12 +229,14 @@ class GridProjectPanel extends JPanel implements MouseWheelListener, MouseMotion
         if(KeyEvent.VK_PLUS == e.getKeyCode()) {
             grid = (grid * 1.1) as int
             if(grid > 400){grid=400}
+            nameWidth = grid *3
             lp?.setGridWidth(grid)
 
         }
         if(KeyEvent.VK_MINUS == e.getKeyCode()) {
             grid = (grid / 1.1) as int
             if(grid < 10){grid=10}
+            nameWidth = grid *3
             lp?.setGridWidth(grid)
         }
 
@@ -275,7 +282,7 @@ class GridProjectPanel extends JPanel implements MouseWheelListener, MouseMotion
     }
 
     void scrollToCursorXY() {
-        scrollRectToVisible(new Rectangle(cursorX * grid - grid, cursorY * grid - grid, 3 * grid, 3 * grid))
+        scrollRectToVisible(new Rectangle(nameWidth + cursorX * grid - grid, cursorY * grid - grid, 3 * grid, 3 * grid))
     }
 
     @Override
@@ -361,7 +368,7 @@ class GridProjectPanel extends JPanel implements MouseWheelListener, MouseMotion
      * for testing purposes - uses internal, filled GridModel
      */
     GridProjectPanel(int grid = 60) {
-        this(grid, new GridDemoModel(), null)
+        this(grid, new GridDemoModel(), null, null)
     }
 
 
@@ -371,15 +378,17 @@ class GridProjectPanel extends JPanel implements MouseWheelListener, MouseMotion
      * @param borderWidth
      * @param model
      */
-    GridProjectPanel(int grid, GridModel model, LoadGridPanel lp) {
+    GridProjectPanel(int grid, GridModel model, LoadGridPanel lp, ProjectDataToLoadCalculator dc) {
         this.grid = grid
         this.borderWidth = grid / 3 as int
+        this.nameWidth = grid * 3
         addKeyListener(this)
         addMouseMotionListener(this)
         addMouseListener(this)
         addMouseWheelListener(this)
         this.model = model
         this.lp = lp
+        this.dc = dc
         setCursorToNow()
 
         lp?.setGridWidth(width)
@@ -389,11 +398,12 @@ class GridProjectPanel extends JPanel implements MouseWheelListener, MouseMotion
     def updateLoadData() {
         if(lp) {
             SwingUtilities.invokeLater {
-                ProjectDataToLoadCalculator dc = new ProjectDataToLoadCalculator()
+                //ProjectDataToLoadCalculator dc = new ProjectDataToLoadCalculator()
                 dc.taskList = ((ProjectGridModel) model).taskList
                 Map<String, Map<String, Double>> stringMapMap = dc.calcDepartmentLoad(TaskInProject.WeekOrMonth.WEEK)
                 List<String> allKeys = dc.getFullSeriesOfTimeKeys(TaskInProject.WeekOrMonth.WEEK)
-                lp.setModelData(stringMapMap, allKeys)
+                dc.filledCapaTransformer.reCalcCapa()
+                lp.setModelData(stringMapMap, allKeys, dc.filledCapaTransformer.capaAvailable)
             }
         }
     }
@@ -422,7 +432,7 @@ class GridProjectPanel extends JPanel implements MouseWheelListener, MouseMotion
 
         for (int x in 0..model.sizeX - 1) {
             for (int y in 0..model.sizeY - 1) {
-                int graphX = borderWidth + x * grid
+                int graphX = borderWidth + x * grid + nameWidth
                 int graphY = borderWidth + y * grid
                 if(graphX >= r.x-2*grid && graphX <= r.x+2*grid + r.width && graphY >= r.y-2*grid && graphY <= r.y+2*grid + r.height) {
                     GridElement e = model.getElement(x, y)
@@ -443,7 +453,7 @@ class GridProjectPanel extends JPanel implements MouseWheelListener, MouseMotion
         int size = (int)((grid - offset)/3 ) // size of shadow box and element box
         if(grid<15) {size=size*2}
         int round = (size / 2) as int // corner diameter
-        int nowGraphX = borderWidth + model.nowX * grid + (int)((grid - size)/2)// position start (left up)
+        int nowGraphX = borderWidth + model.nowX * grid + (int)((grid - size)/2) + nameWidth// position start (left up)
         int nowGraphY = borderWidth + model.sizeY * grid // position end (right down)
 
         // shadow
@@ -452,6 +462,34 @@ class GridProjectPanel extends JPanel implements MouseWheelListener, MouseMotion
         // element in project color, integration phase color (orange), empty color (white)
         g.setColor( nowBarColor )
         g.fillRoundRect(nowGraphX, 0, size-4 , nowGraphY+borderWidth-4, round, round)
+
+        //
+        // draw the department names
+        //
+
+        int y = 0
+        model.getProjectNames()
+        model.getProjectNames().each { String projectName ->
+            g.setColor(Color.LIGHT_GRAY)
+            int gridY = borderWidth + y*grid
+            g.fillRoundRect(borderWidth , gridY, nameWidth-4, grid - 4 , round, round)
+
+            if(grid>20) {
+                // write (with shadow) some info
+                // TODO: use Clip, Transform, Paint, Font and Composite
+                float fontSize = grid / 2
+                g.getClipBounds(rBackup)
+                g.setClip(borderWidth , gridY, nameWidth-6, grid - 6)
+                g.setFont(g.getFont().deriveFont((float) fontSize))
+                g.setColor(Color.WHITE)
+                g.drawString(projectName, borderWidth + (int) (grid * 0.2), gridY + (int) (grid * 2/3))
+                g.setColor(Color.BLACK)
+                g.drawString(projectName, borderWidth + (int) (grid * 0.2)-2, gridY + (int) (grid * 2/3)-2)
+                g.setClip(rBackup)
+            }
+
+            y++
+        }
 
         t.stop("drawing all")
     }
@@ -462,7 +500,7 @@ class GridProjectPanel extends JPanel implements MouseWheelListener, MouseMotion
      */
     @Override
     Dimension getPreferredSize() {
-        return new Dimension(model.sizeX*grid + 2*borderWidth, model.sizeY*grid + 2*borderWidth)
+        return new Dimension(nameWidth + model.sizeX*grid + 2*borderWidth, model.sizeY*grid + 2*borderWidth)
     }
 
 
@@ -481,7 +519,7 @@ class GridProjectPanel extends JPanel implements MouseWheelListener, MouseMotion
         int offset = (grid/20) as int // shadow and space
         int size = grid - offset // size of shadow box and element box
         int round = (size / 2) as int // corner diameter
-        int graphX = borderWidth + x * grid // position
+        int graphX = borderWidth + x * grid + nameWidth// position
         int graphY = borderWidth + y * grid // position
         //int gridMouseX = getGridXFromMouseX()
         //int gridMouseY = getGridYFromMouseY()
@@ -542,7 +580,7 @@ class GridProjectPanel extends JPanel implements MouseWheelListener, MouseMotion
      */
     int getGridXFromMouseX(int mouseX = -1) {
         mouseX = mouseX < 0 ? this.mouseX : mouseX // take this.mouseY, if default-Param, else take param
-        int gridX = ((mouseX - borderWidth) / grid) as int
+        int gridX = ((mouseX - borderWidth- nameWidth) / grid) as int
         gridX
     }
 

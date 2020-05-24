@@ -124,4 +124,9 @@ class GridDemoModel implements GridModel {
     int getNowX() {
         data[0].size() / 2
     }
+
+    @Override
+    List<String> getProjectNames() {
+        return []
+    }
 }

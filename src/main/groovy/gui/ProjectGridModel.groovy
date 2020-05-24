@@ -64,6 +64,7 @@ class ProjectGridModel implements GridModel, TaskListPortfolioAccessor {
         for (Date w = startOfGrid; w < endOfGrid; w += 7) {
             if(w <= now && now < w + 7) {
                 nowXRowCache = row
+
             }
             row ++
             if (w >= startOfProject && w < endOfProject) {
@@ -72,6 +73,7 @@ class ProjectGridModel implements GridModel, TaskListPortfolioAccessor {
                 gridElements << GridElement.nullElement
             }
         }
+
         return gridElements
     }
 
@@ -123,5 +125,10 @@ class ProjectGridModel implements GridModel, TaskListPortfolioAccessor {
     @Override
     int getNowX() {
         nowXRowCache
+    }
+
+    @Override
+    List<String> getProjectNames() {
+        return allProjectNames
     }
 }

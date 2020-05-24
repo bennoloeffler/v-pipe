@@ -1,5 +1,6 @@
 package transform
 
+import core.VpipeDataException
 import core.VpipeException
 import groovy.json.JsonSlurper
 
@@ -131,21 +132,21 @@ class CapaTransformerTest extends GroovyTestCase {
             def capa = slurpTextAndCalc(text)
             println(capa)
         }
-        assert msg == "Problem in JSON-Format von Datei Abteilungs-Kapazitäts-Angebot.txt: unexpected character x"
+        assert msg == "Problem in JSON-Format von Datei Abteilungs-Kapazitaets-Angebot.txt:\nunexpected character x"
 
         text = ""
         msg = shouldFail (VpipeException) {
             def capa = slurpTextAndCalc(text)
             println(capa)
         }
-        assert msg == "Problem in JSON-Format von Datei Abteilungs-Kapazitäts-Angebot.txt: Text must not be null or empty"
+        assert msg == "Problem in JSON-Format von Datei Abteilungs-Kapazitaets-Angebot.txt:\nText must not be null or empty"
 
         text = "{}"
-        msg = shouldFail (VpipeException) {
+        msg = shouldFail (VpipeDataException) {
             def capa = slurpTextAndCalc(text)
             println(capa)
         }
-        assert msg == "Problem in JSON-Format von Datei Abteilungs-Kapazitäts-Angebot.txt: Cannot get property 'Feiertage' on null object"
+        assert msg == "Fehler beim Lesen der Datei Abteilungs-Kapazitaets-Angebot.txt\nEintrag 'Kapa_Gesamt' fehlt."
 
         text = """{
                  "Kapa_Gesamt": {
@@ -161,7 +162,8 @@ class CapaTransformerTest extends GroovyTestCase {
             def capa = slurpTextAndCalc(text)
             println(capa)
         }
-        assert msg == "Problem in JSON-Format von Datei Abteilungs-Kapazitäts-Angebot.txt: Keine Abteilungen definiert in Abteilungs-Kapazitäts-Angebot.txt"
+        assert msg == "Fehler beim Lesen der Datei Abteilungs-Kapazitaets-Angebot.txt\n" +
+                "Kein Abschnitt 'Kapa_Abteilungen' definiert"
 
 
     }

@@ -2,7 +2,9 @@ package gui
 
 import core.ProjectDataToLoadCalculator
 import core.TaskInProject
-
+import transform.CapaTransformer
+import transform.DateShiftTransformer
+import transform.PipelineTransformer
 
 import javax.swing.JFrame
 import javax.swing.JScrollPane
@@ -44,10 +46,18 @@ class VpipeGui {
      * @param p
      */
     def static openGuiOnFile() {
-        List<TaskInProject> taskInProjects = ProjectDataToLoadCalculator.dataFromFileStatic
+        ProjectDataToLoadCalculator pt = new ProjectDataToLoadCalculator()
+        def dst = new DateShiftTransformer(pt)
+        pt.transformers << dst
+        //pt.transformers << new PipelineTransformer(pt)
+        pt.transformers << new CapaTransformer(pt)
+        pt.updateConfiguration()
+        pt.calcDepartmentLoad(TaskInProject.WeekOrMonth.WEEK)
+        pt.transformers.remove(dst)
+        List<TaskInProject> taskInProjects = pt.taskList
         ProjectGridModel m = new ProjectGridModel(taskInProjects)
         loadPanel = new LoadGridPanel(30)
-        projectPanel = new GridProjectPanel(30,  m, loadPanel)
+        projectPanel = new GridProjectPanel(30,  m, loadPanel, pt)
         createProjectFrame(projectPanel)
         createLoadFrame(loadPanel)
 

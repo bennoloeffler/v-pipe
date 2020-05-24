@@ -1,6 +1,7 @@
 package core
 
 import core.TaskInProject.WeekOrMonth
+import transform.CapaTransformer
 import utils.FileSupport
 import groovy.time.TimeCategory
 import groovy.transform.ToString
@@ -92,6 +93,13 @@ class ProjectDataToLoadCalculator implements TaskListPortfolioAccessor {
         writeToFileStatic(this, weekOrMonth)
     }
 
+    CapaTransformer getFilledCapaTransformer() {
+        for(t in transformers) {
+            if (t instanceof CapaTransformer && t.capaAvailable){return t}
+        }
+        null
+    }
+
 
     /**
      * reads data lines into a list of core.TaskInProject
@@ -165,6 +173,7 @@ class ProjectDataToLoadCalculator implements TaskListPortfolioAccessor {
      */
     static void writeToFileStatic(ProjectDataToLoadCalculator tr, WeekOrMonth weekOrMonth) {
 
+
         def t = new RunTimer(true)
 
         Map<String, Map<String, Double>> stringMapMap = tr.calcDepartmentLoad(weekOrMonth)
@@ -194,6 +203,7 @@ class ProjectDataToLoadCalculator implements TaskListPortfolioAccessor {
             allTimeKeys.each { String timeKey ->
                 if (loadMap[timeKey]) {
                     def commaNumber = String.format("%.1f", loadMap[timeKey])
+
                     loads << "\t" +  commaNumber
                 } else {
                     loads << "\t0,0"

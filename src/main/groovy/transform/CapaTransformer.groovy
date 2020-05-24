@@ -23,7 +23,7 @@ class YellowRedLimit {
 @groovy.transform.InheritConstructors
 class CapaTransformer extends Transformer {
 
-    static String FILE_NAME = "Abteilungs-Kapazitäts-Angebot.txt"
+    static String FILE_NAME = "Abteilungs-Kapazitaets-Angebot.txt"
 
     /**
      * key: department -->
@@ -31,8 +31,12 @@ class CapaTransformer extends Transformer {
      * value: the capaAvailable
      */
     Map<String, Map<String, YellowRedLimit>> capaAvailable
-    List<Date> publicHoliday
+    //List<Date> publicHoliday
 
+    /**
+     * cache for recalc
+     */
+    def jsonSlurp
 
     /**
      * @return the core.TaskInProject List that is transformed
@@ -41,12 +45,8 @@ class CapaTransformer extends Transformer {
     List<TaskInProject> transform() {
 
         description="Dates transformed:\n"
-        List<TaskInProject> result = []
 
-        def allProjects = plc.getAllProjects()
-        allProjects.each() { projectName ->
-            def projectList = plc.getProject(projectName)
-        }
+        // DO NOTZING - just get the load
         return plc.taskList
     }
 
@@ -63,8 +63,14 @@ class CapaTransformer extends Transformer {
     }
 
 
+    def reCalcCapa() {
+        assert jsonSlurp
+        capaAvailable = calcCapa(jsonSlurp)
+
+    }
 
     Map<String, Map<String, YellowRedLimit>> calcCapa(def jsonSlurp) {
+        this.jsonSlurp = jsonSlurp
 
         def fileErr = {"Fehler beim Lesen der Datei $FILE_NAME\n"}
 

@@ -1,6 +1,7 @@
 package gui
 
 import groovy.transform.CompileStatic
+import transform.YellowRedLimit
 import utils.RunTimer
 
 import javax.swing.JPanel
@@ -24,13 +25,18 @@ class LoadGridPanel extends JPanel{
     int gridHeigth
     int gridWidth
 
+    int nameWidth
+
     int nowXRowCache
 
     /**
      * THIS IS A PERCENTAGE - not the absolut load!
      */
-    Map<String, Map<String, Double>> depTimeLoadMap
+    Map<String, Map<String, Double>> depTimeLoadMap // compared to maxRed
     List<String> allTimeKeys
+    Map<String, Map<String, YellowRedLimit>> capaAvailable
+    Map<String, Double> maxRed
+
 
     JScrollPane getScrollPane() {
         getParent()?.getParent() as JScrollPane
@@ -41,23 +47,30 @@ class LoadGridPanel extends JPanel{
         gridHeigth = gridWidth * 3
         borderWidth = (int)(gridWidth / 3)
         scrollPane?.getVerticalScrollBar()?.setUnitIncrement((gridHeigth/6) as int)
-
+        nameWidth = gridHeigth
         invalidate()
         repaint()
     }
 
-    void setModelData(Map<String, Map<String, Double>> depTimeLoadMap, List<String> allTimeKeys) {
+    void setModelData(Map<String, Map<String, Double>> depTimeLoadMap, List<String> allTimeKeys, Map<String, Map<String, YellowRedLimit>> capaAvailable ) {
         this.depTimeLoadMap = depTimeLoadMap
         this.allTimeKeys = allTimeKeys
+        this.capaAvailable = capaAvailable
+
+        assert this.depTimeLoadMap != null
+        assert this.allTimeKeys != null
+        assert this.capaAvailable != null
+
         normalizeTo100Percent()
         setNow()
         invalidate()
         repaint()
     }
 
-    LoadGridPanel(int gridWidth, Map<String, Map<String, Double>> depTimeLoadMap=[:], List<String> allTimeKeys=[]) {
+    LoadGridPanel(int gridWidth) {
         //super()
-        setModelData(depTimeLoadMap, allTimeKeys)
+        //Map<String, Map<String, Double>> depTimeLoadMap=[:], List<String> allTimeKeys=[], Map<String, Map<String, YellowRedLimit>> capaAvailable = [:]
+        setModelData([:], [], [:])
         setGridWidth(gridWidth)
     }
 
@@ -72,20 +85,37 @@ class LoadGridPanel extends JPanel{
             }
             row++
         }
+        // TODO: out of range = 0...
     }
 
     def normalizeTo100Percent() {
-
-        depTimeLoadMap.each {
-            //String dep = it.key
+        maxRed = [:]
+        if (capaAvailable) {
+            depTimeLoadMap.each {
+            String dep = it.key
             Map<String, Double> load = it.value
-            Double maxVal = load.max {
-                it.value
-            }.value
-            load.each {String timeStamp, Double capa ->
-                load[timeStamp] = (Double) (capa / maxVal)
+                Double maxVal = load.max {
+                    it.value
+                }.value
+                maxRed[dep] = maxVal
+                load.each { String timeStamp, Double capa ->
+                    //Double avail = capaAvailable[dep][timeStamp].yellow
+                    load[timeStamp] = (Double) (capa)
+                }
+            }
+        } else {
+            depTimeLoadMap.each {
+                //String dep = it.key
+                Map<String, Double> load = it.value
+                Double maxVal = load.max {
+                    it.value
+                }.value
+                load.each { String timeStamp, Double capa ->
+                    load[timeStamp] = (Double) (capa / maxVal)
+                }
             }
         }
+        //println depTimeLoadMap
     }
 
 
@@ -101,7 +131,6 @@ class LoadGridPanel extends JPanel{
 
         RunTimer t = new RunTimer(true)
 
-
         //
         // paint elements
         //
@@ -109,12 +138,19 @@ class LoadGridPanel extends JPanel{
         depTimeLoadMap.keySet().each { String department ->
             int x = 0
             allTimeKeys.each { String timeStr ->
-                int gridX = borderWidth + x*gridWidth
+                int gridX = nameWidth + borderWidth + x*gridWidth
                 int gridY = borderWidth + y*gridHeigth
                 Double val = depTimeLoadMap[department][timeStr]?:0
-                //println("b: $borderWidth w: $gridWidth h: $gridHeigth")
-                //println("x: $gridX y: $gridY")
-                drawGridElement(g, val, gridX, gridY)
+                if(capaAvailable) {
+                    Double max = maxRed[department]
+                    Double yellow = capaAvailable[department][timeStr].yellow
+                    Double red = capaAvailable[department][timeStr].red
+                    drawGridElementYelloRed(g, val, max, yellow, red, gridX, gridY)
+                } else {
+                    //println("b: $borderWidth w: $gridWidth h: $gridHeigth")
+                    //println("x: $gridX y: $gridY")
+                    drawGridElement(g, val, gridX, gridY)
+                }
                 x++
             }
             y++
@@ -128,7 +164,7 @@ class LoadGridPanel extends JPanel{
         int size = (int)((gridWidth - offset)/3 ) // size of shadow box and element box
         if(gridWidth<15) {size=size*2}
         int round = (size / 2) as int // corner diameter
-        int nowGraphX = borderWidth + nowXRowCache * gridWidth + (int)((gridWidth - size)/2)// position start (left up)
+        int nowGraphX = borderWidth + nowXRowCache * gridWidth + (int)((gridWidth - size)/2) + nameWidth// position start (left up)
         int nowGraphY = borderWidth + depTimeLoadMap.size() * gridHeigth // position end (right down)
 
         // shadow
@@ -139,25 +175,38 @@ class LoadGridPanel extends JPanel{
         g.fillRoundRect(nowGraphX, 0, size-4 , nowGraphY+borderWidth-4, round, round)
 
 
+
         //
-        // paint only elements inside clipBounds
+        // draw the department names
         //
-        /*
-        int y = 0
-        depTimeLoadMap.entrySet().each { def mapEntry  ->
-            Map<String, Double> loads = mapEntry.value // example: Map of key: 2020-W05 value: 2.0
-            int x = 0
-            loads.each {def timeLoadEntry ->
-                int gridX = borderWidth + x*gridWidth
-                int gridY = borderWidth + y*gridHeigth
-                drawGridElement(g, timeLoadEntry.value, gridX, gridY)
-                x++
+
+        y = 0
+        depTimeLoadMap.keySet().each { String department ->
+            g.setColor(Color.LIGHT_GRAY)
+            int gridY = borderWidth + y*gridHeigth
+            g.fillRoundRect(borderWidth , gridY, nameWidth-4, gridHeigth - 4 , round*3, round*3)
+
+            if(gridWidth>20) {
+                // write (with shadow) some info
+                // TODO: use Clip, Transform, Paint, Font and Composite
+                float fontSize = gridWidth / 2
+                g.getClipBounds(rBackup)
+                g.setClip(borderWidth , gridY, nameWidth-6, gridHeigth - 6)
+                g.setFont(g.getFont().deriveFont((float) fontSize))
+                g.setColor(Color.WHITE)
+                g.drawString(department, borderWidth + (int) (gridWidth * 0.2), gridY + (int) (gridWidth * 2/3))
+                g.setColor(Color.BLACK)
+                g.drawString(department, borderWidth + (int) (gridWidth * 0.2)-2, gridY + (int) (gridWidth * 2/3)-2)
+                g.setClip(rBackup)
             }
+
             y++
         }
-        t.stop("drawing all")
-        */
+
     }
+
+    Rectangle rBackup = new Rectangle()
+
 
 
     /**
@@ -168,9 +217,45 @@ class LoadGridPanel extends JPanel{
         int y = depTimeLoadMap.size()
         int x = allTimeKeys.size()
         //println("$x $y")
-        return new Dimension(2*borderWidth + gridWidth * x ,2 * borderWidth + gridHeigth * y) //model.sizeX*grid + 2*borderWidth, model.sizeY*grid + 2*borderWidth)
+        return new Dimension(nameWidth + 2*borderWidth + gridWidth * x ,2 * borderWidth + gridHeigth * y) //model.sizeX*grid + 2*borderWidth, model.sizeY*grid + 2*borderWidth)
     }
 
+    @CompileStatic
+    def drawGridElementYelloRed(Graphics2D g,  Double val, Double max, Double yellow, Double red, int x, int y) {
+
+        int offset = (gridWidth/20) as int // shadow and space
+        int sizeX = gridWidth - offset // size of shadow box and element box
+        int sizeY = gridHeigth - offset // size of shadow box and element box
+        int round = (sizeX / 2) as int // corner diameter
+        //int graphX = borderWidth + x * gridWidth // position
+        //int graphY = borderWidth + y * gridHeigth // position
+        //int gridMouseX = getGridXFromMouseX()
+        //int gridMouseY = getGridYFromMouseY()
+        //println("gridMouseX=$gridMouseX gridMouseY=$gridMouseY")
+
+
+        if (max < red) {max = red}
+        if (max < yellow) {max = yellow}
+
+        Double percent = (Double)(val / max)
+
+        //println(percent)
+        int percentShift = (int)((sizeY-4) - percent * (sizeY-4))
+        //int percentShift = sizeY - percentageGrid
+
+        // shadow
+        g.setColor(Color.LIGHT_GRAY)
+        g.fillRoundRect(x+offset, y+percentShift+offset, sizeX-4, (int)(percent * (sizeY-4)), round, round)
+
+        // accordig to load...
+        g.setColor(Color.GRAY)
+        if(val <= yellow) {g.setColor(Color.GREEN)}
+        if(val > yellow && val <= red) {g.setColor(Color.YELLOW)}
+        if(val > red) {g.setColor(Color.RED)}
+
+        g.fillRoundRect(x, y+percentShift, sizeX-4 , (int)(percent * (sizeY-4)), round, round)
+
+    }
 
 
     /**
