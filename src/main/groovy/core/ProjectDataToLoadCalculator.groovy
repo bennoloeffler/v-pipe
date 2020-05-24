@@ -215,4 +215,7 @@ class ProjectDataToLoadCalculator implements TaskListPortfolioAccessor {
         t.stop("writeToFileStatic $fn")
     }
 
+    List<String> getAllDepartments() {
+        taskList*.department.unique()
+    }
 }

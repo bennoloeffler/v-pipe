@@ -6,16 +6,19 @@ import utils.RunTimer
 
 import javax.swing.JPanel
 import javax.swing.JScrollPane
+import javax.swing.ToolTipManager
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.Rectangle
+import java.awt.event.MouseEvent
+import java.awt.event.MouseMotionListener
 
 import static extensions.DateHelperFunctions._getWeekYearStr
 
 @CompileStatic
-class LoadGridPanel extends JPanel{
+class LoadGridPanel extends JPanel implements MouseMotionListener{
 
     Color nowBarColor = new Color(255, 0, 0, 60)
     Color nowBarShadowColor = new Color(50, 50, 50, 30)
@@ -32,11 +35,85 @@ class LoadGridPanel extends JPanel{
     /**
      * THIS IS A PERCENTAGE - not the absolut load!
      */
-    Map<String, Map<String, Double>> depTimeLoadMap // compared to maxRed
+    Map<String, Map<String, Double>> depTimeLoadMap // compared to maxRed, if capaAvailable
     List<String> allTimeKeys
     Map<String, Map<String, YellowRedLimit>> capaAvailable
     Map<String, Double> maxRed
 
+
+    /**
+     * @return gridY - based on mouse pos
+     */
+    int getGridYFromMouseY(int mouseY) {
+        int gridY = ((mouseY - borderWidth) / gridHeigth) as int
+        gridY
+    }
+
+    /**
+     * @return gridX - based on mouse pos
+     */
+    int getGridXFromMouseX(int mouseX) {
+        int gridX = ((mouseX - borderWidth- nameWidth) / gridWidth) as int
+        gridX
+    }
+
+    //
+    // MouseMotionListener
+    //
+
+    @Override
+    void mouseDragged(MouseEvent e) {
+        int x = e.getY()
+        int y = e.getX()
+        /*
+        println("drag: x=$x y=$y")
+        int gX = getGridXFromMouseX(x)
+        int gY = getGridYFromMouseY(y)
+        int swapX = getGridXFromMouseX(startDragX)
+        int swapY = getGridYFromMouseY(startDragY)
+        */
+    }
+
+    @Override
+    void mouseMoved(MouseEvent e) {
+        //mouseX = e.getX()
+        //mouseY = e.getY()
+        MouseEvent phantom = new MouseEvent(
+                this,
+                MouseEvent.MOUSE_MOVED,
+                System.currentTimeMillis(),
+                0,
+                e.getX(),
+                e.getY(),
+                0,
+                false)
+
+        ToolTipManager.sharedInstance().mouseMoved(phantom)
+    }
+
+    @Override
+    String getToolTipText(MouseEvent event) {
+        String html = null
+
+        def gridX = getGridXFromMouseX(event.x)
+        def gridY = getGridYFromMouseY(event.y)
+        if (gridX >= 0 && gridX < allTimeKeys.size() && gridY >= 0 && gridY < depTimeLoadMap.size()) {
+            String timeKey = allTimeKeys[gridX]
+            String dep = depTimeLoadMap.keySet()[gridY]
+            Double load = depTimeLoadMap[dep][timeKey]
+            Double red = capaAvailable[dep][timeKey].red
+            Double yellow = capaAvailable[dep][timeKey].yellow
+
+
+            // <br/>$element.fromToDateString
+            html =
+                    "<html><p style=\"background-color:white;\"><font color=\"#808080\" " +
+                            "size=\"20\" face=\"Verdana\">$dep<br/>$timeKey<br/>Last: ${String.format('%.1f',load)}<br/>"+
+                            "gelb bei: ${String.format('%.1f',yellow)}<br/>rot bei: ${String.format('%.1f',red)}" + // SIZE DOES NOT WORK!
+                            "</font></p></html>"
+        }
+        return html
+    }
 
     JScrollPane getScrollPane() {
         getParent()?.getParent() as JScrollPane
@@ -72,6 +149,7 @@ class LoadGridPanel extends JPanel{
         //Map<String, Map<String, Double>> depTimeLoadMap=[:], List<String> allTimeKeys=[], Map<String, Map<String, YellowRedLimit>> capaAvailable = [:]
         setModelData([:], [], [:])
         setGridWidth(gridWidth)
+        addMouseMotionListener(this)
     }
 
     def setNow() {
@@ -247,13 +325,50 @@ class LoadGridPanel extends JPanel{
         g.setColor(Color.LIGHT_GRAY)
         g.fillRoundRect(x+offset, y+percentShift+offset, sizeX-4, (int)(percent * (sizeY-4)), round, round)
 
-        // accordig to load...
+        //
+        // color and bar accordig to load...
+        //
+        //
         g.setColor(Color.GRAY)
         if(val <= yellow) {g.setColor(Color.GREEN)}
         if(val > yellow && val <= red) {g.setColor(Color.YELLOW)}
         if(val > red) {g.setColor(Color.RED)}
 
         g.fillRoundRect(x, y+percentShift, sizeX-4 , (int)(percent * (sizeY-4)), round, round)
+
+        Double percentRed = (Double)(red / max)
+        Double percentYellow = (Double)(yellow / max)
+
+        percentShift = (int)((sizeY-4) - percentRed * (sizeY-4))
+        g.setColor(Color.RED)
+        //g.drawLine(x, y+percentShift, x - (int)(sizeX/2)+sizeX-4, y+percentShift)
+        g.drawLine(x, y+percentShift, x +sizeX-4, y+percentShift)
+
+        g.setColor(getBackground())
+        //g.drawLine(x, y+percentShift, x - (int)(sizeX/2)+sizeX-4, y+percentShift)
+        g.drawLine(x, y+percentShift+1, x +sizeX-4, y+percentShift+1)
+
+        percentShift = (int)((sizeY-4) - percentYellow * (sizeY-4))
+        g.setColor(Color.ORANGE)
+        //g.drawLine(x+(int)(sizeX/2), y+percentShift, x+sizeX-4, y+percentShift)
+        g.drawLine(x, y+percentShift, x+sizeX-4, y+percentShift)
+
+        //
+        // write percantage
+        //
+        String p = String.format('%.0f', val/yellow*100) +"%"
+
+        // write (with shadow) some info
+        float fontSize = 20.0 * gridWidth/60
+        g.getClipBounds(rBackup)
+        g.setClip(x, y, sizeX-8 , sizeY-8)
+        g.setFont (g.getFont().deriveFont((float)fontSize) )
+        g.setColor(Color.WHITE)
+        g.drawString(p, x+4, y + gridHeigth - (int)fontSize)
+        g.setColor(Color.BLACK)
+        g.drawString(p, x+4-2, y + gridHeigth - (int)fontSize-2)
+        g.setClip(rBackup)
+
 
     }
 
@@ -299,19 +414,6 @@ class LoadGridPanel extends JPanel{
 
         // or cursor color (overwrites everything)
 
-/*
-        // write (with shadow) some info
-        // TODO: use Clip, Transform, Paint, Font and Composite
-        float fontSize = 20.0 * grid/60
-        g.getClipBounds(rBackup)
-        g.setClip(graphX, graphY, size-6, size-6)
-        g.setFont (g.getFont().deriveFont((float)fontSize) )
-        g.setColor(Color.WHITE)
-        g.drawString(e.project, graphX + (int)(grid*0.2),     graphY + (int)(grid/2))
-        g.setColor(Color.BLACK)
-        g.drawString(e.project, graphX + (int)(grid*0.2 - 2), graphY + (int)(grid/2 - 2))
-        g.setClip(rBackup)
-*/
     }
 
     //Rectangle rBackup = new Rectangle()

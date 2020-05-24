@@ -55,6 +55,8 @@ class CapaTransformer extends Transformer {
             def slurper = new JsonSlurper()
             def result = slurper.parseText(text)
             capaAvailable = calcCapa(result)
+            check()
+
         } catch (VpipeDataException ve) {
             throw ve
         } catch (Exception e) {
@@ -143,7 +145,18 @@ class CapaTransformer extends Transformer {
             //println("$dep.key $capaMap")
             result[(String)(dep.key)] = capaMap
         }
+
         result
+    }
+
+    def check() {
+        List<String> depsTasks = plc.getAllDepartments()
+        Set<String> depsCapa= capaAvailable.keySet()
+        List<String> remain = (List<String>)(depsTasks.clone())
+        remain.removeAll(depsCapa)
+        if(remain) throw new VpipeDataException("für folgende Abteilungen ist keine Kapa definiert: $remain")
+
+
     }
 
     Double percentageLeftAfterPublicHoliday(String week, List listOfPubHoliday) {

@@ -2,6 +2,7 @@ package gui
 
 import core.ProjectDataToLoadCalculator
 import core.TaskInProject
+import core.VpipeDataException
 import transform.CapaTransformer
 import transform.DateShiftTransformer
 import transform.PipelineTransformer
@@ -27,6 +28,31 @@ import java.awt.Toolkit
  */
 class VpipeGui {
 
+    static class ExceptionHandler implements Thread.UncaughtExceptionHandler {
+
+        void handle(Throwable thrown) {
+            // for EDT exceptions
+            handleException(Thread.currentThread().getName(), thrown)
+        }
+
+        void uncaughtException(Thread thread, Throwable thrown) {
+            // for other uncaught exceptions
+            handleException(thread.getName(), thrown)
+        }
+
+        void handleException(String tname, Throwable thrown) {
+            if(thrown instanceof VpipeDataException) {
+                println "\nD A T E N - F E H L E R :\n" + thrown.getMessage()?:''
+            } else {
+                println "PROBLEM. Programm ist gecrasht :-(:\n${thrown.getMessage()?:''}\n\nSTACKTRACE: (bitte an BEL)\n\n"
+                thrown.printStackTrace()
+            }
+            //todo logile
+            sleep(10000)
+            System.exit(-1)
+        }
+    }
+
     static JFrame projectFrame
     static JFrame loadFrame
     static LoadGridPanel loadPanel
@@ -36,8 +62,32 @@ class VpipeGui {
      * @param args
      */
     static void main(String[] args) {
-        GridProjectPanel p = new GridProjectPanel()
-        createProjectFrame(p)
+        //
+        // AWT event dispatch thread: get the exceptions...
+        //
+        Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler())
+        System.setProperty("sun.awt.exception.handler",
+                ExceptionHandler.class.getName())
+
+        try {
+            SwingUtilities.invokeLater {
+                openGuiOnFile()
+            }
+        } catch ( VpipeDataException e ) {
+            println "\nD A T E N - F E H L E R :\n" + e.getMessage()
+            sleep(10000)
+        } catch(Exception e) {
+            println "PROBLEM. Programm ist gecrasht :-(:\n${e.getMessage()}\n\nSTACKTRACE: (bitte an BEL)\n\n"
+            e.printStackTrace()
+            //todo logile
+            sleep(10000)
+        }
+
+        //
+        // Demo Panel
+        //
+        //GridProjectPanel p = new GridProjectPanel()
+        //createProjectFrame(p)
     }
 
 
@@ -79,7 +129,7 @@ class VpipeGui {
         //placeWindowTop(projectFrame)
         projectFrame.setVisible(true)
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize()
-        projectFrame.setSize((int)(projectFrame.getSize().width), (int)(dimension.height/2))
+        projectFrame.setSize((int)(dimension.width), (int)(dimension.height/2))
         projectFrame.setLocation((int)((dimension.width-projectFrame.width) / 2), 0)
     }
 
@@ -99,7 +149,7 @@ class VpipeGui {
         //placeWindowBottom(loadFrame)
         loadFrame.setVisible(true)
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize()
-        loadFrame.setSize((int)(projectFrame.getSize().width), (int)(dimension.height/2 -50))
+        loadFrame.setSize((int)(dimension.width), (int)(dimension.height/2 -50))
         loadFrame.setLocation((int)((dimension.width-projectFrame.width) / 2), (int)(dimension.height/2))
         loadPanel.setGridWidth(projectPanel.grid) // to make repaint...
 
