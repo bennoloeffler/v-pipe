@@ -103,9 +103,7 @@ class CapaTransformer extends Transformer {
         Map departments = jsonSlurp.Kapa_Abteilungen
         if(!departments) {throw new VpipeDataException("${fileErr()}Kein Abschnitt 'Kapa_Abteilungen' definiert")}
         for(dep in departments) {
-            if(dep.key == 'Konstruktion') {
-                println()
-            }
+
             Map<String, YellowRedLimit> capaMap = [:]
             // get the red and green limit
             if(! dep.value['Kapa']) {throw new VpipeDataException("${fileErr()}Kein Abschnitt 'Kapa' in Abteilung '$dep.key' definiert")}

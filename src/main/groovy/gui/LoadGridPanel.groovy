@@ -35,6 +35,7 @@ class LoadGridPanel extends JPanel implements MouseMotionListener{
     /**
      * THIS IS A PERCENTAGE - not the absolut load!
      */
+    Map<String, Map<String, Double>> projectTimeLoadMap = [:] // compared to maxRed, if capaAvailable // CURRENT PROJECT OR [:]
     Map<String, Map<String, Double>> depTimeLoadMap // compared to maxRed, if capaAvailable
     List<String> allTimeKeys
     Map<String, Map<String, YellowRedLimit>> capaAvailable
@@ -129,14 +130,15 @@ class LoadGridPanel extends JPanel implements MouseMotionListener{
         repaint()
     }
 
-    void setModelData(Map<String, Map<String, Double>> depTimeLoadMap, List<String> allTimeKeys, Map<String, Map<String, YellowRedLimit>> capaAvailable ) {
+    void setModelData(Map<String, Map<String, Double>> depTimeLoadMap, Map<String, Map<String, Double>> projectTimeLoadMap, List<String> allTimeKeys, Map<String, Map<String, YellowRedLimit>> capaAvailable ) {
         this.depTimeLoadMap = depTimeLoadMap
+        this.projectTimeLoadMap = projectTimeLoadMap
         this.allTimeKeys = allTimeKeys
         this.capaAvailable = capaAvailable
 
         assert this.depTimeLoadMap != null
         assert this.allTimeKeys != null
-        assert this.capaAvailable != null
+        //assert this.capaAvailable != null
 
         normalizeTo100Percent()
         setNow()
@@ -147,7 +149,7 @@ class LoadGridPanel extends JPanel implements MouseMotionListener{
     LoadGridPanel(int gridWidth) {
         //super()
         //Map<String, Map<String, Double>> depTimeLoadMap=[:], List<String> allTimeKeys=[], Map<String, Map<String, YellowRedLimit>> capaAvailable = [:]
-        setModelData([:], [], [:])
+        setModelData([:], [:], [], [:])
         setGridWidth(gridWidth)
         addMouseMotionListener(this)
     }
@@ -220,10 +222,18 @@ class LoadGridPanel extends JPanel implements MouseMotionListener{
                 int gridY = borderWidth + y*gridHeigth
                 Double val = depTimeLoadMap[department][timeStr]?:0
                 if(capaAvailable) {
+                    Double valProject =  0
+                    Map<String, Double> map = projectTimeLoadMap[department]
+                    if(map) {
+                        valProject = map[timeStr] ?: 0
+                        if (valProject > 0) {
+                            //print(String.format("%.2f", valProject) + " ")
+                        }
+                    }
                     Double max = maxRed[department]
                     Double yellow = capaAvailable[department][timeStr].yellow
                     Double red = capaAvailable[department][timeStr].red
-                    drawGridElementYelloRed(g, val, max, yellow, red, gridX, gridY)
+                    drawGridElementYelloRed(g, val, valProject, max, yellow, red, gridX, gridY)
                 } else {
                     //println("b: $borderWidth w: $gridWidth h: $gridHeigth")
                     //println("x: $gridX y: $gridY")
@@ -233,6 +243,7 @@ class LoadGridPanel extends JPanel implements MouseMotionListener{
             }
             y++
         }
+        //println()
 
         //
         // paint the now-indicator row above everything else
@@ -299,7 +310,7 @@ class LoadGridPanel extends JPanel implements MouseMotionListener{
     }
 
     @CompileStatic
-    def drawGridElementYelloRed(Graphics2D g,  Double val, Double max, Double yellow, Double red, int x, int y) {
+    def drawGridElementYelloRed(Graphics2D g,  Double val, Double valProject, Double max, Double yellow, Double red, int x, int y) {
 
         int offset = (gridWidth/20) as int // shadow and space
         int sizeX = gridWidth - offset // size of shadow box and element box
@@ -335,6 +346,23 @@ class LoadGridPanel extends JPanel implements MouseMotionListener{
         if(val > red) {g.setColor(Color.RED)}
 
         g.fillRoundRect(x, y+percentShift, sizeX-4 , (int)(percent * (sizeY-4)), round, round)
+
+
+
+        //
+        // project caused load
+        //
+        Double percentProject = (Double)(valProject / max)
+        int percentShiftProject = (int)((sizeY-4) - percentProject * (sizeY-4))
+
+        g.setColor(Color.BLUE)
+        g.fillRoundRect(x, y+percentShiftProject, sizeX-4 , (int)(percentProject * (sizeY-4)), round, round)
+
+
+
+        //
+        // draw max-line of yellow and read
+        //
 
         Double percentRed = (Double)(red / max)
         Double percentYellow = (Double)(yellow / max)

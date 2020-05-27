@@ -237,11 +237,20 @@ gleichzeitig gearbeitet werden soll.
 
 ### Features
 
-TODO: 2020-05-XX `0.4.0-GUI-Pipeliner`
-- Belastung beim bearbeiten visualisieren, editieren.
+TODO: 2020-05-XX `0.8.0-LoadSave`
+- Speichern der Daten (in eigenem Daten-Ordner) - öffnen von Datenordnern
 
-TODO: 2020-05-XX `0.4.0-GUI-Pipeliner`
-- Pipeline visualisieren, editieren. Ergebnisse speiche.
+TODO: 2020-05-XX `0.7.0-Template`
+- Datenfile für Portfolio auf Basis von Templates
+
+TODO: 2020-05-XX `0.6.0-GUI-Project-Edit`
+- Tasks eines Projektes visualisieren und verschieben.
+
+2020-05-25 `0.5.0-GUI-Project`
+- Belastung durch ein Projekt visualisieren.
+
+2020-05-23 `0.4.0-GUI-Pipeliner`
+- Pipeline visualisieren, editieren.
 
 2020-05-13 `0.3.1-Pipeliner`
 - Performance besser beim schreiben  

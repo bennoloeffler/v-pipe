@@ -19,7 +19,7 @@ import java.awt.Desktop
  */
 class  Main {
 
-    static VERSION_STRING ='0.4.0-GUI-Pipeliner'
+    static VERSION_STRING ='0.5.0-GUI-Project'
 
     static void main(String[] args) {
 

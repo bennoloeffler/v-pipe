@@ -218,4 +218,27 @@ class ProjectDataToLoadCalculator implements TaskListPortfolioAccessor {
     List<String> getAllDepartments() {
         taskList*.department.unique()
     }
+
+    Map<String, Map<String, Double>> calcProjectLoad(WeekOrMonth weekOrMonth, String project) {
+
+        List<TaskInProject> projectTaskList = getProject(project)
+        def load = [:]
+        projectTaskList.each {
+            def capaMap = it.getCapaDemandSplitIn(weekOrMonth)
+            capaMap.each { key, value ->
+
+                // if there is not yet a department key and map: create
+                if (!load[it.department]) {
+                    load[it.department] = [:]
+                }
+                if(load[it.department][key]) { // if department and week-key are available
+                    load[it.department][key]+=value // add
+                } else {
+                    load[it.department][key]=value // otherwise create
+                }
+
+            }
+        }
+        load as Map<String, Map<String, Double>>
+    }
 }

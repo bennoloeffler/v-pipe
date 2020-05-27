@@ -179,6 +179,9 @@ class GridProjectPanel extends JPanel implements MouseWheelListener, MouseMotion
         mouseY = e.getY()
         cursorX = getGridXFromMouseX()
         cursorY = getGridYFromMouseY()
+        SwingUtilities.invokeLater {
+            updateLoadData()
+        }
         //redraw << new Point(cursorX, cursorY)
         //revalidate()
         //model.firePointListeners(redraw)
@@ -276,6 +279,8 @@ class GridProjectPanel extends JPanel implements MouseWheelListener, MouseMotion
 
         SwingUtilities.invokeLater() {
             scrollToCursorXY()
+            updateLoadData()
+
         }
 
         invalidateAndRepaint()
@@ -401,9 +406,14 @@ class GridProjectPanel extends JPanel implements MouseWheelListener, MouseMotion
                 //ProjectDataToLoadCalculator dc = new ProjectDataToLoadCalculator()
                 dc.taskList = ((ProjectGridModel) model).taskList
                 Map<String, Map<String, Double>> stringMapMap = dc.calcDepartmentLoad(TaskInProject.WeekOrMonth.WEEK)
+                Map<String, Map<String, Double>> stringMapMapProject = [:]
+                if(cursorY >= 0 && cursorY < model.getSizeY()) {
+                    String project = model.getProjectNames()[cursorY]
+                    stringMapMapProject = dc.calcProjectLoad(TaskInProject.WeekOrMonth.WEEK, project)
+                }
                 List<String> allKeys = dc.getFullSeriesOfTimeKeys(TaskInProject.WeekOrMonth.WEEK)
-                dc.filledCapaTransformer.reCalcCapa()
-                lp.setModelData(stringMapMap, allKeys, dc.filledCapaTransformer.capaAvailable)
+                dc.filledCapaTransformer?.reCalcCapa()
+                lp.setModelData(stringMapMap, stringMapMapProject, allKeys, dc.filledCapaTransformer?.capaAvailable)
             }
         }
     }
