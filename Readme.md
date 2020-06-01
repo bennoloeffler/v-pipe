@@ -5,8 +5,8 @@ Das V&S Pipeline-Werkzeug liest Daten-Dateien
 mit einer Projektlandschaft ein und erzeugt eine  
 Übersicht der Belastung aller beteiligten Abteilungen.  
 Es gibt die Möglichkeit, Projekte zu verschieben  
-und Portfolio-Szenarien zu modellieren.
-
+und Portfolio-Szenarien zu modellieren.  
+Quickstart- Video? [Hier Klicken...](https://www.loom.com/share/84d7636a20e745d19ac0489aa4eba2fc)
 ## Installation
 
 Die Distribution ist ein `v-pipe.zip`.  
