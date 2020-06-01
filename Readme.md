@@ -48,10 +48,12 @@ Option: *Zugriff auf Datei-URLs zulassen* aktivieren
 
 ### Start von v-pipe  
 
-Einfach Doppelklick auf v-pipe.exe. Das startet den  
+Einfach Doppelklick auf `v-pipe.exe`. Das startet den  
 Deamon-Mode: v-pipe lauert jetzt auf Veränderungen  
 der Daten-Dateien und zeigt Fehlermeldungen oder rechnet.  
-Mit v-pipe-exe bekommt man die Daten schnell konsistent.
+Mit v-pipe-exe bekommt man die Daten schnell konsistent.  
+Wenn die Daten konstistent sind, dann ansehen:  
+`v-pipe-gui.exe`
 
 **Alternative:** 
 `Windows-Taste` und tippen: `cmd + ENTER-Taste`  
@@ -64,7 +66,7 @@ Dort Programm durch tippen von
 Jetzt kann das Fenster zur Seite geschoben werden.  
 Wann immer die Grunddaten neu erzeugt, verändert oder  
 gelöscht werden, rechnet v-pipe und erzeugt  
-die Ergebnis-Dateien neu.
+die Ergebnis-Dateien neu - oder zeigt Datenfehler an.
 
 ### Ablage der Arbeits-Dateien
 Alle Arbeits-Dateien (Grunddaten und Ergebnise der Berechnungen)  
@@ -237,14 +239,14 @@ gleichzeitig gearbeitet werden soll.
 
 ### Features
 
-TODO: 2020-05-XX `0.8.0-LoadSave`
+TODO: 2020-06-XX `0.8.0-LoadSave`
 - Speichern der Daten (in eigenem Daten-Ordner) - öffnen von Datenordnern
 
-TODO: 2020-05-XX `0.7.0-Template`
+TODO: 2020-06-XX `0.7.0-Template`
 - Datenfile für Portfolio auf Basis von Templates
 
-TODO: 2020-05-XX `0.6.0-GUI-Project-Edit`
-- Tasks eines Projektes visualisieren und verschieben.
+2020-06-01 `0.6.0-GUI-Project-View`
+- Tasks eines Projektes visualisieren (noch nicht verschieben).
 
 2020-05-25 `0.5.0-GUI-Project`
 - Belastung durch ein Projekt visualisieren.

@@ -1,4 +1,4 @@
-package gui
+package view
 
 import groovy.transform.TupleConstructor
 
@@ -77,6 +77,9 @@ trait GridModel {
     /**
      * @return as it says
      */
-    abstract List<String> getProjectNames()
+    abstract List<String> getLineNames()
+
+    //abstract List<String> getLineNames()
+
 }
 

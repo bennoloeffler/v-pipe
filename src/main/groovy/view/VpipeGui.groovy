@@ -1,11 +1,11 @@
-package gui
+package view
 
-import core.ProjectDataToLoadCalculator
-import core.TaskInProject
-import core.VpipeDataException
+import core.LoadCalculator
+import model.Model
+import model.VpipeDataException
+import model.WeekOrMonth
 import transform.CapaTransformer
 import transform.DateShiftTransformer
-import transform.PipelineTransformer
 
 import javax.swing.JFrame
 import javax.swing.JScrollPane
@@ -27,6 +27,16 @@ import java.awt.Toolkit
  * Main - Demo and Real Starter (CTRL-O = open real data)
  */
 class VpipeGui {
+
+
+    static JFrame loadFrame
+    static LoadPanel loadPanel
+
+    static JFrame pipelineFrame
+    static PipelinePanel pipelinePanel
+
+    static JFrame projectFrame
+    static ProjectPanel projectPanel
 
     static class ExceptionHandler implements Thread.UncaughtExceptionHandler {
 
@@ -53,10 +63,6 @@ class VpipeGui {
         }
     }
 
-    static JFrame projectFrame
-    static JFrame loadFrame
-    static LoadGridPanel loadPanel
-    static GridProjectPanel projectPanel
     /**
      * start in DEMO-Mode
      * @param args
@@ -96,20 +102,29 @@ class VpipeGui {
      * @param p
      */
     def static openGuiOnFile() {
-        ProjectDataToLoadCalculator pt = new ProjectDataToLoadCalculator()
-        def dst = new DateShiftTransformer(pt)
+
+        Model model = new Model()
+        model.readAllData()
+
+        LoadCalculator pt = new LoadCalculator(model: model)
+        def dst = new DateShiftTransformer(model)
         pt.transformers << dst
-        //pt.transformers << new PipelineTransformer(pt)
-        pt.transformers << new CapaTransformer(pt)
-        pt.updateConfiguration()
-        pt.calcDepartmentLoad(TaskInProject.WeekOrMonth.WEEK)
+        pt.transformers << new CapaTransformer(model)
+        pt.calcDepartmentLoad(WeekOrMonth.WEEK)
         pt.transformers.remove(dst)
-        List<TaskInProject> taskInProjects = pt.taskList
-        ProjectGridModel m = new ProjectGridModel(taskInProjects)
-        loadPanel = new LoadGridPanel(30)
-        projectPanel = new GridProjectPanel(30,  m, loadPanel, pt)
-        createProjectFrame(projectPanel)
-        createLoadFrame(loadPanel)
+
+        loadPanel = new LoadPanel(30)
+
+
+        ProjectModel projectModel = new ProjectModel(model)
+        projectPanel = new ProjectPanel(30,  projectModel, loadPanel, pt)
+
+        PipelineModel m = new PipelineModel(model)
+        pipelinePanel = new PipelinePanel(30,  m, loadPanel, projectModel, pt)
+
+        createPipelineFrame()
+        createLoadFrame()
+        createProjectFrame()
 
     }
 
@@ -118,19 +133,39 @@ class VpipeGui {
      * create grid frame for pipelining
      * @param p
      */
-    static void createProjectFrame(GridProjectPanel p) {
-        projectFrame = new JFrame("v-pipe    |  +/- = Zoom  |  Pfeile = Cursor bewegen  |  Shift+Pfeile = Projekt bewegen  | CTRL-o = öffnen  ")
-        JScrollPane sp = new JScrollPane(p)
+    static void createPipelineFrame() {
+        pipelineFrame = new JFrame("v-pipe    |  +/- = Zoom  |  Pfeile = Cursor bewegen  |  Shift+Pfeile = Projekt bewegen  | CTRL-o = öffnen  ")
+        JScrollPane sp = new JScrollPane(pipelinePanel)
+        sp.getViewport().setScrollMode(JViewport.BACKINGSTORE_SCROLL_MODE)
+        pipelineFrame.getContentPane().add(sp)
+        pipelineFrame.addKeyListener(pipelinePanel) // needs to be here... not in p
+        pipelineFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
+        pipelineFrame.pack()
+        //placeWindowTop(projectFrame)
+        pipelineFrame.setVisible(true)
+        Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize()
+        pipelineFrame.setSize((int)(dimension.width/2), (int)(dimension.height/2))
+        pipelineFrame.setLocation(0, 0)
+    }
+
+    /**
+     * create grid frame for pipelining
+     * @param p
+     */
+    static void createProjectFrame() {
+
+        projectFrame = new JFrame("v-pipe  Projekt")
+        JScrollPane sp = new JScrollPane(projectPanel)
         sp.getViewport().setScrollMode(JViewport.BACKINGSTORE_SCROLL_MODE)
         projectFrame.getContentPane().add(sp)
-        projectFrame.addKeyListener(p) // needs to be here... not in p
+        //projectFrame.addKeyListener(projectPanel) // needs to be here... not in p
         projectFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
         projectFrame.pack()
         //placeWindowTop(projectFrame)
         projectFrame.setVisible(true)
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize()
-        projectFrame.setSize((int)(dimension.width), (int)(dimension.height/2))
-        projectFrame.setLocation((int)((dimension.width-projectFrame.width) / 2), 0)
+        projectFrame.setSize((int)(dimension.width/2), (int)(dimension.height/2))
+        projectFrame.setLocation((int)(dimension.width/ 2), 0)
     }
 
 
@@ -138,9 +173,9 @@ class VpipeGui {
      * create (invisible) load view
      * @param p
      */
-    def static createLoadFrame(LoadGridPanel lp) {
+    def static createLoadFrame() {
         loadFrame = new JFrame("v-pipe  Load")
-        JScrollPane sp = new JScrollPane(lp)
+        JScrollPane sp = new JScrollPane(loadPanel)
         sp.getViewport().setScrollMode(JViewport.BACKINGSTORE_SCROLL_MODE)
         loadFrame.getContentPane().add(sp)
         //frame.addKeyListener(p) // needs to be here... not in p
@@ -150,8 +185,8 @@ class VpipeGui {
         loadFrame.setVisible(true)
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize()
         loadFrame.setSize((int)(dimension.width), (int)(dimension.height/2 -50))
-        loadFrame.setLocation((int)((dimension.width-projectFrame.width) / 2), (int)(dimension.height/2))
-        loadPanel.setGridWidth(projectPanel.grid) // to make repaint...
+        loadFrame.setLocation(0, (int)(dimension.height/2))
+        loadPanel.setGridWidth(pipelinePanel.grid) // to make repaint...
 
     }
 
@@ -163,7 +198,7 @@ class VpipeGui {
         SwingUtilities.invokeLater {
             loadFrame?.setVisible(!loadFrame?.isVisible())
             if (loadFrame?.isVisible()) {
-                loadPanel.setGridWidth(projectPanel.grid)
+                loadPanel.setGridWidth(pipelinePanel.grid)
                 //loadFrame.pack()
                 //loadPanel.setSize(projectFrame.getWidth(), (int)(projectFrame.getHeight()/2))
                 loadFrame?.invalidate()

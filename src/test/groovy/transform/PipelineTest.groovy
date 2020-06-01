@@ -1,5 +1,7 @@
 package transform
 
+import model.PipelineOriginalElement
+
 import static testdata.TestDataHelper.pe
 
 

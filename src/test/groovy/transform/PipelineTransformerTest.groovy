@@ -1,7 +1,10 @@
 package transform
 
-import core.ProjectDataToLoadCalculator
+import core.LoadCalculator
 import core.VpipeException
+import model.DataReader
+import model.Model
+import model.PipelineOriginalElement
 import testdata.TestDataHelper
 
 import static testdata.TestDataHelper.pe
@@ -14,7 +17,7 @@ class PipelineTransformerTest extends GroovyTestCase {
     List<PipelineOriginalElement> listOfPOEs
 
     void setUp() {
-        f = new File(PipelineTransformer.FILE_NAME)
+        f = new File(DataReader.PIPELINING_FILE_NAME)
         f.delete()
         f.createNewFile()
 
@@ -25,7 +28,7 @@ class PipelineTransformerTest extends GroovyTestCase {
     void tearDown() { f.delete() }
 
     void testTransform() {
-        ProjectDataToLoadCalculator plc = TestDataHelper.getPopulatedCalculator()
+        Model m = TestDataHelper.getPopulatedModel()
         /*
                 t1p1 = t("p1", "5.1.2020", "10.1.2020", "d1", 20.0)
                 t2p1 = t("p1", "8.1.2020", "9.1.2020", "d2", 20.0)
@@ -33,13 +36,13 @@ class PipelineTransformerTest extends GroovyTestCase {
                 t2p2 = t("p2", "8.1.2020", "9.2.2020", "d2", 20.0) --> 2 days
          */
 
-        def pt = new PipelineTransformer(plc)
+        def pt = new PipelineTransformer(m)
         pt.pipelineElements = listOfPOEs
         pt.maxPipelineSlots = 2
-        plc.taskList = pt.transform()
+        m = pt.transform()
 
-        assert plc.getProject('p1')[0] == t('p1', '5.1.2020', '10.1.2020', 'd1', 20)
-        assert plc.getProject('p2')[0] == t('p2', '7.1.2020', '12.1.2020', 'd1', 20)
+        assert m.getProject('p1')[0] == t('p1', '5.1.2020', '10.1.2020', 'd1', 20)
+        assert m.getProject('p2')[0] == t('p2', '7.1.2020', '12.1.2020', 'd1', 20)
 
     }
 
@@ -48,12 +51,12 @@ class PipelineTransformerTest extends GroovyTestCase {
         //
         // slots wrong (1 avail, 2 needed)
         //
-        ProjectDataToLoadCalculator plc = TestDataHelper.getPopulatedCalculator()
-        def pt = new PipelineTransformer(plc)
+        Model m = TestDataHelper.getPopulatedModel()
+        def pt = new PipelineTransformer(m)
         pt.pipelineElements = listOfPOEs
         pt.maxPipelineSlots = 1
         String msg = shouldFail {
-            plc.taskList = pt.transform()
+            m.taskList = pt.transform()
         }
         assert msg.contains('Staffelungs-Element braucht mehr Slots')
 
@@ -61,33 +64,34 @@ class PipelineTransformerTest extends GroovyTestCase {
         //
         // mismatch: lesser projects than in piplining (or typo)
         //
-        plc = TestDataHelper.getPopulatedCalculator()
-        plc.taskList.remove(0) // p1 raus
-        plc.taskList.remove(0) // p1 raus
-        pt = new PipelineTransformer(plc)
+        m = TestDataHelper.getPopulatedModel()
+        m.taskList.remove(0) // p1 raus
+        m.taskList.remove(0) // p1 raus
+        pt = new PipelineTransformer(m)
         pt.pipelineElements = listOfPOEs
         pt.maxPipelineSlots = 2
         msg = shouldFail {
-            plc.taskList = pt.transform()
+            m.taskList = pt.transform()
         }
         assert msg.contains('Integrations-Phasen.txt enthält Projekte,\ndie nicht in den Grunddaten sind: p1')
 
         //
         // mismatch: lesser POEs than in projects (or typo)
         //
-        plc = TestDataHelper.getPopulatedCalculator()
-        pt = new PipelineTransformer(plc)
+        m = TestDataHelper.getPopulatedModel()
+        pt = new PipelineTransformer(m)
         pt.pipelineElements = listOfPOEs
         pt.pipelineElements.remove(0) // p1 raus
 
         pt.maxPipelineSlots = 2
         msg = shouldFail {
-            plc.taskList = pt.transform()
+            m.taskList = pt.transform()
         }
         assert msg.contains('Grunddaten enthalten Projekte,\ndie nicht in Integrations-Phasen.txt aufgeführt sind: p1')
 
 
     }
+
 
 
     void testUpdateConfiguration() {
@@ -102,20 +106,25 @@ class PipelineTransformerTest extends GroovyTestCase {
             p6 5.3.2020 26.4.2020 2
             """
 
-        ProjectDataToLoadCalculator plc = new ProjectDataToLoadCalculator()
-        def pt = new PipelineTransformer(plc)
-        pt.updateConfiguration()
+        //LoadCalculator plc = new LoadCalculator()
+        //def pt = new PipelineTransformer(plc)
+        def maxPipelineSlots
+        def pipelineElements
 
-        assert pt.maxPipelineSlots == 6
+        (maxPipelineSlots, pipelineElements) = DataReader.readPipelining()
 
-        assert '20.02.2020' == pt.pipelineElements[0].startDate.toString()
-        assert '20.03.2020' == pt.pipelineElements[0].endDate.toString()
-        assert 2 == pt.pipelineElements[0].pipelineSlotsNeeded
+        assert maxPipelineSlots == 6
 
-        assert '05.03.2020' == pt.pipelineElements[5].startDate.toString()
-        assert '26.04.2020' == pt.pipelineElements[5].endDate.toString()
-        assert 2 == pt.pipelineElements[5].pipelineSlotsNeeded
+        assert '20.02.2020' == pipelineElements[0].startDate.toString()
+        assert '20.03.2020' == pipelineElements[0].endDate.toString()
+        assert 2 == pipelineElements[0].pipelineSlotsNeeded
+
+        assert '05.03.2020' == pipelineElements[5].startDate.toString()
+        assert '26.04.2020' == pipelineElements[5].endDate.toString()
+        assert 2 == pipelineElements[5].pipelineSlotsNeeded
     }
+
+
 
     def readShouldFail(String content, String errorMsgContains) {
 
@@ -123,11 +132,11 @@ class PipelineTransformerTest extends GroovyTestCase {
         f.createNewFile()
         f << content
 
-        ProjectDataToLoadCalculator plc = new ProjectDataToLoadCalculator()
-        def pt = new PipelineTransformer(plc)
+        //LoadCalculator plc = new LoadCalculator()
+        //def pt = new PipelineTransformer(plc)
 
         def msg = shouldFail VpipeException, {
-            pt.updateConfiguration()
+            DataReader.readPipelining()
         }
         assert msg.contains(errorMsgContains)
 
@@ -180,10 +189,9 @@ class PipelineTransformerTest extends GroovyTestCase {
             p2 5.3.2020 26.4.2020 2
             """
 
-        ProjectDataToLoadCalculator plc = new ProjectDataToLoadCalculator()
-        def pt = new PipelineTransformer(plc)
+
         def msg = shouldFail {
-            pt.updateConfiguration()
+            DataReader.readPipelining()
         }
         assert msg.contains("[p2=2]")
     }

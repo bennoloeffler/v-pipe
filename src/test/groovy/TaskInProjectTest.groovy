@@ -1,7 +1,7 @@
-import core.TaskInProject
+import model.TaskInProject
 import testdata.TestDataHelper
 
-import static core.TaskInProject.WeekOrMonth.WEEK
+import static model.WeekOrMonth.WEEK
 
 class TaskInProjectTest extends GroovyTestCase {
 

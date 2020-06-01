@@ -1,16 +1,20 @@
-import core.ProjectDataToLoadCalculator
-import core.TaskInProject
+import core.LoadCalculator
+import model.DataReader
+import model.Model
+import model.TaskInProject
 import testdata.TestDataHelper
 import transform.DateShiftTransformer
 
+import static model.WeekOrMonth.*
+
 class ProjectDataToLoadCalculatorTest extends GroovyTestCase {
 
-    ProjectDataToLoadCalculator tr
+    LoadCalculator tr
     TaskInProject t1p1, t2p1, t1p2, t2p2, t3p1
 
     void setUp() {
         super.setUp()
-        tr = new ProjectDataToLoadCalculator()
+        tr = new LoadCalculator()
         t1p1 = TestDataHelper.t("p1", "5.1.2020", "10.1.2020", "d1", 20.0)
         t2p1 = TestDataHelper.t("p1", "8.1.2020", "9.1.2020", "d2", 20.0)
         t1p2 = TestDataHelper.t("p2", "5.1.2020", "10.1.2020", "d1", 20.0)
@@ -50,7 +54,7 @@ class ProjectDataToLoadCalculatorTest extends GroovyTestCase {
         // p1-d2           20
         // p2-d3           20
         //
-        def load = tr.calcDepartmentLoad(TaskInProject.WeekOrMonth.WEEK)
+        def load = tr.calcDepartmentLoad(WEEK)
         assert load['d1']['2020-W01'] == 8
         assert load['d1']['2020-W02'] == 32
         assert load['d2']['2020-W02'] == 40
@@ -68,7 +72,7 @@ class ProjectDataToLoadCalculatorTest extends GroovyTestCase {
 
         tr.taskList << TestDataHelper.t("p4", "1.1.2020", "1.2.2021", "d4", 31+29+31+30+31+30+31+31+30+31+30+31+31)
 
-        def load = tr.calcDepartmentLoad(TaskInProject.WeekOrMonth.MONTH)
+        def load = tr.calcDepartmentLoad(MONTH)
         assert load['d1']['2020-M01'] == 40
         assert load['d2']['2020-M01'] == 40
         assert load['d3']['2020-M02'] == 20
@@ -91,13 +95,13 @@ class ProjectDataToLoadCalculatorTest extends GroovyTestCase {
         // p2-d2           20
         // p3-d3                            20
         //[W1       ][W2            ][...][W6  ]
-        def load = tr.calcDepartmentLoad(TaskInProject.WeekOrMonth.WEEK)
+        def load = tr.calcDepartmentLoad(WEEK)
         assert load['d1']['2020-W01'] == 8
         assert load['d1']['2020-W02'] == 32
         assert load['d2']['2020-W02'] == 40
         assert load['d3']['2020-W06'] == 20
 
-        def timeKeys = tr.getFullSeriesOfTimeKeys(TaskInProject.WeekOrMonth.WEEK)
+        def timeKeys = tr.getFullSeriesOfTimeKeys(WEEK)
         assert timeKeys.size() == 6
         assert timeKeys[0] == "2020-W01"
         assert timeKeys[5] == "2020-W06"
@@ -106,22 +110,22 @@ class ProjectDataToLoadCalculatorTest extends GroovyTestCase {
     void testUpdateConfiguration() {
 
 
-        def f = new File(ProjectDataToLoadCalculator.FILE_NAME)
+        def f = new File(DataReader.TASK_FILE_NAME)
         f.delete()
         f.createNewFile()
         f << "p1 6.1.2020 12.1.2020 d1 20\n"
         f << "p1 13.1.2020 19.1.2020 d1 20"
 
-        f = new File(DateShiftTransformer.FILE_NAME)
+        f = new File(DataReader.DATESHIFT_FILE_NAME)
         f.delete()
         f.createNewFile()
         f << "p1 7"
 
-
-        ProjectDataToLoadCalculator pt = new ProjectDataToLoadCalculator()
-        pt.transformers << new DateShiftTransformer(pt)
-        pt.updateConfiguration()
-        def load = pt.calcDepartmentLoad(TaskInProject.WeekOrMonth.WEEK)
+        Model m = new Model()
+        m.readAllData()
+        LoadCalculator pt = new LoadCalculator()
+        pt.transformers << new DateShiftTransformer(m)
+        def load = pt.calcDepartmentLoad(WEEK)
 
 
         assert load['d1']['2020-W02'] == null
@@ -135,20 +139,23 @@ class ProjectDataToLoadCalculatorTest extends GroovyTestCase {
     void testUpdateConfigurationWithNoDateShiftTransformerData() {
 
 
-        def f = new File(ProjectDataToLoadCalculator.FILE_NAME)
+        def f = new File(DataReader.TASK_FILE_NAME)
         f.delete()
         f.createNewFile()
         f << "p1 6.1.2020 12.1.2020 d1 20\n"
         f << "p1 13.1.2020 19.1.2020 d1 20"
 
-        f = new File(DateShiftTransformer.FILE_NAME)
+        f = new File(DataReader.DATESHIFT_FILE_NAME)
         f.delete()
 
+        f = new File(DataReader.CAPA_FILE_NAME)
+        f.delete()
 
-        ProjectDataToLoadCalculator pt = new ProjectDataToLoadCalculator()
-        pt.transformers << new DateShiftTransformer(pt)
-        pt.updateConfiguration()
-        def load = pt.calcDepartmentLoad(TaskInProject.WeekOrMonth.WEEK)
+        Model m = new Model()
+        m.readAllData()
+        LoadCalculator pt = new LoadCalculator()
+        pt.transformers << new DateShiftTransformer(m)
+        def load = pt.calcDepartmentLoad(WEEK)
 
 
         assert load['d1']['2020-W02'] == 20

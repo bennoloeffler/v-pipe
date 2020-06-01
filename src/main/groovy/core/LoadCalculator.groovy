@@ -1,9 +1,10 @@
 package core
 
-import core.TaskInProject.WeekOrMonth
+import model.Model
+import model.TaskInProject
+import model.WeekOrMonth
 import transform.CapaTransformer
 import utils.FileSupport
-import groovy.time.TimeCategory
 import groovy.transform.ToString
 import transform.Transformer
 import utils.RunTimer
@@ -11,18 +12,17 @@ import utils.RunTimer
 
 /**
  * this does the raw data calculation:
- * 1. set a list of core.TaskInProject
+ * 1. set a list of model.TaskInProject
  * 2. then call calcDepartmentWeekLoad
  * 3. now you may get the departments and the loads per week
  */
 @ToString
-class ProjectDataToLoadCalculator implements TaskListPortfolioAccessor {
+class LoadCalculator {
 
-    /**
-     * from where to read data
-     */
-    public static String FILE_NAME = "Projekt-Start-End-Abt-Kapa.txt"
-    static def SILENT = true // during reading: show all data read?
+
+    @Delegate
+    Model model = new Model()
+    // during reading: show all data read?
 
     /**
      * to where to write
@@ -43,11 +43,11 @@ class ProjectDataToLoadCalculator implements TaskListPortfolioAccessor {
      *
      * @return map of department-strings with a map of intervall-strings with demand of capacity
      */
-    Map<String, Map<String, Double>> calcDepartmentLoad(TaskInProject.WeekOrMonth weekOrMonth) {
+    Map<String, Map<String, Double>> calcDepartmentLoad(WeekOrMonth weekOrMonth) {
 
         def t = new RunTimer(true)
         transformers.each {
-            taskList = it.transform()
+            model = it.transform()
         }
         t.stop("Transformers")
         t.start()
@@ -73,25 +73,17 @@ class ProjectDataToLoadCalculator implements TaskListPortfolioAccessor {
         load as Map<String, Map<String, Double>>
     }
 
-    /**
-     * hint, that config may have changed and to urgently re-read it before next operation
-     * @return
-     */
-    def updateConfiguration() {
-        taskList = dataFromFileStatic
-        transformers.each() {
-            it.updateConfiguration()
-        }
-    }
 
 
+    /*
     def readFromFile() {
-        taskList = getDataFromFileStatic()
+        taskList = Model.readTasks()
     }
 
     def writeToFile(WeekOrMonth weekOrMonth) {
         writeToFileStatic(this, weekOrMonth)
     }
+    */
 
     CapaTransformer getFilledCapaTransformer() {
         for(t in transformers) {
@@ -102,83 +94,18 @@ class ProjectDataToLoadCalculator implements TaskListPortfolioAccessor {
 
 
     /**
-     * reads data lines into a list of core.TaskInProject
-     * Default file name: Projekt-Start-End-Abt-Capa.txt
-     * This reflects the order of the data fields.
-     * Start and End are Dates, formatted like: dd.MM.yyyy
-     * Capa is capacityNeededByThisTask and is a float (NO comma - but point for decimal numbers)
-     * Default separator: any number of spaces, tabs, commas, semicolons (SEPARATOR_ALL)
-     * If whitespace is in project names or department names, semicolon or comma is needed (SEPARATOR_SC)
-     */
-    static List<TaskInProject> getDataFromFileStatic() {
-        def t = new RunTimer(true)
-        List<TaskInProject> taskList = []
-        def i = 0 // count the lines
-        SILENT?:println("\nstart reading data file:   " + FILE_NAME)
-        def errMsg ={""}
-        //String all = new File(FILE_NAME).text
-        //all.eachLine {
-        def f = new File(FILE_NAME).eachLine {
-            if(it.trim()) {
-                try {
-                    i++
-                    String line = it.trim()
-                    SILENT?:println("\n$i raw-data:   " + line)
-                    String[] strings = line.split(FileSupport.SEPARATOR)
-                    errMsg = {"$FILE_NAME\nZeile $i: $line\nZerlegt: $strings\n"}
-                    if(strings.size() != 5){
-                        throw new VpipeDataException(errMsg() +
-                            "Keine 5 Daten-Felder gefunden mit Regex-SEPARATOR = "+FileSupport.SEPARATOR +
-                            "\nSoll-Format: 'Projekt-Name Task-Start Task-Ende Abteilungs-Name Kapa-Bedarf'")}
-                    SILENT?:println("$i split-data: " + strings)
-
-                    Date start = strings[1].toDate()
-                    Date end = strings[2].toDate()
-                    if( ! start.before(end)) {
-                        throw new VpipeDataException(errMsg() + "Start (${start.toString()}) liegt nicht vor Ende: (${end.toString()})")
-                    }
-                    use (TimeCategory) {
-                        if (end - start > 20.years) {
-                            throw new VpipeDataException(errMsg() + "Task zu lang! ${start.toString()} " +
-                                    "bis ${end.toString()}\nist mehr als 20 Jahre")
-                        }
-                    }
-
-                    def tip = new TaskInProject(
-                            project: strings[0],
-                            starting: strings[1].toDate(),
-                            ending: strings[2].toDate(),
-                            department: strings[3],
-                            capacityNeeded: Double.parseDouble(strings[4])
-                    )
-                    taskList << tip
-                    SILENT?:println("$i task-data:  " + tip)
-                } catch (VpipeDataException v) {
-                    throw v
-                } catch (Exception e) {
-                    throw new VpipeDataException(errMsg() + "\nVermutlich Fehler beim parsen von \nDatum (--> 22.4.2020) oder Kommazahl (--> 4.5 Punkt statt Komma!)\n Grund: ${e.getMessage()}")
-                }
-            }
-        }
-        t.stop("reading file $FILE_NAME")
-        if( ! taskList){throw new VpipeDataException("$FILE_NAME enthält keine Daten")}
-        return taskList
-    }
-
-
-    /**
      *
      * @param tr
      * @param weekOrMonth
      */
-    static void writeToFileStatic(ProjectDataToLoadCalculator tr, WeekOrMonth weekOrMonth) {
+    static void writeToFileStatic(LoadCalculator tr, WeekOrMonth weekOrMonth) {
 
 
         def t = new RunTimer(true)
 
         Map<String, Map<String, Double>> stringMapMap = tr.calcDepartmentLoad(weekOrMonth)
 
-        def fn = weekOrMonth == TaskInProject.WeekOrMonth.WEEK ? FILE_NAME_WEEK : FILE_NAME_MONTH
+        def fn = weekOrMonth == WeekOrMonth.WEEK ? FILE_NAME_WEEK : FILE_NAME_MONTH
         File f = new File(fn)
         if(f.exists()) { // BACKUP
             BACKUP_FILE = FileSupport.backupFileName(f.toString())
@@ -215,9 +142,6 @@ class ProjectDataToLoadCalculator implements TaskListPortfolioAccessor {
         t.stop("writeToFileStatic $fn")
     }
 
-    List<String> getAllDepartments() {
-        taskList*.department.unique()
-    }
 
     Map<String, Map<String, Double>> calcProjectLoad(WeekOrMonth weekOrMonth, String project) {
 

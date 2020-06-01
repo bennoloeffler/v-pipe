@@ -1,4 +1,4 @@
-package core
+package model
 
 import extensions.DateHelperFunctions
 import groovy.time.TimeCategory
@@ -12,7 +12,7 @@ import static extensions.DateHelperFunctions.*
 
 /**
  * Represents one entry of a dataset that models a multi-project situation.
- * A core.TaskInProject belongs to a project, has a start, an end, belongs to a department und needs a certain amount of capacity.
+ * A model.TaskInProject belongs to a project, has a start, an end, belongs to a department und needs a certain amount of capacity.
  * The model assumes, that capacity consumption is distributed evenly between start and end.
  * Start and end are days. Start is included - end is EXCLUDED.
  */
@@ -21,7 +21,6 @@ import static extensions.DateHelperFunctions.*
 @EqualsAndHashCode
 class TaskInProject {
 
-    enum WeekOrMonth {WEEK, MONTH}
 
     String project
     Date starting

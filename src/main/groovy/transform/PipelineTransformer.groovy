@@ -1,32 +1,15 @@
 package transform
 
-import core.TaskInProject
-import core.VpipeDataException
-import core.VpipeException
-import utils.FileSupport
+import model.DataReader
+import model.Model
+import model.PipelineOriginalElement
+import model.TaskInProject
+import model.VpipeDataException
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import groovy.transform.Immutable
 import groovy.transform.InheritConstructors
 
-/**
- * Those elements read from file eg. The "original planning".
- */
-@Immutable
-//@ToString
-class  PipelineOriginalElement {
-    String project
-    Date startDate
-    Date endDate
-    /**
-     *  mostly 1 - but sometimes, one task needs several parallel pipelinging slots
-     */
-    int pipelineSlotsNeeded
-
-    String toString() { // for the Dates to be readable
-        "Pipline-Element($project ${startDate.toString()} ${endDate.toString()} $pipelineSlotsNeeded)"
-    }
-}
 
 /**
  * Elements after automatic pipelining.
@@ -169,34 +152,17 @@ class Pipeline {
 @InheritConstructors
 class PipelineTransformer extends Transformer {
 
-    /**
-     * get data from
-     */
-    static String FILE_NAME = "Integrations-Phasen.txt"
-
 
     /**
-     * maximum number of parallel slots in pipeline
-     */
-    int maxPipelineSlots
-
-
-    /**
-     * the original elements to feed into the pipeline
-     */
-    List<PipelineOriginalElement> pipelineElements
-
-
-    /**
-     * @return the core.TaskInProject List that is transformed
+     * @return the model.TaskInProject List that is transformed
      */
     @Override
-    List<TaskInProject> transform() {
+    Model transform() {
 
-        assert plc != null
+        assert model != null
 
         if(maxPipelineSlots == 0) { // DO NO TRANSFORM
-            return plc.taskList
+            return model
         }
 
         description="Dates transformed:\n"
@@ -209,9 +175,9 @@ class PipelineTransformer extends Transformer {
         }
         Map<String, Integer> projectDayShift = p.getProjectShift()
 
-        def allProjects = plc.getAllProjects()
+        def allProjects = getAllProjects()
         allProjects.each() { projectName ->
-            def projectList = plc.getProject(projectName)
+            def projectList = getProject(projectName)
             int shift = projectDayShift[projectName]?:0
             if(shift){description += "$projectName: $shift\n"}
             projectList.each() {
@@ -221,14 +187,14 @@ class PipelineTransformer extends Transformer {
 
         // Check: for every pipeline-Element, there needs to be a real project - and vice verca
         projectDayShift.keySet().each {
-            if(! plc.getProject(it)) {
-                throw new VpipeDataException("$FILE_NAME enthält Projekte,\ndie nicht in den Grunddaten sind: $it")
+            if(! getProject(it)) {
+                throw new VpipeDataException("$DataReader.PIPELINING_FILE_NAME enthält Projekte,\ndie nicht in den Grunddaten sind: $it")
             }
         }
-        plc.getAllProjects().each {
+        getAllProjects().each {
             def projects = pipelineElements*.project
             if (! projects.contains(it)) {
-                throw new VpipeDataException("Grunddaten enthalten Projekte,\ndie nicht in $FILE_NAME aufgeführt sind: $it")
+                throw new VpipeDataException("Grunddaten enthalten Projekte,\ndie nicht in $DataReader.PIPELINING_FILE_NAME aufgeführt sind: $it")
             }
         }
 
@@ -240,51 +206,11 @@ class PipelineTransformer extends Transformer {
 
 
         if (description == "Dates transformed:\n") {description+"none..."}
-        result
+
+        //Model clone = model.clone() as Model
+        model.taskList = result
+        model
     }
 
-    @Override
-    def updateConfiguration() {
-        pipelineElements =[]
-        List<String[]> lines = FileSupport.getDataLinesSplitTrimmed(FILE_NAME)
-        if(lines) {
-            try {
-                maxPipelineSlots = lines[0][0].toInteger()
-                if (maxPipelineSlots == 0) {
-                    println("WARNUNG: In $FILE_NAME ist unbegrenzte Kapazität eingestellt (0 = kein Slot = unbegrenzt)...\n Pipelining wird ignoriert!")
-                }
-            } catch(Exception e) {
-                throw new VpipeDataException("Fehler beim Lesen von $FILE_NAME.\nErste Zeile muss exakt eine Ganzzahl sein: Slots der Pipeline.")
-            }
-        }
-        if(lines.size()>1) {
-            (1..lines.size()-1).each {
-                def line = lines[it]
-                def errMsg = {"Lesen von Datei $FILE_NAME fehlgeschlagen.\nDatensatz: ${line}"}
-                if(line.size() != 4) {
-                    throw new VpipeDataException(errMsg() + "\nEs sind keine 4 Elemente.")
-                }
-                try {
-                    //def pe = new PipelineOriginalElement(project: line[0], startDate: line[1].toDate(), endDate: line[2].toDate(), pipelineSlotsNeeded: line[3].toInteger() )
-                    Date start = line[1].toDate()
-                    Date end = line[2].toDate()
-                    if( ! start.before(end)) {
-                        throw new VpipeDataException(errMsg() + "\nStart liegt nicht vor Ende.")
-                    }
-                    def pe = new PipelineOriginalElement(line[0], start, end, line[3].toInteger() )
 
-                    pipelineElements << pe
-                } catch (VpipeDataException v) {
-                    throw v
-                }catch (Exception e) {
-                    throw new VpipeDataException(errMsg() + '\nVermutung:\na) Datum falsch (dd.MM.yyyy). Oder\nb) Pipeline-Bedarf ist keine Zahl', e)
-                }
-            }
-        }
-        List<String> projects = pipelineElements*.project
-        def diff = projects.countBy{it}.grep{it.value > 1}.collect{it}
-        if(diff) {
-            throw new VpipeDataException("Lesen von Datei $FILE_NAME fehlgeschlagen.\nMehrfacheinträge für Projekte: $diff")
-        }
-    }
 }

@@ -1,6 +1,13 @@
 package core
 
-import gui.VpipeGui
+
+import model.DataReader
+import model.Model
+import model.TaskInProject
+import model.VpipeDataException
+import model.WeekOrMonth
+import org.tinylog.Logger
+import org.tinylog.Logger as l
 import transform.CapaTransformer
 import utils.*
 import groovy.time.TimeDuration
@@ -19,7 +26,7 @@ import java.awt.Desktop
  */
 class  Main {
 
-    static VERSION_STRING ='0.5.0-GUI-Project'
+    static VERSION_STRING ='0.6.0-GUI-Project-View'
 
     static void main(String[] args) {
 
@@ -34,8 +41,14 @@ class  Main {
         if(argsStr.contains("-m")) {multiInstanceMode = true}
         if(argsStr.contains("-c")) {commandLineMode = true}
 
-        println "\n\nv-pipe  (release: $VERSION_STRING)\n\n"
-
+        l.info "v-pipe  (release: $VERSION_STRING)"
+        /*
+        Logger.trace("Hello World!")
+        Logger.debug("Hello World!")
+        Logger.info("Hello World!")
+        Logger.warn("Hello World!")
+        Logger.error("Hello World!")
+        */
         //
         // only one instance - typically...
         //
@@ -57,9 +70,9 @@ class  Main {
 
             // args from apache commons
             if(singleRunMode) { // single mode
-                println "Daten lesen: $ProjectDataToLoadCalculator.FILE_NAME und $DateShiftTransformer.FILE_NAME" // todo
+                println "Daten lesen: $DataReader.TASK_FILE_NAME und $DataReader.DATESHIFT_FILE_NAME" // todo
                 processData()
-                println "E R F O L G :   Ergebnisse geschrieben. " + ProjectDataToLoadCalculator.FILE_NAME_WEEK + ' (und -Monat )' // todo
+                println "E R F O L G :   Ergebnisse geschrieben. " + LoadCalculator.FILE_NAME_WEEK + ' (und -Monat )' // todo
 
             } else { // deamon mode
 
@@ -68,11 +81,11 @@ class  Main {
                 }
 
                 def fwd = new FileWatcherDeamon(".")
-                fwd.filter = [ProjectDataToLoadCalculator.FILE_NAME, DateShiftTransformer.FILE_NAME, PipelineTransformer.FILE_NAME, CapaTransformer.FILE_NAME]
+                fwd.filter = [DataReader.TASK_FILE_NAME, DataReader.DATESHIFT_FILE_NAME, DataReader.PIPELINING_FILE_NAME, DataReader.CAPA_FILE_NAME]
 
                 while(true) {
                     try {
-                        File projectDataFile = new File(ProjectDataToLoadCalculator.FILE_NAME)
+                        File projectDataFile = new File(DataReader.TASK_FILE_NAME)
                         if (projectDataFile.exists()) {
                             println 'Daten lesen, rechnen und schreiben...'
                             long startProcessing = System.currentTimeMillis()
@@ -136,13 +149,14 @@ class  Main {
      * one processing loop
      */
     private static void processData() {
-        ProjectDataToLoadCalculator pt = new ProjectDataToLoadCalculator()
-        pt.transformers << new DateShiftTransformer(pt)
-        pt.transformers << new PipelineTransformer(pt)
-        pt.transformers << new CapaTransformer(pt)
-        pt.updateConfiguration()
-        ProjectDataToLoadCalculator.writeToFileStatic(pt, TaskInProject.WeekOrMonth.WEEK)
-        ProjectDataToLoadCalculator.writeToFileStatic(pt, TaskInProject.WeekOrMonth.MONTH)
+        Model m = new Model()
+        m.readAllData()
+        LoadCalculator pt = new LoadCalculator(model: m)
+        pt.transformers << new DateShiftTransformer(pt.model)
+        pt.transformers << new PipelineTransformer(pt.model)
+        pt.transformers << new CapaTransformer(pt.model)
+        LoadCalculator.writeToFileStatic(pt, WeekOrMonth.WEEK)
+        LoadCalculator.writeToFileStatic(pt, WeekOrMonth.MONTH)
     }
 
 

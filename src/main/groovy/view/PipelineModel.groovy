@@ -1,21 +1,25 @@
-package gui
+package view
 
-import core.TaskInProject
-import core.TaskListPortfolioAccessor
+import model.Model
+import model.TaskInProject
 import groovy.transform.CompileStatic
 
 import static extensions.DateHelperFunctions.*
 
 @CompileStatic
-class ProjectGridModel implements GridModel, TaskListPortfolioAccessor {
+class PipelineModel implements GridModel {
 
     List<List<GridElement>> allProjectGridLines
     List<String> allProjectNames
     int nowXRowCache = 0
 
+    @Delegate
+    Model model
 
-    ProjectGridModel(List<TaskInProject> taskList) {
-        this.taskList = taskList
+
+    PipelineModel(Model model) {
+        this.model = model
+        //this.taskList = taskList
 
         //
         // just for sorting projects to ending-date
@@ -128,7 +132,7 @@ class ProjectGridModel implements GridModel, TaskListPortfolioAccessor {
     }
 
     @Override
-    List<String> getProjectNames() {
+    List<String> getLineNames() {
         return allProjectNames
     }
 }

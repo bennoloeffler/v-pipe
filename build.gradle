@@ -20,6 +20,8 @@ repositories {
 dependencies {
     implementation 'joda-time:joda-time:2.10.6'
     implementation 'org.codehaus.groovy:groovy-all:2.4.10'
+    implementation 'org.tinylog:tinylog-impl:2.1.2'
+    implementation 'org.tinylog:tinylog-api:2.1.2'
     testCompile 'junit:junit:4.12'
 }
 
@@ -31,7 +33,9 @@ launch4j {
 
 task createGui(type: edu.sc.seis.launch4j.tasks.Launch4jLibraryTask) {
     outfile = 'v-pipe-gui.exe'
-    mainClassName = 'gui.VpipeGui'
+    mainClassName = 'view.VpipeGui'
+    jvmOptions =['-Dsun.java2d.uiScale=0.9']
+
 }
 
 /**

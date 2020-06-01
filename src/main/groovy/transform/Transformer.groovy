@@ -1,32 +1,32 @@
 package transform
 
-import core.ProjectDataToLoadCalculator
-import core.TaskInProject
+import model.Model
 
 /**
- * works on the list of TaskInProjects to change something
+ * works on the model to change something
  */
 abstract class Transformer {
 
     /**
      * has to be set before call to transform
      */
-    ProjectDataToLoadCalculator plc
+    @Delegate
+    Model model
 
     String description
 
     /**
      * make shure to have a core.ProjectDataToLoadCalculator
      */
-    Transformer(ProjectDataToLoadCalculator  plc) {
-        this.plc = plc
+    Transformer(Model model) {
+        this.model = model
     }
 
     /**
      * needs to do the work and needs to fill description
      * @return the work of transformer
      */
-    abstract List<TaskInProject> transform ()
+    abstract Model transform ()
 
     /**
      * has to be filled during transform
@@ -37,9 +37,4 @@ abstract class Transformer {
         return description
     }
 
-    /**
-     * hint, that config may have changed and to urgently re-read it before next operation
-     * @return
-     */
-    abstract def updateConfiguration()
 }

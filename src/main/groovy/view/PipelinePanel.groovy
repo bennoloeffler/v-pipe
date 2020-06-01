@@ -1,14 +1,15 @@
-package gui
+package view
 
-import core.ProjectDataToLoadCalculator
-import core.TaskInProject
+import core.LoadCalculator
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
+import model.WeekOrMonth
 import utils.RunTimer
 
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.SwingUtilities
+import javax.swing.SwingWorker
 import javax.swing.ToolTipManager
 import java.awt.Color
 import java.awt.Dimension
@@ -29,16 +30,18 @@ import java.awt.event.MouseWheelListener
  * It has a GridModel to
  */
 @CompileStatic
-class GridProjectPanel extends JPanel implements MouseWheelListener, MouseMotionListener, MouseListener, KeyListener {
+class PipelinePanel extends JPanel implements MouseWheelListener, MouseMotionListener, MouseListener, KeyListener {
 
     Color cursorColor = new Color(255, 10, 50, 160)
     Color nowBarColor = new Color(255, 0, 0, 60)
     Color nowBarShadowColor = new Color(50, 50, 50, 30)
 
 
-    LoadGridPanel lp // notify that one when grid or model changed...
+    ProjectModel projectModel
 
-    ProjectDataToLoadCalculator dc
+    LoadPanel lp // notify that one when grid or model changed...
+
+    LoadCalculator dc
 
     GridModel model
     int grid
@@ -372,8 +375,8 @@ class GridProjectPanel extends JPanel implements MouseWheelListener, MouseMotion
     /**
      * for testing purposes - uses internal, filled GridModel
      */
-    GridProjectPanel(int grid = 60) {
-        this(grid, new GridDemoModel(), null, null)
+    PipelinePanel(int grid = 60) {
+        this(grid, new GridDemoModel(), null, null, null)
     }
 
 
@@ -383,7 +386,7 @@ class GridProjectPanel extends JPanel implements MouseWheelListener, MouseMotion
      * @param borderWidth
      * @param model
      */
-    GridProjectPanel(int grid, GridModel model, LoadGridPanel lp, ProjectDataToLoadCalculator dc) {
+     PipelinePanel(int grid, GridModel model, LoadPanel lp, ProjectModel pm, LoadCalculator dc) {
         this.grid = grid
         this.borderWidth = grid / 3 as int
         this.nameWidth = grid * 3
@@ -394,25 +397,85 @@ class GridProjectPanel extends JPanel implements MouseWheelListener, MouseMotion
         this.model = model
         this.lp = lp
         this.dc = dc
+        this.projectModel = pm
         setCursorToNow()
 
         lp?.setGridWidth(width)
         updateLoadData()
     }
 
+    SwingWorker sw
     def updateLoadData() {
+
+        SwingUtilities.invokeLater {
+
+        String pn = model.lineNames[cursorY]
+        projectModel.setProjectName pn
+        //println "pn: $pn"
+
         if(lp) {
-            SwingUtilities.invokeLater {
+
+            /*
+
+            if(sw?.getState() != SwingWorker.StateValue.DONE) {
+                sw?.cancel(true)
+            }
+            sw = new SwingWorker() {
+
+                @Override
+                protected Object doInBackground() throws Exception {
+                    try {
+                        dc.taskList = ((ProjectGridModel) model).taskList
+                        Map<String, Map<String, Double>> stringMapMap = dc.calcDepartmentLoad(WeekOrMonth.WEEK)
+                        Map<String, Map<String, Double>> stringMapMapProject = [:]
+                        if (cursorY >= 0 && cursorY < model.getSizeY()) {
+                            String project = model.getLineNames()[cursorY]
+                            stringMapMapProject = dc.calcProjectLoad(WeekOrMonth.WEEK, project)
+                        }
+                        List<String> allKeys = dc.getFullSeriesOfTimeKeys(WeekOrMonth.WEEK)
+                        dc.filledCapaTransformer?.reCalcCapa() // if time series has expanded...
+
+                        return [stringMapMap, stringMapMapProject, allKeys, dc.filledCapaTransformer?.capaAvailable]
+                    }catch(InterruptedException e) {
+                        return null
+                    }
+                }
+
+                @Override
+                protected void done() {
+
+                    List result
+                    try {
+                            result = get() as List
+                    }catch (Exception e) {
+                        // was canceled...
+                    }
+
+                    if (result) {
+                        lp.setModelData(
+                                result[0] as Map<String, Map<String, Double>>,
+                                result[1] as Map<String, Map<String, Double>>,
+                                result[2] as List<String>,
+                                result[3] as Map<String, Map<String, YellowRedLimit>>)
+                    }
+
+                }
+            }
+            sw.execute()
+
+            */
+
+
                 //ProjectDataToLoadCalculator dc = new ProjectDataToLoadCalculator()
-                dc.taskList = ((ProjectGridModel) model).taskList
-                Map<String, Map<String, Double>> stringMapMap = dc.calcDepartmentLoad(TaskInProject.WeekOrMonth.WEEK)
+                dc.taskList = ((PipelineModel) model).taskList
+                Map<String, Map<String, Double>> stringMapMap = dc.calcDepartmentLoad(WeekOrMonth.WEEK)
                 Map<String, Map<String, Double>> stringMapMapProject = [:]
                 if(cursorY >= 0 && cursorY < model.getSizeY()) {
-                    String project = model.getProjectNames()[cursorY]
-                    stringMapMapProject = dc.calcProjectLoad(TaskInProject.WeekOrMonth.WEEK, project)
+                    String project = model.getLineNames()[cursorY]
+                    stringMapMapProject = dc.calcProjectLoad(WeekOrMonth.WEEK, project)
                 }
-                List<String> allKeys = dc.getFullSeriesOfTimeKeys(TaskInProject.WeekOrMonth.WEEK)
-                dc.filledCapaTransformer?.reCalcCapa()
+                List<String> allKeys = dc.getFullSeriesOfTimeKeys(WeekOrMonth.WEEK)
+                dc.filledCapaTransformer?.reCalcCapa() // if time series has expanded...
                 lp.setModelData(stringMapMap, stringMapMapProject, allKeys, dc.filledCapaTransformer?.capaAvailable)
             }
         }
@@ -478,8 +541,8 @@ class GridProjectPanel extends JPanel implements MouseWheelListener, MouseMotion
         //
 
         int y = 0
-        model.getProjectNames()
-        model.getProjectNames().each { String projectName ->
+        model.getLineNames()
+        model.getLineNames().each { String projectName ->
             g.setColor(Color.LIGHT_GRAY)
             int gridY = borderWidth + y*grid
             g.fillRoundRect(borderWidth , gridY, nameWidth-4, grid - 4 , round, round)

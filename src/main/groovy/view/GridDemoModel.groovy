@@ -1,4 +1,4 @@
-package gui
+package view
 
 /**
  * base model for grid - this one is for manual testing
@@ -126,7 +126,7 @@ class GridDemoModel implements GridModel {
     }
 
     @Override
-    List<String> getProjectNames() {
+    List<String> getLineNames() {
         return []
     }
 }

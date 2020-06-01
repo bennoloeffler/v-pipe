@@ -1,44 +1,32 @@
 package transform
 
-import core.TaskInProject
-import core.VpipeDataException
-import core.VpipeException
-import utils.FileSupport
+import model.DataReader
+import model.Model
+import model.TaskInProject
+import model.VpipeDataException
 
 /**
- * Can move all the starting and ending of core.TaskInProject.
+ * Can move all the starting and ending of model.TaskInProject.
  * Based on data that is a map of project names and time shifts in days.
  */
 @groovy.transform.InheritConstructors
 class DateShiftTransformer extends Transformer {
 
-    static String FILE_NAME = "Projekt-Verschiebung.txt"
-
     /**
-     * key: project name
-     * value: integer, representing the shift of the project:
-     * +7 = delay one week to the future.
-     * 0 = no shift.
-     * -7 = due date one week earlier.
-     */
-    Map<String, Integer> projectDayShift
-
-
-    /**
-     * @return the core.TaskInProject List that is transformed
+     * @return the model.TaskInProject List that is transformed
      */
     @Override
-    List<TaskInProject> transform() {
+    Model transform() {
 
         assert projectDayShift != null
-        assert plc != null
+        assert model != null
 
         description="Dates transformed:\n"
         List<TaskInProject> result = []
 
-        def allProjects = plc.getAllProjects()
+        def allProjects = getAllProjects()
         allProjects.each() { projectName ->
-            def projectList = plc.getProject(projectName)
+            def projectList = getProject(projectName)
             int shift = projectDayShift[projectName]?:0
             if(shift){description += "$projectName: $shift\n"}
             projectList.each() {
@@ -59,32 +47,19 @@ class DateShiftTransformer extends Transformer {
         }
         */
         projectDayShift.keySet().each {
-            if(! plc.getProject(it)) {
+            if(! getProject(it)) {
                 throw new VpipeDataException("Es gibt keine Projektdaten,\n"+
                         "um das Projekt $it zu verschieben.\n"+
-                        "Ursache in $FILE_NAME")
+                        "Ursache in $DataReader.DATESHIFT_FILE_NAME")
             }
         }
         if (description == "Dates transformed:\n") {description+"none..."}
-        result
+
+        //Model clone = model.clone() as Model
+        model.taskList = result
+        //clone
+        model
     }
 
-    @Override
-    def updateConfiguration() {
-        projectDayShift = [:]
-        List<String[]> lines = FileSupport.getDataLinesSplitTrimmed(FILE_NAME)
-        lines.each { line ->
-            def errMsg = {"Lesen von Datei $FILE_NAME fehlgeschlagen.\nDatensatz: ${line}"}
-            if(line?.size() != 2) {
-                throw new VpipeDataException(errMsg()+"\nJede Zeile braucht zwei Einträge")
-            }
-            try {
-                def project = line[0]
-                def days = line[1] as Integer
-                projectDayShift[project] = days
-            } catch (Exception e) {
-                throw new VpipeDataException(errMsg() + '\nVermutung... Der Tagesversatz ist keine Ganz-Zahl.', e)
-            }
-        }
-    }
+
 }

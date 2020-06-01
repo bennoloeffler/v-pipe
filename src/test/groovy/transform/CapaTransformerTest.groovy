@@ -1,6 +1,8 @@
 package transform
 
-import core.VpipeDataException
+import model.DataReader
+import model.Model
+import model.VpipeDataException
 import core.VpipeException
 import groovy.json.JsonSlurper
 
@@ -59,8 +61,23 @@ class CapaTransformerTest extends GroovyTestCase {
                     "gelb": 340,
                     "rot": 500
                    }
-                  }
+                  },
                 
+                  "d1": {
+                   "Kapa": {
+                    "gelb": 340,
+                    "rot": 500
+                   }
+                  },
+                
+                  "d2": {
+                   "Kapa": {
+                    "gelb": 340,
+                    "rot": 500
+                   }
+                  }
+                  
+                                  
                  }
                 }        
         """
@@ -141,12 +158,7 @@ class CapaTransformerTest extends GroovyTestCase {
         }
         assert msg == "Problem in JSON-Format von Datei Abteilungs-Kapazitaets-Angebot.txt:\nText must not be null or empty"
 
-        text = "{}"
-        msg = shouldFail (VpipeDataException) {
-            def capa = slurpTextAndCalc(text)
-            println(capa)
-        }
-        assert msg == "Fehler beim Lesen der Datei Abteilungs-Kapazitaets-Angebot.txt\nEintrag 'Kapa_Gesamt' fehlt."
+
 
         text = """{
                  "Kapa_Gesamt": {
@@ -166,17 +178,72 @@ class CapaTransformerTest extends GroovyTestCase {
                 "Kein Abschnitt 'Kapa_Abteilungen' definiert"
 
 
+
+
     }
 
     def slurpTextAndCalc(String text) {
-        def ct = new CapaTransformer(populatedCalculator)
-        ct.slurpAndCalc(text)
+        Model m = populatedModel
+        def ct = new CapaTransformer(m)
+        try {
+            def slurper = new JsonSlurper()
+            def result = slurper.parseText(text)
+            m.capaAvailable = [:]
+            //if(result) {
+            m.capaAvailable = m.calcCapa(result)
+            //}
+            if(m.capaAvailable) {
+                m.check()
+            }
+            return m.capaAvailable
+
+        } catch (VpipeDataException ve) {
+            throw ve
+        } catch (Exception e) {
+            throw new VpipeDataException("Problem in JSON-Format von Datei $DataReader.CAPA_FILE_NAME:\n${e.getMessage()}")
+        }
+        null
     }
 
-    void testTransform() {
-
+    void testEmpty() {
+        def text = "{}"
+        def msg = shouldFail (VpipeDataException) {
+            def capa = slurpTextAndCalc(text)
+            println(capa)
+        }
+        assert msg == "Fehler beim Lesen der Datei Abteilungs-Kapazitaets-Angebot.txt\nEintrag 'Kapa_Gesamt' fehlt."
     }
 
-    void testUpdateConfiguration() {
+    void testMissingDepatments() {
+        def text = """{
+                    "Kapa_Gesamt": {
+                        "Feiertage": [ "1.1.2020" ],
+                        "Kapa_Profil": {
+                            "2020-W01": 80,
+                            "2020-W02": 90
+                        }
+                    },
+               
+                    "Kapa_Abteilungen": {
+                  
+                        "Konstruktion": {
+                            "Kapa": {
+                                "gelb": 140,
+                                "rot": 190
+                            },
+                            "Kapa_Profil": {
+                                "2020-W04": { "gelb": 180, "rot": 220 }
+                            }
+                        }
+                    }
+                 }
+                """
+        def msg = shouldFail (VpipeDataException) {
+            def capa = slurpTextAndCalc(text)
+            println(capa)
+        }
+        assert msg == "Fehler beim Lesen der Datei Abteilungs-Kapazitaets-Angebot.txt\n" +
+                "Für folgende Abteilungen ist keine Kapa definiert: [d1, d2]"
+
     }
 }

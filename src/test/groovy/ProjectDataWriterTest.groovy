@@ -1,17 +1,16 @@
-import core.ProjectDataToLoadCalculator
-import core.TaskInProject
+import core.LoadCalculator
 import testdata.TestDataHelper
 
-import static core.TaskInProject.WeekOrMonth.MONTH
+import static model.WeekOrMonth.*
 
 class ProjectDataWriterTest extends GroovyTestCase {
 
     void testWriteToFileWeek() {
 
         def tr = TestDataHelper.getPopulatedCalculator()
-        ProjectDataToLoadCalculator.writeToFileStatic(tr, TaskInProject.WeekOrMonth.WEEK)
+        LoadCalculator.writeToFileStatic(tr, WEEK)
 
-        File data = new File(ProjectDataToLoadCalculator.FILE_NAME_WEEK)
+        File data = new File(LoadCalculator.FILE_NAME_WEEK)
         def lines = data.readLines()
         lines = lines*.trim()
         assert lines[0] == "DEP\t2020-W01\t2020-W02\t2020-W03\t2020-W04\t2020-W05\t2020-W06"
@@ -24,9 +23,9 @@ class ProjectDataWriterTest extends GroovyTestCase {
     void testWriteToFileMonth() {
 
         def tr = TestDataHelper.getPopulatedCalculator()
-        ProjectDataToLoadCalculator.writeToFileStatic(tr, MONTH)
+        LoadCalculator.writeToFileStatic(tr, MONTH)
 
-        File data = new File(ProjectDataToLoadCalculator.FILE_NAME_MONTH)
+        File data = new File(LoadCalculator.FILE_NAME_MONTH)
         def lines = data.readLines()
         lines = lines*.trim()
         assert lines[0] == "DEP\t2020-M01\t2020-M02"
@@ -38,20 +37,20 @@ class ProjectDataWriterTest extends GroovyTestCase {
 
     void testWriteToExistingFileBackup() {
 
-        File data = new File(ProjectDataToLoadCalculator.FILE_NAME_WEEK)
+        File data = new File(LoadCalculator.FILE_NAME_WEEK)
         data.delete()
         data.createNewFile()
         data << "backup"
 
         def tr = TestDataHelper.getPopulatedCalculator()
-        ProjectDataToLoadCalculator.writeToFileStatic(tr, TaskInProject.WeekOrMonth.WEEK)
+        LoadCalculator.writeToFileStatic(tr, WEEK)
 
-        def back = new File(ProjectDataToLoadCalculator.BACKUP_FILE)
+        def back = new File(LoadCalculator.BACKUP_FILE)
         assert back.exists()
         def backupLines = back.readLines()
         assert backupLines[0] == "backup"
 
-        data = new File(ProjectDataToLoadCalculator.FILE_NAME_WEEK)
+        data = new File(LoadCalculator.FILE_NAME_WEEK)
         def lines = data.readLines()
         lines = lines*.trim()
         assert lines[0] == "DEP\t2020-W01\t2020-W02\t2020-W03\t2020-W04\t2020-W05\t2020-W06"

@@ -1,7 +1,7 @@
-package gui
+package view
 
 import groovy.transform.CompileStatic
-import transform.YellowRedLimit
+import model.YellowRedLimit
 import utils.RunTimer
 
 import javax.swing.JPanel
@@ -18,7 +18,7 @@ import java.awt.event.MouseMotionListener
 import static extensions.DateHelperFunctions._getWeekYearStr
 
 @CompileStatic
-class LoadGridPanel extends JPanel implements MouseMotionListener{
+class LoadPanel extends JPanel implements MouseMotionListener{
 
     Color nowBarColor = new Color(255, 0, 0, 60)
     Color nowBarShadowColor = new Color(50, 50, 50, 30)
@@ -138,7 +138,6 @@ class LoadGridPanel extends JPanel implements MouseMotionListener{
 
         assert this.depTimeLoadMap != null
         assert this.allTimeKeys != null
-        //assert this.capaAvailable != null
 
         normalizeTo100Percent()
         setNow()
@@ -146,9 +145,7 @@ class LoadGridPanel extends JPanel implements MouseMotionListener{
         repaint()
     }
 
-    LoadGridPanel(int gridWidth) {
-        //super()
-        //Map<String, Map<String, Double>> depTimeLoadMap=[:], List<String> allTimeKeys=[], Map<String, Map<String, YellowRedLimit>> capaAvailable = [:]
+    LoadPanel(int gridWidth) {
         setModelData([:], [:], [], [:])
         setGridWidth(gridWidth)
         addMouseMotionListener(this)
@@ -195,7 +192,6 @@ class LoadGridPanel extends JPanel implements MouseMotionListener{
                 }
             }
         }
-        //println depTimeLoadMap
     }
 
 
