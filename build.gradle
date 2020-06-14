@@ -43,8 +43,8 @@ launch4j {
 
 task createGui(type: edu.sc.seis.launch4j.tasks.Launch4jLibraryTask) {
     outfile = 'v-pipe-gui.exe'
-    mainClassName = 'view.VpipeGui'
-    jvmOptions =['-Dsun.java2d.uiScale=0.9']
+    mainClassName = 'newview.MainGui'
+    jvmOptions =['-Dsun.java2d.uiScale=1.5']
 
 }
 
