@@ -3,25 +3,48 @@ package core
 import model.Model
 import model.TaskInProject
 import model.WeekOrMonth
-import transform.CapaTransformer
 import utils.FileSupport
 import groovy.transform.ToString
-import transform.Transformer
 import utils.RunTimer
 
+/*
+class CapaDetailsEntry {
+    BigDecimal value
+    Map<String, Double> projectDetails // percentage of all project of valueAbs (sum of projectDetails = 100% = valueAbs)
+}*/
 
 /**
  * this does the raw data calculation:
- * 1. set a list of model.TaskInProject
- * 2. then call calcDepartmentWeekLoad
- * 3. now you may get the departments and the loads per week
+ * call calcDepartmentWeekLoad
+ * you may get the departments and the loads per week
  */
 @ToString
 class LoadCalculator {
 
+    WeekOrMonth weekOrMonth = WeekOrMonth.WEEK
+
+    Map<String, Map<String, Double>> projectTimeLoadMap = [:]
+    // compared to maxRed, if capaAvailable // CURRENT PROJECT OR [:]
+    Map<String, Map<String, Double>> depTimeLoadMap // compared to maxRed, if capaAvailable
+    Map<String, Double> maxRed // the maximum red value (> red limit) or red limit (if value < red limit)
+
+
+    // new data
+    //Map<String, Map<String, CapaDetailsEntry>> capaLoadAbsolut = [:] // compared to maxRed, if capaAvailable
+    //Map<String, Map<String, CapaDetailsEntry>> capaLoadPercent = [:] // compared to maxPercent, if capaAvailable
+    //Map<String, Double> maxAbsolut = [:] // the maximum value
+    //Map<String, Double> maxPercent = [:] // the maximum red value (> red limit) or red limit (if value < red limit)
+    //String currentProject = ""
+
 
     @Delegate
     Model model = new Model()
+
+    /*
+    LoadCalculator(Model model) {
+        this.model = model
+    }*/
+
     // during reading: show all data read?
 
     /**
@@ -31,24 +54,106 @@ class LoadCalculator {
     public static def FILE_NAME_MONTH = 'Abteilungs-Kapazitäts-Belastung-Monat.txt'
     public static String BACKUP_FILE
 
-    List<Transformer> transformers = []
+    //List<Transformer> transformers = []
+
+    /*
+    void calcProjectCapaNeeded(String project) {
+        projectTimeLoadMap = calcProjectLoad(weekOrMonth, project)
+        normalizeTo100Percent()
+    }
+
+    void __calcLoadAbsolut() {
+        depTimeLoadMap = calcDepartmentLoad(weekOrMonth)
+        normalizeTo100Percent()
+    }
 
 
+    void calcLoadPercent() {
+        if(capaAvailable) {
 
+            maxPercent = [:]
+            capaLoadPercent = [:]
+
+            capaLoadAbsolut.each {
+
+                String dep = it.key
+
+                // key: timeStr
+                Map<String, CapaDetailsEntry> depLoad = it.value
+
+                // find maximum absoluteValue of the current load
+                Double maxAbsCapaVal = depLoad.max {
+                    it.value.value // entry of map, the value (is a CapaDetailsEntry) and the biggest value...
+                }.value.value
+
+                Double maxPercentCapaVal = 0
+                capaLoadPercent[dep]=[:]
+                depLoad.each { String timeStamp, CapaDetailsEntry capaAbs ->
+                    //Double availYellow = capaAvailable[dep][timeStamp].yellow
+                    Double availRedAbs = capaAvailable[dep][timeStamp].red
+
+                    Double percentageNeeded = capaAbs.value / availRedAbs
+                    CapaDetailsEntry detailsPercent = new CapaDetailsEntry(value: percentageNeeded, projectDetails: [:])
+                    capaAbs.projectDetails.entrySet().each { String project, Double valueAbs ->
+                        detailsPercent.projectDetails[project] = valueAbs / availRedAbs
+                    }
+                    capaLoadPercent[dep][timeStamp] = new CapaDetailsEntry(value: percentageNeeded, projectDetails: detailsPercent)
+
+                }
+                maxPercent[dep] = maxPercentCapaVal
+
+
+            }
+        } else {
+            throw new VpipeException('Need available capa data (capaAvailable) to calc load percentage')
+        }
+    }
+
+     void calcLoadAbsolut() {
+
+        Map<String, Map<String, CapaDetailsEntry>> capaLoadAbsolutLocal = [:]
+        Map<String, Double> maxAbsolutLocal = [:]
+
+        taskList.each {
+            def capaMap = it.getCapaDemandSplitIn(weekOrMonth)
+            capaMap.each { String timeKey, double capaValue ->
+
+                // if there is not yet a department key and map: create
+                if (!capaLoadAbsolutLocal[it.department]) {
+                    capaLoadAbsolutLocal[it.department] = [:]
+                }
+                if(capaLoadAbsolutLocal[it.department][timeKey]) { // if department and week-key are available
+                    capaLoadAbsolutLocal[it.department][timeKey].value += capaValue // add value
+                    capaLoadAbsolutLocal[it.department][timeKey].projectDetails[it.project] = capaValue // and details map entry
+                } else { // create first entry
+                    def firstEntryMap = [(it.project): capaValue]
+                    capaLoadAbsolutLocal[it.department][timeKey] = new CapaDetailsEntry(value: capaValue, projectDetails: firstEntryMap ) // otherwise create
+                }
+
+                maxAbsolutLocal[it.department] = Math.max( // finally search for the maximum of the department load
+                        (double)(maxAbsolutLocal[it.department]?:0),
+                        (double)(capaLoadAbsolutLocal[it.department][timeKey].value)
+                )
+            }
+        }
+        maxAbsolut = maxAbsolutLocal
+        capaLoadAbsolut = capaLoadAbsolutLocal
+    }
+*/
     /**
      * Returns a map with keys that contains the strings of departments.
      * The values are maps again. They contain a interval-key and the total capacityDemand.
      * Interval = 2020-W1 up to W53 (or 2020-M1 up to M12)
-     * ATTENTION: Calcs a "sparce matrix". It will be fully created while writing out in core.ProjectDataWriter
+     * ATTENTION: Calcs a "sparce matrix". It will be fully created while writing out
      *
      * @return map of department-strings with a map of intervall-strings with demand of capacity
      */
     Map<String, Map<String, Double>> calcDepartmentLoad(WeekOrMonth weekOrMonth) {
 
         def t = new RunTimer(true)
-        transformers.each {
-            model = it.transform()
-        }
+        //transformers.each {
+        //    model = it.transform()
+        //}
         t.stop("Transformers")
         t.start()
 
@@ -74,24 +179,63 @@ class LoadCalculator {
     }
 
 
+    /**
+     * @param weekOrMonth
+     * @param project
+     * @return load for exactly the project
+     */
+    Map<String, Map<String, Double>> calcProjectLoad(WeekOrMonth weekOrMonth, String project) {
 
-    /*
-    def readFromFile() {
-        taskList = Model.readTasks()
-    }
+        List<TaskInProject> projectTaskList = getProject(project)
+        def load = [:]
+        projectTaskList.each {
+            def capaMap = it.getCapaDemandSplitIn(weekOrMonth)
+            capaMap.each { key, value ->
 
-    def writeToFile(WeekOrMonth weekOrMonth) {
-        writeToFileStatic(this, weekOrMonth)
-    }
-    */
+                // if there is not yet a department key and map: create
+                if (!load[it.department]) {
+                    load[it.department] = [:]
+                }
+                if(load[it.department][key]) { // if department and week-key are available
+                    load[it.department][key]+=value // add
+                } else {
+                    load[it.department][key]=value // otherwise create
+                }
 
-    CapaTransformer getFilledCapaTransformer() {
-        for(t in transformers) {
-            if (t instanceof CapaTransformer && t.capaAvailable){return t}
+            }
         }
-        null
+        load as Map<String, Map<String, Double>>
     }
 
+
+    def normalizeTo100Percent() {
+        maxRed = [:]
+        if (capaAvailable) {
+            depTimeLoadMap.each {
+                String dep = it.key
+                Map<String, Double> load = it.value
+                Double maxVal = load.max {
+                    it.value
+                }.value
+                maxRed[dep] = maxVal
+                load.each { String timeStamp, Double capa ->
+                    //Double avail = capaAvailable[dep][timeStamp].yellow
+                    load[timeStamp] = (Double) (capa)
+                }
+            }
+        } else {
+            depTimeLoadMap.each {
+                //String dep = it.key
+                Map<String, Double> load = it.value
+                Double maxVal = load.max {
+                    it.value
+                }.value
+                load.each { String timeStamp, Double capa ->
+                    load[timeStamp] = (Double) (capa / maxVal)
+                }
+            }
+        }
+    }
 
     /**
      *
@@ -143,26 +287,4 @@ class LoadCalculator {
     }
 
 
-    Map<String, Map<String, Double>> calcProjectLoad(WeekOrMonth weekOrMonth, String project) {
-
-        List<TaskInProject> projectTaskList = getProject(project)
-        def load = [:]
-        projectTaskList.each {
-            def capaMap = it.getCapaDemandSplitIn(weekOrMonth)
-            capaMap.each { key, value ->
-
-                // if there is not yet a department key and map: create
-                if (!load[it.department]) {
-                    load[it.department] = [:]
-                }
-                if(load[it.department][key]) { // if department and week-key are available
-                    load[it.department][key]+=value // add
-                } else {
-                    load[it.department][key]=value // otherwise create
-                }
-
-            }
-        }
-        load as Map<String, Map<String, Double>>
-    }
 }

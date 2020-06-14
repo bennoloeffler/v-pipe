@@ -21,8 +21,8 @@ import static extensions.DateHelperFunctions.*
 @EqualsAndHashCode
 class TaskInProject {
 
-
     String project
+    String description
     Date starting
     Date ending
     String department
@@ -85,8 +85,7 @@ class TaskInProject {
      */
     //@CompileStatic
     double getCapaNeeded(Date intervalStart, Date intervalEnd) {
-        double perDay = getDaysOverlap(intervalStart, intervalEnd) * getCapaPerDay()
-        return perDay
+        getDaysOverlap(intervalStart, intervalEnd) * getCapaPerDay()
     }
 
     /**

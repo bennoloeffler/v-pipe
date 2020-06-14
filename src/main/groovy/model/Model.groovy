@@ -1,15 +1,20 @@
 package model
 
-
+import groovy.beans.Bindable
 import groovy.time.TimeCategory
 
 import static model.WeekOrMonth.WEEK
 
 class Model {
 
+    @Bindable
+    boolean updateToggle
+
+    @Bindable
+    String currentDir = new File(".").getCanonicalPath().toString()
 
     // all project tasks data
-    List<TaskInProject> taskList
+    List<TaskInProject> taskList =[]
 
     // stable sorted project list
     //List<String> allProjectNames
@@ -19,10 +24,10 @@ class Model {
     //
 
     // maximum number of parallel slots in pipeline
-    int maxPipelineSlots
+    int maxPipelineSlots = 0
 
     // the original elements to feed into the pipeline
-    List<PipelineOriginalElement> pipelineElements
+    List<PipelineOriginalElement> pipelineElements = []
 
 
     /**
@@ -32,7 +37,7 @@ class Model {
      * 0 = no shift.
      * -7 = due date one week earlier.
      */
-    Map<String, Integer> projectDayShift
+    Map<String, Integer> projectDayShift = [:]
 
     // capa available data
 
@@ -41,23 +46,17 @@ class Model {
      * this is needed, because the size of time keys depend on
      * the position of tasks - and that changes when projects are moved
      */
-    private def jsonSlurp
+    private def jsonSlurp = ""
 
     /**
      * key: department -->
      * key: year-week-string 2020-W04 -->
      * value: the capaAvailable
      */
-    Map<String, Map<String, YellowRedLimit>> capaAvailable
-
-    // TODO: template data
+    Map<String, Map<String, YellowRedLimit>> capaAvailable = [:]
 
 
-    //
-    // results model and caching
-    //
 
-    // current load
 
 
 
@@ -90,40 +89,45 @@ class Model {
         (taskList*.ending).max()
     }
 
+    Date cachedStartOfTasks
+    Date cachedEndOfTasks
 
     /**
      * @return even if data is sparce, deliver continous list of timekey strings. Every week.
      */
     List<String> getFullSeriesOfTimeKeys(WeekOrMonth weekOrMonth) {
 
+        def result = []
+
         Date s = getStartOfTasks()
         Date e = getEndOfTasks()
 
-        use(TimeCategory) {
-            if(e - s > 20.years) {
-                throw new VpipeDataException("Dauer von Anfang bis Ende\n"+
-                        "der Tasks zu lange ( > 20 Jahre ): ${s.toString()} bis ${e.toString()}")
-            }
-        }
-
-        def result = []
-
-        if (weekOrMonth == WEEK) {
-            s = s.getStartOfWeek()
-            while (s < e) {
-                result << s.getWeekYearStr()
-                s += 7
-            }
-        } else {
-            s = s.getStartOfMonth()
-            while (s < e) {
-                result << s.getMonthYearStr()
-                use(TimeCategory) {
-                    s = s + 1.month
+        if(s && e) {
+            use(TimeCategory) {
+                if (e - s > 20.years) {
+                    throw new VpipeDataException("Dauer von Anfang bis Ende\n" +
+                            "der Tasks zu lange ( > 20 Jahre ): ${s.toString()} bis ${e.toString()}")
                 }
             }
+
+
+            if (weekOrMonth == WEEK) {
+                s = s.getStartOfWeek()
+                while (s < e) {
+                    result << s.getWeekYearStr()
+                    s += 7
+                }
+            } else {
+                s = s.getStartOfMonth()
+                while (s < e) {
+                    result << s.getMonthYearStr()
+                    use(TimeCategory) {
+                        s = s + 1.month
+                    }
+                }
+            }
+            //result.sort()
         }
-        //result.sort()
         result
     }
 
@@ -150,9 +154,17 @@ class Model {
     }
 */
 
-    def reCalcCapa() {
-        assert jsonSlurp
-        capaAvailable = calcCapa(jsonSlurp)
+    def reCalcCapaAvailableIfNeeded() {
+        def currentStart = getStartOfTasks()
+        def currentEnd = getEndOfTasks()
+        if( currentStart >= cachedStartOfTasks && currentEnd <= cachedEndOfTasks ) {
+            println()
+        } else {
+            assert jsonSlurp
+            capaAvailable = calcCapa(jsonSlurp)
+        }
+        cachedStartOfTasks = currentStart
+        cachedEndOfTasks = currentEnd
     }
 
     def fileErr =""
@@ -278,5 +290,8 @@ class Model {
                 check()
             }
         }
+
+        setUpdateToggle(!getUpdateToggle())
     }
+
 }

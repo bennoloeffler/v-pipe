@@ -1,5 +1,6 @@
-package view
+package newview
 
+import groovy.beans.Bindable
 import groovy.transform.TupleConstructor
 
 /**
@@ -23,7 +24,10 @@ class GridElement {
 
 
 
-trait GridModel {
+abstract class GridModel {
+
+    @Bindable
+    boolean updateToggle
 
     /**
      * @param x grid coordinates
@@ -69,6 +73,8 @@ trait GridModel {
      */
     abstract def swap(int y, int withY)
 
+    abstract def setSelectedElement(int x, int y)
+
     /**
      * @return the row which is to be marked as "now" in the view
      */
@@ -79,7 +85,8 @@ trait GridModel {
      */
     abstract List<String> getLineNames()
 
-    //abstract List<String> getLineNames()
+    // TODO:
+    abstract List<String> getColumnNames()
 
 }
 

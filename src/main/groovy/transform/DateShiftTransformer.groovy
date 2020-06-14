@@ -1,7 +1,7 @@
 package transform
 
+import groovy.transform.InheritConstructors
 import model.DataReader
-import model.Model
 import model.TaskInProject
 import model.VpipeDataException
 
@@ -9,14 +9,14 @@ import model.VpipeDataException
  * Can move all the starting and ending of model.TaskInProject.
  * Based on data that is a map of project names and time shifts in days.
  */
-@groovy.transform.InheritConstructors
+@InheritConstructors
 class DateShiftTransformer extends Transformer {
 
     /**
      * @return the model.TaskInProject List that is transformed
      */
     @Override
-    Model transform() {
+    void transform() {
 
         assert projectDayShift != null
         assert model != null
@@ -55,10 +55,8 @@ class DateShiftTransformer extends Transformer {
         }
         if (description == "Dates transformed:\n") {description+"none..."}
 
-        //Model clone = model.clone() as Model
         model.taskList = result
-        //clone
-        model
+
     }
 
 

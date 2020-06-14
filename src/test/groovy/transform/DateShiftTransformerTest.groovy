@@ -10,7 +10,7 @@ class DateShiftTransformerTest extends GroovyTestCase {
     void testTransform() {
         Model m = TestDataHelper.getPopulatedModel()
         DateShiftTransformer dst = new DateShiftTransformer(m)
-        dst.projectDayShift = [p1: 2, p2: -1]
+        m.projectDayShift = [p1: 2, p2: -1]
 
         /*
         t1p1 = eventType("p1", "5.1.2020", "10.1.2020", "d1", 20.0)
@@ -19,7 +19,7 @@ class DateShiftTransformerTest extends GroovyTestCase {
         t2p2 = eventType("p2", "8.1.2020", "9.2.2020", "d2", 20.0)
          */
 
-        m = dst.transform()
+        dst.transform()
 
         assert dst.description == "Dates transformed:\np1: 2\np2: -1\n"
 

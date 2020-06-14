@@ -184,7 +184,7 @@ class CapaTransformerTest extends GroovyTestCase {
 
     def slurpTextAndCalc(String text) {
         Model m = populatedModel
-        def ct = new CapaTransformer(m)
+        //def ct = new CapaTransformer(m)
         try {
             def slurper = new JsonSlurper()
             def result = slurper.parseText(text)

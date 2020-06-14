@@ -123,8 +123,8 @@ class ProjectDataToLoadCalculatorTest extends GroovyTestCase {
 
         Model m = new Model()
         m.readAllData()
-        LoadCalculator pt = new LoadCalculator()
-        pt.transformers << new DateShiftTransformer(m)
+        LoadCalculator pt = new LoadCalculator(model: m)
+        new DateShiftTransformer(m).transform()
         def load = pt.calcDepartmentLoad(WEEK)
 
 
@@ -153,8 +153,8 @@ class ProjectDataToLoadCalculatorTest extends GroovyTestCase {
 
         Model m = new Model()
         m.readAllData()
-        LoadCalculator pt = new LoadCalculator()
-        pt.transformers << new DateShiftTransformer(m)
+        LoadCalculator pt = new LoadCalculator(model: m)
+        new DateShiftTransformer(m).transform()
         def load = pt.calcDepartmentLoad(WEEK)
 
 

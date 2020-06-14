@@ -4,6 +4,8 @@ import core.LoadCalculator
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import model.WeekOrMonth
+import newview.GridElement
+import newview.GridModel
 import utils.RunTimer
 
 import javax.swing.JPanel
@@ -404,14 +406,12 @@ class PipelinePanel extends JPanel implements MouseWheelListener, MouseMotionLis
         updateLoadData()
     }
 
-    SwingWorker sw
     def updateLoadData() {
 
         SwingUtilities.invokeLater {
 
         String pn = model.lineNames[cursorY]
         projectModel.setProjectName pn
-        //println "pn: $pn"
 
         if(lp) {
 
@@ -433,7 +433,7 @@ class PipelinePanel extends JPanel implements MouseWheelListener, MouseMotionLis
                             stringMapMapProject = dc.calcProjectLoad(WeekOrMonth.WEEK, project)
                         }
                         List<String> allKeys = dc.getFullSeriesOfTimeKeys(WeekOrMonth.WEEK)
-                        dc.filledCapaTransformer?.reCalcCapa() // if time series has expanded...
+                        dc.filledCapaTransformer?.reCalcCapaAvailableIfNeeded() // if time series has expanded...
 
                         return [stringMapMap, stringMapMapProject, allKeys, dc.filledCapaTransformer?.capaAvailable]
                     }catch(InterruptedException e) {
@@ -475,8 +475,8 @@ class PipelinePanel extends JPanel implements MouseWheelListener, MouseMotionLis
                     stringMapMapProject = dc.calcProjectLoad(WeekOrMonth.WEEK, project)
                 }
                 List<String> allKeys = dc.getFullSeriesOfTimeKeys(WeekOrMonth.WEEK)
-                dc.filledCapaTransformer?.reCalcCapa() // if time series has expanded...
-                lp.setModelData(stringMapMap, stringMapMapProject, allKeys, dc.filledCapaTransformer?.capaAvailable)
+                //dc.filledCapaTransformer?.reCalcCapaAvailableIfNeeded() // if time series has expanded...
+                //lp.setModelData(stringMapMap, stringMapMapProject, allKeys, dc.filledCapaTransformer?.capaAvailable)
             }
         }
     }

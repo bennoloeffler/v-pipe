@@ -157,12 +157,12 @@ class PipelineTransformer extends Transformer {
      * @return the model.TaskInProject List that is transformed
      */
     @Override
-    Model transform() {
+    void transform() {
 
         assert model != null
 
         if(maxPipelineSlots == 0) { // DO NO TRANSFORM
-            return model
+            return
         }
 
         description="Dates transformed:\n"

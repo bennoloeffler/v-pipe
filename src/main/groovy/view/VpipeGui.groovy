@@ -4,7 +4,6 @@ import core.LoadCalculator
 import model.Model
 import model.VpipeDataException
 import model.WeekOrMonth
-import transform.CapaTransformer
 import transform.DateShiftTransformer
 
 import javax.swing.JFrame
@@ -108,10 +107,10 @@ class VpipeGui {
 
         LoadCalculator pt = new LoadCalculator(model: model)
         def dst = new DateShiftTransformer(model)
-        pt.transformers << dst
-        pt.transformers << new CapaTransformer(model)
+        //pt.transformers << dst
+        //pt.transformers << new CapaTransformer(model)
         pt.calcDepartmentLoad(WeekOrMonth.WEEK)
-        pt.transformers.remove(dst)
+        //pt.transformers.remove(dst)
 
         loadPanel = new LoadPanel(30)
 

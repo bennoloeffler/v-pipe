@@ -1,42 +1,50 @@
-package view
+package newview
 
 import groovy.beans.Bindable
 import groovy.transform.CompileStatic
 import model.Model
 import model.TaskInProject
+import model.WeekOrMonth
 import newview.GridElement
 import newview.GridModel
+
+import java.beans.PropertyChangeEvent
 
 import static extensions.DateHelperFunctions.*
 
 @CompileStatic
-class ProjectModel extends GridModel {
+class NewProjectModel extends GridModel {
 
     List<List<GridElement>> allProjectGridLines
 
     @Bindable
-    String projectName
+    String projectName =""
 
     int nowXRowCache = -1
-    List<TaskInProject> project
+    List<TaskInProject> project = []
 
-    @Delegate
+    //@Delegate
     Model model
 
+    Closure projectNameCallback = {
+        updateGridElements()
+        setUpdateToggle(!getUpdateToggle())
+    }
 
-    ProjectModel(Model model) {
+    NewProjectModel(Model model) {
         this.model = model
-        //this.taskList = taskList
+        this.addPropertyChangeListener('projectName', projectNameCallback)
         updateGridElements()
     }
 
-
+/*
     def setProjectName(String projectName ) {
         def old = this.projectName
         this.projectName = projectName
         updateGridElements()
         firePropertyChange("projectName", old, this.projectName)
     }
+*/
 
     /**
      * create "the model" List<List<GridElement>> allProjectGridLines
@@ -48,7 +56,7 @@ class ProjectModel extends GridModel {
             //
             // just for sorting projects to ending-date
             //
-            project = getProject(projectName)
+            project = model.getProject(projectName)
 
             project.sort {
                 it.ending
@@ -65,6 +73,7 @@ class ProjectModel extends GridModel {
      * @return GridElements of one project
      */
     List<GridElement> fromTask(TaskInProject projectTask, List<TaskInProject> all) {
+        nowXRowCache = - 1
         assert projectTask
         assert all
         def gridElements = []
@@ -74,7 +83,7 @@ class ProjectModel extends GridModel {
         Date endOfGrid = _getStartOfWeek(all*.ending.max()) + 7
         def fromToDateString = "${_dToS(startOfTask)} - ${_dToS(endOfTask)}"
 
-        Date now = Date.newInstance()
+        Date now = new Date()
         int row = 0
         for (Date w = startOfGrid; w < endOfGrid; w += 7) {
             if(w <= now && now < w + 7) {
@@ -141,7 +150,7 @@ class ProjectModel extends GridModel {
 
     @Override
     def setSelectedElement(int x, int y) {
-        throw new RuntimeException('not yet implemented')
+        //throw new RuntimeException('not yet implemented')
     }
 
     @Override
@@ -158,7 +167,7 @@ class ProjectModel extends GridModel {
 
     @Override
     List<String> getColumnNames() {
-        return []
+        return model.getFullSeriesOfTimeKeys(WeekOrMonth.WEEK)
     }
 
 }

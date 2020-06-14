@@ -26,7 +26,7 @@ abstract class Transformer {
      * needs to do the work and needs to fill description
      * @return the work of transformer
      */
-    abstract Model transform ()
+    abstract void transform ()
 
     /**
      * has to be filled during transform

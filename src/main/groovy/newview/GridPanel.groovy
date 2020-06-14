@@ -1,15 +1,15 @@
-package view
+package newview
 
-import core.LoadCalculator
+import groovy.beans.Bindable
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
-import newview.GridElement
 import utils.RunTimer
 
 import javax.swing.*
 import java.awt.*
 import java.awt.event.*
-import java.beans.PropertyChangeEvent
+import java.awt.geom.AffineTransform
+import java.beans.PropertyChangeListener
 import java.util.List
 
 /**
@@ -18,22 +18,18 @@ import java.util.List
  * It has a GridModel to
  */
 @CompileStatic
-class ProjectPanel extends JPanel implements MouseWheelListener, MouseMotionListener, MouseListener, KeyListener {
+class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListener, MouseListener, KeyListener, PanelBasics {
 
     Color cursorColor = new Color(255, 10, 50, 160)
     Color nowBarColor = new Color(255, 0, 0, 60)
     Color nowBarShadowColor = new Color(50, 50, 50, 30)
 
+    GridModel model
 
-    LoadPanel lp // notify that one when grid or model changed...
+    @Bindable int grid
 
-    LoadCalculator dc
-
-    ProjectModel model
-    int grid
     int borderWidth
     int nameWidth
-
 
     /**
      * the cursor - modeled as position in grid
@@ -82,21 +78,18 @@ class ProjectPanel extends JPanel implements MouseWheelListener, MouseMotionList
     @Override
     @CompileStatic(TypeCheckingMode.SKIP) // because of that: scrollPane.processMouseWheelEvent(e)
     void mouseWheelMoved(MouseWheelEvent e) {
-        //super?
         if((e.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK) > 0) {
             //   negative values if the mouse wheel was rotated up/away from the user,
             //   and positive values if the mouse wheel was rotated down/ towards the user
             int rot = e.getWheelRotation()
             int inc = (int)(grid * rot / 10)
-            grid += inc!=0?inc:1 // min one tic bigger
-            if(grid < 10){grid=10}
-            if(grid > 400){grid=400}
+            setGrid(grid + (inc!=0?inc:1)) // min one tic bigger
+            minMaxGridCheck()
             nameWidth = grid *3
-            lp?.setGridWidth(grid)
             invalidateAndRepaint()
         } else {
-            scrollPane.getVerticalScrollBar().setUnitIncrement((grid/3) as int)
-            scrollPane.processMouseWheelEvent(e)
+            scrollPane?.getVerticalScrollBar()?.setUnitIncrement((grid/3) as int)
+            scrollPane?.processMouseWheelEvent(e)
         }
     }
 
@@ -107,9 +100,11 @@ class ProjectPanel extends JPanel implements MouseWheelListener, MouseMotionList
 
     @Override
     void mouseDragged(MouseEvent e) {
+
+        /*
         int x = e.getY()
         int y = e.getX()
-        /*
+
         println("drag: x=$x y=$y")
         int gX = getGridXFromMouseX(x)
         int gY = getGridYFromMouseY(y)
@@ -118,6 +113,7 @@ class ProjectPanel extends JPanel implements MouseWheelListener, MouseMotionList
         */
     }
 
+    /*
     @Override
     void mouseMoved(MouseEvent e) {
         mouseX = e.getX()
@@ -133,7 +129,10 @@ class ProjectPanel extends JPanel implements MouseWheelListener, MouseMotionList
                 false)
 
         ToolTipManager.sharedInstance().mouseMoved(phantom)
-    }
+        //int gX = getGridXFromMouseX(mouseX)
+        //int gY = getGridYFromMouseY(mouseY)
+        //println("move: mx=$mouseX my=$mouseY   gx=$gX gY=$gY")
+    }*/
 
     @Override
     String getToolTipText(MouseEvent event) {
@@ -163,18 +162,16 @@ class ProjectPanel extends JPanel implements MouseWheelListener, MouseMotionList
 
     @Override
     void mouseClicked(MouseEvent e) {
+        requestFocusInWindow()
+
         //def redraw = [new Point(cursorX, cursorY)]
         mouseX = e.getX()
         mouseY = e.getY()
         cursorX = getGridXFromMouseX()
         cursorY = getGridYFromMouseY()
-        SwingUtilities.invokeLater {
-            updateLoadData()
-            invalidateAndRepaint()
-        }
-        //redraw << new Point(cursorX, cursorY)
-        //revalidate()
-        //model.firePointListeners(redraw)
+        model.setSelectedElement(cursorX, cursorY)
+
+        invalidateAndRepaint()
     }
 
     @Override
@@ -215,21 +212,20 @@ class ProjectPanel extends JPanel implements MouseWheelListener, MouseMotionList
         }
 
         if(KeyEvent.VK_L == e.getKeyCode()) {
-            VpipeGui.openLoad()
+            //VpipeGui.openLoad()
         }
 
         if(KeyEvent.VK_PLUS == e.getKeyCode()) {
-            grid = (grid * 1.1) as int
-            if(grid > 400){grid=400}
-            nameWidth = grid *3
-            lp?.setGridWidth(grid)
+            setGrid((grid * 1.1) as int)
+            minMaxGridCheck()
 
-        }
-        if(KeyEvent.VK_MINUS == e.getKeyCode()) {
-            grid = (grid / 1.1) as int
-            if(grid < 10){grid=10}
             nameWidth = grid *3
-            lp?.setGridWidth(grid)
+        }
+
+        if(KeyEvent.VK_MINUS == e.getKeyCode()) {
+            setGrid((grid / 1.1) as int)
+            minMaxGridCheck()
+            nameWidth = grid *3
         }
 
         //def redraw = [new Point(cursorX, cursorY)]
@@ -255,24 +251,18 @@ class ProjectPanel extends JPanel implements MouseWheelListener, MouseMotionList
         }
 
         if(keyAndShiftPressed(e, KeyEvent.VK_LEFT)) {
-            //println("SHIFT LEFT x: $cursorX y: $cursorY")
             model.moveLeft(cursorY)
-            //updateLoadData()
         }
 
         if(keyAndShiftPressed(e, KeyEvent.VK_RIGHT)) {
-            //println("SHIFT RIGHT x: $cursorX y: $cursorY")
             model.moveRight(cursorY)
-            //updateLoadData()
         }
 
-        SwingUtilities.invokeLater() {
-            scrollToCursorXY()
-            //updateLoadData()
-
-        }
-
+        scrollToCursorXY()
         invalidateAndRepaint()
+
+        model.setSelectedElement(cursorX, cursorY)
+
     }
 
     void scrollToCursorXY() {
@@ -292,55 +282,10 @@ class ProjectPanel extends JPanel implements MouseWheelListener, MouseMotionList
         (keyCode == e.getKeyCode()) && (e.getModifiersEx() & KeyEvent.SHIFT_DOWN_MASK) > 0
     }
 
-    /**
-     * ask for repaint
-     */
-    def invalidateAndRepaint() {
-        revalidate()
-        repaint()
+    def minMaxGridCheck() {
+        if(grid > 100){setGrid(100)}
+        if(grid < 10){setGrid(10)}
     }
-
-
-    /**
-     * open "the" file
-     */
-    def openFile() {
-
-        SwingUtilities.invokeLater {
-            VpipeGui.openGuiOnFile()
-            SwingUtilities.invokeLater {
-                setCursorToNow()
-                invalidateAndRepaint()
-            }
-        }
-
-
-        /*
-
-        JFileChooser fc = new JFileChooser(new File("."))
-        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
-
-        int returnVal = fc.showOpenDialog(this)
-
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-            File dir = fc.getSelectedFile()
-            File root = fc.getCurrentDirectory()
-            println ("Opening: dir: $dir.name  root: $root.absolutePath" )
-            SwingUtilities.invokeLater {
-                VpipeGui.openGuiOnFile(dir)
-                SwingUtilities.invokeLater {
-                    revalidate()
-                    repaint()
-                }
-            }
-
-        } else {
-            println("Open command cancelled by user.")
-        }
-        */
-    }
-
-
 
 
     /**
@@ -354,17 +299,6 @@ class ProjectPanel extends JPanel implements MouseWheelListener, MouseMotionList
     }
 
 
-    JScrollPane getScrollPane() {
-        getParent().getParent() as JScrollPane
-    }
-
-    /**
-     * for testing purposes - uses internal, filled GridModel
-     */
-    /*
-    ProjectPanel(int grid = 60) {
-        this(grid, new GridDemoModel(), null, null)
-    }*/
 
 
     /**
@@ -373,103 +307,23 @@ class ProjectPanel extends JPanel implements MouseWheelListener, MouseMotionList
      * @param borderWidth
      * @param model
      */
-     ProjectPanel(int grid, ProjectModel model, LoadPanel lp, LoadCalculator dc) {
+    GridPanel(int grid, GridModel model) {
         this.grid = grid
-        this.borderWidth = grid / 3 as int
-        this.nameWidth = grid * 3
+        minMaxGridCheck()
+        this.borderWidth = grid / 4 as int
+        this.nameWidth = grid * 4
         addKeyListener(this)
         addMouseMotionListener(this)
         addMouseListener(this)
         addMouseWheelListener(this)
         this.model = model
-        this.lp = lp
-        this.dc = dc
-        setCursorToNow()
-         //updateLoadData()
-
-        //lp?.setGridWidth(width)
-         model.addPropertyChangeListener("projectName") { event ->
-             //println "updated project panel"
-             def evt = event as PropertyChangeEvent
-             //println "n: $evt.propertyName, old: $evt.oldValue new: $evt.newValue"
-
-             SwingUtilities.invokeLater {
-                 updateLoadData()
-                 invalidateAndRepaint()
-             }
-         }
-    }
-
-    def updateLoadData() {
-        if(lp) {
-
-            /*
-
-            if(sw?.getState() != SwingWorker.StateValue.DONE) {
-                sw?.cancel(true)
-            }
-            sw = new SwingWorker() {
-
-                @Override
-                protected Object doInBackground() throws Exception {
-                    try {
-                        dc.taskList = ((ProjectGridModel) model).taskList
-                        Map<String, Map<String, Double>> stringMapMap = dc.calcDepartmentLoad(WeekOrMonth.WEEK)
-                        Map<String, Map<String, Double>> stringMapMapProject = [:]
-                        if (cursorY >= 0 && cursorY < model.getSizeY()) {
-                            String project = model.getLineNames()[cursorY]
-                            stringMapMapProject = dc.calcProjectLoad(WeekOrMonth.WEEK, project)
-                        }
-                        List<String> allKeys = dc.getFullSeriesOfTimeKeys(WeekOrMonth.WEEK)
-                        dc.filledCapaTransformer?.reCalcCapaAvailableIfNeeded() // if time series has expanded...
-
-                        return [stringMapMap, stringMapMapProject, allKeys, dc.filledCapaTransformer?.capaAvailable]
-                    }catch(InterruptedException e) {
-                        return null
-                    }
-                }
-
-                @Override
-                protected void done() {
-
-                    List result
-                    try {
-                            result = get() as List
-                    }catch (Exception e) {
-                        // was canceled...
-                    }
-
-                    if (result) {
-                        lp.setModelData(
-                                result[0] as Map<String, Map<String, Double>>,
-                                result[1] as Map<String, Map<String, Double>>,
-                                result[2] as List<String>,
-                                result[3] as Map<String, Map<String, YellowRedLimit>>)
-                    }
-
-                }
-            }
-            sw.execute()
-
-            */
-
-
+        PropertyChangeListener l = {
             SwingUtilities.invokeLater {
-                //ProjectDataToLoadCalculator dc = new ProjectDataToLoadCalculator()
-/*
-                //dc.taskList = model.project
-                Map<String, Map<String, Double>> stringMapMap = dc.calcDepartmentLoad(WeekOrMonth.WEEK)
-                Map<String, Map<String, Double>> stringMapMapProject = [:]
-                if(cursorY >= 0 && cursorY < model.getSizeY()) {
-                    String project = model.getLineNames()[cursorY]
-                    stringMapMapProject = dc.calcProjectLoad(WeekOrMonth.WEEK, project)
-                }
-                List<String> allKeys = dc.getFullSeriesOfTimeKeys(WeekOrMonth.WEEK)
-                //dc.filledCapaTransformer?.reCalcCapaAvailableIfNeeded() // if time series has expanded...
-                lp.setModelData(stringMapMap, stringMapMapProject, allKeys, dc.filledCapaTransformer?.capaAvailable)
-*/
+                invalidateAndRepaint()
             }
-        }
+        } as PropertyChangeListener
+        model.addPropertyChangeListener('updateToggle', l)
+        setCursorToNow()
     }
 
     def setCursorToNow() {
@@ -477,16 +331,22 @@ class ProjectPanel extends JPanel implements MouseWheelListener, MouseMotionList
         scrollToCursorXY()
     }
 
+
+    //boolean hintsDone=false
+
+
+
+    Rectangle r = new Rectangle()
     /**
      * heart of painting
      * @param g1d
      */
     @Override
     protected void paintComponent(Graphics g1d) {
-
         super.paintComponent(g1d)
         Graphics2D g = g1d as Graphics2D
-        Rectangle r = g.getClipBounds()
+        hints(g)
+        g.getClipBounds(r)
 
         RunTimer t = new RunTimer(true)
 
@@ -511,26 +371,33 @@ class ProjectPanel extends JPanel implements MouseWheelListener, MouseMotionList
             }
         }
 
+
+        int offset = (grid / 20) as int // shadow and space
+        int size = (int) ((grid - offset) / 3) // size of shadow box and element box
+        if (grid < 15) {
+            size = size * 2
+        }
+        int round = (size / 2) as int // corner diameter
+
+
         //
         // paint the now-indicator row above everything else
         //
 
-        int offset = (grid/20) as int // shadow and space
-        int size = (int)((grid - offset)/3 ) // size of shadow box and element box
-        if(grid<15) {size=size*2}
-        int round = (size / 2) as int // corner diameter
-        int nowGraphX = borderWidth + model.nowX * grid + (int)((grid - size)/2) + nameWidth// position start (left up)
-        int nowGraphY = borderWidth + model.sizeY * grid // position end (right down)
+        if(model.nowX >=0 && model.nowX < model.sizeY) {
+            int nowGraphX = borderWidth + model.nowX * grid + (int) ((grid - size) / 2) + nameWidth
+            // position start (left up)
+            int nowGraphY = borderWidth + model.sizeY * grid // position end (right down)
 
-        // shadow
-        g.setColor(nowBarShadowColor)
-        g.fillRoundRect(nowGraphX+offset, +offset, size-4, nowGraphY+borderWidth-4, round, round)
-        // element in project color, integration phase color (orange), empty color (white)
-        g.setColor( nowBarColor )
-        g.fillRoundRect(nowGraphX, 0, size-4 , nowGraphY+borderWidth-4, round, round)
-
+            // shadow
+            g.setColor(nowBarShadowColor)
+            g.fillRoundRect(nowGraphX + offset, +offset, size - 4, nowGraphY + borderWidth - 4, round, round)
+            // element in project color, integration phase color (orange), empty color (white)
+            g.setColor(nowBarColor)
+            g.fillRoundRect(nowGraphX, 0, size - 4, nowGraphY + borderWidth - 4, round, round)
+        }
         //
-        // draw the department names
+        // draw the line names
         //
 
         int y = 0
@@ -540,35 +407,80 @@ class ProjectPanel extends JPanel implements MouseWheelListener, MouseMotionList
             int gridY = borderWidth + y*grid
             g.fillRoundRect(borderWidth , gridY, nameWidth-4, grid - 4 , round, round)
 
-            if(grid>20) {
+            if(grid>0) {
                 // write (with shadow) some info
-                // TODO: use Clip, Transform, Paint, Font and Composite
                 float fontSize = grid / 2
                 g.getClipBounds(rBackup)
-                g.setClip(borderWidth , gridY, nameWidth-6, grid - 6)
+                Rectangle newClip = new Rectangle(borderWidth , gridY, nameWidth-6, grid - 6)
+                g.setClip(newClip.intersection(rBackup))
                 g.setFont(g.getFont().deriveFont((float) fontSize))
                 g.setColor(Color.WHITE)
                 g.drawString(projectName, borderWidth + (int) (grid * 0.2), gridY + (int) (grid * 2/3))
                 g.setColor(Color.BLACK)
-                g.drawString(projectName, borderWidth + (int) (grid * 0.2)-2, gridY + (int) (grid * 2/3)-2)
+                g.drawString(projectName, borderWidth + (int) (grid * 0.2)-1, gridY + (int) (grid * 2/3)-1)
                 g.setClip(rBackup)
             }
 
             y++
         }
 
+        //
+        // draw the row names
+        //
+
+        int x = 0
+        model.getColumnNames().each { String rowName ->
+            g.setColor(Color.LIGHT_GRAY)
+            int gridX = borderWidth + x*grid + nameWidth
+            int gridY = borderWidth + (model.sizeY) * grid
+            g.fillRoundRect(gridX , gridY, grid-4, nameWidth - 4 , round, round)
+
+            if(grid>0) {
+                // write (with shadow) some info
+                float fontSize = grid / 2
+                g.setFont(g.getFont().deriveFont((float) fontSize))
+                atBackup = g.getTransform()
+                //Resets transform to rotation
+                rotationTransform.setToRotation((double)Math.PI/2)
+                translateTransform.setToTranslation(gridX   , gridY )
+                //Chain the transforms (Note order matters)
+                totalTransform.setToIdentity()
+                totalTransform.concatenate(atBackup)
+                totalTransform.concatenate(translateTransform)
+                totalTransform.concatenate(rotationTransform)
+                //at.rotate((double)(Math.PI / 2))
+                g.setTransform(totalTransform)
+                g.setColor(Color.WHITE)
+
+                g.getClipBounds(rBackup)
+                Rectangle newClip = new Rectangle(0 , -grid, nameWidth-6, grid)
+                g.setClip(newClip.intersection(rBackup))
+
+                g.drawString(rowName,  (int) (grid * 0.2),  0 - (int) (grid * 0.2))
+                g.setColor(Color.BLACK)
+                g.drawString(rowName,  (int) (grid * 0.2) -1,  0 - (int) (grid * 0.2) -1)
+                g.setClip(rBackup)
+                g.setTransform(atBackup)
+            }
+            x++
+        }
+
+
         t.stop("drawing all")
     }
 
+    AffineTransform totalTransform = new AffineTransform()
+    AffineTransform rotationTransform = new AffineTransform()
+    AffineTransform translateTransform = new AffineTransform()
+    AffineTransform atBackup
 
     /**
      * @return size as dimonsion based on model-size
      */
     @Override
     Dimension getPreferredSize() {
-        return new Dimension(nameWidth + model.sizeX*grid + 2*borderWidth, model.sizeY*grid + 2*borderWidth)
+        return new Dimension(nameWidth + model.sizeX*grid + 2*borderWidth, nameWidth + model.sizeY*grid + 2*borderWidth)
     }
-
 
 
     /**
@@ -612,17 +524,19 @@ class ProjectPanel extends JPanel implements MouseWheelListener, MouseMotionList
         }
 
 
-        if(grid>30) {
+        if(grid>0) {
             // write (with shadow) some info
             // TODO: use Clip, Transform, Paint, Font and Composite
             float fontSize = 20.0 * grid / 60
+
             g.getClipBounds(rBackup)
-            g.setClip(graphX, graphY, size - 6, size - 6)
+            Rectangle newClip = new Rectangle(graphX, graphY, size - 6, size - 6)
+            g.setClip(newClip.intersection(rBackup))
             g.setFont(g.getFont().deriveFont((float) fontSize))
             g.setColor(Color.WHITE)
             g.drawString(e.project, graphX + (int) (grid * 0.2), graphY + (int) (grid / 2))
             g.setColor(Color.BLACK)
-            g.drawString(e.project, graphX + (int) (grid * 0.2 - 2), graphY + (int) (grid / 2 - 2))
+            g.drawString(e.project, graphX + (int) (grid * 0.2 - 1), graphY + (int) (grid / 2 - 1))
             g.setClip(rBackup)
         }
     }
@@ -651,3 +565,4 @@ class ProjectPanel extends JPanel implements MouseWheelListener, MouseMotionList
     }
 
 }
+

@@ -7,8 +7,9 @@ class FileWatcherDeamonTest extends GroovyTestCase {
 
     static def FAST_TEST = true
     static {
-        FAST_TEST = true
-        println(FAST_TEST?"\n\nV O R S I C H T: FileWatcherDeamonTest is off \n\n":"")
+        if(FAST_TEST) {
+            println(FAST_TEST ? "\n\nV O R S I C H T: FileWatcherDeamonTest is off \n\n" : "")
+        }
     }
 
     void testCreateDirAndGetPath() {

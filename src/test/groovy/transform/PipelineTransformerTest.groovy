@@ -39,7 +39,7 @@ class PipelineTransformerTest extends GroovyTestCase {
         def pt = new PipelineTransformer(m)
         pt.pipelineElements = listOfPOEs
         pt.maxPipelineSlots = 2
-        m = pt.transform()
+        pt.transform()
 
         assert m.getProject('p1')[0] == t('p1', '5.1.2020', '10.1.2020', 'd1', 20)
         assert m.getProject('p2')[0] == t('p2', '7.1.2020', '12.1.2020', 'd1', 20)

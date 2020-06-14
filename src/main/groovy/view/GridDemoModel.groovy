@@ -1,9 +1,12 @@
 package view
 
+import newview.GridElement
+import newview.GridModel
+
 /**
  * base model for grid - this one is for manual testing
  */
-class GridDemoModel implements GridModel {
+class GridDemoModel extends GridModel {
 
     List <List<String>> data =
             [
@@ -121,12 +124,26 @@ class GridDemoModel implements GridModel {
     }
 
     @Override
+    def setSelectedElement(int x, int y) {
+
+    }
+
+    @Override
     int getNowX() {
         data[0].size() / 2
     }
 
     @Override
     List<String> getLineNames() {
-        return []
+        def r  = []
+        data.size().times {r << it.toString()*20}
+        r
+    }
+
+    @Override
+    List<String> getColumnNames() {
+        def r  = []
+        data[0].size().times {r << it.toString()*20}
+        r
     }
 }

@@ -1,44 +1,62 @@
-package view
+package newview
 
+import groovy.beans.Bindable
+import groovy.transform.CompileStatic
 import model.Model
 import model.TaskInProject
-import groovy.transform.CompileStatic
 import model.WeekOrMonth
-import newview.GridElement
-import newview.GridModel
+
+import java.beans.PropertyChangeEvent
+import java.beans.PropertyChangeListener
 
 import static extensions.DateHelperFunctions.*
 
 @CompileStatic
-class PipelineModel extends GridModel {
+class NewPipelineModel extends GridModel {
+
+    @Bindable
+    String selectedProject
 
     List<List<GridElement>> allProjectGridLines
 
     // TODO: write this to model and save it
-    List<String> allProjectNames
+    List<String> allProjectNames =[]
+
     int nowXRowCache = 0
 
     @Delegate
     Model model
 
+    def tasksPropertyListener = { PropertyChangeEvent e ->
+        if(e.propertyName=='updateToggle') {
+            sortProjectNamesWhenChanged() // new task list - probably after opening a new Data-Set
+        }
+        updateGridElements()
+        this.setUpdateToggle(!this.getUpdateToggle()) // just to fire an PropertyChange to the view
+    }
 
-    PipelineModel(Model model) {
+    NewPipelineModel(Model model) {
         this.model = model
-        //this.taskList = taskList
+        model.addPropertyChangeListener(tasksPropertyListener as PropertyChangeListener)
 
-        //
         // just for sorting projects to ending-date
-        //
+        sortProjectNamesWhenChanged()
+
+        updateGridElements()
+    }
+
+    private void sortProjectNamesWhenChanged() {
         List<String> allProjects = getAllProjects()
         Map<String, List<TaskInProject>> projectsMap = [:]
         allProjects.each {
             projectsMap[it] = getProject(it)
         }
-        allProjectNames = allProjects.sort { String p1, String p2 ->
+        List<String> allProjectNames = allProjects.sort { String p1, String p2 ->
             projectsMap[p2]*.ending.max() <=> projectsMap[p1]*.ending.max()
         }
-
-        updateGridElements()
+        if(this.allProjectNames.size() != allProjects.size()) {
+            this.allProjectNames = allProjectNames
+        }
     }
 
     /**
@@ -116,6 +134,8 @@ class PipelineModel extends GridModel {
             it.ending += shift
             it.starting += shift
         }
+        model.reCalcCapaAvailableIfNeeded()
+        model.setUpdateToggle(!model.getUpdateToggle())
     }
 
     @Override
@@ -133,7 +153,7 @@ class PipelineModel extends GridModel {
 
     @Override
     def setSelectedElement(int x, int y) {
-        throw new RuntimeException('not yet implemented')
+        setSelectedProject(allProjectNames[y])
     }
 
     @Override

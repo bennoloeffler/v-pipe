@@ -8,7 +8,6 @@ import model.VpipeDataException
 import model.WeekOrMonth
 import org.tinylog.Logger
 import org.tinylog.Logger as l
-import transform.CapaTransformer
 import utils.*
 import groovy.time.TimeDuration
 import transform.DateShiftTransformer
@@ -151,10 +150,8 @@ class  Main {
     private static void processData() {
         Model m = new Model()
         m.readAllData()
+        new DateShiftTransformer(m).transform()
         LoadCalculator pt = new LoadCalculator(model: m)
-        pt.transformers << new DateShiftTransformer(pt.model)
-        pt.transformers << new PipelineTransformer(pt.model)
-        pt.transformers << new CapaTransformer(pt.model)
         LoadCalculator.writeToFileStatic(pt, WeekOrMonth.WEEK)
         LoadCalculator.writeToFileStatic(pt, WeekOrMonth.MONTH)
     }

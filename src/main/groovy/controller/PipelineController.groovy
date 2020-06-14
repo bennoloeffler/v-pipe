@@ -1,31 +1,28 @@
 package controller
 
-import groovy.transform.CompileStatic
-import groovy.transform.TypeCheckingMode
-import model.Model
-import view.GridElement
-import view.PipelinePanel
-import view.VpipeGui
 
-import javax.swing.SwingUtilities
-import javax.swing.ToolTipManager
-import java.awt.Rectangle
-import java.awt.event.KeyEvent
-import java.awt.event.KeyListener
-import java.awt.event.MouseEvent
-import java.awt.event.MouseListener
-import java.awt.event.MouseMotionListener
-import java.awt.event.MouseWheelEvent
-import java.awt.event.MouseWheelListener
+import model.Model
+import newview.View
+
+import java.awt.event.ActionEvent
 
 class PipelineController {
 
     Model model
-    PipelinePanel panel
+    View view
 
-    PipelineController(Model model, PipelinePanel panel) {
+    PipelineController(Model model, View view) {
         this.model = model
-        this. panel = panel
+        this.view = view
+    }
+
+    def openActionPerformed = { ActionEvent e ->
+        println("openActionPerformed")
+        model.currentDir += "Add"
+    }
+
+    def saveActionPerformed = { ActionEvent e ->
+        println("saveActionPerformed")
     }
 
     /**

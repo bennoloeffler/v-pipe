@@ -41,14 +41,17 @@ class ProjectDataWriterTest extends GroovyTestCase {
         data.delete()
         data.createNewFile()
         data << "backup"
+        sleep(200)
 
         def tr = TestDataHelper.getPopulatedCalculator()
         LoadCalculator.writeToFileStatic(tr, WEEK)
+        sleep(200)
 
         def back = new File(LoadCalculator.BACKUP_FILE)
         assert back.exists()
         def backupLines = back.readLines()
         assert backupLines[0] == "backup"
+        sleep(200)
 
         data = new File(LoadCalculator.FILE_NAME_WEEK)
         def lines = data.readLines()
