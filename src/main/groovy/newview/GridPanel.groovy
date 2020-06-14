@@ -10,7 +10,6 @@ import java.awt.*
 import java.awt.event.*
 import java.awt.geom.AffineTransform
 import java.beans.PropertyChangeListener
-import java.util.List
 
 /**
  * custom JPanel with a grid and a red cursor in that grid,
@@ -20,16 +19,17 @@ import java.util.List
 @CompileStatic
 class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListener, MouseListener, KeyListener, PanelBasics {
 
-    Color cursorColor = new Color(255, 10, 50, 160)
-    Color nowBarColor = new Color(255, 0, 0, 60)
-    Color nowBarShadowColor = new Color(50, 50, 50, 30)
+
+    //Color cursorColor = new Color(255, 10, 50, 160)
+    //Color nowBarColor = new Color(255, 0, 0, 60)
+    //Color nowBarShadowColor = new Color(50, 50, 50, 30)
 
     GridModel model
 
-    @Bindable int grid
+    @Bindable int gridWidth
 
-    int borderWidth
-    int nameWidth
+    //int borderWidth
+    //int nameWidth
 
     /**
      * the cursor - modeled as position in grid
@@ -48,24 +48,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
      */
     int startDragX = -1, startDragY = 1, endDragX = 1, endDragY = -1
 
-    /**
-     * colors for lines...
-     */
-    List<Color> colors = createColorList()
 
-    static List<Color> createColorList() {
-        def cl = []
-        10.times {
-            0.step 11, 1,  {
-                float h1 = (float)((float)it/10.0f)
-                float h2 = (float)(h1 +0.5f)
-                h2 = (float)(h2>1?h2-1:h2)
-                cl << Color.getHSBColor(h1, 0.2f, 0.9f)
-                cl << Color.getHSBColor(h2, 0.2f, 0.9f)
-            }
-        }
-        cl
-    }
 
 
     /**
@@ -82,14 +65,15 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
             //   negative values if the mouse wheel was rotated up/away from the user,
             //   and positive values if the mouse wheel was rotated down/ towards the user
             int rot = e.getWheelRotation()
-            int inc = (int)(grid * rot / 10)
-            setGrid(grid + (inc!=0?inc:1)) // min one tic bigger
+            int inc = (int)(gridWidth * rot / 10)
+            setGridWidth(gridWidth + (inc!=0?inc:1)) // min one tic bigger
             minMaxGridCheck()
-            nameWidth = grid *3
-            invalidateAndRepaint()
+            updateOthersFromGridWidth(gridWidth, this)
+
+            invalidateAndRepaint(this)
         } else {
-            scrollPane?.getVerticalScrollBar()?.setUnitIncrement((grid/3) as int)
-            scrollPane?.processMouseWheelEvent(e)
+            getScrollPane(this)?.getVerticalScrollBar()?.setUnitIncrement((gridWidth/3) as int)
+            getScrollPane(this)?.processMouseWheelEvent(e)
         }
     }
 
@@ -98,41 +82,13 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
     // MouseMotionListener
     //
 
-    @Override
-    void mouseDragged(MouseEvent e) {
 
-        /*
-        int x = e.getY()
-        int y = e.getX()
-
-        println("drag: x=$x y=$y")
-        int gX = getGridXFromMouseX(x)
-        int gY = getGridYFromMouseY(y)
-        int swapX = getGridXFromMouseX(startDragX)
-        int swapY = getGridYFromMouseY(startDragY)
-        */
-    }
-
-    /*
     @Override
     void mouseMoved(MouseEvent e) {
-        mouseX = e.getX()
-        mouseY = e.getY()
-        MouseEvent phantom = new MouseEvent(
-                this,
-                MouseEvent.MOUSE_MOVED,
-                System.currentTimeMillis(),
-                0,
-                mouseX,
-                mouseY,
-                0,
-                false)
+        mouseMoved(e, this)
+    }
 
-        ToolTipManager.sharedInstance().mouseMoved(phantom)
-        //int gX = getGridXFromMouseX(mouseX)
-        //int gY = getGridYFromMouseY(mouseY)
-        //println("move: mx=$mouseX my=$mouseY   gx=$gX gY=$gY")
-    }*/
+
 
     @Override
     String getToolTipText(MouseEvent event) {
@@ -147,10 +103,19 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
             }
 
             // <br/>$element.fromToDateString
-            html =
-                    "<html><p style=\"background-color:white;\"><font color=\"#808080\" " +
-                            "size=\"20\" face=\"Verdana\">${element.timeString?:''}<br/>$element.project<br/>$element.department" + // SIZE DOES NOT WORK!
-                            "</font></p></html>"
+
+            html  =      """<html><head><style>
+                                h1 { color: #808080; font-family: verdana; font-size: 120%; }
+                                p  { color: black; font-family: courier; font-size: 120%; } </style> </head>
+                                
+                                <body>
+                                    <h1>$element.project</h1>
+                                    <p>
+                                        KW & Start-Ende: $element.timeString<br/>
+                                    </p>
+                                </body>
+                             </html>                                
+                         """
         }
         return html
     }
@@ -171,7 +136,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
         cursorY = getGridYFromMouseY()
         model.setSelectedElement(cursorX, cursorY)
 
-        invalidateAndRepaint()
+        invalidateAndRepaint(this)
     }
 
     @Override
@@ -216,16 +181,16 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
         }
 
         if(KeyEvent.VK_PLUS == e.getKeyCode()) {
-            setGrid((grid * 1.1) as int)
+            setGridWidth((gridWidth * 1.1) as int)
             minMaxGridCheck()
+            updateOthersFromGridWidth(gridWidth, this)
 
-            nameWidth = grid *3
         }
 
         if(KeyEvent.VK_MINUS == e.getKeyCode()) {
-            setGrid((grid / 1.1) as int)
+            setGridWidth((gridWidth / 1.1) as int)
             minMaxGridCheck()
-            nameWidth = grid *3
+            updateOthersFromGridWidth(gridWidth, this)
         }
 
         //def redraw = [new Point(cursorX, cursorY)]
@@ -259,14 +224,14 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
         }
 
         scrollToCursorXY()
-        invalidateAndRepaint()
+        invalidateAndRepaint(this)
 
         model.setSelectedElement(cursorX, cursorY)
 
     }
 
     void scrollToCursorXY() {
-        scrollRectToVisible(new Rectangle(nameWidth + cursorX * grid - grid, cursorY * grid - grid, 3 * grid, 3 * grid))
+        scrollRectToVisible(new Rectangle(nameWidth + cursorX * gridWidth - gridWidth, cursorY * gridWidth - gridWidth, 3 * gridWidth, 3 * gridWidth))
     }
 
     @Override
@@ -283,20 +248,11 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
     }
 
     def minMaxGridCheck() {
-        if(grid > 100){setGrid(100)}
-        if(grid < 10){setGrid(10)}
+        if(gridWidth > 100){setGridWidth(100)}
+        if(gridWidth < 10){setGridWidth(10)}
     }
 
 
-    /**
-     * next color of an index mapped to the color list
-     * @param idx
-     * @return color
-     */
-    Color getColor(int idx) {
-        idx = idx % colors.size()
-        return colors[ idx ]
-    }
 
 
 
@@ -308,10 +264,10 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
      * @param model
      */
     GridPanel(int grid, GridModel model) {
-        this.grid = grid
+        this.gridWidth = grid
         minMaxGridCheck()
-        this.borderWidth = grid / 4 as int
-        this.nameWidth = grid * 4
+        updateOthersFromGridWidth(gridWidth, this)
+
         addKeyListener(this)
         addMouseMotionListener(this)
         addMouseListener(this)
@@ -319,7 +275,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
         this.model = model
         PropertyChangeListener l = {
             SwingUtilities.invokeLater {
-                invalidateAndRepaint()
+                invalidateAndRepaint(this)
             }
         } as PropertyChangeListener
         model.addPropertyChangeListener('updateToggle', l)
@@ -356,9 +312,9 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
 
         for (int x in 0..model.sizeX - 1) {
             for (int y in 0..model.sizeY - 1) {
-                int graphX = borderWidth + x * grid + nameWidth
-                int graphY = borderWidth + y * grid
-                if(graphX >= r.x-2*grid && graphX <= r.x+2*grid + r.width && graphY >= r.y-2*grid && graphY <= r.y+2*grid + r.height) {
+                int graphX = borderWidth + x * gridWidth + nameWidth
+                int graphY = borderWidth + y * gridWidth
+                if(graphX >= r.x-2*gridWidth && graphX <= r.x+2*gridWidth + r.width && graphY >= r.y-2*gridWidth && graphY <= r.y+2*gridWidth + r.height) {
                     // TODO: println "x: $x (sizeX: $model.sizeX) y: $y (sizeY: $model.sizeY)"
                     if(model.sizeX == 0 || model.sizeY == 0) return
                     GridElement e = model.getElement(x, y)
@@ -372,9 +328,9 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
         }
 
 
-        int offset = (grid / 20) as int // shadow and space
-        int size = (int) ((grid - offset) / 3) // size of shadow box and element box
-        if (grid < 15) {
+        int offset = (gridWidth / 20) as int // shadow and space
+        int size = (int) ((gridWidth - offset) / 3) // size of shadow box and element box
+        if (gridWidth < 15) {
             size = size * 2
         }
         int round = (size / 2) as int // corner diameter
@@ -384,14 +340,14 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
         // paint the now-indicator row above everything else
         //
 
-        if(model.nowX >=0 && model.nowX < model.sizeY) {
-            int nowGraphX = borderWidth + model.nowX * grid + (int) ((grid - size) / 2) + nameWidth
+        if(model.nowX >=0 && model.nowX < model.sizeX) {
+            int nowGraphX = borderWidth + model.nowX * gridWidth + (int) ((gridWidth - size) / 2) + nameWidth
             // position start (left up)
-            int nowGraphY = borderWidth + model.sizeY * grid // position end (right down)
+            int nowGraphY = borderWidth + model.sizeY * gridWidth // position end (right down)
 
             // shadow
-            g.setColor(nowBarShadowColor)
-            g.fillRoundRect(nowGraphX + offset, +offset, size - 4, nowGraphY + borderWidth - 4, round, round)
+            //g.setColor(nowBarShadowColor)
+            //g.fillRoundRect(nowGraphX + offset, +offset, size - 4, nowGraphY + borderWidth - 4, round, round)
             // element in project color, integration phase color (orange), empty color (white)
             g.setColor(nowBarColor)
             g.fillRoundRect(nowGraphX, 0, size - 4, nowGraphY + borderWidth - 4, round, round)
@@ -404,20 +360,20 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
         model.getLineNames()
         model.getLineNames().each { String projectName ->
             g.setColor(Color.LIGHT_GRAY)
-            int gridY = borderWidth + y*grid
-            g.fillRoundRect(borderWidth , gridY, nameWidth-4, grid - 4 , round, round)
+            int gridY = borderWidth + y*gridWidth
+            g.fillRoundRect(borderWidth , gridY, nameWidth-4, gridWidth - 4 , round, round)
 
-            if(grid>0) {
+            if(gridWidth>0) {
                 // write (with shadow) some info
-                float fontSize = grid / 2
+                float fontSize = gridWidth / 2
                 g.getClipBounds(rBackup)
-                Rectangle newClip = new Rectangle(borderWidth , gridY, nameWidth-6, grid - 6)
+                Rectangle newClip = new Rectangle(borderWidth , gridY, nameWidth-6, gridWidth - 6)
                 g.setClip(newClip.intersection(rBackup))
                 g.setFont(g.getFont().deriveFont((float) fontSize))
                 g.setColor(Color.WHITE)
-                g.drawString(projectName, borderWidth + (int) (grid * 0.2), gridY + (int) (grid * 2/3))
+                g.drawString(projectName, borderWidth + (int) (gridWidth * 0.2), gridY + (int) (gridWidth * 2/3))
                 g.setColor(Color.BLACK)
-                g.drawString(projectName, borderWidth + (int) (grid * 0.2)-1, gridY + (int) (grid * 2/3)-1)
+                g.drawString(projectName, borderWidth + (int) (gridWidth * 0.2)-1, gridY + (int) (gridWidth * 2/3)-1)
                 g.setClip(rBackup)
             }
 
@@ -431,13 +387,13 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
         int x = 0
         model.getColumnNames().each { String rowName ->
             g.setColor(Color.LIGHT_GRAY)
-            int gridX = borderWidth + x*grid + nameWidth
-            int gridY = borderWidth + (model.sizeY) * grid
-            g.fillRoundRect(gridX , gridY, grid-4, nameWidth - 4 , round, round)
+            int gridX = borderWidth + x*gridWidth + nameWidth
+            int gridY = borderWidth + (model.sizeY) * gridWidth
+            g.fillRoundRect(gridX , gridY, gridWidth-4, nameWidth - 4 , round, round)
 
-            if(grid>0) {
+            if(gridWidth>0) {
                 // write (with shadow) some info
-                float fontSize = grid / 2
+                float fontSize = gridWidth / 2
                 g.setFont(g.getFont().deriveFont((float) fontSize))
                 atBackup = g.getTransform()
                 //Resets transform to rotation
@@ -453,12 +409,12 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
                 g.setColor(Color.WHITE)
 
                 g.getClipBounds(rBackup)
-                Rectangle newClip = new Rectangle(0 , -grid, nameWidth-6, grid)
+                Rectangle newClip = new Rectangle(0 , -gridWidth, nameWidth-6, gridWidth)
                 g.setClip(newClip.intersection(rBackup))
 
-                g.drawString(rowName,  (int) (grid * 0.2),  0 - (int) (grid * 0.2))
+                g.drawString(rowName,  (int) (gridWidth * 0.2),  0 - (int) (gridWidth * 0.2))
                 g.setColor(Color.BLACK)
-                g.drawString(rowName,  (int) (grid * 0.2) -1,  0 - (int) (grid * 0.2) -1)
+                g.drawString(rowName,  (int) (gridWidth * 0.2) -1,  0 - (int) (gridWidth * 0.2) -1)
                 g.setClip(rBackup)
                 g.setTransform(atBackup)
             }
@@ -479,7 +435,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
      */
     @Override
     Dimension getPreferredSize() {
-        return new Dimension(nameWidth + model.sizeX*grid + 2*borderWidth, nameWidth + model.sizeY*grid + 2*borderWidth)
+        return new Dimension(nameWidth + model.sizeX*gridWidth + 2*borderWidth, nameWidth + model.sizeY*gridWidth + 2*borderWidth)
     }
 
 
@@ -494,11 +450,11 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
     @CompileStatic
     def drawGridElement(Color c, Graphics2D g, GridElement e, int x, int y) {
 
-        int offset = (grid/20) as int // shadow and space
-        int size = grid - offset // size of shadow box and element box
+        int offset = (gridWidth/20) as int // shadow and space
+        int size = gridWidth - offset // size of shadow box and element box
         int round = (size / 2) as int // corner diameter
-        int graphX = borderWidth + x * grid + nameWidth// position
-        int graphY = borderWidth + y * grid // position
+        int graphX = borderWidth + x * gridWidth + nameWidth// position
+        int graphY = borderWidth + y * gridWidth // position
         //int gridMouseX = getGridXFromMouseX()
         //int gridMouseY = getGridYFromMouseY()
         //println("gridMouseX=$gridMouseX gridMouseY=$gridMouseY")
@@ -524,19 +480,19 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
         }
 
 
-        if(grid>0) {
+        if(gridWidth>0) {
             // write (with shadow) some info
             // TODO: use Clip, Transform, Paint, Font and Composite
-            float fontSize = 20.0 * grid / 60
+            float fontSize = 20.0 * gridWidth / 60
 
             g.getClipBounds(rBackup)
             Rectangle newClip = new Rectangle(graphX, graphY, size - 6, size - 6)
             g.setClip(newClip.intersection(rBackup))
             g.setFont(g.getFont().deriveFont((float) fontSize))
             g.setColor(Color.WHITE)
-            g.drawString(e.project, graphX + (int) (grid * 0.2), graphY + (int) (grid / 2))
+            g.drawString(e.project, graphX + (int) (gridWidth * 0.2), graphY + (int) (gridWidth / 2))
             g.setColor(Color.BLACK)
-            g.drawString(e.project, graphX + (int) (grid * 0.2 - 1), graphY + (int) (grid / 2 - 1))
+            g.drawString(e.project, graphX + (int) (gridWidth * 0.2 - 1), graphY + (int) (gridWidth / 2 - 1))
             g.setClip(rBackup)
         }
     }
@@ -550,7 +506,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
      */
     int getGridYFromMouseY(int mouseY = -1) {
         mouseY = mouseY < 0 ? this.mouseY : mouseY // take this.mouseY, if default-Param, else take param
-        int gridY = ((mouseY - borderWidth) / grid) as int
+        int gridY = ((mouseY - borderWidth) / gridWidth) as int
         gridY
     }
 
@@ -560,7 +516,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
      */
     int getGridXFromMouseX(int mouseX = -1) {
         mouseX = mouseX < 0 ? this.mouseX : mouseX // take this.mouseY, if default-Param, else take param
-        int gridX = ((mouseX - borderWidth- nameWidth) / grid) as int
+        int gridX = ((mouseX - borderWidth- nameWidth) / gridWidth) as int
         gridX
     }
 

@@ -1,5 +1,6 @@
 package newview
 
+import core.ProjectCapaNeedDetails
 import groovy.beans.Bindable
 import groovy.transform.TupleConstructor
 
@@ -13,15 +14,18 @@ class GridLoadElement {
     String timeString
     double load // as absulute value
     double loadProject // as absulute value
-    double percentageYellow = -1 // as absulute value
-    double percentageRed = -1 // as absulute value
+    double yellow = -1 // as absulute value
+    double red = -1 // as absulute value
+    List<ProjectCapaNeedDetails> projectDetails
 
     static GridLoadElement nullElement = new GridLoadElement(
             department:'',
             timeString:'',
             load: 0.0,
-            percentageYellow: -1,
-            percentageRed: -1
+            yellow: -1,
+            red: -1,
+            projectDetails: [],
+
     )
 
     boolean asBoolean() {

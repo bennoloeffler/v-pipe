@@ -157,11 +157,10 @@ class Model {
     def reCalcCapaAvailableIfNeeded() {
         def currentStart = getStartOfTasks()
         def currentEnd = getEndOfTasks()
-        if( currentStart >= cachedStartOfTasks && currentEnd <= cachedEndOfTasks ) {
-            println()
-        } else {
-            assert jsonSlurp
-            capaAvailable = calcCapa(jsonSlurp)
+        if( ! (currentStart >= cachedStartOfTasks && currentEnd <= cachedEndOfTasks) ) {
+            if( jsonSlurp ) {
+                capaAvailable = calcCapa(jsonSlurp)
+            }
         }
         cachedStartOfTasks = currentStart
         cachedEndOfTasks = currentEnd

@@ -50,6 +50,7 @@ class TestDataHelper {
     static TaskInProject t(String pro, String sta, String end, String dep, Double cap) {
         new TaskInProject(
                 project: pro,
+                description: '',
                 starting: sta.toDate(),
                 ending: end.toDate(), //DateHelperFunctions.sToD(end),
                 department: dep,

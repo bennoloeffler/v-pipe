@@ -22,7 +22,7 @@ class NewPipelineModel extends GridModel {
     // TODO: write this to model and save it
     List<String> allProjectNames =[]
 
-    int nowXRowCache = 0
+    int nowXRowCache = -1
 
     @Delegate
     Model model

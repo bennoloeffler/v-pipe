@@ -58,9 +58,9 @@ class NewProjectModel extends GridModel {
             //
             project = model.getProject(projectName)
 
-            project.sort {
-                it.ending
-            }
+            //project.sort {
+            //    it.ending
+            //}
             project.each {
                 allProjectGridLines << fromTask(it, model.taskList)
             }
@@ -112,27 +112,28 @@ class NewProjectModel extends GridModel {
 
     @Override
     def moveLeft(int y) {
-        //shiftProject(y, -7)
-        //updateGridElements()
-
+        shiftProject(y, -7)
+        updateModelRecalcAndFire()
     }
 
     @Override
     def moveRight(int y) {
-        //shiftProject(y, 7)
-        //updateGridElements()
+        shiftProject(y, 7)
+        updateModelRecalcAndFire()
     }
 
     def shiftProject(int y, int shift) {
-        /*
-        def projectName = allProjectNames[y]
-        List<TaskInProject> project = getProject(projectName)
-        project.each {
-            it.ending += shift
-            it.starting += shift
-        }
-        */
+        TaskInProject projectTask = project[y]
+        projectTask.ending += shift
+        projectTask.starting += shift
     }
+
+    def updateModelRecalcAndFire() {
+        model.reCalcCapaAvailableIfNeeded()
+        model.setUpdateToggle(!model.getUpdateToggle())
+        updateGridElements()
+    }
+
 
     @Override
     def toggleIntegrationPhase(int x, int y) {

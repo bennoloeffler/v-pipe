@@ -181,7 +181,7 @@ class PipelineTransformer extends Transformer {
             int shift = projectDayShift[projectName]?:0
             if(shift){description += "$projectName: $shift\n"}
             projectList.each() {
-                result << new TaskInProject(it.project, it.starting + shift, it.ending + shift, it.department, it.capacityNeeded)
+                result << new TaskInProject(it.project, '', it.starting + shift, it.ending + shift, it.department, it.capacityNeeded)
             }
         }
 

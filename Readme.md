@@ -239,11 +239,14 @@ gleichzeitig gearbeitet werden soll.
 
 ### Features
 
+TODO: 2020-06-XX `0.9.0-Template`
+- Datenfile für Portfolio auf Basis von Templates
+
 TODO: 2020-06-XX `0.8.0-LoadSave`
 - Speichern der Daten (in eigenem Daten-Ordner) - öffnen von Datenordnern
 
-TODO: 2020-06-XX `0.7.0-Template`
-- Datenfile für Portfolio auf Basis von Templates
+2020-06-14 `0.7.0-GUI-Project-Editor`
+- Tasks eines Projektes auch verschieben.
 
 2020-06-01 `0.6.0-GUI-Project-View`
 - Tasks eines Projektes visualisieren (noch nicht verschieben).
