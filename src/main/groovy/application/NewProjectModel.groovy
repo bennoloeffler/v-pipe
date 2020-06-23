@@ -1,4 +1,4 @@
-package newview
+package application
 
 import groovy.beans.Bindable
 import groovy.transform.CompileStatic
@@ -7,6 +7,7 @@ import model.TaskInProject
 import model.WeekOrMonth
 import newview.GridElement
 import newview.GridModel
+import utils.RunTimer
 
 import java.beans.PropertyChangeEvent
 
@@ -24,7 +25,7 @@ class NewProjectModel extends GridModel {
     List<TaskInProject> project = []
 
     //@Delegate
-    Model model
+    final Model model
 
     Closure projectNameCallback = {
         updateGridElements()
@@ -34,6 +35,7 @@ class NewProjectModel extends GridModel {
     NewProjectModel(Model model) {
         this.model = model
         this.addPropertyChangeListener('projectName', projectNameCallback)
+        model.addPropertyChangeListener('updateToggle', projectNameCallback)
         updateGridElements()
     }
 
@@ -51,6 +53,8 @@ class NewProjectModel extends GridModel {
      * from task-portfolio
      */
     private void updateGridElements() {
+        def t = RunTimer.getTimerAndStart('NewProjectModel::updateGridElements')
+
         allProjectGridLines = []
         if (projectName) {
             //
@@ -65,6 +69,7 @@ class NewProjectModel extends GridModel {
                 allProjectGridLines << fromTask(it, model.taskList)
             }
         }
+        t.stop()
     }
 
 
@@ -144,9 +149,8 @@ class NewProjectModel extends GridModel {
 
     @Override
     def swap(int y, int withY) {
-        /*
-        allProjectNames.swap(y, withY)
-        updateGridElements()*/
+        project.swap(y, withY)
+        updateGridElements()
     }
 
     @Override

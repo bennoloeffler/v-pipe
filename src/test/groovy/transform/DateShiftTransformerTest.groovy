@@ -2,6 +2,7 @@ package transform
 
 import core.VpipeException
 import model.Model
+import model.VpipeDataException
 import testdata.TestDataHelper
 import transform.DateShiftTransformer
 
@@ -42,11 +43,11 @@ class DateShiftTransformerTest extends GroovyTestCase {
         DateShiftTransformer dst = new DateShiftTransformer(m)
         m.projectDayShift = [p1: 2, p2: -1, p3: 5]
 
-        def msg = shouldFail VpipeException, {
+        def msg = shouldFail VpipeDataException, {
             def list = dst.transform()
         }
-        assert msg == "Es gibt keine Projektdaten,\n"+
-                        "um das Projekt p3 zu verschieben.\n"+
-                        "Ursache in Projekt-Verschiebung.txt"
+        assert msg.contains ("Es gibt keine Projektdaten,\n"+
+                        "um das Projekt p3 zu verschieben.\n")
+
     }
 }

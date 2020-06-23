@@ -1,6 +1,8 @@
 package newview
 
 import core.ProjectCapaNeedDetails
+
+//import core.ProjectCapaNeedDetails // TODO: SÜNDE! ABHÄNGIGKEIT!
 import groovy.beans.Bindable
 import groovy.transform.TupleConstructor
 

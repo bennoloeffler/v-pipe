@@ -19,7 +19,6 @@ class GridElement {
     boolean asBoolean() {
         this != nullElement
     }
-
 }
 
 

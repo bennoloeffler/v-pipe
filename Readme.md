@@ -239,11 +239,12 @@ gleichzeitig gearbeitet werden soll.
 
 ### Features
 
-TODO: 2020-06-XX `0.9.0-Template`
-- Datenfile für Portfolio auf Basis von Templates
+TODO: 2020-06-xx `0.9.0-Pipelining`
+- halbautomatisches und visuelles Pipelining
 
-TODO: 2020-06-XX `0.8.0-LoadSave`
+TODO: 2020-06-21 `0.8.0-LoadSave-Template`
 - Speichern der Daten (in eigenem Daten-Ordner) - öffnen von Datenordnern
+- Datenfile für Portfolio auf Basis von Templates
 
 2020-06-14 `0.7.0-GUI-Project-Editor`
 - Tasks eines Projektes auch verschieben.

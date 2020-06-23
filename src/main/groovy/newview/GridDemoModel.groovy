@@ -1,7 +1,5 @@
-package view
+package newview
 
-import newview.GridElement
-import newview.GridModel
 
 /**
  * base model for grid - this one is for manual testing

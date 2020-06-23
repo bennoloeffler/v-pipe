@@ -4,6 +4,7 @@ import core.LoadCalculator
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import model.WeekOrMonth
+import newview.GridDemoModel
 import newview.GridElement
 import newview.GridModel
 import utils.RunTimer
@@ -11,7 +12,6 @@ import utils.RunTimer
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.SwingUtilities
-import javax.swing.SwingWorker
 import javax.swing.ToolTipManager
 import java.awt.Color
 import java.awt.Dimension
@@ -89,7 +89,7 @@ class PipelinePanel extends JPanel implements MouseWheelListener, MouseMotionLis
 
 
     /**
-     * the Mouse- and KeyListener, that gets all the commands and acts like a controller
+     * the Mouse- and KeyListener, that gets all the commands and acts like a application
      */
 
     //

@@ -1,10 +1,13 @@
-package newview
+package application
 
 import groovy.beans.Bindable
 import groovy.transform.CompileStatic
 import model.Model
 import model.TaskInProject
 import model.WeekOrMonth
+import newview.GridElement
+import newview.GridModel
+import utils.RunTimer
 
 import java.beans.PropertyChangeEvent
 import java.beans.PropertyChangeListener
@@ -29,7 +32,11 @@ class NewPipelineModel extends GridModel {
 
     def tasksPropertyListener = { PropertyChangeEvent e ->
         if(e.propertyName=='updateToggle') {
-            sortProjectNamesWhenChanged() // new task list - probably after opening a new Data-Set
+            //sortProjectNamesWhenChanged() // new task list - probably after opening a new Data-Set
+            updateProjectNames()
+        }
+        if(e.propertyName=='reloadToggle') {
+            updateProjectNames()
         }
         updateGridElements()
         this.setUpdateToggle(!this.getUpdateToggle()) // just to fire an PropertyChange to the view
@@ -39,13 +46,22 @@ class NewPipelineModel extends GridModel {
         this.model = model
         model.addPropertyChangeListener(tasksPropertyListener as PropertyChangeListener)
 
-        // just for sorting projects to ending-date
-        sortProjectNamesWhenChanged()
+        updateProjectNames()
 
         updateGridElements()
     }
 
-    private void sortProjectNamesWhenChanged() {
+    void updateProjectNames() {
+        List<String> current = getAllProjects()
+        List<String> intersect = current.intersect(allProjectNames)
+        List<String> toRemove = allProjectNames - intersect
+        List<String> toAdd = current - intersect
+        allProjectNames.removeAll(toRemove)
+        allProjectNames.addAll(toAdd)
+    }
+
+    void sortProjectNamesToEnd() {
+
         List<String> allProjects = getAllProjects()
         Map<String, List<TaskInProject>> projectsMap = [:]
         allProjects.each {
@@ -54,9 +70,11 @@ class NewPipelineModel extends GridModel {
         List<String> allProjectNames = allProjects.sort { String p1, String p2 ->
             projectsMap[p2]*.ending.max() <=> projectsMap[p1]*.ending.max()
         }
-        if(this.allProjectNames.size() != allProjects.size()) {
-            this.allProjectNames = allProjectNames
-        }
+        this.allProjectNames = allProjectNames
+
+        updateGridElements()
+        this.setUpdateToggle(!this.getUpdateToggle()) // just to fire an PropertyChange to the view
+
     }
 
     /**
@@ -64,12 +82,15 @@ class NewPipelineModel extends GridModel {
      * from task-portfolio
      */
     private void updateGridElements() {
+        def t = RunTimer.getTimerAndStart('NewPipelineModel::updateGridElements')
+
         allProjectGridLines = []
         allProjectNames.each {
             List<TaskInProject> projectTasks = getProject(it)
             def gridElements = fromProjectTasks(projectTasks)
             allProjectGridLines << gridElements
         }
+        t.stop()
     }
 
 

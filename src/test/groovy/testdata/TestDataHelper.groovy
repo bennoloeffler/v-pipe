@@ -1,6 +1,7 @@
 package testdata
 
 import core.LoadCalculator
+import model.DataReader
 import model.Model
 import model.TaskInProject
 import model.PipelineOriginalElement
@@ -49,16 +50,29 @@ class TestDataHelper {
      */
     static TaskInProject t(String pro, String sta, String end, String dep, Double cap) {
         new TaskInProject(
-                project: pro,
-                description: '',
-                starting: sta.toDate(),
-                ending: end.toDate(), //DateHelperFunctions.sToD(end),
-                department: dep,
-                capacityNeeded: cap
+                 pro,
+                sta.toDate(),
+                end.toDate(),
+                dep,
+                cap,
+                '',
         )
     }
 
     static def pe(pr, s, e, c) {
         new PipelineOriginalElement(project: pr, startDate: s, endDate: e, pipelineSlotsNeeded: c)
+    }
+
+    static def cleanAllDataFiles() {
+        List files = [DataReader.get_TASK_FILE_NAME(),
+                     DataReader.get_PIPELINING_FILE_NAME(),
+                     DataReader.get_DATESHIFT_FILE_NAME(),
+                     DataReader.get_CAPA_FILE_NAME(),
+                     DataReader.get_TEMPLATE_FILE_NAME(),
+        ]
+        files.each {
+            File f = new File(it)
+            f.delete()
+        }
     }
 }

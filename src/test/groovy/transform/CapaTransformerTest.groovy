@@ -149,14 +149,14 @@ class CapaTransformerTest extends GroovyTestCase {
             def capa = slurpTextAndCalc(text)
             println(capa)
         }
-        assert msg == "Problem in JSON-Format von Datei Abteilungs-Kapazitaets-Angebot.txt:\nunexpected character x"
+        assert msg.contains("unexpected character x")
 
         text = ""
         msg = shouldFail (VpipeException) {
             def capa = slurpTextAndCalc(text)
             println(capa)
         }
-        assert msg == "Problem in JSON-Format von Datei Abteilungs-Kapazitaets-Angebot.txt:\nText must not be null or empty"
+        assert msg.contains("Text must not be null or empty")
 
 
 
@@ -174,14 +174,14 @@ class CapaTransformerTest extends GroovyTestCase {
             def capa = slurpTextAndCalc(text)
             println(capa)
         }
-        assert msg == "Fehler beim Lesen der Datei Abteilungs-Kapazitaets-Angebot.txt\n" +
-                "Kein Abschnitt 'Kapa_Abteilungen' definiert"
+        assert msg.contains ("Kein Abschnitt 'Kapa_Abteilungen' definiert")
 
 
 
 
     }
 
+    // TODO: move out of test code?
     def slurpTextAndCalc(String text) {
         Model m = populatedModel
         //def ct = new CapaTransformer(m)
@@ -200,7 +200,7 @@ class CapaTransformerTest extends GroovyTestCase {
         } catch (VpipeDataException ve) {
             throw ve
         } catch (Exception e) {
-            throw new VpipeDataException("Problem in JSON-Format von Datei $DataReader.CAPA_FILE_NAME:\n${e.getMessage()}")
+            throw new VpipeDataException("Problem in JSON-Format von Datei ${DataReader.get_CAPA_FILE_NAME()}:\n${e.getMessage()}")
         }
         null
     }
@@ -211,7 +211,7 @@ class CapaTransformerTest extends GroovyTestCase {
             def capa = slurpTextAndCalc(text)
             println(capa)
         }
-        assert msg == "Fehler beim Lesen der Datei Abteilungs-Kapazitaets-Angebot.txt\nEintrag 'Kapa_Gesamt' fehlt."
+        assert msg.contains("Eintrag 'Kapa_Gesamt' fehlt.")
     }
 
     void testMissingDepatments() {
@@ -242,8 +242,7 @@ class CapaTransformerTest extends GroovyTestCase {
             def capa = slurpTextAndCalc(text)
             println(capa)
         }
-        assert msg == "Fehler beim Lesen der Datei Abteilungs-Kapazitaets-Angebot.txt\n" +
-                "Für folgende Abteilungen ist keine Kapa definiert: [d1, d2]"
+        assert msg.contains("Für folgende Abteilungen ist keine Kapa definiert: [d1, d2]")
 
     }
 }

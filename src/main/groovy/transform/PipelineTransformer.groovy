@@ -181,20 +181,20 @@ class PipelineTransformer extends Transformer {
             int shift = projectDayShift[projectName]?:0
             if(shift){description += "$projectName: $shift\n"}
             projectList.each() {
-                result << new TaskInProject(it.project, '', it.starting + shift, it.ending + shift, it.department, it.capacityNeeded)
+                result << new TaskInProject(it.project, it.starting + shift, it.ending + shift, it.department, it.capacityNeeded, it.description)
             }
         }
 
         // Check: for every pipeline-Element, there needs to be a real project - and vice verca
         projectDayShift.keySet().each {
             if(! getProject(it)) {
-                throw new VpipeDataException("$DataReader.PIPELINING_FILE_NAME enthält Projekte,\ndie nicht in den Grunddaten sind: $it")
+                throw new VpipeDataException("${DataReader.get_PIPELINING_FILE_NAME()} enthält Projekte,\ndie nicht in den Grunddaten sind: $it")
             }
         }
         getAllProjects().each {
             def projects = pipelineElements*.project
             if (! projects.contains(it)) {
-                throw new VpipeDataException("Grunddaten enthalten Projekte,\ndie nicht in $DataReader.PIPELINING_FILE_NAME aufgeführt sind: $it")
+                throw new VpipeDataException("Grunddaten enthalten Projekte,\ndie nicht in ${DataReader.get_PIPELINING_FILE_NAME()} aufgeführt sind: $it")
             }
         }
 

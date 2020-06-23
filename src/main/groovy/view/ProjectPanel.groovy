@@ -73,7 +73,7 @@ class ProjectPanel extends JPanel implements MouseWheelListener, MouseMotionList
 
 
     /**
-     * the Mouse- and KeyListener, that gets all the commands and acts like a controller
+     * the Mouse- and KeyListener, that gets all the commands and acts like a application
      */
 
     //

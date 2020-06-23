@@ -12,13 +12,33 @@ class DataReader {
 
     static def SILENT = true
 
+    static String currentDir = "test" // overwrite this for application!
 
-    public static String TASK_FILE_NAME = "Projekt-Start-End-Abt-Kapa.txt"
-    public static String PIPELINING_FILE_NAME = "Integrations-Phasen.txt"
-    public static String DATESHIFT_FILE_NAME = "Projekt-Verschiebung.txt"
-    public static String CAPA_FILE_NAME = "Abteilungs-Kapazitaets-Angebot.txt"
+    private static String _TASK_FILE_NAME = "Projekt-Start-End-Abt-Kapa.txt"
+    private static String _PIPELINING_FILE_NAME = "Integrations-Phasen.txt"
+    private static String _DATESHIFT_FILE_NAME = "Projekt-Verschiebung.txt"
+    private static String _CAPA_FILE_NAME = "Abteilungs-Kapazitaets-Angebot.txt"
+    private static final String _TEMPLATE_FILE_NAME = "Template-Original-Verschiebung.txt"
 
+    static String get_TASK_FILE_NAME() {
+        currentDir + "/" + _TASK_FILE_NAME
+    }
 
+    static String get_PIPELINING_FILE_NAME() {
+        currentDir + "/" + _PIPELINING_FILE_NAME
+    }
+
+    static String get_DATESHIFT_FILE_NAME() {
+        currentDir + "/" + _DATESHIFT_FILE_NAME
+    }
+
+    static String get_CAPA_FILE_NAME() {
+        currentDir + "/" + _CAPA_FILE_NAME
+    }
+
+    static String get_TEMPLATE_FILE_NAME() {
+        currentDir + "/" + _TEMPLATE_FILE_NAME
+    }
     /**
      * reads data lines into a list of model.TaskInProject
      * Default file name: Projekt-Start-End-Abt-Capa.txt
@@ -29,7 +49,7 @@ class DataReader {
      * If whitespace is in project names or department names, semicolon or comma is needed (SEPARATOR_SC)
      */
     static List<TaskInProject> readTasks() {
-        String text = FileSupport.getTextOrEmpty(TASK_FILE_NAME)
+        String text = FileSupport.getTextOrEmpty(get_TASK_FILE_NAME())
         return readTasks(text)
     }
 
@@ -42,7 +62,7 @@ class DataReader {
         def t = new RunTimer(true)
         List<TaskInProject> taskList = []
         def i = 0 // count the lines
-        SILENT?:println("\nstart parsing data file:   " + TASK_FILE_NAME)
+        SILENT?:println("\nstart parsing data file:   " + get_TASK_FILE_NAME())
         def errMsg ={""}
         //String all = new File(FILE_NAME).text
         //all.eachLine {
@@ -50,10 +70,10 @@ class DataReader {
                 try {
                     i++
                     SILENT?:println("\n$i raw-data:   " + line)
-                    errMsg = {"$TASK_FILE_NAME\nZeile $i: Zerlegt: $strings\n"}
-                    if(strings.size() != 5){
+                    errMsg = {"${get_TASK_FILE_NAME()}\nZeile $i: Zerlegt: $strings\n"}
+                    if(strings.size() != 5 && strings.size() != 6 ){
                         throw new VpipeDataException(errMsg() +
-                            "Keine 5 Daten-Felder gefunden mit Regex-SEPARATOR = "+FileSupport.SEPARATOR +
+                            "Keine 5 bzw. 6 Daten-Felder gefunden mit Regex-SEPARATOR = "+FileSupport.SEPARATOR +
                             "\nSoll-Format: 'Projekt-Name Task-Start Task-Ende Abteilungs-Name Kapa-Bedarf'")}
                     SILENT?:println("$i split-data: " + strings)
 
@@ -70,11 +90,12 @@ class DataReader {
                     }
 
                     def tip = new TaskInProject(
-                            project: strings[0],
-                            starting: strings[1].toDate(),
-                            ending: strings[2].toDate(),
-                            department: strings[3],
-                            capacityNeeded: Double.parseDouble(strings[4])
+                             strings[0],
+                             strings[1].toDate(),
+                             strings[2].toDate(),
+                             strings[3],
+                             Double.parseDouble(strings[4]),
+                             strings.size() > 5 ? strings[5] : ''
                     )
                     taskList << tip
                     SILENT?:println("$i task-data:  " + tip)
@@ -84,8 +105,9 @@ class DataReader {
                     throw new VpipeDataException(errMsg() + "\nVermutlich Fehler beim parsen von \nDatum (--> 22.4.2020) oder Kommazahl (--> 4.5 Punkt statt Komma!)\n Grund: ${e.getMessage()}")
                 }
         }
-        t.stop("parsing file $TASK_FILE_NAME")
-        if( ! taskList){throw new VpipeDataException("$TASK_FILE_NAME enthält keine Daten")}
+        t.stop("parsing file ${get_TASK_FILE_NAME()}")
+        if( ! taskList){throw new VpipeDataException("${get_TASK_FILE_NAME()} enthält keine Daten")}
+        if( taskList.size() > 3000 ){throw new VpipeDataException("${get_TASK_FILE_NAME()} enthält ${taskList.size()} Datensätze. GUI wird seeeehr LANGSAM...")}
         return taskList
     }
 
@@ -94,7 +116,7 @@ class DataReader {
      * @return int maxPipelineSlots and List<PipelineOriginalElement> pipelineElements
      */
     static Tuple2 readPipelining() {
-        String text = FileSupport.getTextOrEmpty(PIPELINING_FILE_NAME)
+        String text = FileSupport.getTextOrEmpty(get_PIPELINING_FILE_NAME())
         return readPipelining(text)
     }
 
@@ -110,16 +132,16 @@ class DataReader {
             try {
                 maxPipelineSlots = splitLines[0][0].toInteger()
                 if (maxPipelineSlots == 0) {
-                    println("WARNUNG: In $PIPELINING_FILE_NAME ist unbegrenzte Kapazität eingestellt (0 = kein Slot = unbegrenzt)...\n Pipelining wird ignoriert!")
+                    println("WARNUNG: In ${get_PIPELINING_FILE_NAME()} ist unbegrenzte Kapazität eingestellt (0 = kein Slot = unbegrenzt)...\n Pipelining wird ignoriert!")
                 }
             } catch(Exception e) {
-                throw new VpipeDataException("Fehler beim Lesen von $PIPELINING_FILE_NAME.\nErste Zeile muss exakt eine Ganzzahl sein: Slots der Pipeline.")
+                throw new VpipeDataException("Fehler beim Lesen von ${get_PIPELINING_FILE_NAME()}.\nErste Zeile muss exakt eine Ganzzahl sein: Slots der Pipeline.")
             }
         }
         if(splitLines.size()>1) {
             (1..splitLines.size()-1).each {
                 def line = splitLines[it]
-                def errMsg = {"Lesen von Datei $PIPELINING_FILE_NAME fehlgeschlagen.\nDatensatz: ${line}"}
+                def errMsg = {"Lesen von Datei ${get_PIPELINING_FILE_NAME()} fehlgeschlagen.\nDatensatz: ${line}"}
                 if(line.size() != 4) {
                     throw new VpipeDataException(errMsg() + "\nEs sind keine 4 Elemente.")
                 }
@@ -143,7 +165,7 @@ class DataReader {
         List<String> projects = pipelineElements*.project
         def diff = projects.countBy{it}.grep{it.value > 1}.collect{it}
         if(diff) {
-            throw new VpipeDataException("Lesen von Datei $PIPELINING_FILE_NAME fehlgeschlagen.\nMehrfacheinträge für Projekte: $diff")
+            throw new VpipeDataException("Lesen von Datei ${get_PIPELINING_FILE_NAME()} fehlgeschlagen.\nMehrfacheinträge für Projekte: $diff")
         }
         new Tuple2(maxPipelineSlots, pipelineElements)
     }
@@ -153,7 +175,7 @@ class DataReader {
      * @return day shift of the projects
      */
     static Map<String, Integer> readDateShift() {
-        String text = FileSupport.getTextOrEmpty(DATESHIFT_FILE_NAME)
+        String text = FileSupport.getTextOrEmpty(get_DATESHIFT_FILE_NAME())
         return readDateShift(text)
     }
 
@@ -167,7 +189,7 @@ class DataReader {
         Map<String, Integer> projectDayShift = [:]
         //List<String[]> lines = FileSupport.getDataLinesSplitTrimmed(DataReader.DATESHIFT_FILE_NAME)
         splitLines.each { line ->
-            def errMsg = {"Parsen von Datei $DATESHIFT_FILE_NAME fehlgeschlagen.\nDatensatz: ${line}"}
+            def errMsg = {"Parsen von Datei ${get_DATESHIFT_FILE_NAME()} fehlgeschlagen.\nDatensatz: ${line}"}
             if(line?.size() != 2) {
                 throw new VpipeDataException(errMsg()+"\nJede Zeile braucht zwei Einträge")
             }
@@ -183,21 +205,72 @@ class DataReader {
     }
 
 
+    static String capaTextCache
+
     /**
-     *
      * @return def jsonSlurp
      */
     static def  readCapa() {
         def result =[:]
-        File f = new File(CAPA_FILE_NAME)
+        File f = new File(get_CAPA_FILE_NAME())
         if(f.exists()) {
             try {
                 def slurper = new JsonSlurper()
                 result = slurper.parseText(f.text)
+                capaTextCache = f.text
             } catch (Exception e) {
-                throw new VpipeDataException("Problem in JSON-Format von Datei $CAPA_FILE_NAME:\n${e.getMessage()}")
+                throw new VpipeDataException("Problem in JSON-Format von Datei ${get_CAPA_FILE_NAME()}:\n${e.getMessage()}")
             }
         }
+        result
+    }
+
+
+    /**
+     * @return List of Template-Projects: "copyProject originalProject daysShift"
+     */
+    static List<List>  readTemplates() {
+        String text = FileSupport.getTextOrEmpty(get_TEMPLATE_FILE_NAME())
+        return readTemplates(text)
+    }
+
+    static List<List> readTemplates(String text) {
+        List<List<String>> splitLines =  FileSupport.toSplitAndTrimmedLines(text)
+        return parseTemplates(splitLines)
+    }
+
+    static List<List> parseTemplates(List<List> splitLines) {
+        List result = []
+        def line = 0
+        def errMsg = ''
+        splitLines.each { words ->
+            errMsg = {"Problem in Datei ${get_TEMPLATE_FILE_NAME()}\nZeile ${line}: Zerlegt: ${words}\n"}
+            if (words.size() != 3) {
+                throw new VpipeDataException("${errMsg()}Es müssen 3 Daten-Felder sein")
+            }
+            def days = 0
+            try {
+                days = words[2].toInteger()
+            } catch(Exception e) {
+                throw new VpipeDataException("${errMsg()}Umwandeln in Ganzahl gescheitert. Das ist keine: ${words[2]}")
+            }
+            if(days > 20*365) {
+                throw new VpipeDataException("${errMsg()}Verschiebung in Tagen größer 20 Jahre: ${words[2]}")
+            }
+            result[line++] = [words[0], words[1], days]
+        }
+        // find double entries
+        Set<String> doublettes = []
+        result.each { l ->
+            if (result.count{ it[0] == l[0] } > 1) {
+                doublettes << l[0]
+            }
+        }
+        if(doublettes) {
+            throw new VpipeDataException("Problem in Datei ${get_TEMPLATE_FILE_NAME()}\n Doubletten: $doublettes ")
+        }
+
+
         result
     }
 

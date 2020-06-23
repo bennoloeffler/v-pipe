@@ -75,11 +75,12 @@ class NewLoadPanel  extends JPanel implements MouseMotionListener, PanelBasics {
     protected void paintComponent(Graphics g1d) {
 
         super.paintComponent(g1d)
+        def t = RunTimer.getTimerAndStart('NewLoadPanel::paintComponent')
+
         Graphics2D g = g1d as Graphics2D
         Rectangle r = g.getClipBounds()
         hints(g)
 
-        RunTimer t = new RunTimer(true)
 
         //
         // paint elements
@@ -157,6 +158,7 @@ class NewLoadPanel  extends JPanel implements MouseMotionListener, PanelBasics {
             //}
             y++
         }
+        t.stop()
 
     }
 

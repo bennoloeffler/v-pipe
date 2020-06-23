@@ -52,7 +52,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
 
 
     /**
-     * the Mouse- and KeyListener, that gets all the commands and acts like a controller
+     * the Mouse- and KeyListener, that gets all the commands and acts like a application
      */
 
     //
@@ -300,11 +300,13 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
     @Override
     protected void paintComponent(Graphics g1d) {
         super.paintComponent(g1d)
+        //println(this.name)
+        def t = RunTimer.getTimerAndStart("${this.name} GridPanel::paintComponent ")
+
         Graphics2D g = g1d as Graphics2D
         hints(g)
         g.getClipBounds(r)
 
-        RunTimer t = new RunTimer(true)
 
         //
         // paint only elements inside clipBounds
@@ -316,7 +318,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
                 int graphY = borderWidth + y * gridWidth
                 if(graphX >= r.x-2*gridWidth && graphX <= r.x+2*gridWidth + r.width && graphY >= r.y-2*gridWidth && graphY <= r.y+2*gridWidth + r.height) {
                     // TODO: println "x: $x (sizeX: $model.sizeX) y: $y (sizeY: $model.sizeY)"
-                    if(model.sizeX == 0 || model.sizeY == 0) return
+                    if(model.sizeX == 0 || model.sizeY == 0) {t.stop(); return}
                     GridElement e = model.getElement(x, y)
                     if (e != GridElement.nullElement || cursorX == x && cursorY == y) {
                         Color c = getColor(y)
@@ -421,8 +423,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
             x++
         }
 
-
-        t.stop("drawing all")
+        t.stop()
     }
 
     AffineTransform totalTransform = new AffineTransform()

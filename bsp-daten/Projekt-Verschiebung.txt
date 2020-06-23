@@ -1,2 +1,3 @@
 p1 100
-pro2 3
+Neu-Ulm-Anlage 100
+pro2 100

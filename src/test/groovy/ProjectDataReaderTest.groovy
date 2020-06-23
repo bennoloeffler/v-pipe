@@ -7,7 +7,7 @@ import utils.FileSupport
  */
 class ProjectDataReaderTest extends GroovyTestCase {
 
-    def f = new File(DataReader.TASK_FILE_NAME)
+    def f = new File(DataReader.get_TASK_FILE_NAME())
 
     void createDataFile(String data) {
         f.with {
@@ -47,12 +47,13 @@ class ProjectDataReaderTest extends GroovyTestCase {
     void testFailCommaCapa() {
         createDataFile("""
             p1 01.01.2020 20.01.2020 d1 20.5\n
-            p1 01.01.2020 20.01.2020 d2 20,5\n""")
+            p1 01.01.2020 20.01.2020 d2 20,5\n
+            p1 01.01.2020 20.01.2020 d2 20,5 7""")
 
         def msg = shouldFail {
             List<TaskInProject> data = DataReader.readTasks()
         }
-        assert msg.contains("Keine 5 Daten-Felder gefunden mit Regex-SEPARATOR")
+        assert msg.contains("Keine 5 bzw. 6 Daten-Felder gefunden mit Regex-SEPARATOR")
     }
 
     void testSpacesAndTabs() {

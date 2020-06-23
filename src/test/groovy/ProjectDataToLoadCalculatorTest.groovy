@@ -13,6 +13,7 @@ class ProjectDataToLoadCalculatorTest extends GroovyTestCase {
     TaskInProject t1p1, t2p1, t1p2, t2p2, t3p1
 
     void setUp() {
+        TestDataHelper.cleanAllDataFiles()
         super.setUp()
         tr = new LoadCalculator()
         t1p1 = TestDataHelper.t("p1", "5.1.2020", "10.1.2020", "d1", 20.0)
@@ -110,13 +111,13 @@ class ProjectDataToLoadCalculatorTest extends GroovyTestCase {
     void testUpdateConfiguration() {
 
 
-        def f = new File(DataReader.TASK_FILE_NAME)
+        def f = new File(DataReader.get_TASK_FILE_NAME())
         f.delete()
         f.createNewFile()
         f << "p1 6.1.2020 12.1.2020 d1 20\n"
         f << "p1 13.1.2020 19.1.2020 d1 20"
 
-        f = new File(DataReader.DATESHIFT_FILE_NAME)
+        f = new File(DataReader.get_DATESHIFT_FILE_NAME())
         f.delete()
         f.createNewFile()
         f << "p1 7"
@@ -124,7 +125,7 @@ class ProjectDataToLoadCalculatorTest extends GroovyTestCase {
         Model m = new Model()
         m.readAllData()
         LoadCalculator pt = new LoadCalculator(model: m)
-        new DateShiftTransformer(m).transform()
+        //new DateShiftTransformer(m).transform()
         def load = pt.calcDepartmentLoad(WEEK)
 
 
@@ -139,16 +140,16 @@ class ProjectDataToLoadCalculatorTest extends GroovyTestCase {
     void testUpdateConfigurationWithNoDateShiftTransformerData() {
 
 
-        def f = new File(DataReader.TASK_FILE_NAME)
+        def f = new File(DataReader.get_TASK_FILE_NAME())
         f.delete()
         f.createNewFile()
         f << "p1 6.1.2020 12.1.2020 d1 20\n"
         f << "p1 13.1.2020 19.1.2020 d1 20"
 
-        f = new File(DataReader.DATESHIFT_FILE_NAME)
+        f = new File(DataReader.get_DATESHIFT_FILE_NAME())
         f.delete()
 
-        f = new File(DataReader.CAPA_FILE_NAME)
+        f = new File(DataReader.get_CAPA_FILE_NAME())
         f.delete()
 
         Model m = new Model()

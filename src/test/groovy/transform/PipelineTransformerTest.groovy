@@ -17,7 +17,7 @@ class PipelineTransformerTest extends GroovyTestCase {
     List<PipelineOriginalElement> listOfPOEs
 
     void setUp() {
-        f = new File(DataReader.PIPELINING_FILE_NAME)
+        f = new File(DataReader.get_PIPELINING_FILE_NAME())
         f.delete()
         f.createNewFile()
 
@@ -30,10 +30,10 @@ class PipelineTransformerTest extends GroovyTestCase {
     void testTransform() {
         Model m = TestDataHelper.getPopulatedModel()
         /*
-                t1p1 = t("p1", "5.1.2020", "10.1.2020", "d1", 20.0)
-                t2p1 = t("p1", "8.1.2020", "9.1.2020", "d2", 20.0)
-                t1p2 = t("p2", "5.1.2020", "10.1.2020", "d1", 20.0) --> 2 days
-                t2p2 = t("p2", "8.1.2020", "9.2.2020", "d2", 20.0) --> 2 days
+        t1p1 = t("p1", "5.1.2020", "10.1.2020", "d1", 20.0)
+        t2p1 = t("p1", "8.1.2020", "9.1.2020", "d2", 20.0)
+        t1p2 = t("p2", "5.1.2020", "10.1.2020", "d1", 20.0)
+        t2p2 = t("p2", "8.1.2020", "9.2.2020", "d2", 20.0)
          */
 
         def pt = new PipelineTransformer(m)
@@ -87,7 +87,7 @@ class PipelineTransformerTest extends GroovyTestCase {
         msg = shouldFail {
             m.taskList = pt.transform()
         }
-        assert msg.contains('Grunddaten enthalten Projekte,\ndie nicht in Integrations-Phasen.txt aufgeführt sind: p1')
+        assert msg.contains('Integrations-Phasen.txt aufgeführt sind: p1')
 
 
     }

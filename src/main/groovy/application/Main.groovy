@@ -1,17 +1,14 @@
-package core
+package application
 
-
+import core.LoadCalculator
 import model.DataReader
 import model.Model
-import model.TaskInProject
 import model.VpipeDataException
 import model.WeekOrMonth
-import org.tinylog.Logger
 import org.tinylog.Logger as l
 import utils.*
 import groovy.time.TimeDuration
 import transform.DateShiftTransformer
-import transform.PipelineTransformer
 
 import java.awt.Desktop
 
@@ -25,7 +22,7 @@ import java.awt.Desktop
  */
 class  Main {
 
-    static VERSION_STRING ='0.7.0-GUI-Project-Editor'
+    static VERSION_STRING ='0.8.0-LoadSave-Template'
 
     static void main(String[] args) {
 
@@ -69,72 +66,75 @@ class  Main {
 
             // args from apache commons
             if(singleRunMode) { // single mode
-                println "Daten lesen: $DataReader.TASK_FILE_NAME und $DataReader.DATESHIFT_FILE_NAME" // todo
+                //println "Daten lesen: $DataReader.TASK_FILE_NAME und $DataReader.DATESHIFT_FILE_NAME" // todo
                 processData()
                 println "E R F O L G :   Ergebnisse geschrieben. " + LoadCalculator.FILE_NAME_WEEK + ' (und -Monat )' // todo
 
             } else { // deamon mode
 
-                Thread t = Thread.start {
-                    //VpipeGui.main(null)
-                }
-
+                List<FileEvent> fileEvents = null
                 def fwd = new FileWatcherDeamon(".")
-                fwd.filter = [DataReader.TASK_FILE_NAME, DataReader.DATESHIFT_FILE_NAME, DataReader.PIPELINING_FILE_NAME, DataReader.CAPA_FILE_NAME]
+                fwd.filter = [DataReader.TASK_FILE_NAME,
+                              DataReader.DATESHIFT_FILE_NAME,
+                              DataReader.PIPELINING_FILE_NAME,
+                              DataReader.CAPA_FILE_NAME,
+                              DataReader.TEMPLATE_FILE_NAME, ]
 
                 while(true) {
                     try {
                         File projectDataFile = new File(DataReader.TASK_FILE_NAME)
                         if (projectDataFile.exists()) {
-                            println 'Daten lesen, rechnen und schreiben...'
+                            println '\nDaten lesen, rechnen und schreiben...'
                             long startProcessing = System.currentTimeMillis()
                             processData()
                             long endProcessing = System.currentTimeMillis()
-                            def d = new TimeDuration(0,0,0, endProcessing-startProcessing as int)
-                            println ("Fertig nach: " + d.toString())
+                            def d = new TimeDuration(0, 0, 0, endProcessing - startProcessing as int)
+                            println("Fertig nach: " + d.toString())
                             println '\nE R F O L G :-)    jetzt warte ich, bis sich etwas ändert.'
                         } else {
                             println "Datei ${projectDataFile.absolutePath} existiert (noch) nicht. Ich warte..."
                         }
 
+                    }catch(VpipeDataException e) {
+                        println "\nD A T E N - F E H L E R :\n" + e.getMessage()+"\n"
+                    } catch(Exception e) {
+                        e.printStackTrace()
+                        println ":-( CRASH - erst nach der Behebung wird gerechnet...:\n" + e.getMessage()
+                        sleep(100000)
+                        System.exit(-1)
+                    } finally {
                         //
                         // File listener running? No? Start...
                         //
-                        List<FileEvent> fileEvents = null
                         if (!fwd.isRunning()) {
                             fwd.startReceivingEvents()
                         }
+                    }
 
 
-                        //
-                        // Polling loop of v-pipe
-                        //
-                        def lastSecond = 0
-                        def lastMinute = 0
-                        while (!fileEvents) {
-                            fileEvents = fwd.extractEvents()
-                            sleep(200)
-                            if (System.currentTimeSeconds() - lastSecond > 1) {
-                                print '.'
-                                lastSecond=System.currentTimeSeconds()
+                    //
+                    // Polling loop of v-pipe
+                    //
+                    def lastSecond = System.currentTimeSeconds()
+                    def lastMinute = System.currentTimeSeconds()
+                    while (!fileEvents) {
+                        fileEvents = fwd.extractEvents()
+                        //println('Events:' +fileEvents)
+                        sleep(200)
+                        if (System.currentTimeSeconds() - lastSecond > 1) {
+                            print '.'
+                            lastSecond=System.currentTimeSeconds()
 
-                                if (System.currentTimeSeconds() - lastMinute > 120) {
-                                    println ''
-                                    lastMinute=System.currentTimeSeconds()
-                                }
+                            if (System.currentTimeSeconds() - lastMinute > 120) {
+                                println ''
+                                lastMinute=System.currentTimeSeconds()
                             }
-
                         }
 
-                    }catch(VpipeDataException e) {
-                        println "\nD A T E N - F E H L E R :\n" + e.getMessage()
-                       sleep(10000)
-                    } catch(Exception e) {
-                        println "PROBLEM - erst nach der Behebung wird gerechnet...:\n" + e.getMessage()
-                        e.printStackTrace()
-                        //todo logile
-                        sleep(10000)
                     }
+                    fileEvents = null
+
+
                 }
 
             }
@@ -150,7 +150,6 @@ class  Main {
     private static void processData() {
         Model m = new Model()
         m.readAllData()
-        new DateShiftTransformer(m).transform()
         LoadCalculator pt = new LoadCalculator(model: m)
         LoadCalculator.writeToFileStatic(pt, WeekOrMonth.WEEK)
         LoadCalculator.writeToFileStatic(pt, WeekOrMonth.MONTH)

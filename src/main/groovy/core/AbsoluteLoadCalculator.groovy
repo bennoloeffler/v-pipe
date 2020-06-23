@@ -1,10 +1,12 @@
 package core
 
+import groovy.transform.CompileStatic
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.Memoized
 import groovy.transform.ToString
 import model.TaskInProject
 import model.WeekOrMonth
+import utils.RunTimer
 
 @ToString
 @EqualsAndHashCode
@@ -19,6 +21,7 @@ class CapaNeedDetails {
 
     BigDecimal totalCapaNeed
     List<ProjectCapaNeedDetails> projects
+    //List<String> projects
 
     boolean asBoolean() {
         ! nullElement.is(this)
@@ -31,6 +34,7 @@ class CapaNeedDetails {
  * Calculates a sparce matrix of CapaNeedDetails indexed by "department" and "timeKey".
  * Returns CapaNeedDetails.nullElement, when there is nothing to return.
  */
+
 class AbsoluteLoadCalculator {
 
     WeekOrMonth weekOrMonth = WeekOrMonth.WEEK
@@ -77,6 +81,7 @@ class AbsoluteLoadCalculator {
 
 
     void calculate() {
+        def t = RunTimer.getTimerAndStart('AbsoluteLoadCalculator::calculate')
 
         Map<String, Map<String, CapaNeedDetails>> result = [:]
 
@@ -102,6 +107,7 @@ class AbsoluteLoadCalculator {
                 }
             }
         }
+        t.stop()
         capaLoadAbsolut = result
     }
 

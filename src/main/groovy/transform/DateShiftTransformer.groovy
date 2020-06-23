@@ -30,7 +30,7 @@ class DateShiftTransformer extends Transformer {
             int shift = projectDayShift[projectName]?:0
             if(shift){description += "$projectName: $shift\n"}
             projectList.each() {
-                result << new TaskInProject(it.project, '', it.starting + shift, it.ending + shift, it.department, it.capacityNeeded)
+                result << new TaskInProject(it.project, it.starting + shift, it.ending + shift, it.department, it.capacityNeeded, it.description)
             }
         }
 /*
@@ -50,7 +50,7 @@ class DateShiftTransformer extends Transformer {
             if(! getProject(it)) {
                 throw new VpipeDataException("Es gibt keine Projektdaten,\n"+
                         "um das Projekt $it zu verschieben.\n"+
-                        "Ursache in $DataReader.DATESHIFT_FILE_NAME")
+                        "Ursache in ${DataReader.get_DATESHIFT_FILE_NAME()}")
             }
         }
         if (description == "Dates transformed:\n") {description+"none..."}

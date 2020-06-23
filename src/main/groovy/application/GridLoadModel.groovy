@@ -1,21 +1,17 @@
-package newview
+package application
 
 import core.AbsoluteLoadCalculator
 import core.CapaNeedDetails
 import groovy.beans.Bindable
 import model.Model
-import model.TaskInProject
 import model.WeekOrMonth
+import newview.AbstractGridLoadModel
+import newview.GridLoadElement
+import utils.RunTimer
 
 import java.beans.PropertyChangeEvent
 
-import static extensions.DateHelperFunctions._dToS
-import static extensions.DateHelperFunctions._dToS
 import static extensions.DateHelperFunctions._getStartOfWeek
-import static extensions.DateHelperFunctions._getStartOfWeek
-import static extensions.DateHelperFunctions._getStartOfWeek
-import static extensions.DateHelperFunctions._getStartOfWeek
-import static extensions.DateHelperFunctions._getWeekYearStr
 
 class GridLoadModel extends AbstractGridLoadModel  {
 
@@ -50,15 +46,35 @@ class GridLoadModel extends AbstractGridLoadModel  {
     }
 
     void updateAllFromModelData() {
+        def t = RunTimer.getTimerAndStart('GridLoadModel::updateAllFromModelData')
+        /*
+        SwingBuilder b = new SwingBuilder()
+        b.edt {
+
+                doOutside {
+                    absoluteLoadCalculator = new AbsoluteLoadCalculator(model.taskList)
+                    calcGridElements()
+                    calcRowX()
+
+                    doLater {
+                        setUpdateToggle(!getUpdateToggle())
+                    }
+                }
+        }*/
         absoluteLoadCalculator = new AbsoluteLoadCalculator(model.taskList)
         calcGridElements()
         calcRowX()
+
+        t.stop()
+
         setUpdateToggle(!getUpdateToggle())
+
     }
 
 
     void calcGridElements() {
-
+        def oldElements = gridElements
+        def t = RunTimer.getTimerAndStart('GridLoadModel::calcGridElements')
         gridElements = [:]
         model.getAllDepartments().each { String department ->
             gridElements[department] = [:]
@@ -85,13 +101,28 @@ class GridLoadModel extends AbstractGridLoadModel  {
                     //projectLoad /= maxAbsolute
                     //capaNeedDetailsAbsolut.totalCapaNeed /= maxAbsolute
                 }
+                def avail = oldElements[department]?.get(timeStr)
+                if(avail) {
+                    avail.department = department
+                    avail.timeString = timeStr
+                    avail.load = capaNeedDetailsAbsolut.totalCapaNeed
+                    avail.loadProject = projectLoad
+                    avail.yellow = yellowAbs
+                    avail.red = redAbs
+                    avail.projectDetails = capaNeedDetailsAbsolut.projects
+                    gridElements[department][timeStr] = avail
+                } else {
+                    gridElements[department][timeStr] = new GridLoadElement(department, timeStr, capaNeedDetailsAbsolut.totalCapaNeed, projectLoad, yellowAbs, redAbs, capaNeedDetailsAbsolut.projects)
+                }
 
-                gridElements[department][timeStr] = new GridLoadElement(department, timeStr, capaNeedDetailsAbsolut.totalCapaNeed, projectLoad, yellowAbs, redAbs, capaNeedDetailsAbsolut.projects)
             }
         }
+        t.stop()
     }
 
     private void calcRowX() {
+        def t = RunTimer.getTimerAndStart('GridLoadModel::calcRowX')
+
         nowXRowCache = -1
         Date startOfGrid = _getStartOfWeek(model.getStartOfTasks())
         Date endOfGrid = _getStartOfWeek(model.getEndOfTasks()) + 7
@@ -104,6 +135,7 @@ class GridLoadModel extends AbstractGridLoadModel  {
             }
             row++
         }
+        t.stop()
     }
 
     @Override
