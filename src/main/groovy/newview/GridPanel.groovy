@@ -9,6 +9,7 @@ import javax.swing.*
 import java.awt.*
 import java.awt.event.*
 import java.awt.geom.AffineTransform
+import java.beans.PropertyChangeEvent
 import java.beans.PropertyChangeListener
 
 /**
@@ -34,6 +35,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
     /**
      * the cursor - modeled as position in grid
      */
+    @Bindable
     int cursorX = 0
     int cursorY = 0
 
@@ -132,7 +134,8 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
         //def redraw = [new Point(cursorX, cursorY)]
         mouseX = e.getX()
         mouseY = e.getY()
-        cursorX = getGridXFromMouseX()
+        //cursorX = getGridXFromMouseX()
+        setCursorX(getGridXFromMouseX()) // @bindable...
         cursorY = getGridYFromMouseY()
         model.setSelectedElement(cursorX, cursorY)
 
@@ -196,8 +199,8 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
         //def redraw = [new Point(cursorX, cursorY)]
         if(KeyEvent.VK_UP == e.getKeyCode())    {cursorY > 0              ? --cursorY :0}
         if(KeyEvent.VK_DOWN == e.getKeyCode())  {cursorY < model.sizeY-1  ? ++cursorY :0}
-        if(KeyEvent.VK_LEFT == e.getKeyCode())  {cursorX > 0              ? --cursorX :0}
-        if(KeyEvent.VK_RIGHT == e.getKeyCode()) {cursorX < model.sizeX-1  ? ++cursorX :0}
+        if(KeyEvent.VK_LEFT == e.getKeyCode())  {cursorX > 0              ? setCursorX(cursorX-1) :0}
+        if(KeyEvent.VK_RIGHT == e.getKeyCode()) {cursorX < model.sizeX-1  ? setCursorX(cursorX+1) :0}
 
         if(keyAndShiftPressed(e, KeyEvent.VK_UP)) {
             //println("SHIFT UP x: $cursorX y: $cursorY")
@@ -255,7 +258,9 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
 
 
 
-
+    def cursorXChanged = { PropertyChangeEvent e ->
+        invalidateAndRepaint(this)
+    }
 
     /**
      * create with custom grid and custom model
@@ -279,6 +284,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
             }
         } as PropertyChangeListener
         model.addPropertyChangeListener('updateToggle', l)
+        addPropertyChangeListener('cursorX', cursorXChanged as PropertyChangeListener)
         setCursorToNow()
     }
 
@@ -354,6 +360,24 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
             g.setColor(nowBarColor)
             g.fillRoundRect(nowGraphX, 0, size - 4, nowGraphY + borderWidth - 4, round, round)
         }
+
+        //
+        // paint the cursor-indicator line above everything else
+        //
+
+        if(cursorX >=0 ) {
+            int nowGraphX = borderWidth + cursorX * gridWidth + (int) ((gridWidth - size) / 2) + nameWidth
+            // position start (left up)
+            int nowGraphY = borderWidth + model.sizeY * gridWidth // position end (right down)
+
+            // shadow
+            //g.setColor(nowBarShadowColor)
+            //g.fillRoundRect(nowGraphX + offset, +offset, size - 4, nowGraphY + borderWidth - 4, round, round)
+            // element in project color, integration phase color (orange), empty color (white)
+            g.setColor(cursorColor)
+            g.fillRoundRect(nowGraphX, 0, size - 4, nowGraphY + borderWidth - 4, round, round)
+        }
+
         //
         // draw the line names
         //

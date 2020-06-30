@@ -6,8 +6,6 @@ import transform.DateShiftTransformer
 import transform.TemplateTransformer
 import utils.RunTimer
 
-import java.nio.file.Path
-
 import static model.WeekOrMonth.WEEK
 
 class Model {
@@ -75,6 +73,7 @@ class Model {
 
 
 
+    List<String> projectSequence = []
 
 
 
@@ -90,10 +89,17 @@ class Model {
         r
     }
 
+    PipelineOriginalElement getPipelineElement(String project) {
+        PipelineOriginalElement e = pipelineElements.find {
+            it.project == project
+        }
+        e
+    }
+
     /**
      * @return List of Strings with all projectNames found in
      */
-    List<String> getAllProjects() {
+    List<String> _getAllProjects() {
         def t = RunTimer.getTimerAndStart('getAllProjects')
         def r = (taskList*.project).unique()
         t.stop()
@@ -343,17 +349,32 @@ class Model {
     // loading & saving
     //
 
+    def emtpyTheModel() {
+        taskList = []
+        projectDayShift = [:]
+        templateProjects = []
+        pipelineElements = []
+        capaAvailable = [:]
+        jsonSlurp = ''
+    }
+
 
     def readAllData() {
 
         def t = RunTimer.getTimerAndStart('readAllData')
-        t.withCloseable {
+        try {
+
 
 
             //
             // ordinary tasks
             //
             taskList = DataReader.readTasks()
+
+            //
+            // read the integrationPhaseData
+            //
+            (maxPipelineSlots, pipelineElements) = DataReader.readPipelining()
 
             //
             // FIRST move projects - if needed
@@ -370,14 +391,8 @@ class Model {
             tt.transform()
 
             //
-            // read the integrationPhaseData
-            //
-            (maxPipelineSlots, pipelineElements) = DataReader.readPipelining()
-
-            //
             // capa
             //
-
             jsonSlurp = DataReader.readCapa()
             if (jsonSlurp) {
                 capaAvailable = calcCapa(jsonSlurp)
@@ -385,7 +400,21 @@ class Model {
                     check()
                 }
             }
+
+            // if sequence has been saved AND project data removed or added: sync and let seqnence stable anyway
+            projectSequence = DataReader.readSequence()
+            def all = _getAllProjects()
+            def intersect = all.intersect(projectSequence)
+            projectSequence.retainAll(intersect)
+            def added = all - intersect
+            projectSequence = added + projectSequence
+
+        }catch(Exception e) {
+            emtpyTheModel()
+            throw e
+        } finally {
             setUpdateToggle(!getUpdateToggle())
+            t.stop()
         }
     }
 

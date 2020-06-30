@@ -84,6 +84,15 @@ class FileSupport {
         BACKUP_DIR + "/" + fileName[0..-5] + " backup von " + new DateTime().toString("yyyy-MM-dd HH.mm.ss") + fileName[-4..-1]
     }
 
+    /**
+     * works only for filenames with 3-Letter-Postfix like .txt
+     * @param fileName
+     * @return
+     */
+    static String backupDirName(String dirName) {
+        assert dirName
+        dirName + '\\' + BACKUP_DIR + "\\" +  new DateTime().toString("yyyy-MM-ddHHmmss")
+    }
 
     static def checkBackupDir() {
         def f = new File(FileSupport.BACKUP_DIR)

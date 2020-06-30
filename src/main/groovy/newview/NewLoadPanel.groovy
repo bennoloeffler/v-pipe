@@ -2,6 +2,7 @@ package newview
 
 import groovy.beans.Bindable
 import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 import utils.RunTimer
 
 import javax.swing.JPanel
@@ -10,23 +11,28 @@ import java.awt.Dimension
 import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.Rectangle
+import java.awt.event.KeyEvent
 import java.awt.event.MouseEvent
+import java.awt.event.MouseListener
 import java.awt.event.MouseMotionListener
+import java.awt.event.MouseWheelEvent
+import java.awt.event.MouseWheelListener
 import java.beans.PropertyChangeEvent
 
 @CompileStatic
-class NewLoadPanel  extends JPanel implements MouseMotionListener, PanelBasics {
+class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener, PanelBasics {
 
     //Color nowBarShadowColor = new Color(50, 50, 50, 30)
 
     @Bindable int gridWidth
 
+    @Bindable int cursorX = -1
     //int gridHeigth
     //int nameWidth
 
     AbstractGridLoadModel model
 
-    Closure updateFromModelCallback = {
+    Closure updateCallback = {
         invalidateAndRepaint(this)
     }
 
@@ -40,15 +46,65 @@ class NewLoadPanel  extends JPanel implements MouseMotionListener, PanelBasics {
         setGridWidth(gridWidth)
         updateOthersFromGridWidth(gridWidth, this)
 
-        this.model.addPropertyChangeListener('updateToggle', updateFromModelCallback) // when updateToggle is changed
+        this.model.addPropertyChangeListener('updateToggle', updateCallback) // when updateToggle is changed
         this.addPropertyChangeListener('gridWidth', updateFromGridWidthCallback) // when gridWidth is changed
+        this.addPropertyChangeListener('cursorX', updateCallback)
         addMouseMotionListener(this)
+        addMouseWheelListener(this)
+        addMouseListener(this)
     }
 
 
 
+    //
+    // MouseWheelListener
+    //
+    @Override
+    @CompileStatic(TypeCheckingMode.SKIP) // because of that: scrollPane.processMouseWheelEvent(e)
+    void mouseWheelMoved(MouseWheelEvent e) {
+        if((e.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK) > 0) {
+            //   negative values if the mouse wheel was rotated up/away from the user,
+            //   and positive values if the mouse wheel was rotated down/ towards the user
+            int rot = e.getWheelRotation()
+            int inc = (int)(gridWidth * rot / 10)
+            setGridWidth(gridWidth + (inc!=0?inc:1)) // min one tic bigger
+            minMaxGridCheck()
+            updateOthersFromGridWidth(gridWidth, this)
+
+            invalidateAndRepaint(this)
+        } else {
+            getScrollPane(this)?.getVerticalScrollBar()?.setUnitIncrement((gridWidth/3) as int)
+            getScrollPane(this)?.processMouseWheelEvent(e)
+        }
+    }
 
 
+    def minMaxGridCheck() {
+        if(gridWidth > 100){setGridWidth(100)}
+        if(gridWidth < 10){setGridWidth(10)}
+    }
+
+    //
+    // MouseListener
+    //
+
+    @Override
+    void mouseClicked(MouseEvent e) {
+        requestFocusInWindow()
+        setCursorX(getGridXFromMouseX(e.getX())) // @bindable...
+    }
+
+    @Override
+    void mousePressed(MouseEvent e) {}
+
+    @Override
+    void mouseReleased(MouseEvent e) {}
+
+    @Override
+    void mouseEntered(MouseEvent e) {}
+
+    @Override
+    void mouseExited(MouseEvent e) {}
 
 
     /**
@@ -75,7 +131,7 @@ class NewLoadPanel  extends JPanel implements MouseMotionListener, PanelBasics {
     protected void paintComponent(Graphics g1d) {
 
         super.paintComponent(g1d)
-        def t = RunTimer.getTimerAndStart('NewLoadPanel::paintComponent')
+        def t = RunTimer.getTimerAndStart("${this.name}NewLoadPanel::paintComponent")
 
         Graphics2D g = g1d as Graphics2D
         Rectangle r = g.getClipBounds()
@@ -130,6 +186,23 @@ class NewLoadPanel  extends JPanel implements MouseMotionListener, PanelBasics {
             //g.fillRoundRect(nowGraphX + offset, +offset, size - 4, nowGraphY + borderWidth - 4, round, round)
             // element in project color, integration phase color (orange), empty color (white)
             g.setColor(nowBarColor)
+            g.fillRoundRect(nowGraphX, 0, size - 4, nowGraphY + borderWidth - 4, round, round)
+        }
+
+        //
+        // paint the cursor-indicator line above everything else
+        //
+
+        if(cursorX >=0 ) {
+            int nowGraphX = borderWidth + cursorX * gridWidth + (int) ((gridWidth - size) / 2) + nameWidth
+            // position start (left up)
+            int nowGraphY = borderWidth + model.getSizeY() * gridHeigth // position end (right down)
+
+            // shadow
+            //g.setColor(nowBarShadowColor)
+            //g.fillRoundRect(nowGraphX + offset, +offset, size - 4, nowGraphY + borderWidth - 4, round, round)
+            // element in project color, integration phase color (orange), empty color (white)
+            g.setColor(cursorColor)
             g.fillRoundRect(nowGraphX, 0, size - 4, nowGraphY + borderWidth - 4, round, round)
         }
 

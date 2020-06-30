@@ -22,7 +22,7 @@ import java.awt.Desktop
  */
 class  Main {
 
-    static VERSION_STRING ='0.8.0-LoadSave-Template'
+    static VERSION_STRING ='0.9.0-TePiLoSa'
 
     static void main(String[] args) {
 
@@ -72,6 +72,7 @@ class  Main {
 
             } else { // deamon mode
 
+                DataReader.setCurrentDir('.')
                 List<FileEvent> fileEvents = null
                 def fwd = new FileWatcherDeamon(".")
                 fwd.filter = [DataReader.TASK_FILE_NAME,

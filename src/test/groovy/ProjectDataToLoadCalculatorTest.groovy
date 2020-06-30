@@ -34,7 +34,7 @@ class ProjectDataToLoadCalculatorTest extends GroovyTestCase {
     }
 
     void testGetAllProjects() {
-        def pList = tr.getAllProjects()
+        def pList = tr._getAllProjects()
         assert pList == ["p1", "p2", "p3"] || pList == ["p2", "p1", "p3"] // sequence?
     }
 

@@ -1,8 +1,10 @@
 
 package application
 
+import com.formdev.flatlaf.FlatLightLaf
 import groovy.swing.SwingBuilder
 import model.Model
+import model.WeekOrMonth
 import net.miginfocom.swing.MigLayout
 import newview.GridModel
 import newview.GridPanel
@@ -30,31 +32,42 @@ class View {
 
     GridModel gridPipelineModel = new NewPipelineModel(model)
     GridLoadModel gridLoadModel = new GridLoadModel(model)
+    //GridLoadModel gridMonthLoadModel = new GridLoadModel(model, WeekOrMonth.MONTH)
+    GridPipelineLoadModel gridPipelineLoadModel = new GridPipelineLoadModel(model)
     GridModel gridProjectModel = new NewProjectModel(model)
 
     def pipelineView = new GridPanel(20, gridPipelineModel)
     def projectView = new GridPanel(20, gridProjectModel)
     def loadView = new NewLoadPanel(20, gridLoadModel)
+    def pipelineLoadView = new NewLoadPanel(20, gridPipelineLoadModel)
 
 
     View(Model model) {
         this.model = model
         build()
+
+        // TODO: move to Bilder?
         pipelineView.name = "pipelineView" // in order to have a specific name in "paintComponent... getRuntimer(...)"
         projectView.name = "projectView"
+        loadView.name = "departmentLoad"
+        pipelineLoadView.name = "pipelineLoad"
     }
 
+    /*
     void log(String logMessage) {
         def jta = (JTextArea)(swing.textAreaLog)
         //jta.setFont(new Font("Monospaced", jta.getFont().getStyle(), 14));
         jta.append('\n'+logMessage+'\n')
-    }
+    }*/
 
 
 
     void build() {
 
-        MigLayout ml = new MigLayout()
+        FlatLightLaf.install()
+
+
+        //MigLayout ml = new MigLayout()
         swing = new SwingBuilder()
         swing.registerBeanFactory('migLayout', MigLayout)
 
@@ -62,6 +75,9 @@ class View {
 
         // see: https://stackoverflow.com/questions/42833424/java-key-bindings-using-groovy-swing-builder/42834255
         swing.actions {
+
+
+            // file
 
             action ( id: 'openAction',
                     name: "oeffnen",
@@ -95,6 +111,8 @@ class View {
                     shortDescription: 'v-pipe beenden - und vorher nochmal speichern ;-)'
             )
 
+            // tools
+
             action ( id: 'sortPipelineAction',
                     name: "Staffelung (P) sortieren",
                     mnemonic: 'p',
@@ -103,6 +121,9 @@ class View {
                     shortDescription: 'Staffelung sortieren dem spätesten End-Termin des letzten Tasks des Projektes'
             )
 
+
+            // view
+
             action ( id: 'pipelineViewAction',
                     name: "Staffelungs-Ansicht, separat",
                     //mnemonic: 'p',
@@ -110,6 +131,25 @@ class View {
                     //accelerator: shortcut('P'),
                     shortDescription: 'Staffelung in gesondertem Fenster öffnen. Gerne mehrere. Multi-Monitor. Multi-View...'
             )
+
+            action ( id: 'loadViewAction',
+                    name: "Abt-Belastungs-Ansicht, separat",
+                    //mnemonic: 'p',
+                    closure: {println "loadViewAction not connected to application..."},
+                    //accelerator: shortcut('P'),
+                    shortDescription: 'Abt-Belastung in gesondertem Fenster öffnen. Gerne mehrere. Multi-Monitor. Multi-View...'
+            )
+
+
+            action ( id: 'pipelineLoadViewAction',
+                    name: "Pipeline-Belastungs-Ansicht, separat",
+                    //mnemonic: 'p',
+                    closure: {println "pipelineLoadViewAction not connected to application..."},
+                    //accelerator: shortcut('P'),
+                    shortDescription: 'Pipeline-Belastung in gesondertem Fenster öffnen. Gerne mehrere. Multi-Monitor. Multi-View...'
+            )
+
+            // help
 
             action ( id: 'helpAction',
                     name: "Hilfe...",
@@ -134,11 +174,11 @@ class View {
 
         swing.build {
 
-            lookAndFeel 'nimbus'
+            //lookAndFeel 'nimbus'
 
-            f = frame(id: 'frame', title: '"v-pipe    |  +/- = Zoom  |  Pfeile = Cursor bewegen  |  Shift+Pfeile = Projekt bewegen  | CTRL-o = öffnen  "', locationRelativeTo: null, show: false, defaultCloseOperation: JFrame.DO_NOTHING_ON_CLOSE) {
+            f = frame(id: 'frame', title: 'v-pipe    |  +/- = Zoom  |  Pfeile = Cursor bewegen  |  Shift+Pfeile = Projekt bewegen  | CTRL-o = öffnen  ', locationRelativeTo: null, show: false, defaultCloseOperation: JFrame.DO_NOTHING_ON_CLOSE) {
 
-                menuBar{
+                menuBar(id: 'menuBar') {
                     menu(text:'Dateien', mnemonic:'D') {
                         menuItem(openAction)
                         menuItem(saveAction)
@@ -147,11 +187,13 @@ class View {
                     }
                     menu(text:'Werkzeug', mnemonic:'W') {
                         menuItem(sortPipelineAction)
+                        //menuItem(viewPipelineLoadAction)
                     }
                     menu(text:'Ansicht', mnemonic:'A') {
                         menuItem(pipelineViewAction)
                         //menuItem(projectViewAction)
-                        //menuItem(loadViewAction)
+                        menuItem(loadViewAction)
+                        menuItem(pipelineLoadViewAction)
                     }
                     menu(text:'Hilfe', mnemonic:'H') {
                         menuItem(helpAction)
@@ -169,9 +211,18 @@ class View {
                         scrollPane {
                             widget(pipelineView)
                         }
-                        scrollPane {
-                            widget(loadView)
+
+                        splitPane(id: 'spV3', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: 0.5) {
+                            scrollPane(id: 'pipelineLoadViewScrollPane') {
+                                widget( pipelineLoadView)
+                            }
+                            scrollPane(id: 'spSwap') {
+                                widget(loadView)
+                            }
                         }
+                        // toggeling view...
+                        // spV1.setSecond(view.swing.sp-swap) // only load, without pipeline
+                        // spV1.setSecond(view.swing.spV3) // both
 
                     }
                     splitPane(id: 'spV2', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: 0.5) {
@@ -186,12 +237,6 @@ class View {
                 }
 
             }
-            //f.pack()
-
-            //b.addActionListener(actionListenerProjectNameInit)
-            //t.addActionListener(actionListenerProjectNameChange)
-            //cc.addPropertyChangeListener('color', colorListener) // does not work. color does not fire events...
-
         }
     }
 
@@ -208,12 +253,54 @@ class View {
             initModelAndNotifyView()
             swing.frame.setVisible(true)
             setFullSize(swing.frame)
+            // TODO: move to Builder?
             swing.spH.setDividerLocation(900)
             swing.spV1.setDividerLocation(500)
             swing.spV2.setDividerLocation(500)
+            swing.spV3.setDividerLocation(120)
+        }
+    }
+
+    int i = 0
+
+    def openPipelineWindow() {
+        def newPipelineView = new GridPanel(20, gridPipelineModel)
+        swing.edt {
+
+            frame(id: "framePipeline+${i++}", title: "v-pipe: Staffelung", locationRelativeTo: null, show: true, pack:true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
+                scrollPane {
+                    widget(newPipelineView)
+                }
+            }
+            bind(target: newPipelineView, targetProperty: 'cursorX', source: pipelineView, sourceProperty: "cursorX")
+            bind(target: pipelineView, targetProperty: 'cursorX', source: newPipelineView, sourceProperty: "cursorX")
+        }
+    }
+
+    def openLoadWindow() {
+        def newLoadView = new NewLoadPanel(20, gridLoadModel)
+        swing.edt {
+            frame(id: "frameLoad+${i++}", title: "v-pipe: Abt.-Belastung", locationRelativeTo: null, show: true, pack:true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
+                scrollPane {
+                    widget(newLoadView)
+                }
+            }
+            bind(target: newLoadView, targetProperty: 'cursorX', source: pipelineView, sourceProperty: "cursorX")
+            bind(target: pipelineView, targetProperty: 'cursorX', source: newLoadView, sourceProperty: "cursorX")
         }
     }
 
 
-
+    def openPipelineLoadWindow() {
+        def newLoadView = new NewLoadPanel(20, gridPipelineLoadModel)
+        swing.edt {
+            frame(id: "framePipelineLoad+${i++}", title: "v-pipe: Pipeline-Belastung", locationRelativeTo: null, show: true, pack:true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
+                scrollPane {
+                    widget(newLoadView, name: "monthLoad$i++")
+                }
+            }
+            bind(target: newLoadView, targetProperty: 'cursorX', source: pipelineView, sourceProperty: "cursorX")
+            bind(target: pipelineView, targetProperty: 'cursorX', source: newLoadView, sourceProperty: "cursorX")
+        }
+    }
 }

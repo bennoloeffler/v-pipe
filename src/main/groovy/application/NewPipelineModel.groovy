@@ -2,7 +2,9 @@ package application
 
 import groovy.beans.Bindable
 import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 import model.Model
+import model.PipelineOriginalElement
 import model.TaskInProject
 import model.WeekOrMonth
 import newview.GridElement
@@ -14,7 +16,7 @@ import java.beans.PropertyChangeListener
 
 import static extensions.DateHelperFunctions.*
 
-@CompileStatic
+//@CompileStatic
 class NewPipelineModel extends GridModel {
 
     @Bindable
@@ -23,20 +25,20 @@ class NewPipelineModel extends GridModel {
     List<List<GridElement>> allProjectGridLines
 
     // TODO: write this to model and save it
-    List<String> allProjectNames =[]
+    //List<String> allProjectNames =[]
 
     int nowXRowCache = -1
 
-    @Delegate
+    //@Delegate
     Model model
 
     def tasksPropertyListener = { PropertyChangeEvent e ->
         if(e.propertyName=='updateToggle') {
             //sortProjectNamesWhenChanged() // new task list - probably after opening a new Data-Set
-            updateProjectNames()
+            //updateProjectNames()
         }
         if(e.propertyName=='reloadToggle') {
-            updateProjectNames()
+            //updateProjectNames()
         }
         updateGridElements()
         this.setUpdateToggle(!this.getUpdateToggle()) // just to fire an PropertyChange to the view
@@ -46,31 +48,36 @@ class NewPipelineModel extends GridModel {
         this.model = model
         model.addPropertyChangeListener(tasksPropertyListener as PropertyChangeListener)
 
-        updateProjectNames()
+        //updateProjectNames()
 
         updateGridElements()
     }
 
-    void updateProjectNames() {
+    //@CompileStatic(TypeCheckingMode.SKIP)
+    /*void updateProjectNames() {
         List<String> current = getAllProjects()
         List<String> intersect = current.intersect(allProjectNames)
         List<String> toRemove = allProjectNames - intersect
         List<String> toAdd = current - intersect
         allProjectNames.removeAll(toRemove)
         allProjectNames.addAll(toAdd)
-    }
+    }*/
 
     void sortProjectNamesToEnd() {
 
-        List<String> allProjects = getAllProjects()
+        //List<String> allProjects = getAllProjects()
         Map<String, List<TaskInProject>> projectsMap = [:]
-        allProjects.each {
-            projectsMap[it] = getProject(it)
+        model.projectSequence.each {
+            projectsMap[it] = model.getProject(it)
         }
-        List<String> allProjectNames = allProjects.sort { String p1, String p2 ->
+        List<String> allProjectNames = model.projectSequence.sort { String p1, String p2 ->
             projectsMap[p2]*.ending.max() <=> projectsMap[p1]*.ending.max()
         }
-        this.allProjectNames = allProjectNames
+
+
+
+        model.projectSequence = allProjectNames
+
 
         updateGridElements()
         this.setUpdateToggle(!this.getUpdateToggle()) // just to fire an PropertyChange to the view
@@ -83,12 +90,13 @@ class NewPipelineModel extends GridModel {
      */
     private void updateGridElements() {
         def t = RunTimer.getTimerAndStart('NewPipelineModel::updateGridElements')
-
         allProjectGridLines = []
-        allProjectNames.each {
-            List<TaskInProject> projectTasks = getProject(it)
-            def gridElements = fromProjectTasks(projectTasks)
-            allProjectGridLines << gridElements
+        if(model.taskList) {
+            model.projectSequence.each {
+                List<TaskInProject> projectTasks = model.getProject(it)
+                def gridElements = fromProjectTasks(projectTasks)
+                allProjectGridLines << gridElements
+            }
         }
         t.stop()
     }
@@ -101,8 +109,8 @@ class NewPipelineModel extends GridModel {
     List<GridElement> fromProjectTasks( List<TaskInProject> projectTasks) {
         assert projectTasks
         def gridElements = []
-        Date startOfGrid = _getStartOfWeek(getStartOfTasks())
-        Date endOfGrid = _getStartOfWeek(getEndOfTasks()) + 7
+        Date startOfGrid = _getStartOfWeek(model.getStartOfTasks())
+        Date endOfGrid = _getStartOfWeek(model.getEndOfTasks()) + 7
         Date startOfProject = _getStartOfWeek(projectTasks*.starting.min())
         Date endOfProject = _getStartOfWeek(projectTasks*.ending.max()) + 7
         def fromToDateString = "${_dToS(startOfProject)} - ${_dToS(endOfProject)}"
@@ -116,7 +124,17 @@ class NewPipelineModel extends GridModel {
             }
             row ++
             if (w >= startOfProject && w < endOfProject) {
-                gridElements << new GridElement(projectTasks[0].project, '', "${_getWeekYearStr(w)}  ($fromToDateString)", false)
+                boolean integrationPhase = false
+                if(model.pipelineElements) {
+                    PipelineOriginalElement element = model.getPipelineElement(projectTasks[0].project)
+                    long overlap = element.getDaysOverlap(w, w+7)
+                    if(overlap){ integrationPhase = true }
+                }
+                gridElements << new GridElement(
+                        project: projectTasks[0].project,
+                        department: '',
+                        timeString: "${_getWeekYearStr(w)}  ($fromToDateString)",
+                        integrationPhase: integrationPhase)
             } else {
                 gridElements << GridElement.nullElement
             }
@@ -149,12 +167,16 @@ class NewPipelineModel extends GridModel {
     }
 
     def shiftProject(int y, int shift) {
-        def projectName = allProjectNames[y]
-        List<TaskInProject> project = getProject(projectName)
+        def projectName = model.projectSequence[y]
+        List<TaskInProject> project = model.getProject(projectName)
         project.each {
             it.ending += shift
             it.starting += shift
         }
+        PipelineOriginalElement pe = model.getPipelineElement(projectName)
+        pe.startDate += shift
+        pe.endDate += shift
+
         model.reCalcCapaAvailableIfNeeded()
         model.setUpdateToggle(!model.getUpdateToggle())
     }
@@ -168,13 +190,14 @@ class NewPipelineModel extends GridModel {
 
     @Override
     def swap(int y, int withY) {
-        allProjectNames.swap(y, withY)
+        model.projectSequence.swap(y, withY)
         updateGridElements()
+        this.setUpdateToggle(!this.getUpdateToggle()) // just to fire an PropertyChange to the view
     }
 
     @Override
     def setSelectedElement(int x, int y) {
-        setSelectedProject(allProjectNames[y])
+        setSelectedProject(model.projectSequence[y])
     }
 
     @Override
@@ -184,12 +207,12 @@ class NewPipelineModel extends GridModel {
 
     @Override
     List<String> getLineNames() {
-        return allProjectNames
+        return model.projectSequence
     }
 
     @Override
     List<String> getColumnNames() {
-        return getFullSeriesOfTimeKeys(WeekOrMonth.WEEK)
+        return model.getFullSeriesOfTimeKeys(WeekOrMonth.WEEK)
     }
 
 }

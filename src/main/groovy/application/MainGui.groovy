@@ -5,9 +5,14 @@ import model.Model
 import model.VpipeDataException
 
 import javax.swing.JFrame
+import javax.swing.JMenuBar
 import javax.swing.JOptionPane
 import javax.swing.JTextArea
+import javax.swing.SwingUtilities
 import javax.swing.ToolTipManager
+import javax.swing.UIDefaults
+import javax.swing.UIManager
+import javax.swing.plaf.FontUIResource
 import java.awt.Font
 import java.awt.Graphics2D
 import java.awt.RenderingHints
@@ -64,7 +69,7 @@ class MainGui {
             out.println(s)
             //Graphics2D g = getLogArea().getGraphics()
             //g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            getLogArea().append('\n'+s+'\n')
+            getLogArea().append(s+'\n')
             getLogArea().setCaretPosition(getLogArea().getDocument().getLength())
         }
     }
@@ -88,7 +93,7 @@ class MainGui {
         System.setOut(outStream)
         //System.setErr(errStream)
         JTextArea la = getLogArea()
-        la.setFont(new Font("Monospaced", Font.PLAIN, 18))
+        la.setFont(new Font("Monospaced", Font.PLAIN, 25))
         println("Programm-Version: $Main.VERSION_STRING")
 
 
@@ -108,13 +113,22 @@ class MainGui {
         //
         // glue view and application together
         //
+        // File
         view.swing.openAction.closure = controller.&openActionPerformed
         view.swing.saveAction.closure = controller.&saveActionPerformed
         view.swing.saveAsAction.closure = controller.&saveAsActionPerformed
         view.swing.exitAction.closure = controller.&exitActionPerformed
 
+        // Tool
         view.swing.sortPipelineAction.closure = controller.&sortPipelineActionPerformed
 
+        // View
+        view.swing.pipelineViewAction.closure = controller.&pipelineViewActionPerformed
+        view.swing.loadViewAction.closure = controller.&loadViewActionPerformed
+        view.swing.pipelineLoadViewAction.closure = controller.&pipelineLoadViewActionPerformed
+
+        // Help
+        view.swing.helpAction.closure = controller.&helpActionPerformed
         view.swing.printPerformanceAction.closure = controller.&printPerformanceActionPerformed
 
 
@@ -124,9 +138,24 @@ class MainGui {
         //
         view.swing.build() {
             bind(target: view.swing.currentPath, targetProperty: 'text', source: model, sourceProperty: "currentDir", converter: { v -> v.toUpperCase()})
+
+            // sync pipelineView with loadView and projectView (details of witch project?)
             bind(target: view.gridLoadModel, targetProperty: 'selectedProject', source: view.gridPipelineModel, sourceProperty: 'selectedProject')
-            bind(target: view.loadView, targetProperty: 'gridWidth', source: view.pipelineView, sourceProperty: 'gridWidth')
             bind(target: view.gridProjectModel, targetProperty: 'projectName', source: view.gridPipelineModel, sourceProperty: 'selectedProject')
+
+            // sync zoom factor of load views
+            bind(target: view.pipelineLoadView, targetProperty: 'gridWidth', source: view.pipelineView, sourceProperty: 'gridWidth')
+            bind(target: view.loadView, targetProperty: 'gridWidth', source: view.pipelineView, sourceProperty: 'gridWidth')
+
+            // sync cursorX: central node -> pipelineView
+            bind(target: view.projectView, targetProperty: 'cursorX', source: view.pipelineView, sourceProperty: 'cursorX')
+            bind(target: view.loadView, targetProperty: 'cursorX', source: view.pipelineView, sourceProperty: 'cursorX')
+            bind(target: view.pipelineLoadView, targetProperty: 'cursorX', source: view.pipelineView, sourceProperty: 'cursorX')
+
+            bind(target: view.pipelineView, targetProperty: 'cursorX', source: view.loadView, sourceProperty: 'cursorX')
+            bind(target: view.pipelineView, targetProperty: 'cursorX', source: view.projectView, sourceProperty: 'cursorX')
+            bind(target: view.pipelineView, targetProperty: 'cursorX', source: view.pipelineLoadView, sourceProperty: 'cursorX')
+
             //bind(target: view.gridProjectModel, targetProperty: 'updateToggle', source: view.gridPipelineModel, sourceProperty: 'updateToggle')
         }
 
@@ -138,8 +167,7 @@ class MainGui {
         //
         try {
             view.start {
-                model.setCurrentDir('.')
-                model.readAllData() // in EDT
+                controller.openDir('.')
             }
         } catch (VpipeDataException vde) {
             JOptionPane.showMessageDialog(null,
@@ -153,5 +181,35 @@ class MainGui {
                     JOptionPane.ERROR_MESSAGE)
             throw e // to produce stacktrace on console...
         }
+
+        SwingUtilities.invokeLater {
+            // increase fonts in java 1.8
+            /*
+            JMenuBar menuBar = view.swing.menuBar
+            Font f = new FontUIResource(menuBar.getFont().getFontName(), menuBar.getFont().getStyle(), 25)
+            UIManager.put("Menu.font", f)
+            UIManager.put("MenuItem.font", f)
+            UIManager.put("Label.font", f)
+            UIManager.put("TextArea.font", f)
+            UIManager.put("Button.font", f)
+            */
+
+/*
+            int szIncr = 10; // Value to increase the size by
+            UIDefaults uidef = UIManager.getLookAndFeelDefaults();
+            for (Map.Entry<Object,Object> e : uidef.entrySet()) {
+                Object val = e.getValue();
+                if (val != null && val instanceof FontUIResource) {
+                    FontUIResource fui = (FontUIResource)val;
+                    uidef.put(e.getKey(), new FontUIResource(fui.getName(), fui.getStyle(), fui.getSize()+szIncr));
+                }
+            }
+            */
+            JFrame frame = view.swing.frame
+            SwingUtilities.updateComponentTreeUI(frame)
+
+        }
+
     }
+
 }

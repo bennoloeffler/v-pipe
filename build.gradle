@@ -26,6 +26,7 @@ dependencies {
     //implementation "org.codehaus.groovy:groovy-all:2.5.7"
     implementation 'org.tinylog:tinylog-impl:2.1.2'
     implementation 'org.tinylog:tinylog-api:2.1.2'
+    implementation name: 'flatlaf-0.37'
     implementation name: 'miglayout-4.0-swing'
     //implementation 'net.java.balloontip:balloontip:1.2.4.1'
 
@@ -36,15 +37,16 @@ dependencies {
 }
 
 launch4j {
-    mainClassName = 'core.Main'
+    mainClassName = 'application.Main'
     headerType='console'
     bundledJrePath='jre'
 }
 
+
 task createGui(type: edu.sc.seis.launch4j.tasks.Launch4jLibraryTask) {
     outfile = 'v-pipe-gui.exe'
-    mainClassName = 'newview.MainGui'
-    jvmOptions =['-Dsun.java2d.uiScale=1.5 ']
+    mainClassName = 'application.MainGui'
+    //jvmOptions =['-Dsun.java2d.uiScale=1.0']
 
 }
 

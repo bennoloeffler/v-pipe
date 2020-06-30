@@ -1,5 +1,11 @@
 package model
 
+import utils.FileSupport
+
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.StandardCopyOption
+
 
 class DataWriter {
 
@@ -43,8 +49,72 @@ class DataWriter {
         f << data
     }
 
+
+    def backup() {
+        def filesToMove = [
+                DataReader.TASK_FILE_NAME,
+                DataReader.PIPELINING_FILE_NAME,
+                DataReader.DATESHIFT_FILE_NAME,
+                DataReader.CAPA_FILE_NAME,
+                DataReader.TEMPLATE_FILE_NAME,
+        ]
+
+        def bDir = FileSupport.backupDirName(DataReader.currentDir)
+        assert new File(bDir).mkdirs()
+
+        filesToMove.each { fileName ->
+            File from = new File( DataReader.path(fileName))
+            File to = new File(bDir + '\\' + fileName)
+            //def r = from.renameTo(to)
+            //println(to.getCanonicalPath())
+            //to.createNewFile()
+            //Files.move(from.toPath(), to.toPath(), StandardCopyOption.REPLACE_EXISTING)
+            //to << from.text
+            //from.delete()
+            from.renameTo(to) // move without exception, if file is missing - but also ignore fails...
+        }
+    }
+
+
+
+
+    def writeSequenceToFile() {
+        def f = new File(DataReader.get_SEQUENCE_FILE_NAME())
+        f.delete()
+
+        model.projectSequence.each {
+            f << "$it\n"
+        }
+        /*
+        f.withObjectOutputStream { out ->
+            out.writeObject(model.projectSequence)
+        }*/
+    }
+
+    String getPipelining() {
+        StringBuffer result = new StringBuffer(model.maxPipelineSlots.toString()+'\n')
+        model.pipelineElements.each {
+            result << "${it.project.padLeft(20)} ${it.startDate.toString()} ${it.endDate.toString()} ${it.pipelineSlotsNeeded}\n"
+        }
+        result.toString()
+    }
+
+    def writePipliningToFile() {
+        String data = getPipelining()
+        def f = new File(DataReader.get_PIPELINING_FILE_NAME())
+        f.delete()
+        f << data
+    }
+
+
     void saveAll() {
+
+        backup()
+
         writeTasksToFile()
         writeCapaToFile()
+        writeSequenceToFile()
+        writePipliningToFile()
+        //wriiteDeliveriyDatetoFile()
     }
 }

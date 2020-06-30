@@ -14,31 +14,43 @@ class DataReader {
 
     static String currentDir = "test" // overwrite this for application!
 
-    private static String _TASK_FILE_NAME = "Projekt-Start-End-Abt-Kapa.txt"
-    private static String _PIPELINING_FILE_NAME = "Integrations-Phasen.txt"
-    private static String _DATESHIFT_FILE_NAME = "Projekt-Verschiebung.txt"
-    private static String _CAPA_FILE_NAME = "Abteilungs-Kapazitaets-Angebot.txt"
-    private static final String _TEMPLATE_FILE_NAME = "Template-Original-Verschiebung.txt"
+    private static String TASK_FILE_NAME = "Projekt-Start-End-Abt-Kapa.txt"
+    private static String PIPELINING_FILE_NAME = "Integrations-Phasen.txt"
+    private static String DATESHIFT_FILE_NAME = "Projekt-Verschiebung.txt"
+    private static String CAPA_FILE_NAME = "Abteilungs-Kapazitaets-Angebot.txt"
+    private static String TEMPLATE_FILE_NAME = "Template-Original-Verschiebung.txt"
+    private static String SEQUENCE_FILE_NAME = "Projekt_Sequenz.txt"
+
+    static String path(String fileName){
+        currentDir + "/" + fileName
+    }
 
     static String get_TASK_FILE_NAME() {
-        currentDir + "/" + _TASK_FILE_NAME
+        path TASK_FILE_NAME
     }
 
     static String get_PIPELINING_FILE_NAME() {
-        currentDir + "/" + _PIPELINING_FILE_NAME
+        path PIPELINING_FILE_NAME
     }
 
     static String get_DATESHIFT_FILE_NAME() {
-        currentDir + "/" + _DATESHIFT_FILE_NAME
+        path DATESHIFT_FILE_NAME
     }
 
     static String get_CAPA_FILE_NAME() {
-        currentDir + "/" + _CAPA_FILE_NAME
+        path CAPA_FILE_NAME
     }
 
     static String get_TEMPLATE_FILE_NAME() {
-        currentDir + "/" + _TEMPLATE_FILE_NAME
+        path TEMPLATE_FILE_NAME
     }
+
+    static String get_SEQUENCE_FILE_NAME() {
+        path SEQUENCE_FILE_NAME
+    }
+
+
+
     /**
      * reads data lines into a list of model.TaskInProject
      * Default file name: Projekt-Start-End-Abt-Capa.txt
@@ -152,7 +164,12 @@ class DataReader {
                     if( ! start.before(end)) {
                         throw new VpipeDataException(errMsg() + "\nStart liegt nicht vor Ende.")
                     }
-                    def pe = new PipelineOriginalElement(line[0], start, end, line[3].toInteger() )
+                    def pe = new PipelineOriginalElement(
+                            project: line[0],
+                            startDate: start,
+                            endDate: end,
+                            pipelineSlotsNeeded: line[3].toInteger()
+                    )
 
                     pipelineElements << pe
                 } catch (VpipeDataException v) {
@@ -273,5 +290,27 @@ class DataReader {
 
         result
     }
+
+
+
+    static List<String>  readSequence() {
+        String text = FileSupport.getTextOrEmpty(get_SEQUENCE_FILE_NAME())
+        return readSequence(text)
+    }
+
+    static List<String> readSequence(String text) {
+        List<List<String>> splitLines =  FileSupport.toSplitAndTrimmedLines(text)
+        return parseSequence(splitLines)
+    }
+
+    static List<String> parseSequence(List<List<String>> splitLines) {
+        List<String> result = []
+        for(List<String> line in splitLines) {
+            assert line.size() == 1
+            result << line[0]
+        }
+        result
+    }
+
 
 }

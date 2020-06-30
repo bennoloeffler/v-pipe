@@ -29,7 +29,7 @@ class PipelineModel extends GridModel {
         //
         // just for sorting projects to ending-date
         //
-        List<String> allProjects = getAllProjects()
+        List<String> allProjects = _getAllProjects()
         Map<String, List<TaskInProject>> projectsMap = [:]
         allProjects.each {
             projectsMap[it] = getProject(it)

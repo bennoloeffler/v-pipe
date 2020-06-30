@@ -26,12 +26,13 @@ class ConsoleTable {
         StringBuffer result = new StringBuffer()
         //println header
         //println table
+        def minus = '-' // or '─'
         result.append('| ')
         header.keySet().each {result.append(sprintf("${it} | "))}
 
         def tableWidth = result.size()-3
-        result.insert(0, '\n┌' +  ('─' * tableWidth) + '┐\n' )
-        result.append( '\n├' +  ('─' * tableWidth) +'┤\n' )
+        result.insert(0, '┌' +  (minus * tableWidth) + '┐\n' )
+        result.append( '\n├' +  (minus * tableWidth) +'┤\n' )
 
         for (line in table) {
             int column=0
@@ -70,7 +71,7 @@ class ConsoleTable {
             result.append('\n')
 
         }
-        result.append( '└' +  ('─' * tableWidth) +'┘\n' )
+        result.append( '└' +  (minus * tableWidth) +'┘' )
         result.toString()
 
     }

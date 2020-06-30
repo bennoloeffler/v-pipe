@@ -3,10 +3,12 @@ package application
 import model.DataWriter
 import model.Model
 import utils.RunTimer
+import utils.SystemInfo
 
 import javax.swing.JComponent
 import javax.swing.JFileChooser
 import javax.swing.JOptionPane
+import javax.swing.JSplitPane
 import java.awt.event.ActionEvent
 
 class GlobalController {
@@ -22,8 +24,7 @@ class GlobalController {
     def openActionPerformed = { ActionEvent e ->
         String dir = chooseDir('Datenverzeichnis öffnen', (JComponent)(e.source))
         if (dir) {
-            model.setCurrentDir(dir)
-            model.readAllData()
+            openDir(dir)
         }
 
     }
@@ -50,14 +51,35 @@ class GlobalController {
         }
     }
 
-    def printPerformanceActionPerformed = {ActionEvent e ->
-        println(RunTimer.getResultTable())
-    }
-
     def sortPipelineActionPerformed = {ActionEvent e ->
         println("sortPipelineActionPerformed")
         view.gridPipelineModel.sortProjectNamesToEnd()
     }
+
+    def pipelineViewActionPerformed = { ActionEvent e ->
+        view.openPipelineWindow()
+    }
+
+    def loadViewActionPerformed = { ActionEvent e ->
+        view.openLoadWindow()
+    }
+
+    def pipelineLoadViewActionPerformed = { ActionEvent e ->
+        view.openPipelineLoadWindow()
+    }
+
+    def helpActionPerformed = {ActionEvent e ->
+        Main.openBrowserWithHelp()
+    }
+
+    def printPerformanceActionPerformed = {ActionEvent e ->
+        println(SystemInfo.getSystemInfoTable())
+        println(RunTimer.getResultTable())
+
+    }
+
+
+
 
     private String chooseDir(String dialogTitle, JComponent root) {
         String result = null
@@ -89,6 +111,27 @@ class GlobalController {
         if (dialogButton == JOptionPane.NO_OPTION) {
             view.swing.frame.dispose()
             System.exit(0)
+        }
+    }
+
+    def openDir(String dir) {
+        model.setCurrentDir(dir)
+        model.readAllData() // in EDT
+        if(model.pipelineElements) {
+            view.swing.pipelineLoadViewScrollPane.setVisible(true)
+            //((JSplitPane)(view.swing.spV1)).setBottomComponent(view.swing.spV3) // with pipeline
+            //view.swing.spH.setDividerLocation(900)
+            view.swing.spV1.setDividerLocation(500)
+            view.swing.spV2.setDividerLocation(500)
+            view.swing.spV3.setDividerLocation(120)
+            //view.pipelineLoadView.setVisible(true)
+        } else {
+            view.swing.pipelineLoadViewScrollPane.setVisible(false)
+            //((JSplitPane)(view.swing.spV1)).setBottomComponent(view.swing.spSwap) // only load, without pipeline
+            //view.pipelineLoadView.setVisible(false)
+            //view.swing.spV1.setDividerLocation(500)
+            //view.swing.spV2.setDividerLocation(500)
+            //view.swing.spV3.setDividerLocation(120)
         }
     }
 
