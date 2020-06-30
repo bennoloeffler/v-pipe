@@ -239,12 +239,15 @@ gleichzeitig gearbeitet werden soll.
 
 ### Features
 
-TODO: 2020-06-xx `0.9.0-Pipelining`
-- halbautomatisches und visuelles Pipelining
+2020-06-30 `0.9.1-TePiLoSa`
+- Pipeline-View: Verschieben auch ohne piplining Daten crasht nicht mehr
 
-TODO: 2020-06-21 `0.8.0-LoadSave-Template`
+2020-06-30 `0.9.0-TePiLoSa`
+- visuelles Pipelining
+
+2020-06-21 `0.8.0-LoadSave-Template`
 - Speichern der Daten (in eigenem Daten-Ordner) - öffnen von Datenordnern
-- Datenfile für Portfolio auf Basis von Templates
+- Szeanrien im Portfolio auf Basis von Templates
 
 2020-06-14 `0.7.0-GUI-Project-Editor`
 - Tasks eines Projektes auch verschieben.

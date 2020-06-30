@@ -173,9 +173,11 @@ class NewPipelineModel extends GridModel {
             it.ending += shift
             it.starting += shift
         }
-        PipelineOriginalElement pe = model.getPipelineElement(projectName)
-        pe.startDate += shift
-        pe.endDate += shift
+        if(model.pipelineElements) {
+            PipelineOriginalElement pe = model.getPipelineElement(projectName)
+            pe.startDate += shift
+            pe.endDate += shift
+        }
 
         model.reCalcCapaAvailableIfNeeded()
         model.setUpdateToggle(!model.getUpdateToggle())
