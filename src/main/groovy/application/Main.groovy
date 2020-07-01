@@ -22,7 +22,7 @@ import java.awt.Desktop
  */
 class  Main {
 
-    static VERSION_STRING ='0.9.1-TePiLoSa'
+    static VERSION_STRING ='0.9.2-Search'
 
     static void main(String[] args) {
 
