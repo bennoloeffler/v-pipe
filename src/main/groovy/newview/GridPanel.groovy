@@ -27,6 +27,10 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
 
     GridModel model
 
+    @Bindable String hightlightLinePattern
+
+    @Bindable String nowString
+
     @Bindable int gridWidth
 
     //int borderWidth
@@ -256,10 +260,11 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
     }
 
 
-
-
     def cursorXChanged = { PropertyChangeEvent e ->
         invalidateAndRepaint(this)
+        def nowStr = model.getColumnNames()[cursorX]
+        setNowString(nowStr)
+        scrollToCursorXY()
     }
 
     /**
@@ -269,6 +274,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
      * @param model
      */
     GridPanel(int grid, GridModel model) {
+        setFocusable(true)
         this.gridWidth = grid
         minMaxGridCheck()
         updateOthersFromGridWidth(gridWidth, this)
@@ -285,6 +291,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
         } as PropertyChangeListener
         model.addPropertyChangeListener('updateToggle', l)
         addPropertyChangeListener('cursorX', cursorXChanged as PropertyChangeListener)
+        addPropertyChangeListener('hightlightLinePattern', l)
         setCursorToNow()
     }
 
@@ -307,7 +314,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
     protected void paintComponent(Graphics g1d) {
         super.paintComponent(g1d)
         //println(this.name)
-        def t = RunTimer.getTimerAndStart("${this.name} GridPanel::paintComponent ")
+        //def t = RunTimer.getTimerAndStart("${this.name} GridPanel::paintComponent ")
 
         Graphics2D g = g1d as Graphics2D
         hints(g)
@@ -324,8 +331,12 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
                 int graphY = borderWidth + y * gridWidth
                 if(graphX >= r.x-2*gridWidth && graphX <= r.x+2*gridWidth + r.width && graphY >= r.y-2*gridWidth && graphY <= r.y+2*gridWidth + r.height) {
                     // TODO: println "x: $x (sizeX: $model.sizeX) y: $y (sizeY: $model.sizeY)"
-                    if(model.sizeX == 0 || model.sizeY == 0) {t.stop(); return}
+                    if(model.sizeX == 0 || model.sizeY == 0) {
+                        //t.stop();
+                        return
+                    }
                     GridElement e = model.getElement(x, y)
+                    assert e != null
                     if (e != GridElement.nullElement || cursorX == x && cursorY == y) {
                         Color c = getColor(y)
                         g.setColor(c)
@@ -385,8 +396,14 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
         int y = 0
         model.getLineNames()
         model.getLineNames().each { String projectName ->
-            g.setColor(Color.LIGHT_GRAY)
             int gridY = borderWidth + y*gridWidth
+            if( hightlightLinePattern && projectName =~ hightlightLinePattern) {
+
+                g.setColor(new Color(150,255,255,100))
+                g.fillRoundRect(borderWidth , (int)(gridY+gridWidth/2)-2, borderWidth+gridWidth*model.sizeX,  4 , round, round)
+            } else {
+                g.setColor(Color.WHITE)
+            }
             g.fillRoundRect(borderWidth , gridY, nameWidth-4, gridWidth - 4 , round, round)
 
             if(gridWidth>0) {
@@ -412,7 +429,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
 
         int x = 0
         model.getColumnNames().each { String rowName ->
-            g.setColor(Color.LIGHT_GRAY)
+            g.setColor(Color.WHITE)
             int gridX = borderWidth + x*gridWidth + nameWidth
             int gridY = borderWidth + (model.sizeY) * gridWidth
             g.fillRoundRect(gridX , gridY, gridWidth-4, nameWidth - 4 , round, round)
@@ -447,7 +464,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
             x++
         }
 
-        t.stop()
+        //t.stop()
     }
 
     AffineTransform totalTransform = new AffineTransform()
@@ -489,6 +506,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
         g.fillRoundRect(graphX+offset, graphY+offset, size-4, size-4, round, round)
 
         // element in project color, integration phase color (orange), empty color (white)
+        assert e != null
         g.setColor( e.integrationPhase ? Color.orange : (e == e.nullElement ? Color.WHITE : c) )
 
         // or current mouse location color (overwrites even more)

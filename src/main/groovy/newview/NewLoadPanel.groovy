@@ -34,6 +34,7 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
 
     Closure updateCallback = {
         invalidateAndRepaint(this)
+        scrollToCursorX()
     }
 
     Closure updateFromGridWidthCallback = { PropertyChangeEvent e ->
@@ -42,6 +43,7 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
     }
 
     NewLoadPanel(int gridWidth, AbstractGridLoadModel model) {
+        setFocusable(true)
         this.model = model
         setGridWidth(gridWidth)
         updateOthersFromGridWidth(gridWidth, this)
@@ -123,6 +125,9 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
         gridX
     }
 
+    void scrollToCursorX() {
+        scrollRectToVisible(new Rectangle(nameWidth + cursorX * gridWidth - gridWidth, (int)(getVisibleRect().getY()), 3 * gridWidth, 3 * gridWidth))
+    }
 
     /**
      * @param g1d
@@ -213,7 +218,7 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
 
         int y = 0
         model.getYNames().each { String yNames ->
-            g.setColor(Color.LIGHT_GRAY)
+            g.setColor(Color.WHITE)
             int gridY = borderWidth + y * gridHeigth
             g.fillRoundRect(borderWidth , gridY, nameWidth-4, gridHeigth - 4 , round*3, round*3)
 

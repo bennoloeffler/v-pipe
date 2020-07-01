@@ -3,6 +3,7 @@ package application
 import groovy.beans.Bindable
 import groovy.transform.CompileStatic
 import model.Model
+import model.PipelineOriginalElement
 import model.TaskInProject
 import model.WeekOrMonth
 import newview.GridElement
@@ -57,17 +58,20 @@ class NewProjectModel extends GridModel {
 
         allProjectGridLines = []
         if (projectName) {
-            //
-            // just for sorting projects to ending-date
-            //
+
             project = model.getProject(projectName)
 
-            //project.sort {
-            //    it.ending
-            //}
+            if(model.pipelineElements) {
+                allProjectGridLines << fromPipelineElement(model.getPipelineElement(projectName), model.taskList)
+            }
+            //project.sort { it.ending }
+
             project.each {
                 allProjectGridLines << fromTask(it, model.taskList)
             }
+
+
+
         }
         t.stop()
     }
@@ -102,12 +106,36 @@ class NewProjectModel extends GridModel {
             }
         }
 
+
+        return gridElements
+    }
+
+    List<GridElement> fromPipelineElement(PipelineOriginalElement element, List<TaskInProject> all) {
+        assert element
+        def gridElements = []
+        Date startOfTask = _getStartOfWeek(element.startDate)
+        Date endOfTask = _getStartOfWeek(element.endDate) + 7
+        Date startOfGrid = _getStartOfWeek(all*.starting.min())
+        Date endOfGrid = _getStartOfWeek(all*.ending.max()) + 7
+        def fromToDateString = "${_dToS(startOfTask)} - ${_dToS(endOfTask)}"
+
+        for (Date w = startOfGrid; w < endOfGrid; w += 7) {
+            if (w >= startOfTask && w < endOfTask) {
+                gridElements << new GridElement(element.project, 'IP', "${_getWeekYearStr(w)}  ($fromToDateString)", true)
+            } else {
+                gridElements << GridElement.nullElement
+            }
+        }
+
         return gridElements
     }
 
 
     @Override
-    GridElement getElement(int x, int y) { allProjectGridLines[y][x] }
+    GridElement getElement(int x, int y) {
+        def r = allProjectGridLines[y][x]
+        r
+    }
 
     @Override
     int getSizeY() { allProjectGridLines.size() }
@@ -128,9 +156,26 @@ class NewProjectModel extends GridModel {
     }
 
     def shiftProject(int y, int shift) {
-        TaskInProject projectTask = project[y]
-        projectTask.ending += shift
-        projectTask.starting += shift
+        if(model.pipelineElements) {
+            if (y == 0) {
+                //Date startP = _getStartOfWeek(project*.starting.min())
+                //Date endProject = _getStartOfWeek(project*.ending.max() + 7)
+                Date potPipStartDate = model.getPipelineElement(projectName).startDate + shift
+                Date potPipEndDate = model.getPipelineElement(projectName).endDate + shift
+                //if (potPipStartDate >= startP && potPipEndDate <= endProject) {
+                model.getPipelineElement(projectName).startDate = potPipStartDate
+                model.getPipelineElement(projectName).endDate = potPipEndDate
+                //}
+            } else {
+                TaskInProject projectTask = project[y - 1]
+                projectTask.ending += shift
+                projectTask.starting += shift
+            }
+        } else {
+            TaskInProject projectTask = project[y]
+            projectTask.ending += shift
+            projectTask.starting += shift
+        }
     }
 
     def updateModelRecalcAndFire() {
@@ -166,6 +211,7 @@ class NewProjectModel extends GridModel {
     @Override
     List<String> getLineNames() {
         def r =[]
+        if(model.pipelineElements) {r << 'IP'}
         project.each {r << it.department}
         r
     }

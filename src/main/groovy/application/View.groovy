@@ -142,11 +142,11 @@ class View {
 
 
             action ( id: 'pipelineLoadViewAction',
-                    name: "Pipeline-Belastungs-Ansicht, separat",
+                    name: "IP-Belastungs-Ansicht, separat",
                     //mnemonic: 'p',
                     closure: {println "pipelineLoadViewAction not connected to application..."},
                     //accelerator: shortcut('P'),
-                    shortDescription: 'Pipeline-Belastung in gesondertem Fenster öffnen. Gerne mehrere. Multi-Monitor. Multi-View...'
+                    shortDescription: 'IP-Belastung in gesondertem Fenster öffnen. Gerne mehrere. Multi-Monitor. Multi-View...'
             )
 
             // help
@@ -202,11 +202,15 @@ class View {
                 }
 
                 //migLayout(layoutConstraints:"fill, debug", columnConstraints:"", rowConstraints:"[][grow]")
-                migLayout(layoutConstraints:"fill", columnConstraints:"", rowConstraints:"[][grow]")
+                migLayout(layoutConstraints:"fill", columnConstraints:"[][][][][][grow]", rowConstraints:"[][grow]")
+                label("Projekt markieren: ")
+                textField(id: 'searchTextField', columns: 20, constraints: 'width 100')
+                label("    Zeit-Markierung: ")
+                label("-----W--", id: 'timeLabel')
+                label("    Pfad: ")
+                label(id:'currentPath', constraints:  'wrap')
 
-                label(id:'currentPath', constraints:  'grow, wrap')
-
-                splitPane(id: 'spH', orientation: JSplitPane.HORIZONTAL_SPLIT, continuousLayout:true, dividerLocation: 0.5, constraints: 'grow') {
+                splitPane(id: 'spH', orientation: JSplitPane.HORIZONTAL_SPLIT, continuousLayout:true, dividerLocation: 0.5, constraints: 'grow, span') {
                     splitPane(id: 'spV1', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: 0.5) {
                         scrollPane {
                             widget(pipelineView)
@@ -230,7 +234,7 @@ class View {
                             widget(projectView)
                         }
                         scrollPane {
-                            textArea(id: 'textAreaLog')
+                            textArea(id: 'textAreaLog', editable: false)
                         }
 
                     }
@@ -294,7 +298,7 @@ class View {
     def openPipelineLoadWindow() {
         def newLoadView = new NewLoadPanel(20, gridPipelineLoadModel)
         swing.edt {
-            frame(id: "framePipelineLoad+${i++}", title: "v-pipe: Pipeline-Belastung", locationRelativeTo: null, show: true, pack:true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
+            frame(id: "framePipelineLoad+${i++}", title: "v-pipe: IP-Belastung", locationRelativeTo: null, show: true, pack:true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
                 scrollPane {
                     widget(newLoadView, name: "monthLoad$i++")
                 }

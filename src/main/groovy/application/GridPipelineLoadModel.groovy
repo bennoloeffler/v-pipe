@@ -114,7 +114,7 @@ class GridPipelineLoadModel extends AbstractGridLoadModel  {
 
     @Override
     List<String> getYNames() {
-        return  model.pipelineElements ? ['Pipeline'] : []
+        return  model.pipelineElements ? ['IP-Belastung'] : []
 
     }
 

@@ -6,6 +6,10 @@ import transform.DateShiftTransformer
 import transform.TemplateTransformer
 import utils.RunTimer
 
+import static extensions.DateHelperFunctions._getStartOfWeek
+import static extensions.DateHelperFunctions._getStartOfWeek
+import static extensions.DateHelperFunctions._getStartOfWeek
+import static extensions.DateHelperFunctions._getStartOfWeek
 import static model.WeekOrMonth.WEEK
 
 class Model {
@@ -200,7 +204,7 @@ class Model {
         t.stop()
     }
 
-    def fileErr =""
+    def fileErr = {""}
 
     Map<String, Map<String, YellowRedLimit>> calcCapa(def jsonSlurp) {
 
@@ -321,6 +325,29 @@ class Model {
         }
     }
 
+    def checkPipelineInProject() {
+        if(pipelineElements) {
+            fileErr = { " beim Lesen der Datei ${DataReader.get_PIPELINING_FILE_NAME()}\n" }
+            pipelineElements.each {
+                List<TaskInProject> p = getProject(it.project)
+                if(p) {
+                    Date startOfPipeline = _getStartOfWeek(it.startDate)
+                    Date endOfPipeline = _getStartOfWeek(it.endDate) + 7
+                    Date startOfProject = _getStartOfWeek(p*.starting.min())
+                    Date endOfProject = _getStartOfWeek(p*.ending.max()) + 7
+                    if(startOfPipeline < startOfProject) {
+                        println("WARNUNG ${fileErr()}Projekt: $it.project... Integrations-Phase außerhalb des Projektes")
+                    }
+                    if(endOfPipeline > endOfProject) {
+                        println("WARNUNG ${fileErr()}Projekt: $it.project... Integrations-Phase außerhalb des Projektes")
+                    }
+                }else{
+                    throw new VpipeDataException("Fehler ${fileErr()}Projekt: $it.project existiert nicht in Projekt-Daten")
+                }
+            }
+        }
+    }
+
     def check() {
         List<String> depsTasks = getAllDepartments()
         Set<String> depsCapa= capaAvailable.keySet()
@@ -375,6 +402,8 @@ class Model {
             // read the integrationPhaseData
             //
             (maxPipelineSlots, pipelineElements) = DataReader.readPipelining()
+            checkPipelineInProject()
+
 
             //
             // FIRST move projects - if needed

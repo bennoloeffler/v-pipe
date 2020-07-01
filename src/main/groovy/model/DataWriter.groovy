@@ -57,6 +57,7 @@ class DataWriter {
                 DataReader.DATESHIFT_FILE_NAME,
                 DataReader.CAPA_FILE_NAME,
                 DataReader.TEMPLATE_FILE_NAME,
+                DataReader.SEQUENCE_FILE_NAME,
         ]
 
         def bDir = FileSupport.backupDirName(DataReader.currentDir)
@@ -112,9 +113,13 @@ class DataWriter {
         backup()
 
         writeTasksToFile()
-        writeCapaToFile()
+        if(model.capaAvailable) {
+            writeCapaToFile()
+        }
         writeSequenceToFile()
-        writePipliningToFile()
+        if(model.pipelineElements) {
+            writePipliningToFile()
+        }
         //wriiteDeliveriyDatetoFile()
     }
 }
