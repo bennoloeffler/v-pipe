@@ -102,10 +102,16 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
 
         def gridX = getGridXFromMouseX(event.x)
         def gridY = getGridYFromMouseY(event.y)
+        if(gridX < 0) {
+            return model.getLineNames()[gridY]
+        }
+        if(gridY > model.getSizeY()-1) {
+            return model.getColumnNames()[gridX]
+        }
         if (gridX >= 0 && gridX < model.sizeX && gridY >= 0 && gridY < model.sizeY) {
             def element = model.getElement(gridX, gridY)
             if (element == GridElement.nullElement) {
-                return null
+                return model.getLineNames()[gridY] + '  ' + model.getColumnNames()[gridX]
             }
 
             // <br/>$element.fromToDateString
