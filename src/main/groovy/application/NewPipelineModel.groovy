@@ -19,17 +19,9 @@ import static extensions.DateHelperFunctions.*
 //@CompileStatic
 class NewPipelineModel extends GridModel {
 
-    @Bindable
-    String selectedProject
-
+    @Bindable String selectedProject
     List<List<GridElement>> allProjectGridLines
-
-    // TODO: write this to model and save it
-    //List<String> allProjectNames =[]
-
     int nowXRowCache = -1
-
-    //@Delegate
     Model model
 
     def tasksPropertyListener = { PropertyChangeEvent e ->
@@ -47,25 +39,11 @@ class NewPipelineModel extends GridModel {
     NewPipelineModel(Model model) {
         this.model = model
         model.addPropertyChangeListener(tasksPropertyListener as PropertyChangeListener)
-
-        //updateProjectNames()
-
         updateGridElements()
     }
 
-    //@CompileStatic(TypeCheckingMode.SKIP)
-    /*void updateProjectNames() {
-        List<String> current = getAllProjects()
-        List<String> intersect = current.intersect(allProjectNames)
-        List<String> toRemove = allProjectNames - intersect
-        List<String> toAdd = current - intersect
-        allProjectNames.removeAll(toRemove)
-        allProjectNames.addAll(toAdd)
-    }*/
-
     void sortProjectNamesToEnd() {
 
-        //List<String> allProjects = getAllProjects()
         Map<String, List<TaskInProject>> projectsMap = [:]
         model.projectSequence.each {
             projectsMap[it] = model.getProject(it)
@@ -74,10 +52,7 @@ class NewPipelineModel extends GridModel {
             projectsMap[p2]*.ending.max() <=> projectsMap[p1]*.ending.max()
         }
 
-
-
         model.projectSequence = allProjectNames
-
 
         updateGridElements()
         this.setUpdateToggle(!this.getUpdateToggle()) // just to fire an PropertyChange to the view
@@ -157,7 +132,6 @@ class NewPipelineModel extends GridModel {
     def moveLeft(int y) {
         shiftProject(y, -7)
         updateGridElements()
-
     }
 
     @Override
@@ -185,8 +159,6 @@ class NewPipelineModel extends GridModel {
 
     @Override
     def toggleIntegrationPhase(int x, int y) {
-        // TODO: Write to other model first...
-        // TODO: connect integration phase
         allProjectGridLines[y][x].integrationPhase = ! allProjectGridLines[y][x].integrationPhase
     }
 

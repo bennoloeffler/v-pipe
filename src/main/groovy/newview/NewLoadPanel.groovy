@@ -330,7 +330,7 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
             g.drawLine(x, y + percentShift, x + sizeX - 4, y + percentShift)
 
             //
-            // write percantage
+            // write percentage
             //
             String p = String.format('%.0f', val / yellow * 100) + "%"
 
@@ -339,9 +339,10 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
             //g.getClipBounds(rBackup)
             //g.setClip(x, y, sizeX-8 , sizeY-8)
             g.setFont(g.getFont().deriveFont((float) fontSize))
-            g.setColor(Color.WHITE)
+            if(val > red) {g.setColor(Color.BLACK)}else{g.setColor(Color.WHITE)}
             g.drawString(p, x + 4, y + gridHeigth - (int) fontSize)
-            g.setColor(Color.BLACK)
+            if(val > red) {g.setColor(Color.WHITE)}else{g.setColor(Color.BLACK)}
+            //g.setColor(Color.BLACK)
             g.drawString(p, x + 4 - 1, y + gridHeigth - (int) fontSize - 1)
             //g.setClip(rBackup)
         }

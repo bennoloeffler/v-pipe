@@ -22,6 +22,9 @@ class NewProjectModel extends GridModel {
     @Bindable
     String projectName =""
 
+    @Bindable
+    String departmentName =""
+
     int nowXRowCache = -1
     List<TaskInProject> project = []
 
@@ -200,7 +203,8 @@ class NewProjectModel extends GridModel {
 
     @Override
     def setSelectedElement(int x, int y) {
-        //throw new RuntimeException('not yet implemented')
+        setDepartmentName(getLineNames()[y])
+
     }
 
     @Override

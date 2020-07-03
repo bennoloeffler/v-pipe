@@ -159,6 +159,8 @@ class MainGui {
             // sync indicators in tools and status line
             bind(target: view.pipelineView, targetProperty: 'hightlightLinePattern', source: view.swing.searchTextField, sourceProperty: 'text')
             bind(target: view.swing.timeLabel, targetProperty: 'text', source: view.pipelineView, sourceProperty: 'nowString')
+            bind(target: view.swing.projectLabel, targetProperty: 'text', source: view.gridPipelineModel, sourceProperty: 'selectedProject')
+            bind(target: view.swing.depLabel, targetProperty: 'text', source: view.gridProjectModel, sourceProperty: 'departmentName')
         }
 
         ToolTipManager.sharedInstance().setDismissDelay(15000) // 15 seconds

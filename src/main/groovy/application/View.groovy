@@ -12,11 +12,14 @@ import newview.NewLoadPanel
 
 import javax.swing.JComponent
 import javax.swing.JFrame
+import javax.swing.JLabel
 import javax.swing.JSplitPane
 import javax.swing.JTextArea
 import java.awt.Dimension
 import java.awt.Font
 import java.awt.Toolkit
+
+import static java.awt.Color.*
 
 class View {
 
@@ -202,11 +205,15 @@ class View {
                 }
 
                 //migLayout(layoutConstraints:"fill, debug", columnConstraints:"", rowConstraints:"[][grow]")
-                migLayout(layoutConstraints:"fill", columnConstraints:"[][][][][][grow]", rowConstraints:"[][grow]")
-                label("Projekt markieren: ")
-                textField(id: 'searchTextField', columns: 20, constraints: 'width 100')
-                label("    Zeit-Markierung: ")
-                label("-----W--", id: 'timeLabel')
+                migLayout(layoutConstraints:"fill", columnConstraints:"[][][][][][][][][][][grow]", rowConstraints:"[][grow]")
+                label("Projekt suchen: ")
+                textField(id: 'searchTextField', toolTipText: 'Tutorial & Experimente: regex101.com', constraints: 'width 100')
+                label("    Zeit-Marke: ")
+                label("", id: 'timeLabel', foreground:BLUE)
+                label("    Projekt-Marke: ")
+                label("", id: 'projectLabel', foreground:BLUE)
+                label("    Abt-Marke: ")
+                label("", id: 'depLabel', foreground:BLUE)
                 label("    Pfad: ")
                 label(id:'currentPath', constraints:  'wrap')
 
@@ -262,6 +269,10 @@ class View {
             swing.spV1.setDividerLocation(500)
             swing.spV2.setDividerLocation(500)
             swing.spV3.setDividerLocation(120)
+            //JLabel label = (JLabel)(swing.timeLabel)
+            //label.setForeground(BLUE)
+
+
         }
     }
 
