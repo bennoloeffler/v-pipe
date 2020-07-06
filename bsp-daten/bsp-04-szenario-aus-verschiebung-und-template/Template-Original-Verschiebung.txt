@@ -1,0 +1,48 @@
+p-Kopie-01 p1 -100
+p-Kopie-02 p1 -50
+p-Kopie-03 p1 -25
+p-Kopie-04 p1 1
+p-Kopie-05 p1 25
+p-Kopie-06 p1 50
+p-Kopie-07 p1 75
+p-Kopie-08 p1 100
+p-Kopie-09 p1 110
+p-Kopie-10 p1 120
+p-Kopie-11 p1 130
+
+nua-012 Neu-Ulm-Anlage -100
+nua-013 Neu-Ulm-Anlage -80
+nua-014 Neu-Ulm-Anlage -60
+nua-015 Neu-Ulm-Anlage -40
+nua-016 Neu-Ulm-Anlage -20
+nua-017 Neu-Ulm-Anlage   0
+nua-018 Neu-Ulm-Anlage 20
+nua-019 Neu-Ulm-Anlage 40
+nua-0112 Neu-Ulm-Anlage 60
+nua-0113 Neu-Ulm-Anlage 80
+nua-0114 Neu-Ulm-Anlage 100
+nua-0115 Neu-Ulm-Anlage 120
+nua-0116 Neu-Ulm-Anlage 130
+nua-0117 Neu-Ulm-Anlage 140
+
+
+
+p2-k-011 pro2 13
+p2-k-012 pro2 23
+p2-k-013 pro2 33
+p2-k-014 pro2 43
+p2-k-015 pro2 53
+p2-k-016 pro2 63
+p2-k-017 pro2 73
+p2-k-018 pro2 83
+p2-k-019 pro2 93
+p2-k-0112 pro2 103
+p2-k-021 pro2 113
+p2-k-031 pro2 123
+p2-k-041 pro2 34
+p2-k-051 pro2 35
+p2-k-061 pro2 36
+p2-k-071 pro2 37
+p2-k-081 pro2 38
+p2-k-091 pro2 39
+p2-k-001 pro2 39

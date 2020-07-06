@@ -239,6 +239,9 @@ gleichzeitig gearbeitet werden soll.
 
 ### Features
 
+2020-07-06 `0.9.3-BetaPhase`
+- minor changes like examples, docu, marker, fucus by tab and mouse, mouse-cursor, tooltips (d)
+ 
 2020-06-30 `0.9.1-TePiLoSa`
 - Pipeline-View: Verschieben auch ohne piplining Daten crasht nicht mehr
 

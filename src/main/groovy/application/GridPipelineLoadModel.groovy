@@ -55,14 +55,17 @@ class GridPipelineLoadModel extends AbstractGridLoadModel  {
                     Date start = timeStr.toDateFromYearWeek()
                     Date end = start + 7
                     long overlap = element.getDaysOverlap(start, end)
-                    double capaNeeded = overlap / 7
-                    if (gridElements[timeStr]) {
-                        gridElements[timeStr].load += capaNeeded
-                    } else {
-                        gridElements[timeStr] = new GridLoadElement('', timeStr, capaNeeded, 0, model.maxPipelineSlots, model.maxPipelineSlots, [])
-                    }
+                    double capaNeeded = ((double)overlap / 7) * element.pipelineSlotsNeeded
+                    //println("$overlap $capaNeeded $timeStr --> $element")
+                    //if(capaNeeded > 0) {
+                        if (gridElements[timeStr]) {
+                            gridElements[timeStr].load += capaNeeded
+                        } else {
+                            gridElements[timeStr] = new GridLoadElement('', timeStr, capaNeeded, 0, model.maxPipelineSlots, model.maxPipelineSlots, [])
+                        }
+                    //}
                 }
-                maxVal = Math.max(gridElements[timeStr].load, maxVal)
+                maxVal = Math.max(gridElements[timeStr]?.load?:0, maxVal)
             }
         }
         t.stop()

@@ -10,6 +10,8 @@ import newview.GridModel
 import newview.GridPanel
 import newview.NewLoadPanel
 
+import javax.swing.Icon
+import javax.swing.ImageIcon
 import javax.swing.JComponent
 import javax.swing.JFrame
 import javax.swing.JLabel
@@ -17,11 +19,14 @@ import javax.swing.JSplitPane
 import javax.swing.JTextArea
 import java.awt.Dimension
 import java.awt.Font
+import java.awt.Image
 import java.awt.Toolkit
 
 import static java.awt.Color.*
 
 class View {
+
+    Image frameIcon
 
     Dimension screenDimension = Toolkit.getDefaultToolkit().getScreenSize()
 
@@ -47,6 +52,7 @@ class View {
 
     View(Model model) {
         this.model = model
+        frameIcon = new ImageIcon(getClass().getResource("/icons/vunds_icon_64x64_t.png")).getImage()
         build()
 
         // TODO: move to Bilder?
@@ -143,7 +149,6 @@ class View {
                     shortDescription: 'Abt-Belastung in gesondertem Fenster öffnen. Gerne mehrere. Multi-Monitor. Multi-View...'
             )
 
-
             action ( id: 'pipelineLoadViewAction',
                     name: "IP-Belastungs-Ansicht, separat",
                     //mnemonic: 'p',
@@ -151,6 +156,15 @@ class View {
                     //accelerator: shortcut('P'),
                     shortDescription: 'IP-Belastung in gesondertem Fenster öffnen. Gerne mehrere. Multi-Monitor. Multi-View...'
             )
+
+            action ( id: 'projectViewAction',
+                    name: "Projekt-Ansicht, separat",
+                    //mnemonic: 'p',
+                    closure: {println "projectViewAction not connected to application..."},
+                    //accelerator: shortcut('P'),
+                    shortDescription: 'Projekt-Ansicht in gesondertem Fenster öffnen. Gerne mehrere. Multi-Monitor. Multi-View...'
+            )
+
 
             // help
 
@@ -179,7 +193,7 @@ class View {
 
             //lookAndFeel 'nimbus'
 
-            f = frame(id: 'frame', title: 'v-pipe    |  +/- = Zoom  |  Pfeile = Cursor bewegen  |  Shift+Pfeile = Projekt bewegen  | CTRL-o = öffnen  ', locationRelativeTo: null, show: false, defaultCloseOperation: JFrame.DO_NOTHING_ON_CLOSE) {
+            f = frame(id: 'frame', iconImage: frameIcon, title: 'v-pipe    |  +/- = Zoom  |  Pfeile = Cursor bewegen  |  Shift+Pfeile = Projekt bewegen  |  d = Details an/aus', locationRelativeTo: null, show: false, defaultCloseOperation: JFrame.DO_NOTHING_ON_CLOSE) {
 
                 menuBar(id: 'menuBar') {
                     menu(text:'Dateien', mnemonic:'D') {
@@ -190,13 +204,12 @@ class View {
                     }
                     menu(text:'Werkzeug', mnemonic:'W') {
                         menuItem(sortPipelineAction)
-                        //menuItem(viewPipelineLoadAction)
                     }
                     menu(text:'Ansicht', mnemonic:'A') {
                         menuItem(pipelineViewAction)
-                        //menuItem(projectViewAction)
                         menuItem(loadViewAction)
                         menuItem(pipelineLoadViewAction)
+                        menuItem(projectViewAction)
                     }
                     menu(text:'Hilfe', mnemonic:'H') {
                         menuItem(helpAction)
@@ -253,7 +266,7 @@ class View {
 
 
     def setFullSize(JFrame f) {
-        f.setSize((int)(screenDimension.width), (int)(screenDimension.height - 30))
+        f.setSize((int)(screenDimension.width), (int)(screenDimension.height - 50))
         f.setLocation(0, 0)
     }
 
@@ -282,7 +295,7 @@ class View {
         def newPipelineView = new GridPanel(20, gridPipelineModel)
         swing.edt {
 
-            frame(id: "framePipeline+${i++}", title: "v-pipe: Staffelung", locationRelativeTo: null, show: true, pack:true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
+            frame(id: "framePipeline+${i++}", iconImage: frameIcon, title: "v-pipe: Staffelung", locationRelativeTo: null, show: true, pack:true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
                 scrollPane {
                     widget(newPipelineView)
                 }
@@ -295,7 +308,7 @@ class View {
     def openLoadWindow() {
         def newLoadView = new NewLoadPanel(20, gridLoadModel)
         swing.edt {
-            frame(id: "frameLoad+${i++}", title: "v-pipe: Abt.-Belastung", locationRelativeTo: null, show: true, pack:true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
+            frame(id: "frameLoad+${i++}", iconImage: frameIcon, title: "v-pipe: Abt.-Belastung", locationRelativeTo: null, show: true, pack:true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
                 scrollPane {
                     widget(newLoadView)
                 }
@@ -309,13 +322,27 @@ class View {
     def openPipelineLoadWindow() {
         def newLoadView = new NewLoadPanel(20, gridPipelineLoadModel)
         swing.edt {
-            frame(id: "framePipelineLoad+${i++}", title: "v-pipe: IP-Belastung", locationRelativeTo: null, show: true, pack:true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
+            frame(id: "framePipelineLoad+${i++}", iconImage: frameIcon, title: "v-pipe: IP-Belastung", locationRelativeTo: null, show: true, pack:true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
                 scrollPane {
                     widget(newLoadView, name: "monthLoad$i++")
                 }
             }
             bind(target: newLoadView, targetProperty: 'cursorX', source: pipelineView, sourceProperty: "cursorX")
             bind(target: pipelineView, targetProperty: 'cursorX', source: newLoadView, sourceProperty: "cursorX")
+        }
+    }
+
+
+    def openProjectWindow() {
+        def newProjectView = new GridPanel(20, gridProjectModel)
+        swing.edt {
+            frame(id: "frameProjectLoad+${i++}", iconImage: frameIcon, title: "v-pipe: Projekt", locationRelativeTo: null, show: true, pack:true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
+                scrollPane {
+                    widget(newProjectView, name: "monthLoad$i++")
+                }
+            }
+            bind(target: newProjectView, targetProperty: 'cursorX', source: pipelineView, sourceProperty: "cursorX")
+            bind(target: pipelineView, targetProperty: 'cursorX', source: newProjectView, sourceProperty: "cursorX")
         }
     }
 }

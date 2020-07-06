@@ -18,8 +18,9 @@ import java.beans.PropertyChangeListener
  * It has a GridModel to
  */
 @CompileStatic
-class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListener, MouseListener, KeyListener, PanelBasics {
+class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListener, MouseListener, KeyListener, FocusListener, PanelBasics {
 
+    Image frameIcon = new ImageIcon(getClass().getResource("/icons/vunds_icon_ 400x400.png")).getImage()
 
     //Color cursorColor = new Color(255, 10, 50, 160)
     //Color nowBarColor = new Color(255, 0, 0, 60)
@@ -32,6 +33,8 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
     @Bindable String nowString
 
     @Bindable int gridWidth
+
+    @Bindable detailsToolTip = true
 
     //int borderWidth
     //int nameWidth
@@ -52,7 +55,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
     /**
      * start and end of the last mouse-drag operation
      */
-    int startDragX = -1, startDragY = 1, endDragX = 1, endDragY = -1
+    //int startDragX = -1, startDragY = 1, endDragX = 1, endDragY = -1
 
 
 
@@ -60,6 +63,22 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
     /**
      * the Mouse- and KeyListener, that gets all the commands and acts like a application
      */
+
+
+    //
+    // Focus Listener
+    //
+
+    @Override
+    void focusGained(FocusEvent e) {
+
+    }
+
+    @Override
+    void focusLost(FocusEvent e) {
+        mouseX = -1
+        invalidateAndRepaint(this)
+    }
 
     //
     // MouseWheelListener
@@ -91,18 +110,23 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
 
     @Override
     void mouseMoved(MouseEvent e) {
+        mouseX = e.getX()
+        mouseY = e.getY()
         mouseMoved(e, this)
+        invalidateAndRepaint(this)
     }
 
 
 
     @Override
     String getToolTipText(MouseEvent event) {
+        if(!detailsToolTip) {return null}
+
         String html = null
 
         def gridX = getGridXFromMouseX(event.x)
         def gridY = getGridYFromMouseY(event.y)
-        if(gridX < 0) {
+        if(gridX < 0 || gridX > model.sizeX-1) {
             return model.getLineNames()[gridY]
         }
         if(gridY > model.getSizeY()-1) {
@@ -121,7 +145,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
                                 p  { color: black; font-family: courier; font-size: 120%; } </style> </head>
                                 
                                 <body>
-                                    <h1>$element.project</h1>
+                                    <h1>$element.project </h1>
                                     <p>
                                         KW & Start-Ende: $element.timeString<br/>
                                     </p>
@@ -130,6 +154,17 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
                          """
         }
         return html
+    }
+
+    @Override
+    Point getToolTipLocation(MouseEvent event) {
+        if(!detailsToolTip){return null}
+        def gridX = (int)((event.x-borderWidth-nameWidth)/gridWidth)
+        def locX = gridX*gridWidth + borderWidth + nameWidth + 2*gridWidth
+        def gridY = (int)((event.y-borderWidth)/gridWidth)
+        def locY = gridY*gridWidth + borderWidth
+
+        return new Point(locX, locY)
     }
 
 
@@ -154,19 +189,23 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
 
     @Override
     void mousePressed(MouseEvent e) {
-        startDragX = e.getX()
-        startDragY = e.getY()
+        //startDragX = e.getX()
+        //startDragY = e.getY()
     }
 
     @Override
     void mouseReleased(MouseEvent e) {
-        endDragX = e.getX()
-        endDragY = e.getY()
-        startDragX = startDragY = endDragX = endDragY = -1
+        //endDragX = e.getX()
+        //endDragY = e.getY()
+        //startDragX = startDragY = endDragX = endDragY = -1
     }
 
     @Override
-    void mouseEntered(MouseEvent e) {}
+    @CompileStatic(TypeCheckingMode.SKIP)
+    void mouseEntered(MouseEvent e) {
+        requestFocusInWindow()
+        ToolTipManager.sharedInstance().hideTipWindow()
+    }
 
     @Override
     void mouseExited(MouseEvent e) {}
@@ -179,6 +218,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
     void keyTyped(KeyEvent e) {}
 
     @Override
+    @CompileStatic(TypeCheckingMode.SKIP)
     void keyPressed(KeyEvent e){
 
         if(KeyEvent.VK_I == e.getKeyCode()) {
@@ -191,6 +231,26 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
 
         if(KeyEvent.VK_L == e.getKeyCode()) {
             //VpipeGui.openLoad()
+        }
+
+        if(KeyEvent.VK_D == e.getKeyCode()) {
+            setDetailsToolTip(!detailsToolTip)
+            if(detailsToolTip) {
+                MouseEvent phantom = new MouseEvent(
+                        this,
+                        MouseEvent.MOUSE_MOVED,
+                        System.currentTimeMillis(),
+                        0,
+                        mouseX,
+                        mouseY,
+                        0,
+                        false)
+
+                ToolTipManager.sharedInstance().mouseMoved(phantom)
+                ToolTipManager.sharedInstance().showTipWindow()
+            }else{
+                ToolTipManager.sharedInstance().hideTipWindow()
+            }
         }
 
         if(KeyEvent.VK_PLUS == e.getKeyCode()) {
@@ -289,6 +349,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
         addMouseMotionListener(this)
         addMouseListener(this)
         addMouseWheelListener(this)
+        addFocusListener(this)
         this.model = model
         PropertyChangeListener l = {
             SwingUtilities.invokeLater {
@@ -320,11 +381,12 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
     protected void paintComponent(Graphics g1d) {
         super.paintComponent(g1d)
         //println(this.name)
-        //def t = RunTimer.getTimerAndStart("${this.name} GridPanel::paintComponent ")
+        def t = RunTimer.getTimerAndStart("${this.name} GridPanel::paintComponent ")
 
         Graphics2D g = g1d as Graphics2D
         hints(g)
         g.getClipBounds(r)
+
 
 
         //
@@ -338,7 +400,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
                 if(graphX >= r.x-2*gridWidth && graphX <= r.x+2*gridWidth + r.width && graphY >= r.y-2*gridWidth && graphY <= r.y+2*gridWidth + r.height) {
                     // TODO: println "x: $x (sizeX: $model.sizeX) y: $y (sizeY: $model.sizeY)"
                     if(model.sizeX == 0 || model.sizeY == 0) {
-                        //t.stop();
+                        t.stop()
                         return
                     }
                     GridElement e = model.getElement(x, y)
@@ -360,6 +422,17 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
         }
         int round = (size / 2) as int // corner diameter
 
+        if(mouseX>0) {
+            int gridX = (int)((mouseX-nameWidth-borderWidth)/gridWidth)
+            //int gridY = (int)((mouseY-borderWidth)/gridHeigth)
+            //println ("$gridX ")
+            // shadow
+            //g.setColor(nowBarShadowColor)
+            //g.fillRoundRect(nowGraphX + offset, +offset, size - 4, nowGraphY + borderWidth - 4, round, round)
+            // element in project color, integration phase color (orange), empty color (white)
+            g.setColor(mouseColor)
+            g.fillRoundRect((int)(borderWidth+nameWidth+gridX*gridWidth+gridWidth/4), borderWidth,  (int)(gridWidth/2), gridWidth*model.sizeY,  round, round)
+        }
 
         //
         // paint the now-indicator row above everything else
@@ -429,6 +502,8 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
             y++
         }
 
+        g.drawImage(frameIcon, (int)borderWidth,  (int)(borderWidth + y*gridWidth), nameWidth-4, nameWidth-4,  null)
+
         //
         // draw the row names
         //
@@ -470,7 +545,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
             x++
         }
 
-        //t.stop()
+        t.stop()
     }
 
     AffineTransform totalTransform = new AffineTransform()
@@ -503,8 +578,8 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
         int round = (size / 2) as int // corner diameter
         int graphX = borderWidth + x * gridWidth + nameWidth// position
         int graphY = borderWidth + y * gridWidth // position
-        //int gridMouseX = getGridXFromMouseX()
-        //int gridMouseY = getGridYFromMouseY()
+        int gridMouseX = getGridXFromMouseX()
+        int gridMouseY = getGridYFromMouseY()
         //println("gridMouseX=$gridMouseX gridMouseY=$gridMouseY")
 
         // shadow
@@ -516,11 +591,13 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
         g.setColor( e.integrationPhase ? Color.orange : (e == e.nullElement ? Color.WHITE : c) )
 
         // or current mouse location color (overwrites even more)
-        //if(x==gridMouseX && y == gridMouseY) {
-        //    g.setColor(makeTransparent(g.getColor(), 120))
-        //} //g.setColor(Color.LIGHT_GRAY)}
-
+        if(x==gridMouseX && y == gridMouseY) {
+            //println "x $x, y $y (gmx $gridMouseX, gmy $gridMouseY)"
+            g.setColor(new Color(255,0,0,150))
+        } //g.setColor(Color.LIGHT_GRAY)}
         g.fillRoundRect(graphX, graphY, size-4 , size-4, round, round)
+        g.fillRoundRect(graphX, graphY, size-4 , size-4, round, round)
+
 
         // or cursor color (overwrites everything)
         if(x==cursorX && y == cursorY) {

@@ -68,6 +68,10 @@ class GlobalController {
         view.openPipelineLoadWindow()
     }
 
+    def projectViewActionPerformed = { ActionEvent e ->
+        view.openProjectWindow()
+    }
+
     def helpActionPerformed = {ActionEvent e ->
         Main.openBrowserWithHelp()
     }

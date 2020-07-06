@@ -6,12 +6,18 @@ import groovy.transform.TypeCheckingMode
 import utils.RunTimer
 
 import javax.swing.JPanel
+import javax.swing.JToolTip
+import javax.swing.ToolTipManager
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.Graphics
 import java.awt.Graphics2D
+import java.awt.Point
 import java.awt.Rectangle
+import java.awt.event.FocusEvent
+import java.awt.event.FocusListener
 import java.awt.event.KeyEvent
+import java.awt.event.KeyListener
 import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
 import java.awt.event.MouseMotionListener
@@ -20,7 +26,7 @@ import java.awt.event.MouseWheelListener
 import java.beans.PropertyChangeEvent
 
 @CompileStatic
-class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener, PanelBasics {
+class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, FocusListener, PanelBasics {
 
     //Color nowBarShadowColor = new Color(50, 50, 50, 30)
 
@@ -29,6 +35,11 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
     @Bindable int cursorX = -1
     //int gridHeigth
     //int nameWidth
+
+    @Bindable boolean detailsToolTip = true
+
+    int mouseX
+    int mouseY
 
     AbstractGridLoadModel model
 
@@ -54,9 +65,24 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
         addMouseMotionListener(this)
         addMouseWheelListener(this)
         addMouseListener(this)
+        addKeyListener(this)
+        addFocusListener(this)
     }
 
+    //
+    // Focus Listener
+    //
 
+    @Override
+    void focusGained(FocusEvent e) {
+
+    }
+
+    @Override
+    void focusLost(FocusEvent e) {
+        mouseX = -1
+        invalidateAndRepaint(this)
+    }
 
     //
     // MouseWheelListener
@@ -102,11 +128,90 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
     @Override
     void mouseReleased(MouseEvent e) {}
 
-    @Override
-    void mouseEntered(MouseEvent e) {}
+    @Override @CompileStatic(TypeCheckingMode.SKIP)
+    void mouseEntered(MouseEvent e) {
+        requestFocusInWindow()
+        ToolTipManager.sharedInstance().hideTipWindow()
+    }
 
     @Override
     void mouseExited(MouseEvent e) {}
+
+
+    @Override
+    void mouseMoved(MouseEvent e) {
+        mouseMoved(e, this)
+        mouseX = e.x
+        mouseY = e.y
+        invalidateAndRepaint(this)
+    }
+
+
+    //
+    // KeyListener
+    //
+
+    @Override
+    void keyTyped(KeyEvent e) {}
+
+    @Override
+    @CompileStatic(TypeCheckingMode.SKIP)
+    void keyPressed(KeyEvent e){
+
+        if(KeyEvent.VK_D == e.getKeyCode()) {
+            setDetailsToolTip(!detailsToolTip)
+            if(detailsToolTip) {
+                MouseEvent phantom = new MouseEvent(
+                        this,
+                        MouseEvent.MOUSE_MOVED,
+                        System.currentTimeMillis(),
+                        0,
+                        mouseX,
+                        mouseY,
+                        0,
+                        false)
+
+                ToolTipManager.sharedInstance().mouseMoved(phantom)
+                ToolTipManager.sharedInstance().showTipWindow()
+            }else{
+                ToolTipManager.sharedInstance().hideTipWindow()
+            }
+        }
+
+        if(KeyEvent.VK_O == e.getKeyCode()) {
+            //openFile()
+        }
+
+        if(KeyEvent.VK_L == e.getKeyCode()) {
+            //VpipeGui.openLoad()
+        }
+
+        if(KeyEvent.VK_PLUS == e.getKeyCode()) {
+            setGridWidth((gridWidth * 1.1) as int)
+            minMaxGridCheck()
+            updateOthersFromGridWidth(gridWidth, this)
+
+        }
+
+        if(KeyEvent.VK_MINUS == e.getKeyCode()) {
+            setGridWidth((gridWidth / 1.1) as int)
+            minMaxGridCheck()
+            updateOthersFromGridWidth(gridWidth, this)
+        }
+
+        if(KeyEvent.VK_LEFT == e.getKeyCode())  {cursorX > 0              ? setCursorX(cursorX-1) :0}
+        if(KeyEvent.VK_RIGHT == e.getKeyCode()) {cursorX < model.sizeX-1  ? setCursorX(cursorX+1) :0}
+
+
+        scrollToCursorX()
+        invalidateAndRepaint(this)
+
+    }
+
+
+
+    @Override
+    void keyReleased(KeyEvent e) {}
 
 
     /**
@@ -211,6 +316,17 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
             g.fillRoundRect(nowGraphX, 0, size - 4, nowGraphY + borderWidth - 4, round, round)
         }
 
+        if(mouseX>0) {
+            int gridX = (int)((mouseX-nameWidth-borderWidth)/gridWidth)
+            int gridY = (int)((mouseY-borderWidth)/gridHeigth)
+            //println ("$gridX $gridY")
+                    // shadow
+            //g.setColor(nowBarShadowColor)
+            //g.fillRoundRect(nowGraphX + offset, +offset, size - 4, nowGraphY + borderWidth - 4, round, round)
+            // element in project color, integration phase color (orange), empty color (white)
+            g.setColor(mouseColor)
+            g.fillRoundRect((int)(borderWidth+nameWidth+gridX*gridWidth+gridWidth/4), borderWidth+gridY*gridHeigth,  (int)(gridWidth/2), gridHeigth,  round, round)
+        }
 
         //
         // draw the department names
@@ -354,19 +470,36 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
 
     @Override
     String getToolTipText(MouseEvent event) {
+        if(!detailsToolTip) return null
+
         String html = null
 
         def gridX = getGridXFromMouseX(event.x)
         def gridY = getGridYFromMouseY(event.y)
+
+        if(event.x <= borderWidth + nameWidth) {
+            return model.getYNames()[gridY]
+        }
+        if(event.y > borderWidth + gridHeigth*(model.sizeY)) {
+            return model.getXNames()[gridX]
+        }
+        if(event.x > borderWidth + nameWidth + gridWidth*(model.sizeX)) {
+            return model.getYNames()[gridY]
+        }
+
         if (gridX >= 0 && gridX < model.sizeX && gridY >= 0 && gridY < model.sizeY) {
             def element = model.getElement(gridX, gridY)
             if (element.load == 0) {
-                return null
+                return "0% ${model.getYNames()[gridY]}"
             }
-
+            def department = model.getYNames()[gridY]
+            def timeStr = model.getXNames()[gridX]
             def yellowRed = element.yellow >=0 ? "($element.yellow, $element.red)":""
             def yellow = element.yellow >= 0 ? "$element.yellow" : "keine Daten"
             def red = element.red >= 0 ? "$element.red" : "keine Daten"
+            def percentTotal = element.yellow > 0 ? ((double)(element.load / element.yellow)*100).round(1) : -1
+            def percentRed = element.yellow > 0 ? ((double)(element.red / element.yellow)*100).round(1) : -1
+            def percentStr = percentTotal >=0 ? "$percentTotal% Rot bei: $percentRed%<br/>": ""
             // <br/>$element.fromToDateString
             //html =  "Gesamtbelastung: $element.load\nGelb: $element.percentageYellow, Rot: $element.percentageYellow)\nGewähltes Projekt:$element.loadProject"
             html  =      """<html><head><style>
@@ -374,10 +507,11 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
                                 p  { color: black; font-family: courier; font-size: 120%; } </style> </head>
                                 
                                 <body>
-                                    <h1>${element.load.round(1)} $yellowRed</h1>
+                                    <h1>${percentTotal>=0?percentTotal.round(1)+ '% ':''}${element.load.round(1)} $yellowRed $department $timeStr</h1>
                                     <p>
                                         Gesamtbelastung: ${element.load.round(1)}<br/>
                                         Gelb: $yellow, Rot: $red<br/>
+                                        $percentStr
                                         Gewähltes Projekt: ${element.loadProject.round(1)}<br/>
                                         Details: <br/> ${(element.projectDetails.collect { it.projectCapaNeed.round(1) + " : " + it.originalTask.toString() + "<br/>" } as List<String>).join('')}
                                     </p>
@@ -389,7 +523,20 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
     }
 
     @Override
-    void mouseMoved(MouseEvent e) {
-        mouseMoved(e, this)
+    Point getToolTipLocation(MouseEvent event) {
+        if(!detailsToolTip) return null
+        def gridX = (int)((event.x-borderWidth-nameWidth)/gridWidth)
+        def locX = gridX*gridWidth + borderWidth + nameWidth + 2*gridWidth
+        def gridY = (int)((event.y-borderWidth)/gridHeigth)
+        def locY = gridY*gridHeigth + borderWidth
+        if(gridY > borderWidth + (gridHeigth*(model.sizeY-1))) {
+            return null
+        }
+        if(gridX > borderWidth + nameWidth+ (gridWidth*(model.sizeX-1))) {
+            return null
+        }
+
+        return new Point(locX, locY)
     }
+
 }

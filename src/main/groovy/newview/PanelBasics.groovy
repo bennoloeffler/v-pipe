@@ -14,7 +14,8 @@ import java.awt.event.MouseEvent
 trait PanelBasics {
 
     Color nowBarColor = new Color(255, 0, 0, 60)
-    Color cursorColor = new Color(0, 170, 170, 160)
+    Color cursorColor = new Color(0, 255, 250, 190)
+    Color mouseColor  = new Color(200, 200, 200, 190)
 
     //@Bindable int gridWidth
 
@@ -46,6 +47,7 @@ trait PanelBasics {
     void mouseMoved(MouseEvent e, JComponent c) {
         //mouseX = e.getX()
         //mouseY = e.getY()
+        //println "$e.x $e.y in $c.name"
         MouseEvent phantom = new MouseEvent(
                 c,
                 MouseEvent.MOUSE_MOVED,
@@ -56,7 +58,7 @@ trait PanelBasics {
                 0,
                 false)
 
-        ToolTipManager.sharedInstance().mouseMoved(phantom)
+        ToolTipManager.sharedInstance().mouseMoved(e)//phantom)
     }
 
 

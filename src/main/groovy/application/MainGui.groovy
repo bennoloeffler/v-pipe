@@ -111,6 +111,13 @@ class MainGui {
 
 
         //
+        // configure tooltip manager
+        //
+        ToolTipManager.sharedInstance().setDismissDelay(15000)
+        ToolTipManager.sharedInstance().setInitialDelay(500)
+
+
+        //
         // glue view and application together
         //
         // File
@@ -126,6 +133,7 @@ class MainGui {
         view.swing.pipelineViewAction.closure = controller.&pipelineViewActionPerformed
         view.swing.loadViewAction.closure = controller.&loadViewActionPerformed
         view.swing.pipelineLoadViewAction.closure = controller.&pipelineLoadViewActionPerformed
+        view.swing.projectViewAction.closure = controller.&projectViewActionPerformed
 
         // Help
         view.swing.helpAction.closure = controller.&helpActionPerformed
@@ -134,7 +142,7 @@ class MainGui {
 
 
         //
-        // config components
+        // bind components together
         //
         view.swing.build() {
             bind(target: view.swing.currentPath, targetProperty: 'text', source: model, sourceProperty: "currentDir", converter: { v -> v.toUpperCase()})
@@ -163,7 +171,6 @@ class MainGui {
             bind(target: view.swing.depLabel, targetProperty: 'text', source: view.gridProjectModel, sourceProperty: 'departmentName')
         }
 
-        ToolTipManager.sharedInstance().setDismissDelay(15000) // 15 seconds
 
 
         //
