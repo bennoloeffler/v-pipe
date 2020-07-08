@@ -22,7 +22,7 @@ import java.awt.Desktop
  */
 class  Main {
 
-    static VERSION_STRING ='0.9.3-BetaPhase'
+    static VERSION_STRING ='0.9.4-BetaPhaseNice'
 
     static void main(String[] args) {
 
