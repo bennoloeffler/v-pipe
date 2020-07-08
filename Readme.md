@@ -7,16 +7,17 @@ mit einer Projektlandschaft ein und erzeugt eine
 Es gibt die Möglichkeit, Projekte zu verschieben  
 und Portfolio-Szenarien zu modellieren.  
 Quickstart- Video? [Hier Klicken...](https://www.loom.com/share/84d7636a20e745d19ac0489aa4eba2fc)
+
 ## Installation
 
-Die Distribution ist ein `v-pipe.zip`.  
+Die Distribution ist ein `v-pipe-major.minor.bugfix-ReleaseName.zip`.  
 Dieses Zip-File entpacken - ideal in das Verzeichnis:  
 `c:\v-pipe`
 In Win10 braucht man dazu keinen "Zipper".  
-1. Zipfile v-pipe-release-xyz.zip 'irgendwo' ablegen.  
-2. Per Explorer (WIN+E) das v-pipe.zip 'irgendwo öffnen'.
+1. Zipfile v-pipe-x.y.z-release.zip 'irgendwo' ablegen.  
+2. Per Explorer (WIN+E) das v-pipe.zip 'anklicken'.
 Einfach im Explorer einmal draufklicken.  
-3. Inhalte werden wie ein File-System angezeigt.  
+3. Inhalte des zip-files werden wie ein File-System angezeigt.  
 4. Oberes Verzeichnis (`v-pipe`) per Copy&Paste mit CTRL-C 'kopieren'  
 und nach C: einfügen. Also im Explorer auf C: klicken und per CTRL-V entpacken.  
 Fertig.
@@ -26,9 +27,8 @@ Backup schadet trotzdem nicht.
 
 In C:\v-pipe liegen dann die Verzeichnisse und Dateien:
 
-- `README.html` (Link zur Betriebsanleitung auf Github)
 - `Readme.md` (diese Betriebsanleitung als Markdown - falls offline)  
-Markdown-Plugin für Chrome installieren...  
+Markdown-Plugin für Chrome installieren? Dort:  
 [MarkdownPreviewPlus](https://t.ly/xB5M)  
 in den Einstellungen des Plugins unter  
 Einstellungen/Erweiterungen/MarkdownPreviewPlus:  
@@ -39,9 +39,12 @@ Option: *Zugriff auf Datei-URLs zulassen* aktivieren
 - `jre` (eine Java-Laufzeit-Umgebung. Nicht anfassen...)
 - `bsp-daten` (alle Daten-Dateien als funktionierende Beispiele)    
     - `Projekt-Start-End-Abt-Kapa.txt` (Grunddaten: Alle Tasks)
-    - `Projekt-Verschiebung.txt` (Optional: Projekte schieben)
-    - `Integrations-Phasen.txt` (Optional: Projekte staffeln)
+    - `Abteilungs-Kapazitaets-Angebot.txt` (Grundaten, optional: Kapa Abteilungen)
+    - `Integrations-Phasen.txt` (Grundaten, optional: Integrationsphasen der Projekte)
+    - `Projekt-Verschiebung.txt` (Szenarien, optional: Projekte schieben)
+    - `Template-Original-Verschiebung.txt` (Szenarien, optional: Projekte kopieren)
     - `v-pipe-Auswertung.xlsx` (Vorlage für Visualisierung)
+    - `bsp-0x` (Verzeichnisse mit verschiedenen Spielarten der Dateien)  
 
 
 ## Anwendung
@@ -52,8 +55,9 @@ Einfach Doppelklick auf `v-pipe.exe`. Das startet den
 Deamon-Mode: v-pipe lauert jetzt auf Veränderungen  
 der Daten-Dateien und zeigt Fehlermeldungen oder rechnet.  
 Mit v-pipe-exe bekommt man die Daten schnell konsistent.  
-Wenn die Daten konstistent sind, dann ansehen:  
-`v-pipe-gui.exe`
+Wenn die Daten konstistent sind, dann graphische Oberfläche starten:  
+`v-pipe-gui.exe` (startet nur, wenn konsistente Daten da sind...)
+
 
 **Alternative:** 
 `Windows-Taste` und tippen: `cmd + ENTER-Taste`  
@@ -61,21 +65,21 @@ Das startet einen Kommando-Zeilen-Prompt.
 Dort navigieren in das v-pipe-Verzeichnis.  
 Also je nach Installations-Verzeichnis: `cd \v-pipe`  
 Dort Programm durch tippen von  
-`v-pipe + ENTER-Taste` starten.  
+`v-pipe (oder v-pipe-gui) + ENTER-Taste` starten.  
 
 Jetzt kann das Fenster zur Seite geschoben werden.  
 Wann immer die Grunddaten neu erzeugt, verändert oder  
 gelöscht werden, rechnet v-pipe und erzeugt  
 die Ergebnis-Dateien neu - oder zeigt Datenfehler an.
 
-### Ablage der Arbeits-Dateien
+### Ablage der Dateien
 Alle Arbeits-Dateien (Grunddaten und Ergebnise der Berechnungen)  
 werden im Installations-Verzeichnis abgelegt. 
 Also z.B.: `c:\v-pipe`
 
 ### Daten-Dateien
 
-`Projekt-Start-End-Abt-Capa.txt`  
+## `Projekt-Start-End-Abt-Capa.txt`  
 **Grunddaten (erforderlich):** alle Tasks aller Projekte  
 Enthält beispielsweise:   
 `Projekt-1-Neu-Ulm 20.05.2020 31.5.2020 Abt3 45.6`  
@@ -91,23 +95,9 @@ Komma, Strichpunkt, Tab, Leerzeichen sind Trennzeichen.
 KEINE Leerzeichen in den Projekt- und Abteilungs-Bezeichnungen.  
 Falls dort welche sind: Ersetzen mit Unterstrich = _
 
-`Projekt-Verschiebung.txt`  
-**Grunddaten (optional):** Verschiebung aller Tasks einzelner Projekte  
-Enthält beispielsweise:  
-`P2 14`  
-`Projekt1 -21`  
-
-**Bedeutung:** Datei enthält die Verschiebung der Projekte in Tagen.  
-Es müssen nicht alle Projekte aufgeführt sein.   
-Nur die Verschobenen.  
-`+` bedeutet: Verscheibung in die Zukunft.  
-P2 wird um 2 Wochen geschoben.  
-Der 31.7.2020 wird duch `14` zum 14.8.2020  
-Projekt-1-Neu-Ulm wird durch `-21` vorgezogen:   
-Aus 31.6.2020 wird 10.6.2020.  
 
 
-`Integrations-Phasen.txt`
+## `Integrations-Phasen.txt`  
 **Grunddaten (optional):** Integrations-Phasen aller Projekte für Staffelung  
 Enthält beispielsweise:  
 6  
@@ -118,12 +108,12 @@ in der Integrationsphase dar. Die Integrationsphasen von p1, p2 etc. sind
 untereinander aufgeführt. Die Zahl am Ende jeder Zeile ist der Bedarf an Slots.  
 Dieser ist in der Regel 1 und maximal gleich der Anzahl der Slots.  
 
-`Abteilungs-Kapazitäts-Angebot.txt`
+## `Abteilungs-Kapazitäts-Angebot.txt`
 **Grunddaten (optional):** Kapazitäts-Angebot aller Abteilungen für Auswertung  
 Enthält beispielsweise:  
 
-{
-    "Kapa_Gesamt": {
+     {
+     "Kapa_Gesamt": {
     
        "Feiertage": ["1.1.2020", "1.6.2020"],
        
@@ -133,9 +123,9 @@ Enthält beispielsweise:
           "2020-25": 80
        }
        
-},
+     },
    
-   "Abteilungen": {   
+     "Abteilungen": {   
       
       "Konstruktion": {
 
@@ -170,8 +160,8 @@ Enthält beispielsweise:
             "rot": 500
          }
       }
-   }
-}
+     }
+    }
 
 
 
@@ -187,6 +177,35 @@ Kapazitäts-Sprünge werden so beschrieben:
 Das Kapa_Profil ist optional.  
 Die Syntax der Datei ist JSON.  
 
+## `Projekt-Verschiebung.txt`  
+**Szenario (optional):** Verschiebung aller Tasks einzelner Projekte  
+Enthält beispielsweise:  
+`P2 14`  
+`Projekt1 -21`  
+
+**Bedeutung:** Datei enthält die Verschiebung der Projekte in Tagen.  
+Es müssen nicht alle Projekte aufgeführt sein.   
+Nur die Verschobenen.  
+`+` bedeutet: Verscheibung in die Zukunft.  
+P2 wird um 2 Wochen geschoben.  
+Der 31.7.2020 wird duch `14` zum 14.8.2020  
+Projekt-1-Neu-Ulm wird durch `-21` vorgezogen:   
+Aus 31.6.2020 wird 10.6.2020.  
+
+
+## `Template-Original-Verschiebung.txt`  
+**Szeanrio (optional)** Kopie von Projekten  
+Enthält beispielsweise:  
+`pKopie P2 -12`    
+
+**Bedeutung:** Datei enthält Kopier-Anweisungen.  
+`+` bedeutet: Verscheibung in die Zukunft.  
+pKopie wird um -12 Tage geschoben. Und zwar nachdem  
+P2 durch die ursprüngliche Verschiebung +14 Tage verschoben wurde.  
+Der 14.8.2020 wird für pKopie duch `-12` zum 2.7.2020  
+
+
+
 
 ### Ergebnis-Dateien
 Die Belastung der Abteilungen liegt in:  
@@ -195,14 +214,18 @@ und
 `Abteilungs-Kapazitäts-Belastung-Monat.txt`  
 
 
-### Überschreiben von Ergebnissen  
+### Überschreiben von Ergebnissen und Dateien beim Speichern  
 Ergebnis-Dateien werden nie überschrieben.  
 Wann immer eine Ergebnisdatei schon existiert,  
 wird ein Backup mit Datum und Uhrzeit erstellt.  
 Z.B.  
 `Abteilungs-Kapazitäts-Belastung backup vom 2020-05-05 09.31.59.txt`  
 Die aktuellsten Ergebnisse liegen also immer in  
-`Abteilungs-Kapazitäts-Belastung.txt`
+`Abteilungs-Kapazitäts-Belastung.txt`  
+Beim Speichern aus v-pipe-gui wird ein Ordner mit dem Namen backup angelegt.  
+Dort wird ein Ordner mit einem Zeit-Stempel angelegt.  
+Dorthin werden die Dateien verschoben,  
+die beim Speichern überschrieben werden müssten.   
 
 ### Ablage der Backup-Dateien
 Alle Dateien, die überschrieben werden müssten, werden abgelegt in:   
@@ -238,6 +261,9 @@ gleichzeitig gearbeitet werden soll.
 ## Realease
 
 ### Features
+
+2020-07-08 `0.9.4-BetaPhaseNice`
+- Markierungen, Doku
 
 2020-07-06 `0.9.3-BetaPhase`
 - minor changes like examples, docu, marker, fucus by tab and mouse, mouse-cursor, tooltips (d)

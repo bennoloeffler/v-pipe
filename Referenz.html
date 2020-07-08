@@ -398,13 +398,12 @@
 
 <ul>
     <li><a href="https://www.loom.com/share/84d7636a20e745d19ac0489aa4eba2fc">Quickstart-Video</a></li>
-    <li>Daten-Dateien sucht v-pipe direkt im Installationsverzeichnis.</li>
+    <li>Bei Problemen: RTFM... <b>Betriebsanleitung</b> hier... <a href="https://github.com/bennoloeffler/v-pipe/blob/master/Readme.md">README.md</a></li>
+    <li>Daten-Dateien sucht v-pipe direkt im Installationsverzeichnis - also dort wo die "exe" liegt.</li>
     <li>Beispiel-Dateien liegen alle im Verzeichnis bsp-dateien.<br/>Hochkopieren ins Installationsverzeichnis,<br/>
         v-pipe.exe doppelklicken und los-probieren = Datendateien editieren.</li>
     <li><b>Keine Leerzeichen in den Projekt- und Abteilungs-Namen</b> in den Daten-Dateien!<br/> Leerzeichen, Kommas, Strichpunkte und Tabulatoren sind Trennzeichen.</li>
-    <li>v-pipe -s = Single-Run-Mode ON = Deamon-Mode OFF = ein Rechendurchlauf und Ende</a></li>
-    <li>v-pipe -m = Multi-Instance-Mode ON = mehrere Deamons können gleichzeitig laufen</a></li>
-    <li>Bei Problemen: RTFM... <b>Betriebsanleitung</b> hier... <a href="https://github.com/bennoloeffler/v-pipe/blob/master/Readme.md">README.md</a></li>
+    <li>v-pipegui.exe startet nur, wenn Daten im aktuellen Verzeichnis liegen</a></li>
 </ul>
 <h4>Projekt-Start-End-Abt-Kapa.txt</h4>
 (<b>Grunddaten:</b> Tasks der Projekte mit Kapa-Bedarf in Abteilungen)<br/>
@@ -415,10 +414,22 @@ p2 30.3.2020 3.4.2020 a2 10<br/>
 <b>Bedeutung:</b> Projekt p1 und Projekt p2 mit jeweils<br/>
 einem Task in der Abteilung a1 und a2 und der jeweilige Kapabedarf dort.<br/>
 
+<h4>Abteilungs-Kapazitäts-Angebot.txt</h4>
+(<b>Grunddaten (optional):</b> Modellierung der Kapazitäten der Abteilungen)<br/>
+Beispiel siehe  <a href="https://github.com/bennoloeffler/v-pipe/blob/master/Readme.md">README.md</a><br/>
+
 <h4>Projekt-Verschiebung.txt</h4>
-(<b>Grunddaten (optional):</b> Termin-Verschiebung ganzer Projekte zur Szenarienbildung)<br/>
+(<b>zur Szenarienbildung (optional):</b> Termin-Verschiebung ganzer Projekte)<br/>
 p1 7<br/>
 <b>Bedeutung:</b> Projekt p1 schiebt sich um 7 Tage<br/>
+Vorsicht: Nach dem erstmaligen speichern aus v-pipegui.exe ist diese Datei nicht mehr verfügbar.<br/>
+
+<h4>Template-Original-Verschiebung.txt</h4>
+(<b>zur Szenarienbildung (optional):</b> Kopie und erneute Termin-Verschiebung von Projekten der Basisdaten)<br/>
+    p1-Kopie p1 -13<br/>
+    <b>Bedeutung:</b> Projekt p1-Kopie wird auf Basis des ggf. bereits verschobenen Projekt p1 gebildet und um -13 Tage verschoben<br/>
+    Integrations-Phase wird kopiert und ebenfalls mit verschoben<br/>
+    Vorsicht: Nach dem erstmaligen speichern aus v-pipegui.exe ist diese Datei nicht mehr verfügbar.<br/>
 
 <h4>Integrations-Phasen.txt</h4>
 (<b>Grunddaten (optional):</b> Integrations-Phasen für Staffelung)<br/>
