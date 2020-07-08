@@ -238,6 +238,7 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
      * @param g1d
      */
     @Override
+    @CompileStatic
     protected void paintComponent(Graphics g1d) {
 
         super.paintComponent(g1d)
@@ -418,7 +419,7 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
         Double percentProject = (Double)(valProject / max)
         int percentShiftProject = (int)((sizeY-4) - percentProject * (sizeY-4))
 
-        g.setColor(Color.BLUE)
+        g.setColor(cursorColor)
         g.fillRoundRect(x+(int)(sizeX*0.2), y+percentShiftProject, sizeX-4 - (int)(sizeX*0.4) , (int)(percentProject * (sizeY-4)), round, round)
 
 

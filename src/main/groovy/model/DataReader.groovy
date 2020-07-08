@@ -119,7 +119,7 @@ class DataReader {
         }
         t.stop("parsing file ${get_TASK_FILE_NAME()}")
         if( ! taskList){throw new VpipeDataException("${get_TASK_FILE_NAME()} enthält keine Daten")}
-        if( taskList.size() > 3000 ){throw new VpipeDataException("${get_TASK_FILE_NAME()} enthält ${taskList.size()} Datensätze. GUI wird seeeehr LANGSAM...")}
+        if( taskList.size() > 3000 ){println("W A R N U N G:\n${get_TASK_FILE_NAME()} enthält ${taskList.size()} Datensätze. GUI wird seeeehr LANGSAM...")}
         return taskList
     }
 
@@ -163,6 +163,9 @@ class DataReader {
                     Date end = line[2].toDate()
                     if( ! start.before(end)) {
                         throw new VpipeDataException(errMsg() + "\nStart liegt nicht vor Ende.")
+                    }
+                    if(line[3].toInteger() > maxPipelineSlots) {
+                        throw new VpipeDataException(errMsg() +"\nerforderliche Pipeline-Slots (${line[3].toInteger()}) größer als Maximum($maxPipelineSlots)")
                     }
                     def pe = new PipelineOriginalElement(
                             project: line[0],

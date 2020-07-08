@@ -14,7 +14,7 @@ import java.awt.event.MouseEvent
 trait PanelBasics {
 
     Color nowBarColor = new Color(255, 0, 0, 60)
-    Color cursorColor = new Color(0, 255, 250, 190)
+    Color cursorColor = new Color(133, 200, 240, 190)
     Color mouseColor  = new Color(200, 200, 200, 190)
 
     //@Bindable int gridWidth

@@ -17,6 +17,8 @@ import javax.swing.JFrame
 import javax.swing.JLabel
 import javax.swing.JSplitPane
 import javax.swing.JTextArea
+import javax.swing.UIManager
+import java.awt.Color
 import java.awt.Dimension
 import java.awt.Font
 import java.awt.Image
@@ -73,7 +75,10 @@ class View {
 
     void build() {
 
+        Color highlightColor = new Color(80, 130, 220, 255)
+
         FlatLightLaf.install()
+        UIManager.put( "Component.focusWidth", 3 )
 
 
         //MigLayout ml = new MigLayout()
@@ -219,15 +224,15 @@ class View {
 
                 //migLayout(layoutConstraints:"fill, debug", columnConstraints:"", rowConstraints:"[][grow]")
                 migLayout(layoutConstraints:"fill", columnConstraints:"[][][][][][][][][][][grow]", rowConstraints:"[][grow]")
-                label("Projekt suchen: ")
+                label("Projekt suchen: ", foreground:GRAY)
                 textField(id: 'searchTextField', toolTipText: 'Tutorial & Experimente: regex101.com', constraints: 'width 100')
-                label("    Zeit-Marke: ")
-                label("", id: 'timeLabel', foreground:BLUE)
-                label("    Projekt-Marke: ")
-                label("", id: 'projectLabel', foreground:BLUE)
-                label("    Abt-Marke: ")
-                label("", id: 'depLabel', foreground:BLUE)
-                label("    Pfad: ")
+                label("    Zeit-Marke: ", foreground:GRAY)
+                label("", id: 'timeLabel', foreground:highlightColor)
+                label("    Projekt-Marke: ", foreground:GRAY)
+                label("", id: 'projectLabel', foreground:highlightColor)
+                label("    Abt-Marke: ", foreground:GRAY)
+                label("", id: 'depLabel', foreground:highlightColor)
+                label("    Pfad: ", foreground:GRAY)
                 label(id:'currentPath', constraints:  'wrap')
 
                 splitPane(id: 'spH', orientation: JSplitPane.HORIZONTAL_SPLIT, continuousLayout:true, dividerLocation: 0.5, constraints: 'grow, span') {

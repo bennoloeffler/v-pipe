@@ -378,6 +378,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
      * @param g1d
      */
     @Override
+    @CompileStatic
     protected void paintComponent(Graphics g1d) {
         super.paintComponent(g1d)
         //println(this.name)
@@ -478,8 +479,8 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
             int gridY = borderWidth + y*gridWidth
             if( hightlightLinePattern && projectName =~ hightlightLinePattern) {
 
-                g.setColor(new Color(150,255,255,100))
-                g.fillRoundRect(borderWidth , (int)(gridY+gridWidth/2)-2, borderWidth+gridWidth*model.sizeX,  4 , round, round)
+                g.setColor(cursorColor) //new Color(150,255,255,100))
+                g.fillRoundRect(borderWidth , (int)(gridY+gridWidth/2)-2, nameWidth+ borderWidth+gridWidth*model.sizeX,  4 , round, round)
             } else {
                 g.setColor(Color.WHITE)
             }
@@ -544,7 +545,6 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
             }
             x++
         }
-
         t.stop()
     }
 
