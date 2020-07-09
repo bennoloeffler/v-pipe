@@ -262,6 +262,10 @@ gleichzeitig gearbeitet werden soll.
 
 ### Features
 
+
+2020-07-09 `0.9.5-BetaPhase-Bug`
+- Sort ToolTip + 2-Stellen-Jahres-Bug raus
+
 2020-07-08 `0.9.4-BetaPhaseNice`
 - Markierungen, Doku
 

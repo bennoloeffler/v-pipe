@@ -339,20 +339,58 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
             int gridY = borderWidth + y * gridHeigth
             g.fillRoundRect(borderWidth , gridY, nameWidth-4, gridHeigth - 4 , round*3, round*3)
 
-            //if(gridWidth>20) {
                 float fontSize = gridWidth / 2
                 g.getClipBounds(rBackup)
                 g.setClip(borderWidth , gridY, nameWidth-6, gridHeigth - 6)
-                // TODO: intersect
                 g.setFont(g.getFont().deriveFont((float) fontSize))
                 g.setColor(Color.WHITE)
                 g.drawString(yNames, borderWidth + (int) (gridWidth * 0.2), gridY + (int) (gridWidth * 2/3))
                 g.setColor(Color.BLACK)
                 g.drawString(yNames, borderWidth + (int) (gridWidth * 0.2)-2, gridY + (int) (gridWidth * 2/3)-2)
                 g.setClip(rBackup)
-            //}
             y++
         }
+
+        int x = 0
+        model.getXNames().each { String rowName ->
+            g.setColor(Color.WHITE)
+            int gridX = borderWidth + x*gridWidth + nameWidth
+            int gridY = borderWidth + (model.sizeY) * gridHeigth
+            g.fillRoundRect(gridX , gridY, gridWidth-4, nameWidth - 4 , round, round)
+
+            if(gridWidth>0) {
+                // write (with shadow) some info
+                float fontSize = gridWidth / 2
+                g.setFont(g.getFont().deriveFont((float) fontSize))
+                atBackup = g.getTransform()
+                //Resets transform to rotation
+                rotationTransform.setToRotation((double)Math.PI/2)
+                translateTransform.setToTranslation(gridX   , gridY )
+                //Chain the transforms (Note order matters)
+                totalTransform.setToIdentity()
+                totalTransform.concatenate(atBackup)
+                totalTransform.concatenate(translateTransform)
+                totalTransform.concatenate(rotationTransform)
+                //at.rotate((double)(Math.PI / 2))
+                g.setTransform(totalTransform)
+                g.setColor(Color.WHITE)
+
+                g.getClipBounds(rBackup)
+                Rectangle newClip = new Rectangle(0 , -gridWidth, nameWidth-6, gridWidth)
+                g.setClip(newClip.intersection(rBackup))
+
+                g.drawString(rowName,  (int) (gridWidth * 0.2),  0 - (int) (gridWidth * 0.2))
+                g.setColor(Color.BLACK)
+                g.drawString(rowName,  (int) (gridWidth * 0.2) -1,  0 - (int) (gridWidth * 0.2) -1)
+                g.setClip(rBackup)
+                g.setTransform(atBackup)
+            }
+            x++
+        }
+
+        g.drawImage(frameIcon, (int)borderWidth,  (int)(borderWidth + y*gridHeigth), nameWidth-4, nameWidth-4,  null)
+
+
         t.stop()
 
     }
@@ -369,7 +407,7 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
         int y = model.sizeY
         int x = model.sizeX
         //println("$x $y")
-        return new Dimension(nameWidth + 2*borderWidth + gridWidth * x ,2 * borderWidth + gridHeigth * y) //model.sizeX*grid + 2*borderWidth, model.sizeY*grid + 2*borderWidth)
+        return new Dimension(nameWidth + 2*borderWidth + gridWidth * x ,2 * borderWidth + gridHeigth * y + nameWidth) //model.sizeX*grid + 2*borderWidth, model.sizeY*grid + 2*borderWidth)
     }
 
     @CompileStatic
@@ -404,9 +442,9 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
         //
         //
         g.setColor(Color.GRAY)
-        if(val <= yellow) {g.setColor(Color.GREEN)}
-        if(val > yellow && val <= red) {g.setColor(Color.YELLOW)}
-        if(val > red) {g.setColor(Color.RED)}
+        if(val <= yellow) {g.setColor(makeLighter(Color.GREEN, 190))}
+        if(val > yellow && val <= red) {g.setColor(makeLighter(Color.YELLOW, 170))}
+        if(val > red) {g.setColor(makeLighter(Color.RED, 190))}
         if(red == -1) {g.setColor(Color.GRAY)}
 
         g.fillRoundRect(x, y+percentShift, sizeX-4 , (int)(percent * (sizeY-4)), round, round)
@@ -419,7 +457,7 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
         Double percentProject = (Double)(valProject / max)
         int percentShiftProject = (int)((sizeY-4) - percentProject * (sizeY-4))
 
-        g.setColor(cursorColor)
+        g.setColor(Color.white)
         g.fillRoundRect(x+(int)(sizeX*0.2), y+percentShiftProject, sizeX-4 - (int)(sizeX*0.4) , (int)(percentProject * (sizeY-4)), round, round)
 
 
@@ -456,9 +494,11 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
             //g.getClipBounds(rBackup)
             //g.setClip(x, y, sizeX-8 , sizeY-8)
             g.setFont(g.getFont().deriveFont((float) fontSize))
-            if(val > red) {g.setColor(Color.BLACK)}else{g.setColor(Color.WHITE)}
+            //if(val > red) {g.setColor(Color.BLACK)}else{g.setColor(Color.WHITE)}
+            g.setColor(Color.WHITE)
             g.drawString(p, x + 4, y + gridHeigth - (int) fontSize)
-            if(val > red) {g.setColor(Color.WHITE)}else{g.setColor(Color.BLACK)}
+            //if(val > red) {g.setColor(Color.WHITE)}else{g.setColor(Color.BLACK)}
+            g.setColor(Color.BLACK)
             //g.setColor(Color.BLACK)
             g.drawString(p, x + 4 - 1, y + gridHeigth - (int) fontSize - 1)
             //g.setClip(rBackup)
@@ -466,8 +506,19 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
 
     }
 
+    Color makeDarker(Color c, int darker) {
+        int r = c.getRed()
+        int g = c.getGreen()
+        int b = c.getBlue()
+        new Color(r>darker?r-darker:0, g>darker?g-darker:0, b>darker?b-darker:0)
+    }
 
-
+    Color makeLighter(Color c, int lighter) {
+        int r = c.getRed()
+        int g = c.getGreen()
+        int b = c.getBlue()
+        new Color(r+lighter>255?225:r+lighter, g+lighter>255?225:g+lighter, b+lighter>255?225:b+lighter)
+    }
 
     @Override
     String getToolTipText(MouseEvent event) {
@@ -514,7 +565,7 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
                                         Gelb: $yellow, Rot: $red<br/>
                                         $percentStr
                                         Gewähltes Projekt: ${element.loadProject.round(1)}<br/>
-                                        Details: <br/> ${(element.projectDetails.collect { it.projectCapaNeed.round(1) + " : " + it.originalTask.toString() + "<br/>" } as List<String>).join('')}
+                                        Details: <br/> ${(element.projectDetails.sort{-it.projectCapaNeed}.collect { it.projectCapaNeed.round(1) + " : " + it.originalTask.toString() + "<br/>" } as List<String>).join('')}
                                     </p>
                                 </body>
                              </html>                                

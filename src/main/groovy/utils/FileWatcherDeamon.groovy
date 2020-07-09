@@ -59,8 +59,6 @@ class FileWatcherDeamon {
         if( ! path.toFile().exists()) {
             path.toFile().mkdirs()
         }
-        //println(path.toAbsolutePath().toString())
-
     }
 
     /**

@@ -46,29 +46,12 @@ class GridLoadModel extends AbstractGridLoadModel  {
     }
 
     void updateAllFromModelData() {
-        def t = RunTimer.getTimerAndStart('GridLoadModel::updateAllFromModelData')
-        /*
-        SwingBuilder b = new SwingBuilder()
-        b.edt {
-
-                doOutside {
-                    absoluteLoadCalculator = new AbsoluteLoadCalculator(model.taskList)
-                    calcGridElements()
-                    calcRowX()
-
-                    doLater {
-                        setUpdateToggle(!getUpdateToggle())
-                    }
-                }
-        }*/
-        absoluteLoadCalculator = new AbsoluteLoadCalculator(model.taskList)
-        calcGridElements()
-        calcRowX()
-
-        t.stop()
-
+        RunTimer.getTimerAndStart('GridLoadModel::updateAllFromModelData').withCloseable {
+            absoluteLoadCalculator = new AbsoluteLoadCalculator(model.taskList)
+            calcGridElements()
+            calcRowX()
+        }
         setUpdateToggle(!getUpdateToggle())
-
     }
 
 

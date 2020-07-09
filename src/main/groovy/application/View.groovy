@@ -198,7 +198,7 @@ class View {
 
             //lookAndFeel 'nimbus'
 
-            f = frame(id: 'frame', iconImage: frameIcon, title: 'v-pipe    |  +/- = Zoom  |  Pfeile = Cursor bewegen  |  Shift+Pfeile = Projekt bewegen  |  d = Details an/aus', locationRelativeTo: null, show: false, defaultCloseOperation: JFrame.DO_NOTHING_ON_CLOSE) {
+            f = frame(id: 'frame',size:[(int)(screenDimension.width), (int)(screenDimension.height - 50)], location: [0,0], iconImage: frameIcon, title: 'v-pipe    |  +/- = Zoom  |  Pfeile = Cursor bewegen  |  Shift+Pfeile = Projekt bewegen  |  d = Details an/aus', locationRelativeTo: null, show: true, defaultCloseOperation: JFrame.DO_NOTHING_ON_CLOSE) {
 
                 menuBar(id: 'menuBar') {
                     menu(text:'Dateien', mnemonic:'D') {
@@ -235,13 +235,13 @@ class View {
                 label("    Pfad: ", foreground:GRAY)
                 label(id:'currentPath', constraints:  'wrap')
 
-                splitPane(id: 'spH', orientation: JSplitPane.HORIZONTAL_SPLIT, continuousLayout:true, dividerLocation: 0.5, constraints: 'grow, span') {
-                    splitPane(id: 'spV1', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: 0.5) {
+                splitPane(id: 'spH', orientation: JSplitPane.HORIZONTAL_SPLIT, continuousLayout:true, dividerLocation: 1600, constraints: 'grow, span') {
+                    splitPane(id: 'spV1', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: 1000) {
                         scrollPane {
                             widget(pipelineView)
                         }
 
-                        splitPane(id: 'spV3', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: 0.5) {
+                        splitPane(id: 'spV3', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: 200) {
                             scrollPane(id: 'pipelineLoadViewScrollPane') {
                                 widget( pipelineLoadView)
                             }
@@ -254,7 +254,7 @@ class View {
                         // spV1.setSecond(view.swing.spV3) // both
 
                     }
-                    splitPane(id: 'spV2', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: 0.5) {
+                    splitPane(id: 'spV2', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: 500) {
                         scrollPane {
                             widget(projectView)
                         }
@@ -271,8 +271,8 @@ class View {
 
 
     def setFullSize(JFrame f) {
-        f.setSize((int)(screenDimension.width), (int)(screenDimension.height - 50))
-        f.setLocation(0, 0)
+        //f.setSize((int)(screenDimension.width), (int)(screenDimension.height - 50))
+        //f.setLocation(0, 0)
     }
 
 
@@ -280,15 +280,15 @@ class View {
         swing.edt {
             //swing.frame
             initModelAndNotifyView()
-            swing.frame.setVisible(true)
+            //swing.frame.setVisible(true)
             setFullSize(swing.frame)
             // TODO: move to Builder?
+            /*
             swing.spH.setDividerLocation(900)
             swing.spV1.setDividerLocation(500)
             swing.spV2.setDividerLocation(500)
             swing.spV3.setDividerLocation(120)
-            //JLabel label = (JLabel)(swing.timeLabel)
-            //label.setForeground(BLUE)
+*/
 
 
         }

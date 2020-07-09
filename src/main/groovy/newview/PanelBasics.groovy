@@ -2,20 +2,31 @@ package newview
 
 import groovy.transform.CompileStatic
 
+import javax.swing.ImageIcon
 import javax.swing.JComponent
 import javax.swing.JScrollPane
 import javax.swing.ToolTipManager
 import java.awt.Color
 import java.awt.Graphics2D
+import java.awt.Image
 import java.awt.RenderingHints
 import java.awt.event.MouseEvent
+import java.awt.geom.AffineTransform
 
 @CompileStatic
 trait PanelBasics {
 
+    Image frameIcon = new ImageIcon(getClass().getResource("/icons/vunds_icon_ 400x400.png")).getImage()
+
+
     Color nowBarColor = new Color(255, 0, 0, 60)
     Color cursorColor = new Color(133, 200, 240, 190)
     Color mouseColor  = new Color(200, 200, 200, 190)
+
+    AffineTransform totalTransform = new AffineTransform()
+    AffineTransform rotationTransform = new AffineTransform()
+    AffineTransform translateTransform = new AffineTransform()
+    AffineTransform atBackup
 
     //@Bindable int gridWidth
 

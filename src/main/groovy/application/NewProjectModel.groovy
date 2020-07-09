@@ -10,12 +10,12 @@ import newview.GridElement
 import newview.GridModel
 import utils.RunTimer
 
-import java.beans.PropertyChangeEvent
-
 import static extensions.DateHelperFunctions.*
 
 @CompileStatic
 class NewProjectModel extends GridModel {
+
+    final Model model
 
     List<List<GridElement>> allProjectGridLines
 
@@ -26,57 +26,36 @@ class NewProjectModel extends GridModel {
     String departmentName =""
 
     int nowXRowCache = -1
+
     List<TaskInProject> project = []
 
-    //@Delegate
-    final Model model
-
-    Closure projectNameCallback = {
-        updateGridElements()
+    Closure updateCallback = {
+        updateGridElementsFromDomainModel()
         setUpdateToggle(!getUpdateToggle())
     }
 
     NewProjectModel(Model model) {
         this.model = model
-        this.addPropertyChangeListener('projectName', projectNameCallback)
-        model.addPropertyChangeListener('updateToggle', projectNameCallback)
-        updateGridElements()
+        this.addPropertyChangeListener('projectName', updateCallback)
+        model.addPropertyChangeListener('updateToggle', updateCallback)
+        updateGridElementsFromDomainModel()
     }
 
-/*
-    def setProjectName(String projectName ) {
-        def old = this.projectName
-        this.projectName = projectName
-        updateGridElements()
-        firePropertyChange("projectName", old, this.projectName)
-    }
-*/
 
-    /**
-     * create "the model" List<List<GridElement>> allProjectGridLines
-     * from task-portfolio
-     */
-    private void updateGridElements() {
-        def t = RunTimer.getTimerAndStart('NewProjectModel::updateGridElements')
-
-        allProjectGridLines = []
-        if (projectName) {
-
-            project = model.getProject(projectName)
-
-            if(model.pipelineElements) {
-                allProjectGridLines << fromPipelineElement(model.getPipelineElement(projectName), model.taskList)
+    private void updateGridElementsFromDomainModel() {
+        RunTimer.getTimerAndStart('NewProjectModel::updateGridElementsFromDomainModel').withCloseable {
+            allProjectGridLines = []
+            if (projectName) {
+                if (model.pipelineElements) {
+                    allProjectGridLines << fromPipelineElement(model.getPipelineElement(projectName), model.taskList)
+                }
+                //project.sort { it.ending }
+                project = model.getProject(projectName)
+                project.each {
+                    allProjectGridLines << fromTask(it, model.taskList)
+                }
             }
-            //project.sort { it.ending }
-
-            project.each {
-                allProjectGridLines << fromTask(it, model.taskList)
-            }
-
-
-
         }
-        t.stop()
     }
 
 
@@ -184,7 +163,7 @@ class NewProjectModel extends GridModel {
     def updateModelRecalcAndFire() {
         model.reCalcCapaAvailableIfNeeded()
         model.setUpdateToggle(!model.getUpdateToggle())
-        updateGridElements()
+        updateGridElementsFromDomainModel()
     }
 
 
@@ -198,7 +177,7 @@ class NewProjectModel extends GridModel {
     @Override
     def swap(int y, int withY) {
         project.swap(y, withY)
-        updateGridElements()
+        updateGridElementsFromDomainModel()
     }
 
     @Override

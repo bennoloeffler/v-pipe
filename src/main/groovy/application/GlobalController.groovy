@@ -119,24 +119,28 @@ class GlobalController {
     }
 
     def openDir(String dir) {
-        model.setCurrentDir(dir)
-        model.readAllData() // in EDT
-        if(model.pipelineElements) {
-            view.swing.pipelineLoadViewScrollPane.setVisible(true)
-            //((JSplitPane)(view.swing.spV1)).setBottomComponent(view.swing.spV3) // with pipeline
-            //view.swing.spH.setDividerLocation(900)
-            view.swing.spV1.setDividerLocation(500)
-            view.swing.spV2.setDividerLocation(500)
-            view.swing.spV3.setDividerLocation(120)
-            //view.pipelineLoadView.setVisible(true)
-        } else {
-            view.swing.pipelineLoadViewScrollPane.setVisible(false)
-            //((JSplitPane)(view.swing.spV1)).setBottomComponent(view.swing.spSwap) // only load, without pipeline
-            //view.pipelineLoadView.setVisible(false)
-            //view.swing.spV1.setDividerLocation(500)
-            //view.swing.spV2.setDividerLocation(500)
-            //view.swing.spV3.setDividerLocation(120)
-        }
+        //try {
+            model.setCurrentDir(dir)
+            model.readAllData() // in EDT
+            if (model.pipelineElements) {
+                view.swing.pipelineLoadViewScrollPane.setVisible(true)
+                //((JSplitPane)(view.swing.spV1)).setBottomComponent(view.swing.spV3) // with pipeline
+                //view.swing.spH.setDividerLocation(900)
+                view.swing.spV1.setDividerLocation(500)
+                view.swing.spV2.setDividerLocation(500)
+                view.swing.spV3.setDividerLocation(120)
+                //view.pipelineLoadView.setVisible(true)
+            } else {
+                view.swing.pipelineLoadViewScrollPane.setVisible(false)
+                //((JSplitPane)(view.swing.spV1)).setBottomComponent(view.swing.spSwap) // only load, without pipeline
+                //view.pipelineLoadView.setVisible(false)
+                //view.swing.spV1.setDividerLocation(500)
+                //view.swing.spV2.setDividerLocation(500)
+                //view.swing.spV3.setDividerLocation(120)
+            }
+        //} catch (Exception e) {
+        //    e.printStackTrace()
+        //}
     }
 
 

@@ -20,7 +20,6 @@ import java.beans.PropertyChangeListener
 @CompileStatic
 class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListener, MouseListener, KeyListener, FocusListener, PanelBasics {
 
-    Image frameIcon = new ImageIcon(getClass().getResource("/icons/vunds_icon_ 400x400.png")).getImage()
 
     //Color cursorColor = new Color(255, 10, 50, 160)
     //Color nowBarColor = new Color(255, 0, 0, 60)
@@ -548,10 +547,6 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
         t.stop()
     }
 
-    AffineTransform totalTransform = new AffineTransform()
-    AffineTransform rotationTransform = new AffineTransform()
-    AffineTransform translateTransform = new AffineTransform()
-    AffineTransform atBackup
 
     /**
      * @return size as dimonsion based on model-size

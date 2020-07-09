@@ -383,12 +383,13 @@ class Model {
         pipelineElements = []
         capaAvailable = [:]
         jsonSlurp = ''
+        projectSequence = []
     }
 
 
     def readAllData() {
 
-        def t = RunTimer.getTimerAndStart('readAllData')
+        def t = RunTimer.getTimerAndStart('Model::readAllData')
         try {
 
 
@@ -440,7 +441,9 @@ class Model {
 
         }catch(Exception e) {
             emtpyTheModel()
-            throw e
+            println(e.message)
+            e.printStackTrace()
+            //throw e
         } finally {
             setUpdateToggle(!getUpdateToggle())
             t.stop()

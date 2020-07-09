@@ -22,29 +22,32 @@ import java.awt.Desktop
  */
 class  Main {
 
-    static VERSION_STRING ='0.9.4-BetaPhaseNice'
+    static VERSION_STRING ='0.9.5-BetaPhase-Bug'
+
+    def singleRunMode = false // instead: Deamon is default
+    def multiInstanceMode = false // instead SingleInstance is default
+    FileWatcherDeamon fileWatcherDeamon
+    List<FileEvent> fileEvents = null
+
 
     static void main(String[] args) {
+        l.info "v-pipe  (release: $VERSION_STRING)"
+        def m = new Main()
+        m.parseArgs(args)
+        m.checkStartAndHelp()
+        m.runIt()
+    }
 
-        //
-        // parse args
-        //
+
+    void parseArgs(String[] args) {
         def argsStr = args.join(" ")
-        def singleRunMode = false // instead: Deamon is default
-        def multiInstanceMode = false // instead SingleInstance is default
-        def commandLineMode = false
         if(argsStr.contains("-s")) {singleRunMode=true}
         if(argsStr.contains("-m")) {multiInstanceMode = true}
-        if(argsStr.contains("-c")) {commandLineMode = true}
+    }
 
-        l.info "v-pipe  (release: $VERSION_STRING)"
-        /*
-        Logger.trace("Hello World!")
-        Logger.debug("Hello World!")
-        Logger.info("Hello World!")
-        Logger.warn("Hello World!")
-        Logger.error("Hello World!")
-        */
+
+    void checkStartAndHelp() {
+
         //
         // only one instance - typically...
         //
@@ -58,44 +61,28 @@ class  Main {
             openBrowserWithHelp()
             fs.delete()
         }
+    }
 
-        //
-        // do the job...
-        //
+
+    void runIt() {
+
         try {
 
-            // args from apache commons
+            DataReader.setCurrentDir('.')
+
             if(singleRunMode) { // single mode
-                //println "Daten lesen: $DataReader.TASK_FILE_NAME und $DataReader.DATESHIFT_FILE_NAME" // todo
+
                 processData()
-                println "E R F O L G :   Ergebnisse geschrieben. " + LoadCalculator.FILE_NAME_WEEK + ' (und -Monat )' // todo
+                println "E R F O L G :   Ergebnisse geschrieben. " + LoadCalculator.FILE_NAME_WEEK + ' (und -Monat )'
 
             } else { // deamon mode
 
-                DataReader.setCurrentDir('.')
-                List<FileEvent> fileEvents = null
-                def fwd = new FileWatcherDeamon(".")
-                fwd.filter = [DataReader.TASK_FILE_NAME,
-                              DataReader.DATESHIFT_FILE_NAME,
-                              DataReader.PIPELINING_FILE_NAME,
-                              DataReader.CAPA_FILE_NAME,
-                              DataReader.TEMPLATE_FILE_NAME, ]
+                fileWatcherDeamon = createFileWatcherDeamon()
 
                 while(true) {
-                    try {
-                        File projectDataFile = new File(DataReader.TASK_FILE_NAME)
-                        if (projectDataFile.exists()) {
-                            println '\nDaten lesen, rechnen und schreiben...'
-                            long startProcessing = System.currentTimeMillis()
-                            processData()
-                            long endProcessing = System.currentTimeMillis()
-                            def d = new TimeDuration(0, 0, 0, endProcessing - startProcessing as int)
-                            println("Fertig nach: " + d.toString())
-                            println '\nE R F O L G :-)    jetzt warte ich, bis sich etwas ändert.'
-                        } else {
-                            println "Datei ${projectDataFile.absolutePath} existiert (noch) nicht. Ich warte..."
-                        }
 
+                    try {
+                        processDataAndDoTimingAndUserMessages()
                     }catch(VpipeDataException e) {
                         println "\nD A T E N - F E H L E R :\n" + e.getMessage()+"\n"
                     } catch(Exception e) {
@@ -104,50 +91,68 @@ class  Main {
                         sleep(100000)
                         System.exit(-1)
                     } finally {
-                        //
-                        // File listener running? No? Start...
-                        //
-                        if (!fwd.isRunning()) {
-                            fwd.startReceivingEvents()
+                        if (!fileWatcherDeamon.isRunning()) {
+                            fileWatcherDeamon.startReceivingEvents()
                         }
                     }
 
-
-                    //
-                    // Polling loop of v-pipe
-                    //
-                    def lastSecond = System.currentTimeSeconds()
-                    def lastMinute = System.currentTimeSeconds()
-                    while (!fileEvents) {
-                        fileEvents = fwd.extractEvents()
-                        //println('Events:' +fileEvents)
-                        sleep(200)
-                        if (System.currentTimeSeconds() - lastSecond > 1) {
-                            print '.'
-                            lastSecond=System.currentTimeSeconds()
-
-                            if (System.currentTimeSeconds() - lastMinute > 120) {
-                                println ''
-                                lastMinute=System.currentTimeSeconds()
-                            }
-                        }
-
-                    }
-                    fileEvents = null
-
-
+                    waitForFileEvents()
                 }
-
             }
         } catch (VpipeDataException e) {
-            println("D A T E N - F E H L E R :  erst nach der Behebung wird gerechnet...: \n" + e.getMessage()) // todo
+            println("D A T E N - F E H L E R :  erst nach der Behebung wird gerechnet...: \n" + e.getMessage())
+        }
+
+    }
+
+
+    FileWatcherDeamon createFileWatcherDeamon() {
+        def d = new FileWatcherDeamon(".")
+        d.filter = [DataReader.TASK_FILE_NAME,
+                    DataReader.DATESHIFT_FILE_NAME,
+                    DataReader.PIPELINING_FILE_NAME,
+                    DataReader.CAPA_FILE_NAME,
+                    DataReader.TEMPLATE_FILE_NAME, ]
+        d
+    }
+
+
+    void processDataAndDoTimingAndUserMessages() {
+        File projectDataFile = new File(DataReader.TASK_FILE_NAME)
+        if (projectDataFile.exists()) {
+            println '\nDaten lesen, rechnen und schreiben...'
+            long startProcessing = System.currentTimeMillis()
+            processData()
+            long endProcessing = System.currentTimeMillis()
+            def d = new TimeDuration(0, 0, 0, endProcessing - startProcessing as int)
+            println("Fertig nach: " + d.toString())
+            println '\nE R F O L G :-)    jetzt warte ich, bis sich etwas ändert.'
+        } else {
+            println "Datei ${projectDataFile.absolutePath} existiert (noch) nicht. Ich warte..."
         }
     }
 
 
-    /**
-     * one processing loop
-     */
+    void waitForFileEvents() {
+        def lastSecond = System.currentTimeSeconds()
+        def lastMinute = System.currentTimeSeconds()
+        while (!fileEvents) {
+            fileEvents = fileWatcherDeamon.extractEvents()
+            //println('Events:' +fileEvents)
+            sleep(200)
+            if (System.currentTimeSeconds() - lastSecond > 1) {
+                print '.'
+                lastSecond=System.currentTimeSeconds()
+                if (System.currentTimeSeconds() - lastMinute > 120) {
+                    println ''
+                    lastMinute=System.currentTimeSeconds()
+                }
+            }
+        }
+        fileEvents = null
+    }
+
+
     private static void processData() {
         Model m = new Model()
         m.readAllData()
@@ -157,12 +162,11 @@ class  Main {
     }
 
 
-    /**
-     * first start: show browser with Quick-Start
-     */
-    static def openBrowserWithHelp() {
+    void openBrowserWithHelp() {
         if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
             String path = new File("Referenz.html").absolutePath.replace('\\', ('/'))
+            path.replace(' ', '%20')
+            //path = java.net.URLEncoder.encode(path, "UTF-8")
             Desktop.getDesktop().browse(new URI("file:/$path"))
         }
     }

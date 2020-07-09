@@ -91,6 +91,10 @@ class DataReader {
 
                     Date start = strings[1].toDate()
                     Date end = strings[2].toDate()
+                    Date pastOrTwoDigitsDateTest = "1.1.1970".toDate()
+                    if(start < pastOrTwoDigitsDateTest || end < pastOrTwoDigitsDateTest) {
+                        throw new VpipeDataException(errMsg() + "Start oder Ende liegen dramatisch vor 1970 (${start.toString()}, ${end.toString()})")
+                    }
                     if( ! start.before(end)) {
                         throw new VpipeDataException(errMsg() + "Start (${start.toString()}) liegt nicht vor Ende: (${end.toString()})")
                     }
