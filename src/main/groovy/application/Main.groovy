@@ -156,7 +156,7 @@ class  Main {
     private static void processData() {
         Model m = new Model()
         m.readAllData()
-        LoadCalculator pt = new LoadCalculator(model: m)
+        LoadCalculator pt = new LoadCalculator(m)
         LoadCalculator.writeToFileStatic(pt, WeekOrMonth.WEEK)
         LoadCalculator.writeToFileStatic(pt, WeekOrMonth.MONTH)
     }

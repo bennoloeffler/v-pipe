@@ -14,7 +14,7 @@ import groovy.transform.InheritConstructors
 /**
  * Elements after automatic pipelining.
  */
-@Immutable
+//@Immutable
 class PipelineCalcElement {
     Date startDateCalc
     Date endDateCalc
@@ -175,7 +175,7 @@ class PipelineTransformer extends Transformer {
         }
         Map<String, Integer> projectDayShift = p.getProjectShift()
 
-        def allProjects = getAllProjects()
+        def allProjects = model._getAllProjects()
         allProjects.each() { projectName ->
             def projectList = getProject(projectName)
             int shift = projectDayShift[projectName]?:0
@@ -191,7 +191,7 @@ class PipelineTransformer extends Transformer {
                 throw new VpipeDataException("${DataReader.get_PIPELINING_FILE_NAME()} enthält Projekte,\ndie nicht in den Grunddaten sind: $it")
             }
         }
-        getAllProjects().each {
+        model._getAllProjects().each {
             def projects = pipelineElements*.project
             if (! projects.contains(it)) {
                 throw new VpipeDataException("Grunddaten enthalten Projekte,\ndie nicht in ${DataReader.get_PIPELINING_FILE_NAME()} aufgeführt sind: $it")

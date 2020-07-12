@@ -1,5 +1,6 @@
 package core
 
+import groovy.transform.CompileStatic
 import model.Model
 import model.TaskInProject
 import model.WeekOrMonth
@@ -19,6 +20,7 @@ class CapaDetailsEntry {
  * you may get the departments and the loads per week
  */
 @ToString
+@CompileStatic
 class LoadCalculator {
 
     WeekOrMonth weekOrMonth = WeekOrMonth.WEEK
@@ -37,13 +39,13 @@ class LoadCalculator {
     //String currentProject = ""
 
 
-    @Delegate
-    Model model = new Model()
+    //@Delegate
+    Model model //= new Model()
 
-    /*
-    LoadCalculator(Model model) {
-        this.model = model
-    }*/
+
+    LoadCalculator(Model model = null) {
+        this.model = model?:new Model()
+    }
 
     // during reading: show all data read?
 
@@ -157,8 +159,8 @@ class LoadCalculator {
         t.stop("Transformers")
         t.start()
 
-        def load = [:]
-        taskList.each {
+        Map<String, Map<String, Double>> load = [:]
+        model.taskList.each { TaskInProject it ->
             def capaMap = it.getCapaDemandSplitIn(weekOrMonth)
             capaMap.each { key, value ->
 
@@ -167,6 +169,7 @@ class LoadCalculator {
                     load[it.department] = [:]
                 }
                 if(load[it.department][key]) { // if department and week-key are available
+                    //Map<String, Double> departmentLoad = load[it.department]
                     load[it.department][key]+=value // add
                 } else {
                     load[it.department][key]=value // otherwise create
@@ -186,17 +189,18 @@ class LoadCalculator {
      */
     Map<String, Map<String, Double>> calcProjectLoad(WeekOrMonth weekOrMonth, String project) {
 
-        List<TaskInProject> projectTaskList = getProject(project)
-        def load = [:]
-        projectTaskList.each {
+        List<TaskInProject> projectTaskList = model.getProject(project)
+        Map<String, Map<String, Double>> load = [:]
+        projectTaskList.each { TaskInProject it ->
             def capaMap = it.getCapaDemandSplitIn(weekOrMonth)
-            capaMap.each { key, value ->
+            capaMap.each { String key, Double value ->
 
                 // if there is not yet a department key and map: create
                 if (!load[it.department]) {
                     load[it.department] = [:]
                 }
                 if(load[it.department][key]) { // if department and week-key are available
+                    //Double val = load[it.department][key]
                     load[it.department][key]+=value // add
                 } else {
                     load[it.department][key]=value // otherwise create
@@ -210,7 +214,7 @@ class LoadCalculator {
 
     def normalizeTo100Percent() {
         maxRed = [:]
-        if (capaAvailable) {
+        if (model.capaAvailable) {
             depTimeLoadMap.each {
                 String dep = it.key
                 Map<String, Double> load = it.value
@@ -249,7 +253,7 @@ class LoadCalculator {
 
         Map<String, Map<String, Double>> stringMapMap = tr.calcDepartmentLoad(weekOrMonth)
 
-        def fn = weekOrMonth == WeekOrMonth.WEEK ? FILE_NAME_WEEK : FILE_NAME_MONTH
+        String fn = weekOrMonth == WeekOrMonth.WEEK ? FILE_NAME_WEEK : FILE_NAME_MONTH
         File f = new File(fn)
         if(f.exists()) { // BACKUP
             BACKUP_FILE = FileSupport.backupFileName(f.toString())
@@ -262,7 +266,7 @@ class LoadCalculator {
         t.start()
 
         // normalize a maps to contain all time-keys
-        List<String> allTimeKeys = tr.getFullSeriesOfTimeKeys(weekOrMonth)
+        List<String> allTimeKeys = tr.model.getFullSeriesOfTimeKeys(weekOrMonth)
         f << "DEP\t"+allTimeKeys.join("\t") + "\n"
         t.stop("getFullSeriesOfTimeKeys($weekOrMonth)")
 

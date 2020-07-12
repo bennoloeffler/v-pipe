@@ -21,29 +21,29 @@ class ProjectDataToLoadCalculatorTest extends GroovyTestCase {
         t1p2 = TestDataHelper.t("p2", "5.1.2020", "10.1.2020", "d1", 20.0)
         t2p2 = TestDataHelper.t("p2", "8.1.2020", "9.1.2020", "d2", 20.0)
         t3p1 = TestDataHelper.t("p3", "8.2.2020", "9.2.2020", "d3", 20.0)
-        tr.taskList = [t1p1, t2p1, t1p2, t2p2,t3p1]
+        tr.model.taskList = [t1p1, t2p1, t1p2, t2p2,t3p1]
     }
 
     //void tearDown() {}
 
     void testGetProject() {
-        def p1 = tr.getProject("p1")
-        def p2 = tr.getProject("p2")
+        def p1 = tr.model.getProject("p1")
+        def p2 = tr.model.getProject("p2")
         assert p1 == [t1p1, t2p1]
         assert p2 == [t1p2, t2p2]
     }
 
     void testGetAllProjects() {
-        def pList = tr._getAllProjects()
+        def pList = tr.model._getAllProjects()
         assert pList == ["p1", "p2", "p3"] || pList == ["p2", "p1", "p3"] // sequence?
     }
 
     void testGetStartOfTasks() {
-        assert tr.startOfTasks == '5.1.2020'.toDate()
+        assert tr.model.startOfTasks == '5.1.2020'.toDate()
     }
 
     void testGetEndOfTasks() {
-        assert tr.endOfTasks == '9.2.2020'.toDate()
+        assert tr.model.endOfTasks == '9.2.2020'.toDate()
     }
 
     void testCalcDepartmentWeekLoad() {
@@ -71,7 +71,7 @@ class ProjectDataToLoadCalculatorTest extends GroovyTestCase {
         // p2-d3           20
         //
 
-        tr.taskList << TestDataHelper.t("p4", "1.1.2020", "1.2.2021", "d4", 31+29+31+30+31+30+31+31+30+31+30+31+31)
+        tr.model.taskList << TestDataHelper.t("p4", "1.1.2020", "1.2.2021", "d4", 31+29+31+30+31+30+31+31+30+31+30+31+31)
 
         def load = tr.calcDepartmentLoad(MONTH)
         assert load['d1']['2020-M01'] == 40
@@ -102,7 +102,7 @@ class ProjectDataToLoadCalculatorTest extends GroovyTestCase {
         assert load['d2']['2020-W02'] == 40
         assert load['d3']['2020-W06'] == 20
 
-        def timeKeys = tr.getFullSeriesOfTimeKeys(WEEK)
+        def timeKeys = tr.model.getFullSeriesOfTimeKeys(WEEK)
         assert timeKeys.size() == 6
         assert timeKeys[0] == "2020-W01"
         assert timeKeys[5] == "2020-W06"
@@ -124,7 +124,7 @@ class ProjectDataToLoadCalculatorTest extends GroovyTestCase {
 
         Model m = new Model()
         m.readAllData()
-        LoadCalculator pt = new LoadCalculator(model: m)
+        LoadCalculator pt = new LoadCalculator(m)
         //new DateShiftTransformer(m).transform()
         def load = pt.calcDepartmentLoad(WEEK)
 
@@ -154,7 +154,7 @@ class ProjectDataToLoadCalculatorTest extends GroovyTestCase {
 
         Model m = new Model()
         m.readAllData()
-        LoadCalculator pt = new LoadCalculator(model: m)
+        LoadCalculator pt = new LoadCalculator(m)
         new DateShiftTransformer(m).transform()
         def load = pt.calcDepartmentLoad(WEEK)
 

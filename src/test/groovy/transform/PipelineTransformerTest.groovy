@@ -106,12 +106,9 @@ class PipelineTransformerTest extends GroovyTestCase {
             p6 5.3.2020 26.4.2020 2
             """
 
-        //LoadCalculator plc = new LoadCalculator()
-        //def pt = new PipelineTransformer(plc)
-        def maxPipelineSlots
-        def pipelineElements
-
-        (maxPipelineSlots, pipelineElements) = DataReader.readPipelining()
+        DataReader.PipelineResult result = DataReader.readPipelining()
+        def maxPipelineSlots = result.maxPipelineSlots
+        def pipelineElements = result.elements
 
         assert maxPipelineSlots == 6
 

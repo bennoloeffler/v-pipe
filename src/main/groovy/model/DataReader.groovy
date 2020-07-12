@@ -131,17 +131,21 @@ class DataReader {
     /**
      * @return int maxPipelineSlots and List<PipelineOriginalElement> pipelineElements
      */
-    static Tuple2 readPipelining() {
+    static class PipelineResult {
+        Integer maxPipelineSlots
+        List<PipelineOriginalElement> elements
+    }
+    static PipelineResult readPipelining() {
         String text = FileSupport.getTextOrEmpty(get_PIPELINING_FILE_NAME())
         return readPipelining(text)
     }
 
-    static Tuple2 readPipelining(String text) {
+    static PipelineResult readPipelining(String text) {
         List<List<String>> splitLines =  FileSupport.toSplitAndTrimmedLines(text)
         return parsePipelining(splitLines)
     }
 
-    static Tuple2 parsePipelining(List<List<String>> splitLines) {
+    static PipelineResult parsePipelining(List<List<String>> splitLines) {
         int maxPipelineSlots = 0
         List<PipelineOriginalElement> pipelineElements = []
         if(splitLines) {
@@ -191,7 +195,7 @@ class DataReader {
         if(diff) {
             throw new VpipeDataException("Lesen von Datei ${get_PIPELINING_FILE_NAME()} fehlgeschlagen.\nMehrfacheinträge für Projekte: $diff")
         }
-        new Tuple2(maxPipelineSlots, pipelineElements)
+        new PipelineResult(maxPipelineSlots: maxPipelineSlots, elements: pipelineElements)
     }
 
 

@@ -35,7 +35,7 @@ class TestDataHelper {
         t2p1 = t("p1", "8.1.2020", "9.1.2020", "d2", 20.0)
         t1p2 = t("p2", "5.1.2020", "10.1.2020", "d1", 20.0)
         t2p2 = t("p2", "8.1.2020", "9.2.2020", "d2", 20.0)
-        tr.taskList = [t1p1, t2p1, t1p2, t2p2]
+        tr.model.taskList = [t1p1, t2p1, t1p2, t2p2]
         tr
     }
 

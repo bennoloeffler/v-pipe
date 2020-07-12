@@ -19,10 +19,10 @@ class DataWriterTest extends Specification {
 
         when:
         DataWriter dw = new DataWriter(model: m)
-        def tasksString = dw.writeTasks()
+        def tasksString = dw.getTasks()
 
         then:
-        tasksString == "p1  15.01.2020  15.02.2020  IBN                 14.0  " // descritption missing...
+        tasksString == "p1                    15.01.2020  15.02.2020  IBN                   14.0  \n" // descritption missing...
 
     }
 }

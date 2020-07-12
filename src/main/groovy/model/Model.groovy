@@ -1,17 +1,32 @@
 package model
 
+import extensions.DateExtension
+import extensions.StringExtension
 import groovy.beans.Bindable
 import groovy.time.TimeCategory
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
+import org.codehaus.groovy.runtime.DefaultGroovyMethods
 import transform.DateShiftTransformer
 import transform.TemplateTransformer
 import utils.RunTimer
 
+import java.time.Duration
+import java.time.LocalDate
+import java.time.Year
+import java.time.ZoneId
+import java.time.temporal.ChronoUnit
+import java.time.temporal.TemporalUnit
+
 import static extensions.DateHelperFunctions._getStartOfWeek
 import static extensions.DateHelperFunctions._getStartOfWeek
 import static extensions.DateHelperFunctions._getStartOfWeek
 import static extensions.DateHelperFunctions._getStartOfWeek
+import static extensions.DateHelperFunctions._sToD
+import static model.WeekOrMonth.MONTH
 import static model.WeekOrMonth.WEEK
 
+//@CompileStatic
 class Model {
 
     @Bindable
@@ -19,7 +34,6 @@ class Model {
 
     @Bindable
     String currentDir // = new File(".").getCanonicalPath().toString()
-
 
     void setCurrentDir(String currentDir) {
 
@@ -79,8 +93,6 @@ class Model {
 
     List<String> projectSequence = []
 
-
-
     /**
      * @param project
      * @return List of all Tasks with project name project
@@ -134,6 +146,9 @@ class Model {
     /**
      * @return even if data is sparce, deliver continous list of timekey strings. Every week.
      */
+    Duration years20 = Duration.of(20 * 365 * 20, ChronoUnit.DAYS)
+    //Duration oneMonth = Duration.of(1, ChronoUnit.MONTHS)
+
     List<String> getFullSeriesOfTimeKeys(WeekOrMonth weekOrMonth) {
         def t = RunTimer.getTimerAndStart('getFullSeriesOfTimeKeys')
 
@@ -143,33 +158,46 @@ class Model {
         Date e = getEndOfTasks()
 
         if(s && e) {
-            use(TimeCategory) {
-                if (e - s > 20.years) {
+            //use(TimeCategory) {
+                if (e - s > years20.toDays()) {
                     throw new VpipeDataException("Dauer von Anfang bis Ende\n" +
                             "der Tasks zu lange ( > 20 Jahre ): ${s.toString()} bis ${e.toString()}")
                 }
-            }
+            //}
 
 
             if (weekOrMonth == WEEK) {
-                s = s.getStartOfWeek()
+                s = DateExtension.getStartOfWeek(s)
                 while (s < e) {
-                    result << s.getWeekYearStr()
-                    s += 7
+                    result << DateExtension.getWeekYearStr(s)
+                    s = convertToDate(convertToLocalDate(s).plusDays(7))
                 }
             } else {
-                s = s.getStartOfMonth()
+                s = DateExtension.getStartOfMonth(s)
                 while (s < e) {
-                    result << s.getMonthYearStr()
-                    use(TimeCategory) {
-                        s = s + 1.month
-                    }
+                    result << DateExtension.getMonthYearStr(s)
+                    //use(TimeCategory) {
+                        s = convertToDate(convertToLocalDate(s).plusMonths(1))
+                    //}
                 }
             }
             //result.sort()
         }
         t.stop()
         result
+    }
+
+    @CompileStatic
+    LocalDate convertToLocalDate(Date dateToConvert) {
+        dateToConvert.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate()
+    }
+
+    Date convertToDate(LocalDate dateToConvert) {
+        Date.from(dateToConvert.atStartOfDay()
+                .atZone(ZoneId.systemDefault())
+                .toInstant())
     }
 
 
@@ -204,8 +232,9 @@ class Model {
         t.stop()
     }
 
-    def fileErr = {""}
+    Closure<GString> fileErr = {"" as GString}
 
+    @CompileStatic(TypeCheckingMode.SKIP)
     Map<String, Map<String, YellowRedLimit>> calcCapa(def jsonSlurp) {
 
         Map<String, Map<String, YellowRedLimit>> result = [:]
@@ -357,13 +386,13 @@ class Model {
     }
 
     Double percentageLeftAfterPublicHoliday(String week, List listOfPubHoliday) {
-        def p = 1.0
-        Date startOfWeek = week.toDateFromYearWeek()
-        Date endOfWeek = startOfWeek + 5 // exclude Sa and Su
+        Double p = 1.0d
+        Date startOfWeek = StringExtension.toDateFromYearWeek(week)
+        Date endOfWeek = convertToDate(convertToLocalDate(startOfWeek).plusDays(5)) // exclude Sa and Su
         for(String day in listOfPubHoliday) {
-            def date = day.toDate()
+            def date = _sToD(day)
             if(date >= startOfWeek && date < endOfWeek) {
-                p -= 0.2
+                p -= 0.2d
             }
         }
         p
@@ -387,6 +416,7 @@ class Model {
     }
 
 
+    @CompileStatic(TypeCheckingMode.SKIP)
     def readAllData() {
 
         def t = RunTimer.getTimerAndStart('Model::readAllData')
@@ -402,7 +432,9 @@ class Model {
             //
             // read the integrationPhaseData
             //
-            (maxPipelineSlots, pipelineElements) = DataReader.readPipelining()
+            DataReader.PipelineResult pr = DataReader.readPipelining()
+            maxPipelineSlots = pr.maxPipelineSlots
+            pipelineElements = pr.elements
             checkPipelineInProject()
 
 
@@ -433,7 +465,7 @@ class Model {
 
             // if sequence has been saved AND project data removed or added: sync and let seqnence stable anyway
             projectSequence = DataReader.readSequence()
-            def all = _getAllProjects()
+            List<String> all = _getAllProjects()
             def intersect = all.intersect(projectSequence)
             projectSequence.retainAll(intersect)
             def added = all - intersect
@@ -441,9 +473,9 @@ class Model {
 
         }catch(Exception e) {
             emtpyTheModel()
-            println(e.message)
-            e.printStackTrace()
-            //throw e
+            //println(e.message)
+            // e.printStackTrace()
+            throw e
         } finally {
             setUpdateToggle(!getUpdateToggle())
             t.stop()
