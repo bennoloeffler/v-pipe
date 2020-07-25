@@ -471,78 +471,79 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
         //
         // draw the line names
         //
+        if(gridWidth > 12) {
+            int y = 0
+            model.getLineNames()
+            model.getLineNames().each { String projectName ->
+                int gridY = borderWidth + y * gridWidth
+                if (hightlightLinePattern && projectName =~ hightlightLinePattern) {
 
-        int y = 0
-        model.getLineNames()
-        model.getLineNames().each { String projectName ->
-            int gridY = borderWidth + y*gridWidth
-            if( hightlightLinePattern && projectName =~ hightlightLinePattern) {
+                    g.setColor(cursorColor) //new Color(150,255,255,100))
+                    g.fillRoundRect(borderWidth, (int) (gridY + gridWidth / 2) - 2, nameWidth + borderWidth + gridWidth * model.sizeX, 4, round, round)
+                } else {
+                    g.setColor(Color.WHITE)
+                }
+                g.fillRoundRect(borderWidth, gridY, nameWidth - 4, gridWidth - 4, round, round)
 
-                g.setColor(cursorColor) //new Color(150,255,255,100))
-                g.fillRoundRect(borderWidth , (int)(gridY+gridWidth/2)-2, nameWidth+ borderWidth+gridWidth*model.sizeX,  4 , round, round)
-            } else {
-                g.setColor(Color.WHITE)
+                if (gridWidth > 0) {
+                    // write (with shadow) some info
+                    float fontSize = gridWidth / 2
+                    g.getClipBounds(rBackup)
+                    Rectangle newClip = new Rectangle(borderWidth, gridY, nameWidth - 6, gridWidth - 6)
+                    g.setClip(newClip.intersection(rBackup))
+                    g.setFont(g.getFont().deriveFont((float) fontSize))
+                    g.setColor(Color.WHITE)
+                    g.drawString(projectName, borderWidth + (int) (gridWidth * 0.2), gridY + (int) (gridWidth * 2 / 3))
+                    g.setColor(Color.BLACK)
+                    g.drawString(projectName, borderWidth + (int) (gridWidth * 0.2) - 1, gridY + (int) (gridWidth * 2 / 3) - 1)
+                    g.setClip(rBackup)
+                }
+
+                y++
             }
-            g.fillRoundRect(borderWidth , gridY, nameWidth-4, gridWidth - 4 , round, round)
 
-            if(gridWidth>0) {
-                // write (with shadow) some info
-                float fontSize = gridWidth / 2
-                g.getClipBounds(rBackup)
-                Rectangle newClip = new Rectangle(borderWidth , gridY, nameWidth-6, gridWidth - 6)
-                g.setClip(newClip.intersection(rBackup))
-                g.setFont(g.getFont().deriveFont((float) fontSize))
+            g.drawImage(frameIcon, (int) borderWidth, (int) (borderWidth + y * gridWidth), nameWidth - 4, nameWidth - 4, null)
+
+            //
+            // draw the row names
+            //
+
+            int x = 0
+            model.getColumnNames().each { String rowName ->
                 g.setColor(Color.WHITE)
-                g.drawString(projectName, borderWidth + (int) (gridWidth * 0.2), gridY + (int) (gridWidth * 2/3))
-                g.setColor(Color.BLACK)
-                g.drawString(projectName, borderWidth + (int) (gridWidth * 0.2)-1, gridY + (int) (gridWidth * 2/3)-1)
-                g.setClip(rBackup)
+                int gridX = borderWidth + x * gridWidth + nameWidth
+                int gridY = borderWidth + (model.sizeY) * gridWidth
+                g.fillRoundRect(gridX, gridY, gridWidth - 4, nameWidth - 4, round, round)
+
+                if (gridWidth > 0) {
+                    // write (with shadow) some info
+                    float fontSize = gridWidth / 2
+                    g.setFont(g.getFont().deriveFont((float) fontSize))
+                    atBackup = g.getTransform()
+                    //Resets transform to rotation
+                    rotationTransform.setToRotation((double) Math.PI / 2)
+                    translateTransform.setToTranslation(gridX, gridY)
+                    //Chain the transforms (Note order matters)
+                    totalTransform.setToIdentity()
+                    totalTransform.concatenate(atBackup)
+                    totalTransform.concatenate(translateTransform)
+                    totalTransform.concatenate(rotationTransform)
+                    //at.rotate((double)(Math.PI / 2))
+                    g.setTransform(totalTransform)
+                    g.setColor(Color.WHITE)
+
+                    g.getClipBounds(rBackup)
+                    Rectangle newClip = new Rectangle(0, -gridWidth, nameWidth - 6, gridWidth)
+                    g.setClip(newClip.intersection(rBackup))
+
+                    g.drawString(rowName, (int) (gridWidth * 0.2), 0 - (int) (gridWidth * 0.2))
+                    g.setColor(Color.BLACK)
+                    g.drawString(rowName, (int) (gridWidth * 0.2) - 1, 0 - (int) (gridWidth * 0.2) - 1)
+                    g.setClip(rBackup)
+                    g.setTransform(atBackup)
+                }
+                x++
             }
-
-            y++
-        }
-
-        g.drawImage(frameIcon, (int)borderWidth,  (int)(borderWidth + y*gridWidth), nameWidth-4, nameWidth-4,  null)
-
-        //
-        // draw the row names
-        //
-
-        int x = 0
-        model.getColumnNames().each { String rowName ->
-            g.setColor(Color.WHITE)
-            int gridX = borderWidth + x*gridWidth + nameWidth
-            int gridY = borderWidth + (model.sizeY) * gridWidth
-            g.fillRoundRect(gridX , gridY, gridWidth-4, nameWidth - 4 , round, round)
-
-            if(gridWidth>0) {
-                // write (with shadow) some info
-                float fontSize = gridWidth / 2
-                g.setFont(g.getFont().deriveFont((float) fontSize))
-                atBackup = g.getTransform()
-                //Resets transform to rotation
-                rotationTransform.setToRotation((double)Math.PI/2)
-                translateTransform.setToTranslation(gridX   , gridY )
-                //Chain the transforms (Note order matters)
-                totalTransform.setToIdentity()
-                totalTransform.concatenate(atBackup)
-                totalTransform.concatenate(translateTransform)
-                totalTransform.concatenate(rotationTransform)
-                //at.rotate((double)(Math.PI / 2))
-                g.setTransform(totalTransform)
-                g.setColor(Color.WHITE)
-
-                g.getClipBounds(rBackup)
-                Rectangle newClip = new Rectangle(0 , -gridWidth, nameWidth-6, gridWidth)
-                g.setClip(newClip.intersection(rBackup))
-
-                g.drawString(rowName,  (int) (gridWidth * 0.2),  0 - (int) (gridWidth * 0.2))
-                g.setColor(Color.BLACK)
-                g.drawString(rowName,  (int) (gridWidth * 0.2) -1,  0 - (int) (gridWidth * 0.2) -1)
-                g.setClip(rBackup)
-                g.setTransform(atBackup)
-            }
-            x++
         }
         t.stop()
     }
@@ -591,7 +592,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
             g.setColor(new Color(255,0,0,150))
         } //g.setColor(Color.LIGHT_GRAY)}
         g.fillRoundRect(graphX, graphY, size-4 , size-4, round, round)
-        g.fillRoundRect(graphX, graphY, size-4 , size-4, round, round)
+        //g.fillRoundRect(graphX, graphY, size-4 , size-4, round, round)
 
 
         // or cursor color (overwrites everything)
@@ -601,7 +602,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
         }
 
 
-        if(gridWidth>0) {
+        if(gridWidth>1000) {
             // write (with shadow) some info
             // TODO: use Clip, Transform, Paint, Font and Composite
             float fontSize = 20.0 * gridWidth / 60
