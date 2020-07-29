@@ -162,7 +162,7 @@ class  Main {
     }
 
 
-    void openBrowserWithHelp() {
+    static void openBrowserWithHelp() {
         if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
             String path = new File("Referenz.html").absolutePath.replace('\\', ('/'))
             path.replace(' ', '%20')

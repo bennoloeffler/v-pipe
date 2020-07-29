@@ -54,8 +54,9 @@ task createGui(type: edu.sc.seis.launch4j.tasks.Launch4jLibraryTask) {
  * set that to local copy
  */
 def jre = "jre"
-//def jrePath = "C:\\Program Files\\Java\\jre-9.0.4" // does not scale so fine in the Grid-Panel...
 def jrePath = "C:\\Program Files\\Java\\jre1.8.0_172"
+//def jrePath = "C:\\Program Files\\Java\\jre1.8.0_201"
+//def jrePath = "C:\\Program Files\\Java\\jre-9.0.4" // does not scale so fine in the Grid-Panel...
 def tempDist = "$buildDir/dist/v-pipe"
 def exampleDir = "$tempDist/bsp-daten"
 

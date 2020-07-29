@@ -580,7 +580,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
 
         // shadow
         g.setColor(Color.LIGHT_GRAY)
-        g.fillRoundRect(graphX+offset, graphY+offset, size-4, size-4, round, round)
+        //g.fillRoundRect(graphX+offset, graphY+offset, size-4, size-4, round, round)
 
         // element in project color, integration phase color (orange), empty color (white)
         assert e != null
