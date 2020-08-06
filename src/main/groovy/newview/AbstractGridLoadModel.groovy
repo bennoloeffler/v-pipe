@@ -71,7 +71,7 @@ abstract class AbstractGridLoadModel {
      * @param y
      * @return the maximum value in percent or absolute of line y
      */
-    abstract double getMax(int y)
+    abstract double getMaxValAndRed(int y)
 
     /**
      * @return as it says

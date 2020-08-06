@@ -8,6 +8,7 @@ import utils.RunTimer
 
 import javax.swing.JPanel
 import javax.swing.JToolTip
+import javax.swing.SwingUtilities
 import javax.swing.ToolTipManager
 import java.awt.Color
 import java.awt.Dimension
@@ -69,7 +70,18 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
         addMouseListener(this)
         addKeyListener(this)
         addFocusListener(this)
+        /*
+        SwingUtilities.invokeLater {
+            setCursorToNow()
+        }*/
     }
+
+    /*
+    void setModel(AbstractGridLoadModel model) {
+        assert false
+        this.model = model
+        setCursorToNow()
+    }*/
 
     //
     // Focus Listener
@@ -184,8 +196,8 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
             //openFile()
         }
 
-        if(KeyEvent.VK_L == e.getKeyCode()) {
-            //VpipeGui.openLoad()
+        if(KeyEvent.VK_N == e.getKeyCode()) {
+            setCursorToNow()
         }
 
         if(KeyEvent.VK_PLUS == e.getKeyCode()) {
@@ -201,11 +213,11 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
             updateOthersFromGridWidth(gridWidth, this)
         }
 
-        if(KeyEvent.VK_LEFT == e.getKeyCode())  {cursorX > 0              ? setCursorX(cursorX-1) :0}
-        if(KeyEvent.VK_RIGHT == e.getKeyCode()) {cursorX < model.sizeX-1  ? setCursorX(cursorX+1) :0}
+        if(KeyEvent.VK_LEFT == e.getKeyCode())  {cursorX > 0              ? setCursorX(cursorX-1) :0 ; scrollToCursorX()}
+        if(KeyEvent.VK_RIGHT == e.getKeyCode()) {cursorX < model.sizeX-1  ? setCursorX(cursorX+1) :0 ; scrollToCursorX()}
 
 
-        scrollToCursorX()
+        //scrollToCursorX()
         invalidateAndRepaint(this)
 
     }
@@ -230,6 +242,11 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
     int getGridXFromMouseX(int mouseX) {
         int gridX = ((mouseX - borderWidth- nameWidth) / gridWidth) as int
         gridX
+    }
+
+    def setCursorToNow() {
+        setCursorX(model.nowX)
+        scrollToCursorX()
     }
 
     void scrollToCursorX() {
@@ -260,8 +277,9 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
             //def notIn = 0
             //println("m.sizeX: $model.sizeX, m.sizeY: $model.sizeY")
             //println("total: ${model.sizeX * model.sizeY}")
-            for(int x = 0; x < model.sizeX; x++ ) {
-                for (int y = 0; y < model.sizeY; y++ ) {
+            for (int y = 0; y < model.sizeY; y++ ) {
+                def maxValAndRed = model.getMaxValAndRed(y)
+                for(int x = 0; x < model.sizeX; x++ ) {
                     int gridX = nameWidth + borderWidth + x*gridWidth
                     int gridY = borderWidth + y*gridHeigth
                     if(gridX >= r.x-2*gridWidth && gridX <= r.x+2*gridWidth + r.width && gridY >= r.y-2*gridHeigth && gridY <= r.y+2*gridWidth + r.height) {
@@ -275,7 +293,7 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
                             drawGridElementYelloRed(g,
                                     element.load,
                                     element.loadProject,
-                                    model.getMax(y),
+                                    maxValAndRed,
                                     element.yellow,
                                     element.red,
                                     gridX,
@@ -435,7 +453,7 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
             int sizeY = gridHeigth - offset // size of shadow box and element box
             int round = (int)(sizeX / 2) // corner diameter
 
-            if (max < red) { max = red }
+            //if (max < red) { max = red }
             Double percent = (Double) (val / max)
 
             //println(percent)

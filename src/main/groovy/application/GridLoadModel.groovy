@@ -142,8 +142,10 @@ class GridLoadModel extends AbstractGridLoadModel  {
     }
 
     @Override
-    double getMax(int y) {
-        return absoluteLoadCalculator.getMax(model.getAllDepartments()[y])
+    double getMaxValAndRed(int y) {
+        def maxLoad = absoluteLoadCalculator.getMax(model.getAllDepartments()[y])
+        def maxRed = gridElements[model.getAllDepartments()[y]].entrySet()*.value.max {it.red}
+        Math.max(maxLoad, maxRed.red)
     }
 
     @Override

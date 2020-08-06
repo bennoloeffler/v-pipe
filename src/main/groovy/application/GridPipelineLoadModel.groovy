@@ -111,7 +111,7 @@ class GridPipelineLoadModel extends AbstractGridLoadModel  {
     }
 
     @Override
-    double getMax(int y) {
+    double getMaxValAndRed(int y) {
         return maxVal
     }
 

@@ -262,6 +262,11 @@ gleichzeitig gearbeitet werden soll.
 
 ### Features
 
+Scr2020-08-07 `0.9.6-ScrollToll`
+- Scrollt zu 'jetzt' beim öffnen
+- sprint nicht mehr beim umschalten der Detail-Tooltips
+- Bug bei Anzeige der Skalierung der Kapa-Belastung gefixt
+- mit 'n' kann man den Cursor zu 'jetzt' fahren (_n_ow)
 
 2020-07-09 `0.9.5-BetaPhase-Bug`
 - Sort ToolTip + 2-Stellen-Jahres-Bug raus

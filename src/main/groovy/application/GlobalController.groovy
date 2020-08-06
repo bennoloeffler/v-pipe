@@ -122,6 +122,8 @@ class GlobalController {
         //try {
             model.setCurrentDir(dir)
             model.readAllData() // in EDT
+            view.pipelineView.setCursorToNow()
+            view.loadView.setCursorToNow()
             if (model.pipelineElements) {
                 view.swing.pipelineLoadViewScrollPane.setVisible(true)
                 //((JSplitPane)(view.swing.spV1)).setBottomComponent(view.swing.spV3) // with pipeline

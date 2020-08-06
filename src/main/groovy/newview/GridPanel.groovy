@@ -228,8 +228,8 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
             //openFile()
         }
 
-        if(KeyEvent.VK_L == e.getKeyCode()) {
-            //VpipeGui.openLoad()
+        if(KeyEvent.VK_N == e.getKeyCode()) {
+            setCursorToNow()
         }
 
         if(KeyEvent.VK_D == e.getKeyCode()) {
@@ -266,16 +266,17 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
         }
 
         //def redraw = [new Point(cursorX, cursorY)]
-        if(KeyEvent.VK_UP == e.getKeyCode())    {cursorY > 0              ? --cursorY :0}
-        if(KeyEvent.VK_DOWN == e.getKeyCode())  {cursorY < model.sizeY-1  ? ++cursorY :0}
-        if(KeyEvent.VK_LEFT == e.getKeyCode())  {cursorX > 0              ? setCursorX(cursorX-1) :0}
-        if(KeyEvent.VK_RIGHT == e.getKeyCode()) {cursorX < model.sizeX-1  ? setCursorX(cursorX+1) :0}
+        if(KeyEvent.VK_UP == e.getKeyCode())    {cursorY > 0              ? --cursorY :0; scrollToCursorXY()}
+        if(KeyEvent.VK_DOWN == e.getKeyCode())  {cursorY < model.sizeY-1  ? ++cursorY :0; scrollToCursorXY()}
+        if(KeyEvent.VK_LEFT == e.getKeyCode())  {cursorX > 0              ? setCursorX(cursorX-1) :0; scrollToCursorXY()}
+        if(KeyEvent.VK_RIGHT == e.getKeyCode()) {cursorX < model.sizeX-1  ? setCursorX(cursorX+1) :0; scrollToCursorXY()}
 
         if(keyAndShiftPressed(e, KeyEvent.VK_UP)) {
             //println("SHIFT UP x: $cursorX y: $cursorY")
             if(cursorY >= 0) {
                 model.swap(cursorY, cursorY + 1)
                 colors.swap(cursorY % colors.size(), (cursorY + 1) % colors.size())
+                scrollToCursorXY()
             }
         }
 
@@ -284,18 +285,21 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
             if(cursorY <= model.sizeY-1) {
                 model.swap(cursorY - 1, cursorY)
                 colors.swap((cursorY - 1) % colors.size(), cursorY % colors.size())
+                scrollToCursorXY()
             }
         }
 
         if(keyAndShiftPressed(e, KeyEvent.VK_LEFT)) {
             model.moveLeft(cursorY)
+            scrollToCursorXY()
         }
 
         if(keyAndShiftPressed(e, KeyEvent.VK_RIGHT)) {
             model.moveRight(cursorY)
+            scrollToCursorXY()
         }
 
-        scrollToCursorXY()
+        //scrollToCursorXY()
         invalidateAndRepaint(this)
 
         model.setSelectedElement(cursorX, cursorY)
@@ -358,18 +362,26 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
         model.addPropertyChangeListener('updateToggle', l)
         addPropertyChangeListener('cursorX', cursorXChanged as PropertyChangeListener)
         addPropertyChangeListener('hightlightLinePattern', l)
-        setCursorToNow()
+        /*
+        SwingUtilities.invokeLater {
+            setCursorToNow()
+        }*/
     }
+
+    /*
+    void setModel(GridModel model) {
+        assert false
+        this.model = model
+        setCursorToNow()
+    }*/
+
 
     def setCursorToNow() {
-        cursorX = model.nowX
-        scrollToCursorXY()
+        if(model.nowX >= 0) {
+            setCursorX(model.nowX)
+            scrollToCursorXY()
+        }
     }
-
-
-    //boolean hintsDone=false
-
-
 
     Rectangle r = new Rectangle()
     /**
