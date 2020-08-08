@@ -155,7 +155,7 @@ class MainGui {
             bind(target: view.pipelineLoadView, targetProperty: 'gridWidth', source: view.pipelineView, sourceProperty: 'gridWidth')
             bind(target: view.loadView, targetProperty: 'gridWidth', source: view.pipelineView, sourceProperty: 'gridWidth')
 
-            // sync cursorX: central node -> pipelineView
+            // sync cursorX: central node ist the pipelineView
             bind(target: view.projectView, targetProperty: 'cursorX', source: view.pipelineView, sourceProperty: 'cursorX')
             bind(target: view.loadView, targetProperty: 'cursorX', source: view.pipelineView, sourceProperty: 'cursorX')
             bind(target: view.pipelineLoadView, targetProperty: 'cursorX', source: view.pipelineView, sourceProperty: 'cursorX')
@@ -169,6 +169,7 @@ class MainGui {
             bind(target: view.swing.timeLabel, targetProperty: 'text', source: view.pipelineView, sourceProperty: 'nowString')
             bind(target: view.swing.projectLabel, targetProperty: 'text', source: view.gridPipelineModel, sourceProperty: 'selectedProject')
             bind(target: view.swing.depLabel, targetProperty: 'text', source: view.gridProjectModel, sourceProperty: 'departmentName')
+
         }
 
 

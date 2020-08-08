@@ -9,6 +9,7 @@ import javax.swing.ToolTipManager
 import java.awt.Color
 import java.awt.Graphics2D
 import java.awt.Image
+import java.awt.Point
 import java.awt.RenderingHints
 import java.awt.event.MouseEvent
 import java.awt.geom.AffineTransform
@@ -39,6 +40,11 @@ trait PanelBasics {
         nameWidth = (int)(gridHeigth *1.0) // strange compile bug without???
         borderWidth = (int)5 //(gridWidth / 3)
         getScrollPane(c)?.getVerticalScrollBar()?.setUnitIncrement((gridHeigth/6) as int)
+    }
+
+
+    int scrollMouseToMouse(JComponent c, Point mouse) {
+        getScrollPane(c)?.getVerticalScrollBar()?.getValue()
     }
 
 

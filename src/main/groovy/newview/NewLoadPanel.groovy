@@ -109,15 +109,38 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
             //   and positive values if the mouse wheel was rotated down/ towards the user
             int rot = e.getWheelRotation()
             int inc = (int)(gridWidth * rot / 10)
+            def psOld = getPreferredSize()
             setGridWidth(gridWidth + (inc!=0?inc:1)) // min one tic bigger
             minMaxGridCheck()
             updateOthersFromGridWidth(gridWidth, this)
-
+            //def visible = get
+            //visible.getMaxX()
+            //scrollToCursorX()
+            adjustLocationAndMouseAfterZooming(mouseX, mouseY, psOld.width, getPreferredSize().width)
             invalidateAndRepaint(this)
         } else {
             getScrollPane(this)?.getVerticalScrollBar()?.setUnitIncrement((gridWidth/3) as int)
             getScrollPane(this)?.processMouseWheelEvent(e)
         }
+    }
+
+    def adjustLocationAndMouseAfterZooming(double x, double y, double oldSize, double newSize ) {
+        def r = getVisibleRect()
+        double ratio = newSize / oldSize
+
+        double deltaX = x * (1 - ratio)
+        double tmpX = r.x - deltaX
+
+        double deltaY = y * (1 - ratio)
+        double tmpY = r.y - deltaY
+
+        def locX = (int) (tmpX >= 0 ? tmpX : 0)
+        def locY = (int) (tmpY >= 0 ? tmpY : 0)
+
+        setLocation(-locX, -locY)
+
+        mouseY = (int)(mouseY * ratio)
+        mouseX = (int)(mouseX * ratio)
     }
 
 
@@ -192,7 +215,7 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
             }
         }
 
-        if(KeyEvent.VK_O == e.getKeyCode()) {
+        if(KeyEvent.VK_S == e.getKeyCode()) {
             //openFile()
         }
 
@@ -200,18 +223,8 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
             setCursorToNow()
         }
 
-        if(KeyEvent.VK_PLUS == e.getKeyCode()) {
-            setGridWidth((gridWidth * 1.1) as int)
-            minMaxGridCheck()
-            updateOthersFromGridWidth(gridWidth, this)
-
-        }
-
-        if(KeyEvent.VK_MINUS == e.getKeyCode()) {
-            setGridWidth((gridWidth / 1.1) as int)
-            minMaxGridCheck()
-            updateOthersFromGridWidth(gridWidth, this)
-        }
+        if(KeyEvent.VK_PLUS == e.getKeyCode()) { doZooming {gridWidth * 1.1} }
+        if(KeyEvent.VK_MINUS == e.getKeyCode()) { doZooming {gridWidth / 1.1} }
 
         if(KeyEvent.VK_LEFT == e.getKeyCode())  {cursorX > 0              ? setCursorX(cursorX-1) :0 ; scrollToCursorX()}
         if(KeyEvent.VK_RIGHT == e.getKeyCode()) {cursorX < model.sizeX-1  ? setCursorX(cursorX+1) :0 ; scrollToCursorX()}
@@ -220,6 +233,19 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
         //scrollToCursorX()
         invalidateAndRepaint(this)
 
+    }
+
+    def doZooming(Closure howToZoom) {
+        def oldPreferredSize = getPreferredSize()
+        setGridWidth(howToZoom() as int)
+        minMaxGridCheck()
+        updateOthersFromGridWidth(gridWidth, this)
+        def vr = getVisibleRect()
+        adjustLocationAndMouseAfterZooming(
+                vr.centerX,
+                vr.centerY,
+                oldPreferredSize.width,
+                getPreferredSize().width)
     }
 
 

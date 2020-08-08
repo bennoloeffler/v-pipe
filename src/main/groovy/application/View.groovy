@@ -88,49 +88,49 @@ class View {
 
 
         // see: https://stackoverflow.com/questions/42833424/java-key-bindings-using-groovy-swing-builder/42834255
-        swing.actions {
+        swing.actions({
 
 
             // file
 
-            action ( id: 'openAction',
+            action(id: 'openAction',
                     name: "oeffnen",
                     mnemonic: 'o',
-                    closure: {println "openAction not connected to application..."},
+                    closure: { println "openAction not connected to application..." },
                     accelerator: shortcut('O'),
                     focus: JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT,
                     //smallIcon: imageIcon(resource: "icons/folder_r1.png"),
                     shortDescription: 'Verzeichnis mit Daten-Datein öffnen - alle Dateien darin'
             )
-            action ( id: 'saveAction',
+            action(id: 'saveAction',
                     name: "speichern",
                     mnemonic: 's',
-                    closure: {println "saveAction not connected to application..."},
+                    closure: { println "saveAction not connected to application..." },
                     accelerator: shortcut('S'),
                     shortDescription: 'alle Daten ins aktuelle Daten-Verzeichnis sichern'
             )
-            action ( id: 'saveAsAction',
+            action(id: 'saveAsAction',
                     name: "speichern als...",
                     //mnemonic: 's',
-                    closure: {println "saveAsAction not connected to application..."},
+                    closure: { println "saveAsAction not connected to application..." },
                     //accelerator: shortcut('S'),
                     shortDescription: 'anderes Daten-Verzeichnis wählen und Dateien speichern'
             )
 
-            action ( id: 'exitAction',
+            action(id: 'exitAction',
                     name: "beenden",
                     //mnemonic: 'p',
-                    closure: {println "exitAction not connected to application..."},
+                    closure: { println "exitAction not connected to application..." },
                     //accelerator: shortcut('P'),
                     shortDescription: 'v-pipe beenden - und vorher nochmal speichern ;-)'
             )
 
             // tools
 
-            action ( id: 'sortPipelineAction',
+            action(id: 'sortPipelineAction',
                     name: "Staffelung (P) sortieren",
                     mnemonic: 'p',
-                    closure: {println "sortPipelineAction not connected to application..."},
+                    closure: { println "sortPipelineAction not connected to application..." },
                     accelerator: shortcut('P'),
                     shortDescription: 'Staffelung sortieren dem spätesten End-Termin des letzten Tasks des Projektes'
             )
@@ -138,34 +138,34 @@ class View {
 
             // view
 
-            action ( id: 'pipelineViewAction',
+            action(id: 'pipelineViewAction',
                     name: "Staffelungs-Ansicht, separat",
                     //mnemonic: 'p',
-                    closure: {println "pipelineViewAction not connected to application..."},
+                    closure: { println "pipelineViewAction not connected to application..." },
                     //accelerator: shortcut('P'),
                     shortDescription: 'Staffelung in gesondertem Fenster öffnen. Gerne mehrere. Multi-Monitor. Multi-View...'
             )
 
-            action ( id: 'loadViewAction',
+            action(id: 'loadViewAction',
                     name: "Abt-Belastungs-Ansicht, separat",
                     //mnemonic: 'p',
-                    closure: {println "loadViewAction not connected to application..."},
+                    closure: { println "loadViewAction not connected to application..." },
                     //accelerator: shortcut('P'),
                     shortDescription: 'Abt-Belastung in gesondertem Fenster öffnen. Gerne mehrere. Multi-Monitor. Multi-View...'
             )
 
-            action ( id: 'pipelineLoadViewAction',
+            action(id: 'pipelineLoadViewAction',
                     name: "IP-Belastungs-Ansicht, separat",
                     //mnemonic: 'p',
-                    closure: {println "pipelineLoadViewAction not connected to application..."},
+                    closure: { println "pipelineLoadViewAction not connected to application..." },
                     //accelerator: shortcut('P'),
                     shortDescription: 'IP-Belastung in gesondertem Fenster öffnen. Gerne mehrere. Multi-Monitor. Multi-View...'
             )
 
-            action ( id: 'projectViewAction',
+            action(id: 'projectViewAction',
                     name: "Projekt-Ansicht, separat",
                     //mnemonic: 'p',
-                    closure: {println "projectViewAction not connected to application..."},
+                    closure: { println "projectViewAction not connected to application..." },
                     //accelerator: shortcut('P'),
                     shortDescription: 'Projekt-Ansicht in gesondertem Fenster öffnen. Gerne mehrere. Multi-Monitor. Multi-View...'
             )
@@ -173,32 +173,38 @@ class View {
 
             // help
 
-            action ( id: 'helpAction',
+            action(id: 'helpAction',
                     name: "Hilfe...",
                     //mnemonic: 'p',
-                    closure: {println "helpPerformanceAction not connected to application..."},
+                    closure: { println "helpPerformanceAction not connected to application..." },
                     //accelerator: shortcut('P'),
                     shortDescription: 'zeige die aktuelle Hilfe-Datei im Inter-Netz. Online :-(. Aktuelle Version...'
             )
 
 
-            action ( id: 'printPerformanceAction',
+            action(id: 'printPerformanceAction',
                     name: "Performance messen",
                     //mnemonic: 'p',
-                    closure: {println "printPerformanceAction not connected to application..."},
+                    closure: { println "printPerformanceAction not connected to application..." },
                     //accelerator: shortcut('P'),
                     shortDescription: 'gemessene Lauf-Zeiten auf Console printen'
             )
 
 
-
-        }
+        })
 
         swing.build {
 
             //lookAndFeel 'nimbus'
 
-            f = frame(id: 'frame',size:[(int)(screenDimension.width), (int)(screenDimension.height - 50)], location: [0,0], iconImage: frameIcon, title: 'v-pipe    |  +/- = Zoom  |  Pfeile = Cursor bewegen  |  Shift+Pfeile = Projekt bewegen  |  d = Details an/aus', locationRelativeTo: null, show: true, defaultCloseOperation: JFrame.DO_NOTHING_ON_CLOSE) {
+            f = frame(id: 'frame',
+                    size:[(int)(screenDimension.width), (int)(screenDimension.height - 50)],
+                    location: [0,0],
+                    iconImage: frameIcon,
+                    title: 'v-pipe    |  +/- = Zoom  |  Pfeile = Cursor bewegen  |  Shift+Pfeile = Projekt bewegen  |  d = Details an/aus  | n = now',
+                    locationRelativeTo: null,
+                    show: true,
+                    defaultCloseOperation: JFrame.DO_NOTHING_ON_CLOSE) {
 
                 menuBar(id: 'menuBar') {
                     menu(text:'Dateien', mnemonic:'D') {
@@ -278,19 +284,8 @@ class View {
 
     def start(Closure initModelAndNotifyView) {
         swing.edt {
-            //swing.frame
             initModelAndNotifyView()
-            //swing.frame.setVisible(true)
             setFullSize(swing.frame)
-            // TODO: move to Builder?
-            /*
-            swing.spH.setDividerLocation(900)
-            swing.spV1.setDividerLocation(500)
-            swing.spV2.setDividerLocation(500)
-            swing.spV3.setDividerLocation(120)
-*/
-
-
         }
     }
 

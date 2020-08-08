@@ -8,7 +8,6 @@ import utils.RunTimer
 import javax.swing.*
 import java.awt.*
 import java.awt.event.*
-import java.awt.geom.AffineTransform
 import java.beans.PropertyChangeEvent
 import java.beans.PropertyChangeListener
 
@@ -90,11 +89,18 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
             //   and positive values if the mouse wheel was rotated down/ towards the user
             int rot = e.getWheelRotation()
             int inc = (int)(gridWidth * rot / 10)
+            def oldPreferredSize = getPreferredSize()
             setGridWidth(gridWidth + (inc!=0?inc:1)) // min one tic bigger
             minMaxGridCheck()
             updateOthersFromGridWidth(gridWidth, this)
-
+            def newPreferredSize = getPreferredSize()
+            //def ratio = newPreferredSize.width / oldPreferredSize.width
+            //println("ratio: $ratio")
+            //def valScrollBAr = getScrollPane(this)?.getVerticalScrollBar()?.value
+            //getScrollPane(this)?.getVerticalScrollBar()?.setValue((int)((valScrollBAr + size.width/2)*ratio))
+            adjustLocationAndMouseAfterZooming(mouseX, mouseY, oldPreferredSize.width, newPreferredSize.width)
             invalidateAndRepaint(this)
+            //scrollRectToVisible(new Rectangle())
         } else {
             getScrollPane(this)?.getVerticalScrollBar()?.setUnitIncrement((gridWidth/3) as int)
             getScrollPane(this)?.processMouseWheelEvent(e)
@@ -224,8 +230,8 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
             //model.toggleIntegrationPhase(cursorX, cursorY)
         }
 
-        if(KeyEvent.VK_O == e.getKeyCode()) {
-            //openFile()
+        if(KeyEvent.VK_Z == e.getKeyCode()) {
+            printZoomInfo()
         }
 
         if(KeyEvent.VK_N == e.getKeyCode()) {
@@ -252,18 +258,10 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
             }
         }
 
-        if(KeyEvent.VK_PLUS == e.getKeyCode()) {
-            setGridWidth((gridWidth * 1.1) as int)
-            minMaxGridCheck()
-            updateOthersFromGridWidth(gridWidth, this)
+        if(KeyEvent.VK_PLUS == e.getKeyCode()) doZooming {gridWidth * 1.1}
+        if(KeyEvent.VK_MINUS == e.getKeyCode()) doZooming {gridWidth / 1.1}
 
-        }
 
-        if(KeyEvent.VK_MINUS == e.getKeyCode()) {
-            setGridWidth((gridWidth / 1.1) as int)
-            minMaxGridCheck()
-            updateOthersFromGridWidth(gridWidth, this)
-        }
 
         //def redraw = [new Point(cursorX, cursorY)]
         if(KeyEvent.VK_UP == e.getKeyCode())    {cursorY > 0              ? --cursorY :0; scrollToCursorXY()}
@@ -307,7 +305,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
     }
 
     void scrollToCursorXY() {
-        scrollRectToVisible(new Rectangle(nameWidth + cursorX * gridWidth - gridWidth, cursorY * gridWidth - gridWidth, 3 * gridWidth, 3 * gridWidth))
+        scrollRectToVisible(new Rectangle(nameWidth + cursorX * gridWidth - 5*gridWidth, cursorY * gridWidth - 5*gridWidth, 10 * gridWidth, 10 * gridWidth))
     }
 
     @Override
@@ -330,11 +328,68 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
 
 
     def cursorXChanged = { PropertyChangeEvent e ->
-        invalidateAndRepaint(this)
-        def nowStr = model.getColumnNames()[cursorX]
-        setNowString(nowStr)
-        scrollToCursorXY()
+        if(cursorX>-1) {
+            invalidateAndRepaint(this)
+            def nowStr = model.getColumnNames()[cursorX]
+            setNowString(nowStr)
+            scrollToCursorXY()
+        }
     }
+
+
+    def doZooming(Closure howToZoom) {
+        def oldPreferredSize = getPreferredSize()
+        setGridWidth(howToZoom() as int)
+        minMaxGridCheck()
+        updateOthersFromGridWidth(gridWidth, this)
+        def vr = getVisibleRect()
+        adjustLocationAndMouseAfterZooming(
+                vr.centerX,
+                vr.centerY,
+                oldPreferredSize.width,
+                getPreferredSize().width)
+    }
+
+    /**
+     * @param x point to keep where it is
+     * @param y point to keep where it is
+     * @param oldSize of the panel
+     * @param newSize of the panel
+     */
+    def adjustLocationAndMouseAfterZooming(double x, double y, double oldSize, double newSize ) {
+        def r = getVisibleRect()
+        double ratio = newSize / oldSize
+
+        double deltaX = x * (1 - ratio)
+        double tmpX = r.x - deltaX
+
+        double deltaY = y * (1 - ratio)
+        double tmpY = r.y - deltaY
+
+        def locX = (int) (tmpX >= 0 ? tmpX : 0)
+        def locY = (int) (tmpY >= 0 ? tmpY : 0)
+
+        setLocation(-locX, -locY)
+
+        mouseY = (int)(mouseY * ratio)
+        mouseX = (int)(mouseX * ratio)
+    }
+
+    def printZoomInfo() {
+        def location = getLocation()
+        println("location: $location")
+        def los = getLocationOnScreen()
+        println("loc on screen: $los")
+        def rect = getBounds()
+        println("bounds: $rect")
+        def valueSB = getScrollPane(this).getHorizontalScrollBar().value
+        println("H-Scrollbar val: $valueSB")
+        def visRect = getVisibleRect()
+        println("visible rect: $visRect")
+        def prefSize = getPreferredSize()
+        println("pref size: $prefSize")
+    }
+
 
     /**
      * create with custom grid and custom model

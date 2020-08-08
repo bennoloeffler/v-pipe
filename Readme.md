@@ -261,8 +261,11 @@ gleichzeitig gearbeitet werden soll.
 ## Realease
 
 ### Features
+TODO: 2020-08-07 `0.9.7-ScrollCenter`
+- zentrieren beim Scrollen mit Maus: Element des Mouse-Cursors bleibt sichtbar
+- zentrieren beim Scrollen mit +/-: Tasten-Cursor bleibt sichtbar
 
-Scr2020-08-07 `0.9.6-ScrollToll`
+2020-08-07 `0.9.6-ScrollNice`
 - Scrollt zu 'jetzt' beim öffnen
 - sprint nicht mehr beim umschalten der Detail-Tooltips
 - Bug bei Anzeige der Skalierung der Kapa-Belastung gefixt
