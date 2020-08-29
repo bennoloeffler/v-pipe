@@ -1,5 +1,6 @@
 package newview
 
+import groovy.beans.Bindable
 import groovy.transform.CompileStatic
 
 import javax.swing.ImageIcon

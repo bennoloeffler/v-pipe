@@ -261,7 +261,7 @@ gleichzeitig gearbeitet werden soll.
 ## Realease
 
 ### Features
-TODO: 2020-08-07 `0.9.7-ScrollCenter`
+2020-08-07 `0.9.7-ScrollCenter`
 - zentrieren beim Scrollen mit Maus: Element des Mouse-Cursors bleibt sichtbar
 - zentrieren beim Scrollen mit +/-: Tasten-Cursor bleibt sichtbar
 

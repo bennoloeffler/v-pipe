@@ -50,6 +50,9 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
     int mouseX = 0
     int mouseY = 0
 
+    @Bindable
+    int hScrollBarValueZoomingSync
+
     /**
      * start and end of the last mouse-drag operation
      */
@@ -87,21 +90,23 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
         if((e.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK) > 0) {
             //   negative values if the mouse wheel was rotated up/away from the user,
             //   and positive values if the mouse wheel was rotated down/ towards the user
-            int rot = e.getWheelRotation()
-            int inc = (int)(gridWidth * rot / 10)
+            double rot = e.getPreciseWheelRotation()
+            //println "rot: $rot"
+            int inc = (int) (gridWidth * rot / 10)
+            //println "inc: $inc"
             def oldPreferredSize = getPreferredSize()
-            setGridWidth(gridWidth + (inc!=0?inc:1)) // min one tic bigger
+            setGridWidth(gridWidth + (inc != 0 ? inc : 1)) // min one tic bigger
             minMaxGridCheck()
             updateOthersFromGridWidth(gridWidth, this)
             def newPreferredSize = getPreferredSize()
-            //def ratio = newPreferredSize.width / oldPreferredSize.width
+            def ratio = newPreferredSize.width / oldPreferredSize.width
             //println("ratio: $ratio")
-            //def valScrollBAr = getScrollPane(this)?.getVerticalScrollBar()?.value
-            //getScrollPane(this)?.getVerticalScrollBar()?.setValue((int)((valScrollBAr + size.width/2)*ratio))
+
             adjustLocationAndMouseAfterZooming(mouseX, mouseY, oldPreferredSize.width, newPreferredSize.width)
-            invalidateAndRepaint(this)
-            //scrollRectToVisible(new Rectangle())
-        } else {
+            //SwingUtilities.invokeLater {
+                invalidateAndRepaint(this)
+            //}
+        }else {
             getScrollPane(this)?.getVerticalScrollBar()?.setUnitIncrement((gridWidth/3) as int)
             getScrollPane(this)?.processMouseWheelEvent(e)
         }
@@ -117,6 +122,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
     void mouseMoved(MouseEvent e) {
         mouseX = e.getX()
         mouseY = e.getY()
+        //println "mouse move: $mouseX $mouseY"
         mouseMoved(e, this)
         invalidateAndRepaint(this)
     }
@@ -305,7 +311,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
     }
 
     void scrollToCursorXY() {
-        scrollRectToVisible(new Rectangle(nameWidth + cursorX * gridWidth - 5*gridWidth, cursorY * gridWidth - 5*gridWidth, 10 * gridWidth, 10 * gridWidth))
+        scrollRectToVisible(new Rectangle(nameWidth + cursorX * gridWidth - 2*gridWidth, cursorY * gridWidth - 2*gridWidth, 4 * gridWidth, 4 * gridWidth))
     }
 
     @Override
@@ -358,6 +364,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
      */
     def adjustLocationAndMouseAfterZooming(double x, double y, double oldSize, double newSize ) {
         def r = getVisibleRect()
+        //println "\n\nvr: $r"
         double ratio = newSize / oldSize
 
         double deltaX = x * (1 - ratio)
@@ -366,13 +373,43 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
         double deltaY = y * (1 - ratio)
         double tmpY = r.y - deltaY
 
+        //println "dX dY $deltaX $deltaY"
+        //println "tmpX tmpY $tmpX $tmpY"
+
+        //tmpX >= 0?:println("--> tmpX = $tmpX")
+        //tmpY >= 0?:println("--> tmpY = $tmpY")
         def locX = (int) (tmpX >= 0 ? tmpX : 0)
         def locY = (int) (tmpY >= 0 ? tmpY : 0)
+        //println "locX locY $locX $locY"
 
         setLocation(-locX, -locY)
 
         mouseY = (int)(mouseY * ratio)
         mouseX = (int)(mouseX * ratio)
+        //println "mouse: $mouseX $mouseY"
+        //println "cursor: ${getGridXFromMouseX(-1)} ${getGridYFromMouseY(-1)}"
+
+        SwingUtilities.invokeLater notifyScrollBars as Runnable // after invalidate to get the new value of scrollBar
+
+    }
+
+    AdjustmentListener scrollBarAdjListener = new AdjustmentListener() {
+        @Override
+        void adjustmentValueChanged(AdjustmentEvent e) {
+            notifyScrollBars.call()
+        }
+    }
+
+    Closure notifyScrollBars = {
+        def hsb = getScrollPane(this)?.getHorizontalScrollBar()
+        def spv = -1
+        if (hsb) {
+            spv = hsb.value
+            if(! hsb.adjustmentListeners.contains(scrollBarAdjListener)) {
+                hsb.addAdjustmentListener(scrollBarAdjListener as AdjustmentListener)
+            }
+        }
+        sethScrollBarValueZoomingSync(spv)
     }
 
     def printZoomInfo() {
@@ -414,9 +451,13 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
                 invalidateAndRepaint(this)
             }
         } as PropertyChangeListener
+        PropertyChangeListener sbs = { PropertyChangeEvent e ->
+            //println "hScrollBarValueZoomingSync changed: $e.oldValue to $e.newValue"
+        } as PropertyChangeListener
         model.addPropertyChangeListener('updateToggle', l)
         addPropertyChangeListener('cursorX', cursorXChanged as PropertyChangeListener)
         addPropertyChangeListener('hightlightLinePattern', l)
+        addPropertyChangeListener('hScrollBarValueZoomingSync', sbs)
         /*
         SwingUtilities.invokeLater {
             setCursorToNow()
@@ -524,15 +565,14 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
 
         if(cursorX >=0 ) {
             int nowGraphX = borderWidth + cursorX * gridWidth + (int) ((gridWidth - size) / 2) + nameWidth
-            // position start (left up)
             int nowGraphY = borderWidth + model.sizeY * gridWidth // position end (right down)
-
-            // shadow
-            //g.setColor(nowBarShadowColor)
-            //g.fillRoundRect(nowGraphX + offset, +offset, size - 4, nowGraphY + borderWidth - 4, round, round)
-            // element in project color, integration phase color (orange), empty color (white)
             g.setColor(cursorColor)
             g.fillRoundRect(nowGraphX, 0, size - 4, nowGraphY + borderWidth - 4, round, round)
+
+            nowGraphX = borderWidth + model.sizeX * gridWidth - 4
+            nowGraphY = borderWidth + cursorY * gridWidth + (int) ((gridWidth - size) / 2)
+            g.setColor(cursorColor)
+            g.fillRoundRect(nameWidth, nowGraphY, nowGraphX, size - 4, round, round)
         }
 
         //

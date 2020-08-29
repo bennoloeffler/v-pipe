@@ -28,6 +28,10 @@ import java.awt.event.MouseWheelEvent
 import java.awt.event.MouseWheelListener
 import java.beans.PropertyChangeEvent
 
+enum ToolTipDetails {
+    no, some, details
+}
+
 @CompileStatic
 class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, FocusListener, PanelBasics {
 
@@ -39,7 +43,9 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
     //int gridHeigth
     //int nameWidth
 
-    @Bindable boolean detailsToolTip = true
+    @Bindable ToolTipDetails detailsToolTip = ToolTipDetails.some
+
+    @Bindable hScrollBarValueZoomingSync
 
     int mouseX
     int mouseY
@@ -56,6 +62,13 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
         invalidateAndRepaint(this)
     }
 
+
+    Closure zoomScrollSync = { PropertyChangeEvent e ->
+        getScrollPane(this)?.getHorizontalScrollBar()?.setValue((int)(e.newValue))
+        invalidateAndRepaint(this)
+        //println "scrollBarChange: $e.newValue"
+    }
+
     NewLoadPanel(int gridWidth, AbstractGridLoadModel model) {
         setFocusable(true)
         this.model = model
@@ -65,6 +78,7 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
         this.model.addPropertyChangeListener('updateToggle', updateCallback) // when updateToggle is changed
         this.addPropertyChangeListener('gridWidth', updateFromGridWidthCallback) // when gridWidth is changed
         this.addPropertyChangeListener('cursorX', updateCallback)
+        this.addPropertyChangeListener('hScrollBarValueZoomingSync', zoomScrollSync)
         addMouseMotionListener(this)
         addMouseWheelListener(this)
         addMouseListener(this)
@@ -196,8 +210,8 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
     void keyPressed(KeyEvent e){
 
         if(KeyEvent.VK_D == e.getKeyCode()) {
-            setDetailsToolTip(!detailsToolTip)
-            if(detailsToolTip) {
+            setDetailsToolTip(detailsToolTip.next())
+            if(detailsToolTip == ToolTipDetails.some || detailsToolTip == ToolTipDetails.details) {
                 MouseEvent phantom = new MouseEvent(
                         this,
                         MouseEvent.MOUSE_MOVED,
@@ -595,7 +609,7 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
 
     @Override
     String getToolTipText(MouseEvent event) {
-        if(!detailsToolTip) return null
+        if(detailsToolTip == ToolTipDetails.no) return null
 
         String html = null
 
@@ -626,6 +640,10 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
             def percentRed = element.yellow > 0 ? ((double)(element.red / element.yellow)*100).round(1) : -1
             def percentStr = percentTotal >=0 ? "$percentTotal% Rot bei: $percentRed%<br/>": ""
             // <br/>$element.fromToDateString
+            String details = ""
+            if(detailsToolTip == ToolTipDetails.details) {
+                details = "Details: <br/> ${(element.projectDetails.sort { -it.projectCapaNeed }.collect { it.projectCapaNeed.round(1) + " : " + it.originalTask.toString() + "<br/>" } as List<String>).join('')}"
+            }
             //html =  "Gesamtbelastung: $element.load\nGelb: $element.percentageYellow, Rot: $element.percentageYellow)\nGewähltes Projekt:$element.loadProject"
             html  =      """<html><head><style>
                                 h1 { color: #808080; font-family: verdana; font-size: 120%; }
@@ -638,7 +656,7 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
                                         Gelb: $yellow, Rot: $red<br/>
                                         $percentStr
                                         Gewähltes Projekt: ${element.loadProject.round(1)}<br/>
-                                        Details: <br/> ${(element.projectDetails.sort{-it.projectCapaNeed}.collect { it.projectCapaNeed.round(1) + " : " + it.originalTask.toString() + "<br/>" } as List<String>).join('')}
+                                        $details
                                     </p>
                                 </body>
                              </html>                                
@@ -649,7 +667,7 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
 
     @Override
     Point getToolTipLocation(MouseEvent event) {
-        if(!detailsToolTip) return null
+        if(detailsToolTip == ToolTipDetails.no) return null
         def gridX = (int)((event.x-borderWidth-nameWidth)/gridWidth)
         def locX = gridX*gridWidth + borderWidth + nameWidth + 2*gridWidth
         def gridY = (int)((event.y-borderWidth)/gridHeigth)

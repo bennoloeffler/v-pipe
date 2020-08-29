@@ -170,6 +170,12 @@ class MainGui {
             bind(target: view.swing.projectLabel, targetProperty: 'text', source: view.gridPipelineModel, sourceProperty: 'selectedProject')
             bind(target: view.swing.depLabel, targetProperty: 'text', source: view.gridProjectModel, sourceProperty: 'departmentName')
 
+            // sync scroll-pane values hScrollBarValueZoomingSync
+            bind(target: view.loadView, targetProperty: 'hScrollBarValueZoomingSync', source: view.pipelineView, sourceProperty: 'hScrollBarValueZoomingSync')
+            bind(target: view.pipelineLoadView, targetProperty: 'hScrollBarValueZoomingSync', source: view.pipelineView, sourceProperty: 'hScrollBarValueZoomingSync')
+
+
+
         }
 
 

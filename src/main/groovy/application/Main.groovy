@@ -12,7 +12,7 @@ import transform.DateShiftTransformer
 
 import java.awt.Desktop
 
-// TODO: to 15 min groovy
+//
 // https://e.printstacktrace.blog/groovy-regular-expressions-the-definitive-guide/
 //
 
@@ -22,7 +22,7 @@ import java.awt.Desktop
  */
 class  Main {
 
-    static VERSION_STRING ='0.9.7-ScrollCenter'
+    static VERSION_STRING ='0.9.10-LoadSomeDetails'
 
     def singleRunMode = false // instead: Deamon is default
     def multiInstanceMode = false // instead SingleInstance is default
