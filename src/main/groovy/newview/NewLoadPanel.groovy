@@ -355,23 +355,7 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
 
 
 
-            //
-            // paint the now-indicator row above everything else
-            //
 
-            if (model.nowX >= 0) {
-
-                int nowGraphX = borderWidth + model.getNowX() * gridWidth + (int) ((gridWidth - size) / 2) + nameWidth
-                // position start (left up)
-                int nowGraphY = borderWidth + model.getSizeY() * gridHeigth // position end (right down)
-
-                // shadow
-                //g.setColor(nowBarShadowColor)
-                //g.fillRoundRect(nowGraphX + offset, +offset, size - 4, nowGraphY + borderWidth - 4, round, round)
-                // element in project color, integration phase color (orange), empty color (white)
-                g.setColor(nowBarColor)
-                g.fillRoundRect(nowGraphX, 0, size - 4, nowGraphY + borderWidth - 4, round, round)
-            }
 
             //
             // paint the cursor-indicator line above everything else
@@ -401,6 +385,24 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
                 g.setColor(mouseColor)
                 g.fillRoundRect((int) (borderWidth + nameWidth + gridX * gridWidth + gridWidth / 4), borderWidth + gridY * gridHeigth, (int) (gridWidth / 2), gridHeigth, round, round)
             }
+
+        //
+        // paint the now-indicator row above everything else
+        //
+
+        if (model.nowX >= 0) {
+
+            int nowGraphX = borderWidth + model.getNowX() * gridWidth + (int) ((gridWidth - 4) / 4) + nameWidth
+            // position start (left up)
+            int nowGraphY = borderWidth + model.getSizeY() * gridHeigth // position end (right down)
+
+            // shadow
+            //g.setColor(nowBarShadowColor)
+            //g.fillRoundRect(nowGraphX + offset, +offset, size - 4, nowGraphY + borderWidth - 4, round, round)
+            // element in project color, integration phase color (orange), empty color (white)
+            g.setColor(nowBarColor)
+            g.fillRoundRect(nowGraphX, 0, (int)((gridWidth-4)/2), nowGraphY + borderWidth - 4, round, round)
+        }
 
         //
         // draw the department names

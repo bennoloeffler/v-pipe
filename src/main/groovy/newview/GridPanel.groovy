@@ -103,6 +103,8 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
             //println("ratio: $ratio")
 
             adjustLocationAndMouseAfterZooming(mouseX, mouseY, oldPreferredSize.width, newPreferredSize.width)
+            //registerScrollBarListener()
+
             //SwingUtilities.invokeLater {
                 invalidateAndRepaint(this)
             //}
@@ -264,8 +266,15 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
             }
         }
 
-        if(KeyEvent.VK_PLUS == e.getKeyCode()) doZooming {gridWidth * 1.1}
-        if(KeyEvent.VK_MINUS == e.getKeyCode()) doZooming {gridWidth / 1.1}
+        if(KeyEvent.VK_PLUS == e.getKeyCode()) {
+            doZooming {gridWidth * 1.1}
+            //registerScrollBarListener()
+        }
+
+        if(KeyEvent.VK_MINUS == e.getKeyCode()) {
+            doZooming {gridWidth / 1.1}
+            //registerScrollBarListener()
+        }
 
 
 
@@ -338,7 +347,9 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
             invalidateAndRepaint(this)
             def nowStr = model.getColumnNames()[cursorX]
             setNowString(nowStr)
-            scrollToCursorXY()
+            SwingUtilities.invokeLater {
+                scrollToCursorXY()
+            }
         }
     }
 
@@ -400,14 +411,20 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
         }
     }
 
+    def registerScrollBarListener() {
+        def hsb = getScrollPane(this)?.getHorizontalScrollBar()
+        if (hsb) {
+            if(! hsb.adjustmentListeners.contains(scrollBarAdjListener)) {
+                hsb.addAdjustmentListener(scrollBarAdjListener as AdjustmentListener)
+            }
+        }
+    }
+
     Closure notifyScrollBars = {
         def hsb = getScrollPane(this)?.getHorizontalScrollBar()
         def spv = -1
         if (hsb) {
             spv = hsb.value
-            if(! hsb.adjustmentListeners.contains(scrollBarAdjListener)) {
-                hsb.addAdjustmentListener(scrollBarAdjListener as AdjustmentListener)
-            }
         }
         sethScrollBarValueZoomingSync(spv)
     }
@@ -458,10 +475,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
         addPropertyChangeListener('cursorX', cursorXChanged as PropertyChangeListener)
         addPropertyChangeListener('hightlightLinePattern', l)
         addPropertyChangeListener('hScrollBarValueZoomingSync', sbs)
-        /*
-        SwingUtilities.invokeLater {
-            setCursorToNow()
-        }*/
+
     }
 
     /*
@@ -476,6 +490,9 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
         if(model.nowX >= 0) {
             setCursorX(model.nowX)
             scrollToCursorXY()
+        }
+        SwingUtilities.invokeLater{
+            registerScrollBarListener()
         }
     }
 
@@ -542,22 +559,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
             g.fillRoundRect((int)(borderWidth+nameWidth+gridX*gridWidth+gridWidth/4), borderWidth,  (int)(gridWidth/2), gridWidth*model.sizeY,  round, round)
         }
 
-        //
-        // paint the now-indicator row above everything else
-        //
 
-        if(model.nowX >=0 && model.nowX < model.sizeX) {
-            int nowGraphX = borderWidth + model.nowX * gridWidth + (int) ((gridWidth - size) / 2) + nameWidth
-            // position start (left up)
-            int nowGraphY = borderWidth + model.sizeY * gridWidth // position end (right down)
-
-            // shadow
-            //g.setColor(nowBarShadowColor)
-            //g.fillRoundRect(nowGraphX + offset, +offset, size - 4, nowGraphY + borderWidth - 4, round, round)
-            // element in project color, integration phase color (orange), empty color (white)
-            g.setColor(nowBarColor)
-            g.fillRoundRect(nowGraphX, 0, size - 4, nowGraphY + borderWidth - 4, round, round)
-        }
 
         //
         // paint the cursor-indicator line above everything else
@@ -573,6 +575,23 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
             nowGraphY = borderWidth + cursorY * gridWidth + (int) ((gridWidth - size) / 2)
             g.setColor(cursorColor)
             g.fillRoundRect(nameWidth, nowGraphY, nowGraphX, size - 4, round, round)
+        }
+
+        //
+        // paint the now-indicator row above everything else
+        //
+
+        if(model.nowX >=0 && model.nowX < model.sizeX) {
+            int nowGraphX = borderWidth + model.nowX * gridWidth + (int) ((gridWidth-4) / 4)  + nameWidth
+            // position start (left up)
+            int nowGraphY = borderWidth + model.sizeY * gridWidth // position end (right down)
+
+            // shadow
+            //g.setColor(nowBarShadowColor)
+            //g.fillRoundRect(nowGraphX + offset, +offset, size - 4, nowGraphY + borderWidth - 4, round, round)
+            // element in project color, integration phase color (orange), empty color (white)
+            g.setColor(nowBarColor)
+            g.fillRoundRect(nowGraphX, 0, (int)((gridWidth-4)/2), nowGraphY + borderWidth - 4, round, round)
         }
 
         //

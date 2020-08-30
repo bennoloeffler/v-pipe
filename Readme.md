@@ -262,8 +262,19 @@ gleichzeitig gearbeitet werden soll.
 
 ### Features
 
+TODO: 2020-10-XX `1.3.0-RELEASE-operative-Grobplanung`
+
+TODO: 2020-09-XX `1.2.0-Rückstand-In-Zukunft`
+
+TODO: 2020-09-XX `1.1.0-Data-Input-Adapters`
+
+TODO: 2020-09-XX `1.0.0-RELEASE-Analyse`
+
+2020-08-30 `0.9.11-Beta-1-Bugfixes`
+- Cursor sprang 
+
 2020-08-29 `0.9.10-LoadSomeDetails`
-- drei Modi im Auslastungsfenster
+- drei Modi der Tooltips im Auslastungsfenster: no, some, details
 - vollständige Synchronistation der Scrollbars (Staffelung - Auslastung)
 - Cursor mit Fadenkreuz in der Staffelung und Projektsicht
  
@@ -349,7 +360,9 @@ Das ist nur vernünftig in verschiedenen Verzeichnissen!
  
 - Es scheint so, als ob v-pipe beim ersten Start zweimal nacheinander startet.  
 bzw. als ob kurz nach dem Start ein Neustart erfolgt. Harmlos, aber irritierend.
-- beim löschen von Datenfiles fehlt ein DELETE. util-packages Problem
+Vermutlich der Virenscanner...
+- Der Sync der horizontalen Scrollbar funktioniert erst nachdem einmal gezoomt wurde.
+
 
 #### Features (zukünftig, angedacht) 
 

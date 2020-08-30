@@ -15,6 +15,7 @@ import javax.swing.ImageIcon
 import javax.swing.JComponent
 import javax.swing.JFrame
 import javax.swing.JLabel
+import javax.swing.JScrollPane
 import javax.swing.JSplitPane
 import javax.swing.JTextArea
 import javax.swing.UIManager
@@ -243,15 +244,15 @@ class View {
 
                 splitPane(id: 'spH', orientation: JSplitPane.HORIZONTAL_SPLIT, continuousLayout:true, dividerLocation: 1600, constraints: 'grow, span') {
                     splitPane(id: 'spV1', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: 1000) {
-                        scrollPane {
+                        scrollPane (horizontalScrollBarPolicy: JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS) {
                             widget(pipelineView)
                         }
 
                         splitPane(id: 'spV3', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: 200) {
-                            scrollPane(id: 'pipelineLoadViewScrollPane') {
+                            scrollPane(id: 'pipelineLoadViewScrollPane', horizontalScrollBarPolicy: JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS) {
                                 widget( pipelineLoadView)
                             }
-                            scrollPane(id: 'spSwap') {
+                            scrollPane(id: 'spSwap', horizontalScrollBarPolicy: JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS) {
                                 widget(loadView)
                             }
                         }
@@ -265,7 +266,7 @@ class View {
                             widget(projectView)
                         }
                         scrollPane {
-                            textArea(id: 'textAreaLog', editable: false)
+                            textArea(id: 'textAreaLog', editable: false, focusable: false)
                         }
 
                     }
