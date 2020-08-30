@@ -261,6 +261,12 @@ gleichzeitig gearbeitet werden soll.
 ## Realease
 
 ### Features
+
+2020-08-29 `0.9.10-LoadSomeDetails`
+- drei Modi im Auslastungsfenster
+- vollständige Synchronistation der Scrollbars (Staffelung - Auslastung)
+- Cursor mit Fadenkreuz in der Staffelung und Projektsicht
+ 
 2020-08-07 `0.9.7-ScrollCenter`
 - zentrieren beim Scrollen mit Maus: Element des Mouse-Cursors bleibt sichtbar
 - zentrieren beim Scrollen mit +/-: Tasten-Cursor bleibt sichtbar
