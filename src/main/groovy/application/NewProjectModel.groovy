@@ -82,7 +82,7 @@ class NewProjectModel extends GridModel {
             }
             row ++
             if (w >= startOfTask && w < endOfTask) {
-                gridElements << new GridElement(projectTask.project, projectTask.department, "${_getWeekYearStr(w)}  ($fromToDateString)", false)
+                gridElements << new GridElement(projectTask.project, projectTask.department, fromToDateString, false)
             } else {
                 gridElements << GridElement.nullElement
             }
@@ -103,7 +103,7 @@ class NewProjectModel extends GridModel {
 
         for (Date w = startOfGrid; w < endOfGrid; w += 7) {
             if (w >= startOfTask && w < endOfTask) {
-                gridElements << new GridElement(element.project, 'IP', "${_getWeekYearStr(w)}  ($fromToDateString)", true)
+                gridElements << new GridElement(element.project, 'IP', fromToDateString, true)
             } else {
                 gridElements << GridElement.nullElement
             }
@@ -204,4 +204,17 @@ class NewProjectModel extends GridModel {
         return model.getFullSeriesOfTimeKeys(WeekOrMonth.WEEK)
     }
 
+    @Override
+    List<String> getDetailsForTooltip(int x, int y) {
+        List<String> result = []
+        result.add("${lineNames[y]} ${columnNames[x]}" as String)
+        def shift = 0
+        if(model.pipelineElements) shift = 1
+        if(y-shift == -1) {
+            result.add("${model.getPipelineElement(projectName).pipelineSlotsNeeded}" as String)
+        } else {
+            result.add("${project[y - shift].capacityNeeded}" as String)
+        }
+        result
+    }
 }

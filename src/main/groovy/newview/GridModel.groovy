@@ -84,8 +84,15 @@ abstract class GridModel {
      */
     abstract List<String> getLineNames()
 
-    // TODO:
     abstract List<String> getColumnNames()
+
+    /**
+     * @param x
+     * @param y
+     * @return headline, load - line by line
+     */
+    abstract List<String> getDetailsForTooltip(int x, int y)
+
 
 }
 

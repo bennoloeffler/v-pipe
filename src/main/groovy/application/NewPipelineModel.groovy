@@ -108,7 +108,7 @@ class NewPipelineModel extends GridModel {
                 gridElements << new GridElement(
                         project: projectTasks[0].project,
                         department: '',
-                        timeString: "${_getWeekYearStr(w)}  ($fromToDateString)",
+                        timeString: fromToDateString,
                         integrationPhase: integrationPhase)
             } else {
                 gridElements << GridElement.nullElement
@@ -189,4 +189,15 @@ class NewPipelineModel extends GridModel {
         return model.getFullSeriesOfTimeKeys(WeekOrMonth.WEEK)
     }
 
+    @Override
+    List<String> getDetailsForTooltip(int x, int y) {
+        def result = []
+        result << "${lineNames[y]} ${columnNames[x]}"
+        def load = model.getProject(lineNames[y])
+                .stream()
+                .map({it.capacityNeeded})
+                .reduce({a, b -> a + b }).get()
+        result << "$load"
+        result
+    }
 }

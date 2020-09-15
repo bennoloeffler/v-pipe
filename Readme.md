@@ -270,6 +270,9 @@ TODO: 2020-09-XX `1.1.0-Data-Input-Adapters`
 
 TODO: 2020-09-XX `1.0.0-RELEASE-Analyse`
 
+2020-09-15 `0.9.12-Beta-2-Bugfixes`
+- Kapabedarf der Tasks und Projekte sichtbar  
+
 2020-08-30 `0.9.11-Beta-1-Bugfixes`
 - Cursor sprang 
 

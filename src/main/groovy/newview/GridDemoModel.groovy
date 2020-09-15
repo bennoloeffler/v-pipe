@@ -144,4 +144,9 @@ class GridDemoModel extends GridModel {
         data[0].size().times {r << it.toString()*20}
         r
     }
+
+    @Override
+    List<String> getDetailsForTooltip(int x, int y) {
+        ["dummy", "0"]
+    }
 }

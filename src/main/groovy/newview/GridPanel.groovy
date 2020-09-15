@@ -152,15 +152,17 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
             }
 
             // <br/>$element.fromToDateString
+            def details = model.getDetailsForTooltip(gridX, gridY)
 
             html  =      """<html><head><style>
                                 h1 { color: #808080; font-family: verdana; font-size: 120%; }
                                 p  { color: black; font-family: courier; font-size: 120%; } </style> </head>
                                 
                                 <body>
-                                    <h1>$element.project </h1>
+                                    <h1>${details[0]}</h1>
                                     <p>
-                                        KW & Start-Ende: $element.timeString<br/>
+                                        Kapa-Bedarf: ${details[1]}<br/>
+                                        $element.timeString<br/>
                                     </p>
                                 </body>
                              </html>                                
