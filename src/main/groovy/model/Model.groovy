@@ -205,13 +205,19 @@ class Model {
     List<String> allDepartmentsCache = []
 
     List<String> getAllDepartments() {
-        def t = RunTimer.getTimerAndStart('getAllDepartments')
-        if(taskList.size() != sizeLastAccess) {
-            allDepartmentsCache = taskList*.department.unique()
-            sizeLastAccess = taskList.size()
+
+
+        //def t = RunTimer.getTimerAndStart('getAllDepartments')
+        if(capaAvailable) {
+            capaAvailable.keySet().toList()
+        } else {
+            if (taskList.size() != sizeLastAccess) {
+                allDepartmentsCache = taskList*.department.unique()
+                sizeLastAccess = taskList.size()
+            }
+            allDepartmentsCache
         }
-        t.stop()
-        allDepartmentsCache
+        //t.stop()
     }
 
 
@@ -422,7 +428,7 @@ class Model {
         def t = RunTimer.getTimerAndStart('Model::readAllData')
         try {
 
-
+            emtpyTheModel()
 
             //
             // ordinary tasks

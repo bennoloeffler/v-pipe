@@ -635,12 +635,12 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
             }
             def department = model.getYNames()[gridY]
             def timeStr = model.getXNames()[gridX]
-            def yellowRed = element.yellow >=0 ? "($element.yellow, $element.red)":""
-            def yellow = element.yellow >= 0 ? "$element.yellow" : "keine Daten"
-            def red = element.red >= 0 ? "$element.red" : "keine Daten"
+            def yellowRed = element.yellow >=0 ? "(${element.yellow.round(1)}, ${element.red.round(1)})":""
+            def yellow = element.yellow >= 0 ? "${element.yellow.round(1)}" : "keine Daten"
+            def red = element.red >= 0 ? "${element.red.round(1)}" : "keine Daten"
             def percentTotal = element.yellow > 0 ? ((double)(element.load / element.yellow)*100).round(1) : -1
             def percentRed = element.yellow > 0 ? ((double)(element.red / element.yellow)*100).round(1) : -1
-            def percentStr = percentTotal >=0 ? "$percentTotal% Rot bei: $percentRed%<br/>": ""
+            def percentStr = percentTotal >=0 ? "$percentTotal% (von gelb)  (rot bei: $percentRed%)<br/>": ""
             // <br/>$element.fromToDateString
             String details = ""
             if(detailsToolTip == ToolTipDetails.details) {
@@ -652,10 +652,10 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
                                 p  { color: black; font-family: courier; font-size: 120%; } </style> </head>
                                 
                                 <body>
-                                    <h1>${percentTotal>=0?percentTotal.round(1)+ '% ':''}${element.load.round(1)} $yellowRed $department $timeStr</h1>
+                                    <h1>${percentTotal>=0?percentTotal.round(1)+ '% = ':''}${element.load.round(1)}</h1><h1>$department $timeStr</h1>
                                     <p>
                                         Gesamtbelastung: ${element.load.round(1)}<br/>
-                                        Gelb: $yellow, Rot: $red<br/>
+                                        Grenze gelb: $yellow, rot: $red<br/>
                                         $percentStr
                                         Gewähltes Projekt: ${element.loadProject.round(1)}<br/>
                                         $details

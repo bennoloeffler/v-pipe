@@ -270,6 +270,11 @@ TODO: 2020-09-XX `1.1.0-Data-Input-Adapters`
 
 TODO: 2020-09-XX `1.0.0-RELEASE-Analyse`
 
+TODO: 2020-09-16 `0.9.13-Beta-3-Bugfixes`  
+- Reihenfolge der Projekttasks nach End-Termin
+- Reihenfolge der Auslastung wie in Abteilungs-Kapa-Angebot, falls vorhanden  
+- alle Angaben in Auslastungs-Tooltip auf eine Stelle nach Komma runden
+
 2020-09-15 `0.9.12-Beta-2-Bugfixes`
 - Kapabedarf der Tasks und Projekte sichtbar  
 

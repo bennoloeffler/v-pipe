@@ -51,6 +51,7 @@ class NewProjectModel extends GridModel {
                 }
                 //project.sort { it.ending }
                 project = model.getProject(projectName)
+                project = project.sort{-it.ending.time}
                 project.each {
                     allProjectGridLines << fromTask(it, model.taskList)
                 }
@@ -176,8 +177,15 @@ class NewProjectModel extends GridModel {
 
     @Override
     def swap(int y, int withY) {
-        project.swap(y, withY)
+        /*
+        def shift = 0
+        println("$y $withY")
+        if(model.pipelineElements) shift = 1
+        if(y-shift >= 0 && withY-shift >= 0) {
+            project.swap(y - shift, withY - shift)
+        }
         updateGridElementsFromDomainModel()
+        */
     }
 
     @Override

@@ -599,7 +599,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
         //
         // draw the line names
         //
-        if(gridWidth > 12) {
+        if(gridWidth > 0) {
             int y = 0
             model.getLineNames()
             model.getLineNames().each { String projectName ->
