@@ -200,4 +200,13 @@ class NewPipelineModel extends GridModel {
         result << "$load"
         result
     }
+
+    @Override
+    def makeSmaller(int y) {
+    }
+
+    @Override
+    def makeBigger(int y) {
+    }
+
 }

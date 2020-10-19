@@ -591,9 +591,9 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
         g.getFont().deriveFont((float) fontSize)
     }
 
-    Color lightGreen = makeLighter(Color.GREEN,190)
-    Color lightRed = makeLighter(Color.RED,190)
-    Color lightYellow = makeLighter(Color.YELLOW,190)
+    Color lightGreen = makeLighter(Color.GREEN,30) // 190
+    Color lightRed = makeLighter(Color.RED,30)
+    Color lightYellow = makeLighter(Color.YELLOW,30)
 
     Color makeDarker(Color c, int darker) {
         int r = c.getRed()

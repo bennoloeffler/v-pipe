@@ -21,7 +21,7 @@ trait PanelBasics {
     Image frameIcon = new ImageIcon(getClass().getResource("/icons/vunds_icon_ 400x400.png")).getImage()
 
 
-    Color nowBarColor = new Color(255, 0, 0, 90)
+    Color nowBarColor = new Color(0, 0, 255, 90)
     Color cursorColor = new Color(255, 0, 50, 90)
     //Color cursorColor = new Color(133, 200, 240, 190)
     Color mouseColor  = new Color(200, 200, 200, 130)

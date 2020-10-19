@@ -93,6 +93,7 @@ abstract class GridModel {
      */
     abstract List<String> getDetailsForTooltip(int x, int y)
 
-
+    abstract makeSmaller(int i)
+    abstract makeBigger(int i)
 }
 

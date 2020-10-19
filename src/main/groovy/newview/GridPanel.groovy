@@ -314,6 +314,16 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
             scrollToCursorXY()
         }
 
+        if(keyAndCtrlPressed(e, KeyEvent.VK_LEFT)) {
+            model.makeSmaller(cursorY)
+            scrollToCursorXY()
+        }
+
+        if(keyAndCtrlPressed(e, KeyEvent.VK_RIGHT)) {
+            model.makeBigger(cursorY)
+            scrollToCursorXY()
+        }
+
         //scrollToCursorXY()
         invalidateAndRepaint(this)
 
@@ -336,6 +346,10 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
      */
     private boolean keyAndShiftPressed(KeyEvent e, keyCode) {
         (keyCode == e.getKeyCode()) && (e.getModifiersEx() & KeyEvent.SHIFT_DOWN_MASK) > 0
+    }
+
+    private boolean keyAndCtrlPressed(KeyEvent e, keyCode) {
+        (keyCode == e.getKeyCode()) && (e.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK) > 0
     }
 
     def minMaxGridCheck() {

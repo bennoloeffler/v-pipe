@@ -44,14 +44,19 @@ class NewProjectModel extends GridModel {
 
     private void updateGridElementsFromDomainModel() {
         RunTimer.getTimerAndStart('NewProjectModel::updateGridElementsFromDomainModel').withCloseable {
+
             allProjectGridLines = []
             if (projectName) {
                 if (model.pipelineElements) {
                     allProjectGridLines << fromPipelineElement(model.getPipelineElement(projectName), model.taskList)
                 }
-                //project.sort { it.ending }
+                //def departments = model.getAllDepartments()
+                //println(departments)
                 project = model.getProject(projectName)
-                project = project.sort{-it.ending.time}
+                //project = project.sort{-it.ending.time}
+                //project = project.sort{a, b ->
+                //    departments.indexOf(a.department) - departments.indexOf(b.department)
+                //}
                 project.each {
                     allProjectGridLines << fromTask(it, model.taskList)
                 }
@@ -225,4 +230,48 @@ class NewProjectModel extends GridModel {
         }
         result
     }
+
+    @Override
+    def makeSmaller(int y) {
+        shiftSize(y, -7)
+        updateModelRecalcAndFire()
+    }
+
+    @Override
+    def makeBigger(int y) {
+        shiftSize(y, 7)
+        updateModelRecalcAndFire()
+    }
+
+    def shiftSize(int y, int shift) {
+        if(model.pipelineElements) {
+            if (y == 0) {
+                //Date startP = _getStartOfWeek(project*.starting.min())
+                //Date endProject = _getStartOfWeek(project*.ending.max() + 7)
+                Date potPipStartDate = model.getPipelineElement(projectName).startDate + shift
+                Date potPipEndDate = model.getPipelineElement(projectName).endDate - shift
+                if(potPipStartDate >= potPipEndDate) {
+                    potPipStartDate = model.getPipelineElement(projectName).startDate
+                    potPipEndDate = model.getPipelineElement(projectName).endDate
+                }
+                //if (potPipStartDate >= startP && potPipEndDate <= endProject) {
+                model.getPipelineElement(projectName).startDate = potPipStartDate
+                model.getPipelineElement(projectName).endDate = potPipEndDate
+                //}
+            } else {
+                TaskInProject projectTask = project[y - 1]
+                if(projectTask.ending + shift > projectTask.starting - shift) {
+                    projectTask.ending += shift
+                    projectTask.starting -= shift
+                }
+            }
+        } else {
+            TaskInProject projectTask = project[y]
+            if(projectTask.ending + shift > projectTask.starting - shift) {
+                projectTask.ending += shift
+                projectTask.starting -= shift
+            }
+        }
+    }
+
 }

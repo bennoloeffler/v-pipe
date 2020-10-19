@@ -1,0 +1,253 @@
+package application
+
+import groovy.swing.SwingBuilder
+import model.Model
+import model.TaskInProject
+
+import javax.swing.Icon
+import javax.swing.ImageIcon
+import javax.swing.JButton
+import javax.swing.JComboBox
+import javax.swing.JComponent
+import javax.swing.JTextField
+import javax.swing.UIManager
+import java.awt.Color
+import java.awt.Image
+import java.awt.event.KeyEvent
+
+import static java.awt.Color.RED
+
+class ProjectDetails {
+    ImageIcon cut = scaleIcon(new ImageIcon(getClass().getResource("/icons/cut.png")), 0.08)
+    ImageIcon copy = scaleIcon (new ImageIcon(getClass().getResource("/icons/copy.png")), 0.08)
+
+
+    View view
+    Model model
+    SwingBuilder swing
+    Color fg = UIManager.getLookAndFeelDefaults().get("TextField.foreground") as Color
+
+    static def scaleIcon(icon, scale) {
+        Image img = icon.getImage()
+        Image newImg = img.getScaledInstance( (int)(img.getHeight(null) * scale), (int)(img.getWidth(null)*scale),  Image.SCALE_SMOOTH )
+        new ImageIcon( newImg )
+    }
+
+    ProjectDetails(View view) {
+        this.view = view
+        model = view.model // shortcut
+        swing = view.swing // shortcut
+        view.gridPipelineModel.addPropertyChangeListener("selectedProject", updateProjectDetails)
+        model.addPropertyChangeListener("updateToggle", updateProjectDetails)
+    }
+
+
+    def updateProjectDetails = {
+        println "UPDATE project details"
+        def p = buildDataPanel()
+        swing.projectDetailsScrollPane.setViewportView(p)
+    }
+
+
+    def buildDataPanel() {
+        def p = view.gridPipelineModel.selectedProject
+        if(p) {
+            List<TaskInProject> project = model.getProject(p)
+
+            swing.actions({
+                action(id: 'applyProjectDetails',
+                        name: "Änderungen anwenden",
+                        mnemonic: 'r',
+                        closure: saveProjectDetails,
+                        accelerator: shortcut('R'), //, KeyEvent.ALT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK),
+                        focus: JComponent.WHEN_IN_FOCUSED_WINDOW,
+                        //smallIcon: imageIcon(resource: "icons/folder_r1.png"),
+                        shortDescription: 'Details im Projekt übernehmen'
+                )
+            })
+
+            swing.build {
+                panel {
+                    migLayout(layoutConstraints: "", columnConstraints: "[]", rowConstraints: "[][]")
+                    panel(border: titledBorder('Projekt'), constraints: 'wrap') {
+                        migLayout(layoutConstraints: "fill", columnConstraints: "[][]", rowConstraints: "[][]")
+                        label('Projekt-Name', constraints: "")
+                        textField(id: 'deliveryDate', enabled: false, text: p, constraints: 'w 600!, wrap')
+                        label('Liefer-Termin', constraints: "w 200!")
+                        textField(id: 'planFinish', enabled: false, constraints: 'wrap')
+                    }
+                    panel(border: titledBorder('Tasks'), constraints: 'wrap') {
+                        migLayout(layoutConstraints: "fill", columnConstraints: "[][200!][200!][150!][400!][][]", rowConstraints: "")
+                        button('Änderungen anwenden', action: applyProjectDetails, constraints: 'span, growx, wrap') // actionPerformed: saveProjectDetails
+
+                        label('Abteilung')
+                        label('Start')
+                        label('Ende')
+                        label('Last')
+                        label('Bezeichnung', constraints: 'growx')
+                        label("löschen    ") // for button cut
+                        label("duplizieren  ", constraints: 'wrap') // for button copy
+                        def idx = 0
+                        for(task in project) {
+                            buildProjectLine(idx++, task.department, task.starting, task.ending, task.capacityNeeded, task.description)
+                        }
+                    }
+                }
+            }
+        } else {
+            noDataPanel()
+        }
+    }
+
+
+    def buildProjectLine(def idx, def department, def starting, def ending, def capacityNeeded, def description){
+        swing.build {
+            comboBox(id: "department-$idx", items: model.allDepartments, selectedItem: department, toolTipText: "alter Wert:  $department")
+            textField(id: "planStart-$idx", text: starting.toString(), toolTipText: "alter Wert:  " + starting.toString(), actionPerformed: checkProjectDetails)
+            textField(id: "planFinish-$idx", text: ending.toString(), toolTipText: "alter Wert:  " + ending.toString(), actionPerformed: checkProjectDetails)
+            textField(id: "capaNeeded-$idx", text: capacityNeeded as String, toolTipText: "alter Wert:  " + (capacityNeeded as String), actionPerformed: checkProjectDetails)
+            textField(id: "description-$idx", text: description, toolTipText: "alter Wert:  $description", constraints: 'growx', actionPerformed: checkProjectDetails)
+            button("", icon: cut, constraints: 'growx', actionPerformed: deleteLine.curry(idx))
+            button("", icon: copy, constraints: "growx, wrap", actionPerformed: copyLine.curry(idx))
+        }
+    }
+
+    def deleteLine = {int idx, evt ->
+        def p = view.gridPipelineModel.selectedProject
+        if(p) {
+            model.deleteProjectTask(idx, p)
+            model.fireUpdate()
+        }
+    }
+
+    def copyLine = {idx, evt ->
+        def p = view.gridPipelineModel.selectedProject
+        if(p) {
+            model.copyProjectTask(idx, p)
+            model.fireUpdate()
+        }
+    }
+
+
+    def noDataPanel() {
+        swing.build {
+            panel {
+                migLayout(layoutConstraints: "fill", columnConstraints: "", rowConstraints: "")
+                label ("keine Daten", constraints: 'north')
+            }
+        }
+    }
+
+
+    def saveProjectDetails = {
+        if(checkProjectDetails()) {
+            println "SAVE project details"
+            def p = view.gridPipelineModel.selectedProject
+            List<TaskInProject> project = model.getProject(p)
+            def idx = 0
+            for(task in project) {
+                task.department = swing."department-$idx".selectedItem as String
+                task.starting = swing."planStart-$idx".text.toDate()
+                task.ending = swing."planFinish-$idx".text.toDate()
+                task.capacityNeeded = swing."capaNeeded-$idx".text as Double
+                task.description = swing."description-$idx".text
+                idx++
+            }
+            model.reCalcCapaAvailableIfNeeded()
+            model.fireUpdate()
+            //model.setUpdateToggle(!model.updateToggle)
+        } else {
+            println "NOT SAVING project details - found errors..."
+        }
+    }
+
+
+    def checkProjectDetails = {
+        println "CEHCK project details"
+        def result = true
+        def p = view.gridPipelineModel.selectedProject
+        List<TaskInProject> project = model.getProject(p)
+        def idx = 0
+        for(task in project) {
+            def startValid = true
+            def endValid = true
+            if( ! checkTextField(swing."planStart-$idx", Date.class)) {result = false; startValid = false}
+            if( ! checkTextField(swing."planFinish-$idx", Date.class)) {result = false; endValid = false}
+            if( ! checkTextField(swing."capaNeeded-$idx", Double.class)) result = false
+            if( ! checkTextField(swing."description-$idx", String.class)) result = false
+            if(startValid && endValid) {
+                checkStartBeforeEnd(swing."planStart-$idx", swing."planFinish-$idx")
+            }
+            idx++
+        }
+        result
+    }
+
+
+    static def markError(JTextField textField, String error) {
+        textField.setForeground(RED)
+        textField.setToolTipText(error + "  ($textField.text)\n"+ textField.getToolTipText())
+
+    }
+
+
+    def markValid(JTextField textField) {
+        textField.setForeground(fg)
+        String[] split = textField.getToolTipText().split("\n")
+        if(split.size() > 1) {
+            textField.setToolTipText(split[split.size()-1])
+        }
+    }
+
+
+    def checkStartBeforeEnd(JTextField textFieldStart, JTextField textFieldEnd){
+        def result = true
+        Date start = textFieldStart.text.toDate()
+        Date end = textFieldEnd.text.toDate()
+        if(start >= end) {
+            markError(textFieldStart, "Start >= Ende...")
+            markError(textFieldEnd, "Start >= Ende...")
+            result = false
+        } else if(end - start > 20*365 ) {
+            markError(textFieldStart, "Start bis Ende mehr als 20 Jahre...")
+            markError(textFieldEnd, "Start bis Ende mehr als 20 Jahre...")
+            result = false
+        } else {
+            markValid(textFieldStart)
+            markValid(textFieldEnd)
+        }
+        result
+    }
+
+
+    def checkTextField = {JTextField textField, Class type ->
+        def result = true
+        if(type == Double) {
+            try {
+                textField.text.toDouble()
+            } catch(Exception e) {
+                markError(textField, "keine Gleitkommazahl...")
+                result = false
+            }
+        }else if(type == String){
+            def val = textField.text
+            if(val.contains(" ") || val.contains("\t")) {
+                markError(textField, "enthält Leerzeichen...")
+                result = false
+            }
+        }else if (type == Date){
+            try {
+                textField.text.toDate()
+            } catch(Exception e) {
+                markError(textField, "kein gültiges Datum tt.mm.jjjj...")
+                result = false
+            }
+        } else {
+            throw new RuntimeException("type to check unknown... $type")
+        }
+        if (result) markValid(textField)
+        result
+    }
+
+
+}

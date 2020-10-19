@@ -149,4 +149,13 @@ class GridDemoModel extends GridModel {
     List<String> getDetailsForTooltip(int x, int y) {
         ["dummy", "0"]
     }
+
+    @Override
+    def makeSmaller(int y) {
+    }
+
+    @Override
+    def makeBigger(int y) {
+    }
+
 }

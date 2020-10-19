@@ -113,7 +113,7 @@ class MainGui {
         //
         // configure tooltip manager
         //
-        ToolTipManager.sharedInstance().setDismissDelay(60000)
+        ToolTipManager.sharedInstance().setDismissDelay(600000)
         ToolTipManager.sharedInstance().setInitialDelay(500)
 
 

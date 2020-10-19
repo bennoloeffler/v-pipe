@@ -78,6 +78,7 @@ class GridLoadModel extends AbstractGridLoadModel  {
 
 
                 if(model.capaAvailable.size()) {
+                    assert model.capaAvailable[department][timeStr]
                     yellowAbs = model.capaAvailable[department][timeStr].yellow
                     redAbs = model.capaAvailable[department][timeStr].red
                 } else {

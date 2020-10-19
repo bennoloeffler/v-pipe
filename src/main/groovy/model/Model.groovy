@@ -93,6 +93,11 @@ class Model {
 
     List<String> projectSequence = []
 
+
+    def fireUpdate(){
+        setUpdateToggle(!updateToggle)
+    }
+
     /**
      * @param project
      * @return List of all Tasks with project name project
@@ -101,9 +106,37 @@ class Model {
     List<TaskInProject> getProject(String project) {
         def t = RunTimer.getTimerAndStart('getProject')
         def r = taskList.findAll {it.project == project}
+        def departments = getAllDepartments()
+        r = r.sort{a, b ->
+            departments.indexOf(a.department) - departments.indexOf(b.department)
+        }
         t.stop()
         r
     }
+
+
+    def deleteProjectTask(int idx, project) {
+        def r = taskList.findAll {it.project == project}
+        def departments = getAllDepartments()
+        r = r.sort{a, b ->
+            departments.indexOf(a.department) - departments.indexOf(b.department)
+        }
+        TaskInProject t = r[idx]
+        taskList.remove(t)
+    }
+
+
+    def copyProjectTask(int idx, project) {
+        def r = taskList.findAll {it.project == project}
+        def departments = getAllDepartments()
+        r = r.sort{a, b ->
+            departments.indexOf(a.department) - departments.indexOf(b.department)
+        }
+        TaskInProject t = r[idx]
+        TaskInProject copy = new TaskInProject(t.project, t.starting, t.ending, t.department, t.capacityNeeded, t.description)
+        taskList.add(copy)
+    }
+
 
     PipelineOriginalElement getPipelineElement(String project) {
         PipelineOriginalElement e = pipelineElements.find {

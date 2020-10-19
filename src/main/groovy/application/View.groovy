@@ -4,25 +4,33 @@ package application
 import com.formdev.flatlaf.FlatLightLaf
 import groovy.swing.SwingBuilder
 import model.Model
+import model.TaskInProject
 import model.WeekOrMonth
 import net.miginfocom.swing.MigLayout
 import newview.GridModel
 import newview.GridPanel
 import newview.NewLoadPanel
 
+import javax.swing.BoxLayout
 import javax.swing.Icon
 import javax.swing.ImageIcon
 import javax.swing.JComponent
 import javax.swing.JFrame
 import javax.swing.JLabel
+import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JSplitPane
+import javax.swing.JTabbedPane
 import javax.swing.JTextArea
+import javax.swing.JTextField
 import javax.swing.UIManager
+import java.awt.BorderLayout
 import java.awt.Color
+import java.awt.Component
 import java.awt.Dimension
 import java.awt.Font
 import java.awt.Image
+import java.awt.TextField
 import java.awt.Toolkit
 
 import static java.awt.Color.*
@@ -30,20 +38,15 @@ import static java.awt.Color.*
 class View {
 
     Image frameIcon
-
     Dimension screenDimension = Toolkit.getDefaultToolkit().getScreenSize()
-
     SwingBuilder swing
-
     Model model
 
     //
     // adapter models (second layer...)
     //
-
-    GridModel gridPipelineModel = new NewPipelineModel(model)
+    NewPipelineModel gridPipelineModel = new NewPipelineModel(model)
     GridLoadModel gridLoadModel = new GridLoadModel(model)
-    //GridLoadModel gridMonthLoadModel = new GridLoadModel(model, WeekOrMonth.MONTH)
     GridPipelineLoadModel gridPipelineLoadModel = new GridPipelineLoadModel(model)
     GridModel gridProjectModel = new NewProjectModel(model)
 
@@ -51,46 +54,35 @@ class View {
     def projectView = new GridPanel(20, gridProjectModel)
     def loadView = new NewLoadPanel(20, gridLoadModel)
     def pipelineLoadView = new NewLoadPanel(20, gridPipelineLoadModel)
+    def projectDetails
 
 
     View(Model model) {
         this.model = model
         frameIcon = new ImageIcon(getClass().getResource("/icons/vunds_icon_64x64_t.png")).getImage()
         build()
+        projectDetails = new ProjectDetails(this)
 
-        // TODO: move to Bilder?
         pipelineView.name = "pipelineView" // in order to have a specific name in "paintComponent... getRuntimer(...)"
         projectView.name = "projectView"
         loadView.name = "departmentLoad"
         pipelineLoadView.name = "pipelineLoad"
+
     }
-
-    /*
-    void log(String logMessage) {
-        def jta = (JTextArea)(swing.textAreaLog)
-        //jta.setFont(new Font("Monospaced", jta.getFont().getStyle(), 14));
-        jta.append('\n'+logMessage+'\n')
-    }*/
-
 
 
     void build() {
 
         Color highlightColor = new Color(80, 130, 220, 255)
-
         FlatLightLaf.install()
         UIManager.put( "Component.focusWidth", 3 )
-
 
         //MigLayout ml = new MigLayout()
         swing = new SwingBuilder()
         swing.registerBeanFactory('migLayout', MigLayout)
 
-
-
         // see: https://stackoverflow.com/questions/42833424/java-key-bindings-using-groovy-swing-builder/42834255
         swing.actions({
-
 
             // file
 
@@ -103,6 +95,7 @@ class View {
                     //smallIcon: imageIcon(resource: "icons/folder_r1.png"),
                     shortDescription: 'Verzeichnis mit Daten-Datein öffnen - alle Dateien darin'
             )
+
             action(id: 'saveAction',
                     name: "speichern",
                     mnemonic: 's',
@@ -110,6 +103,7 @@ class View {
                     accelerator: shortcut('S'),
                     shortDescription: 'alle Daten ins aktuelle Daten-Verzeichnis sichern'
             )
+
             action(id: 'saveAsAction',
                     name: "speichern als...",
                     //mnemonic: 's',
@@ -135,7 +129,6 @@ class View {
                     accelerator: shortcut('P'),
                     shortDescription: 'Staffelung sortieren dem spätesten End-Termin des letzten Tasks des Projektes'
             )
-
 
             // view
 
@@ -171,7 +164,6 @@ class View {
                     shortDescription: 'Projekt-Ansicht in gesondertem Fenster öffnen. Gerne mehrere. Multi-Monitor. Multi-View...'
             )
 
-
             // help
 
             action(id: 'helpAction',
@@ -182,7 +174,6 @@ class View {
                     shortDescription: 'zeige die aktuelle Hilfe-Datei im Inter-Netz. Online :-(. Aktuelle Version...'
             )
 
-
             action(id: 'printPerformanceAction',
                     name: "Performance messen",
                     //mnemonic: 'p',
@@ -190,47 +181,47 @@ class View {
                     //accelerator: shortcut('P'),
                     shortDescription: 'gemessene Lauf-Zeiten auf Console printen'
             )
-
-
         })
 
         swing.build {
-
-            //lookAndFeel 'nimbus'
 
             f = frame(id: 'frame',
                     size:[(int)(screenDimension.width), (int)(screenDimension.height - 50)],
                     location: [0,0],
                     iconImage: frameIcon,
-                    title: 'v-pipe    |  +/- = Zoom  |  Pfeile = Cursor bewegen  |  Shift+Pfeile = Projekt bewegen  |  d = Details an/aus  | n = now',
+                    title: 'v-pipe    |  +/- = Zoom  |  Pfeile = Cursor bewegen  |  Shift+Pfeile = Projekt bewegen  |  d = Details an/aus  |  n = now  |  Strg+Pfeile = Tasks vergr./verkl.',
                     locationRelativeTo: null,
                     show: true,
                     defaultCloseOperation: JFrame.DO_NOTHING_ON_CLOSE) {
 
                 menuBar(id: 'menuBar') {
+
                     menu(text:'Dateien', mnemonic:'D') {
                         menuItem(openAction)
                         menuItem(saveAction)
                         menuItem(saveAsAction)
                         menuItem(exitAction)
                     }
+
                     menu(text:'Werkzeug', mnemonic:'W') {
                         menuItem(sortPipelineAction)
                     }
+
                     menu(text:'Ansicht', mnemonic:'A') {
                         menuItem(pipelineViewAction)
                         menuItem(loadViewAction)
                         menuItem(pipelineLoadViewAction)
                         menuItem(projectViewAction)
                     }
+
                     menu(text:'Hilfe', mnemonic:'H') {
                         menuItem(helpAction)
                         menuItem(printPerformanceAction)
                     }
                 }
 
-                //migLayout(layoutConstraints:"fill, debug", columnConstraints:"", rowConstraints:"[][grow]")
                 migLayout(layoutConstraints:"fill", columnConstraints:"[][][][][][][][][][][grow]", rowConstraints:"[][grow]")
+
                 label("Projekt suchen: ", foreground:GRAY)
                 textField(id: 'searchTextField', toolTipText: 'Tutorial & Experimente: regex101.com', constraints: 'width 100')
                 label("    Zeit-Marke: ", foreground:GRAY)
@@ -243,37 +234,47 @@ class View {
                 label(id:'currentPath', constraints:  'wrap')
 
                 splitPane(id: 'spH', orientation: JSplitPane.HORIZONTAL_SPLIT, continuousLayout:true, dividerLocation: 1600, constraints: 'grow, span') {
+
                     splitPane(id: 'spV1', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: 1000) {
+
                         scrollPane (horizontalScrollBarPolicy: JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS) {
                             widget(pipelineView)
                         }
 
                         splitPane(id: 'spV3', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: 200) {
+
                             scrollPane(id: 'pipelineLoadViewScrollPane', horizontalScrollBarPolicy: JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS) {
                                 widget( pipelineLoadView)
                             }
+
                             scrollPane(id: 'spSwap', horizontalScrollBarPolicy: JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS) {
                                 widget(loadView)
                             }
                         }
-                        // toggeling view...
-                        // spV1.setSecond(view.swing.sp-swap) // only load, without pipeline
-                        // spV1.setSecond(view.swing.spV3) // both
-
                     }
+
                     splitPane(id: 'spV2', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: 500) {
+
                         scrollPane {
                             widget(projectView)
                         }
-                        scrollPane {
-                            textArea(id: 'textAreaLog', editable: false, focusable: false)
-                        }
 
+                        tabbedPane(id: 'tabs', tabLayoutPolicy: JTabbedPane.SCROLL_TAB_LAYOUT) {
+
+                            scrollPane (id: 'projectDetailsScrollPane',
+                                    name: 'Projekt-Details',
+                                    verticalScrollBarPolicy: JScrollPane.VERTICAL_SCROLLBAR_ALWAYS) {
+                                //projectDetails.noDataPanel()
+                            }
+                            scrollPane(name: 'Info') {
+                                textArea(id: 'textAreaLog', editable: false, focusable: false)
+                            }
+                        }
                     }
                 }
-
             }
         }
+        ((JScrollPane)(swing.projectDetailsScrollPane)).verticalScrollBar.setUnitIncrement(10)
     }
 
 
@@ -296,7 +297,8 @@ class View {
         def newPipelineView = new GridPanel(20, gridPipelineModel)
         swing.edt {
 
-            frame(id: "framePipeline+${i++}", iconImage: frameIcon, title: "v-pipe: Staffelung", locationRelativeTo: null, show: true, pack:true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
+            frame(id: "framePipeline+${i++}", iconImage: frameIcon,
+                    title: "v-pipe: Staffelung", locationRelativeTo: null, show: true, pack:true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
                 scrollPane {
                     widget(newPipelineView)
                 }
@@ -309,7 +311,8 @@ class View {
     def openLoadWindow() {
         def newLoadView = new NewLoadPanel(20, gridLoadModel)
         swing.edt {
-            frame(id: "frameLoad+${i++}", iconImage: frameIcon, title: "v-pipe: Abt.-Belastung", locationRelativeTo: null, show: true, pack:true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
+            frame(id: "frameLoad+${i++}", iconImage: frameIcon,
+                    title: "v-pipe: Abt.-Belastung", locationRelativeTo: null, show: true, pack:true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
                 scrollPane {
                     widget(newLoadView)
                 }
@@ -323,7 +326,8 @@ class View {
     def openPipelineLoadWindow() {
         def newLoadView = new NewLoadPanel(20, gridPipelineLoadModel)
         swing.edt {
-            frame(id: "framePipelineLoad+${i++}", iconImage: frameIcon, title: "v-pipe: IP-Belastung", locationRelativeTo: null, show: true, pack:true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
+            frame(id: "framePipelineLoad+${i++}", iconImage: frameIcon,
+                    title: "v-pipe: IP-Belastung", locationRelativeTo: null, show: true, pack:true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
                 scrollPane {
                     widget(newLoadView, name: "monthLoad$i++")
                 }
@@ -337,7 +341,8 @@ class View {
     def openProjectWindow() {
         def newProjectView = new GridPanel(20, gridProjectModel)
         swing.edt {
-            frame(id: "frameProjectLoad+${i++}", iconImage: frameIcon, title: "v-pipe: Projekt", locationRelativeTo: null, show: true, pack:true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
+            frame(id: "frameProjectLoad+${i++}", iconImage: frameIcon,
+                    title: "v-pipe: Projekt", locationRelativeTo: null, show: true, pack:true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
                 scrollPane {
                     widget(newProjectView, name: "monthLoad$i++")
                 }
