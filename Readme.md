@@ -6,13 +6,13 @@ mit einer Projektlandschaft ein und erzeugt eine
 Übersicht der Belastung aller beteiligten Abteilungen.  
 Es gibt die Möglichkeit, Projekte zu verschieben  
 und Portfolio-Szenarien zu modellieren.  
-Quickstart- Video? [Hier Klicken...](https://www.loom.com/share/84d7636a20e745d19ac0489aa4eba2fc)
+Quickstart- Video? [Hier Klicken...](https://loom.com/share/folder/098a2ada42f647bfbbcc89e4d0e4a202)
 
 ## Installation
 
 Die Distribution ist ein `v-pipe-major.minor.bugfix-ReleaseName.zip`.  
 Dieses Zip-File entpacken - ideal in das Verzeichnis:  
-`c:\v-pipe`
+`c:\v-pipe`. Aber auch gerne auf einen Memory-Stick. Tut auch.
 In Win10 braucht man dazu keinen "Zipper".  
 1. Zipfile v-pipe-x.y.z-release.zip 'irgendwo' ablegen.  
 2. Per Explorer (WIN+E) das v-pipe.zip 'anklicken'.
@@ -267,6 +267,9 @@ TODO: 2020-12-XX `1.3.0-RELEASE-operative-Grobplanung`
 TODO: 2020-11-XX `1.2.0-Data-Input-Adapters`
 
 TODO: 2020-11-XX `1.1.0-Überlasten-glätten`
+
+2020-10-20 `1.0.2-Details-Editor-Bugfixes`
+- Datenkonsistenz-Prüfung Abteilungen geht wieder
 
 2020-10-19 `1.0.1-Details-Editor-Bugfixes`
 - duplizieren

@@ -419,7 +419,7 @@ class Model {
     }
 
     def check() {
-        List<String> depsTasks = getAllDepartments()
+        List<String> depsTasks = taskList*.department.unique()
         Set<String> depsCapa= capaAvailable.keySet()
         List<String> remain = (List<String>)(depsTasks.clone())
         remain.removeAll(depsCapa)

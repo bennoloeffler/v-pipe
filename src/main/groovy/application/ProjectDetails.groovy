@@ -69,14 +69,16 @@ class ProjectDetails {
             swing.build {
                 panel {
                     migLayout(layoutConstraints: "", columnConstraints: "[]", rowConstraints: "[][]")
+
                     panel(border: titledBorder('Projekt'), constraints: 'wrap') {
-                        migLayout(layoutConstraints: "fill", columnConstraints: "[][]", rowConstraints: "[][]")
-                        label('Projekt-Name', constraints: "")
-                        textField(id: 'deliveryDate', enabled: false, text: p, constraints: 'w 600!, wrap')
-                        label('Liefer-Termin', constraints: "w 200!")
-                        textField(id: 'planFinish', enabled: false, constraints: 'wrap')
-                        //button("löschen")
-                        //button()
+                        migLayout(layoutConstraints: "fill", columnConstraints: "[][]", rowConstraints: "[][]1[]")
+                        label('Projekt-Name:', constraints: "")
+                        textField(id: 'projectName', enabled: false, text: p, constraints: 'w 600!, span 4, wrap')
+                        label('Liefer-Termin:')
+                        textField(id: 'planFinish', enabled: false, constraints: 'w 200!, span 3, wrap')
+                        label('Wahrscheinlichkeit:')
+                        textField(id: 'probability', text: 100, enabled: false, constraints: 'w 100!')
+                        label('[%]', constraints: '')
                     }
                     panel(border: titledBorder('Tasks'), constraints: 'wrap') {
                         migLayout(layoutConstraints: "fill", columnConstraints: "[][200!][200!][150!][400!][][]", rowConstraints: "")
@@ -94,6 +96,14 @@ class ProjectDetails {
                             buildProjectLine(idx++, task.department, task.starting, task.ending, task.capacityNeeded, task.description)
                         }
                     }
+                    panel(border: titledBorder('Projektverwaltung'), constraints: 'wrap') {
+                        migLayout(layoutConstraints: "fill", columnConstraints: "[][]", rowConstraints: "[][]")
+                        button("Projekt löschen", enabled: false)
+                        button("Projekt duplizieren", enabled: false, constraints: '')
+                        //checkBox("Vorlage (wird nicht als Last gerechnet)", enabled: false, constraints: 'wrap')
+
+                    }
+
                 }
             }
         } else {
