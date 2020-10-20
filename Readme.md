@@ -268,10 +268,11 @@ TODO: 2020-11-XX `1.2.0-Data-Input-Adapters`
 
 TODO: 2020-11-XX `1.1.0-Überlasten-glätten`
 
-2020-10-19 `1.0.1-Bugfixes`
+2020-10-19 `1.0.1-Details-Editor-Bugfixes`
 - duplizieren
 - Änderungen annehmen
 - CTRL-Pfeil vergrößert / verkleinert die Projekt-Tasks
+- Löschen des letzten Task in Detailansicht nicht möglich
 
 2020-10-19 `1.0.0-RELEASE-Projekt-Editor`
 - Editor für Projekt-Daten (Alle Felder bearbeiten, Copy und Cut von Tasks)

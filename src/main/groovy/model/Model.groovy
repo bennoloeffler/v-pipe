@@ -117,12 +117,14 @@ class Model {
 
     def deleteProjectTask(int idx, project) {
         def r = taskList.findAll {it.project == project}
-        def departments = getAllDepartments()
-        r = r.sort{a, b ->
-            departments.indexOf(a.department) - departments.indexOf(b.department)
+        if(r.size() > 1) {
+            def departments = getAllDepartments()
+            r = r.sort { a, b ->
+                departments.indexOf(a.department) - departments.indexOf(b.department)
+            }
+            TaskInProject t = r[idx]
+            taskList.remove(t)
         }
-        TaskInProject t = r[idx]
-        taskList.remove(t)
     }
 
 

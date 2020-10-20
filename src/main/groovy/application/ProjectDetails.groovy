@@ -75,6 +75,8 @@ class ProjectDetails {
                         textField(id: 'deliveryDate', enabled: false, text: p, constraints: 'w 600!, wrap')
                         label('Liefer-Termin', constraints: "w 200!")
                         textField(id: 'planFinish', enabled: false, constraints: 'wrap')
+                        //button("löschen")
+                        //button()
                     }
                     panel(border: titledBorder('Tasks'), constraints: 'wrap') {
                         migLayout(layoutConstraints: "fill", columnConstraints: "[][200!][200!][150!][400!][][]", rowConstraints: "")
