@@ -267,6 +267,12 @@ TODO: 2020-11-XX `1.2.0-Data-Input-Adapters`
 
 TODO: 2020-11-XX `1.1.0-Überlasten-glätten`
 
+2020-11-03 `1.1.0-Szenario-Differenzen`
+- compare files
+
+2020-10-30 `1.0.3-Details-Editor-Bugfixes`
+- increase / decrease tasks with CTRL-arrow (--> = inc, <-- = dec)
+
 2020-10-20 `1.0.2-Details-Editor-Bugfixes`
 - Datenkonsistenz-Prüfung Abteilungen geht wieder
 
