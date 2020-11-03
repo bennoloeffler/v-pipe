@@ -79,7 +79,10 @@ class GlobalController {
     def printPerformanceActionPerformed = {ActionEvent e ->
         println(SystemInfo.getSystemInfoTable())
         println(RunTimer.getResultTable())
+    }
 
+    def compareActionPerformed = {ActionEvent e ->
+        println(e.getSource())
     }
 
 

@@ -12,8 +12,8 @@ Quickstart- Video? [Hier Klicken...](https://loom.com/share/folder/098a2ada42f64
 
 Die Distribution ist ein `v-pipe-major.minor.bugfix-ReleaseName.zip`.  
 Dieses Zip-File entpacken - ideal in das Verzeichnis:  
-`c:\v-pipe`. Aber auch gerne auf einen Memory-Stick. Tut auch.
-In Win10 braucht man dazu keinen "Zipper".  
+`c:\v-pipe`. Aber auch gerne auf einen Memory-Stick. Tut auch.  
+In Win10 braucht man dazu keinen "Zipper".    
 1. Zipfile v-pipe-x.y.z-release.zip 'irgendwo' ablegen.  
 2. Per Explorer (WIN+E) das v-pipe.zip 'anklicken'.
 Einfach im Explorer einmal draufklicken.  
@@ -79,7 +79,7 @@ Also z.B.: `c:\v-pipe`
 
 ### Daten-Dateien
 
-## `Projekt-Start-End-Abt-Capa.txt`  
+## `Projekt-Start-End-Abt-Kapa.txt`  
 **Grunddaten (erforderlich):** alle Tasks aller Projekte  
 Enthält beispielsweise:   
 `Projekt-1-Neu-Ulm 20.05.2020 31.5.2020 Abt3 45.6`  
@@ -136,10 +136,8 @@ Enthält beispielsweise:
 
           "Kapa_Profil": {
              "2020-23": 100,
-             "2020-24": { "gelb": 140, "rot": 250 },
-             "2020-25": 80,
-             "2020-26": { "gelb": 140, "rot": 190 },
-             "2020-27": 100
+             "2020-24": { "gelb": 170, "rot": 250 },
+             "2020-40": { "gelb": 150, "rot": 200 },
           }
       },
 
@@ -165,8 +163,8 @@ Enthält beispielsweise:
 
 
 
-**Bedeutung:** Kapa_Gesamt beinhaltet Feiertage und ein Kapa_Profil  
-in Prozent. Der Abschnitt Abteilungen beinhaltet Abteilungsnamen und  
+**Bedeutung:** der Abschnitt `Kapa_Gesamt` beinhaltet Feiertage und ein Kapa_Profil  
+in Prozent. Der Abschnitt `Abteilungen` beinhaltet Abteilungsnamen und  
 darunter jeweils zwei Infos:  
 `Kapa`: rote und gelbe Kapazitätsgrenze. Diese Einteilung dient lediglich der   
 Visualisierung.  
@@ -215,7 +213,7 @@ und
 
 
 ### Überschreiben von Ergebnissen und Dateien beim Speichern  
-Ergebnis-Dateien werden nie überschrieben.  
+Ergebnis-Dateien werden nie einfach so überschrieben.  
 Wann immer eine Ergebnisdatei schon existiert,  
 wird ein Backup mit Datum und Uhrzeit erstellt.  
 Z.B.  
@@ -224,12 +222,13 @@ Die aktuellsten Ergebnisse liegen also immer in
 `Abteilungs-Kapazitäts-Belastung.txt`  
 Beim Speichern aus v-pipe-gui wird ein Ordner mit dem Namen backup angelegt.  
 Dort wird ein Ordner mit einem Zeit-Stempel angelegt.  
-Dorthin werden die Dateien verschoben,  
-die beim Speichern überschrieben werden müssten.   
+Dorthin werden die aktuellen Dateien verschoben,  
+die beim Speichern überschrieben werden.   
 
 ### Ablage der Backup-Dateien
 Alle Dateien, die überschrieben werden müssten, werden abgelegt in:   
-Also z.B.: `c:\v-pipe\backup`
+Also z.B.: `c:\v-pipe\backup`   
+Oder bei v-pipe-gui im aktuellen Ordner und dort unter \backup...)
 
 
 ### Terminfester 

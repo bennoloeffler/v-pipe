@@ -22,7 +22,7 @@ import java.awt.Desktop
  */
 class  Main {
 
-    static VERSION_STRING ='1.0.2-Details-Editor-Bugfixes'
+    static VERSION_STRING ='1.1.0-Szenario-Differenzen'
 
     def singleRunMode = false // instead: Deamon is default
     def multiInstanceMode = false // instead SingleInstance is default

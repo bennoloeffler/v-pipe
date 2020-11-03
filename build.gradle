@@ -27,7 +27,7 @@ dependencies {
     implementation 'org.tinylog:tinylog-impl:2.1.2'
     implementation 'org.tinylog:tinylog-api:2.1.2'
     implementation name: 'flatlaf-0.37'
-    implementation name: 'miglayout-4.0-swing'
+    implementation name: 'miglayout-4.0-swing' //ADD LOCAL LIB...
     //implementation 'net.java.balloontip:balloontip:1.2.4.1'
 
     testCompile 'junit:junit:4.12'

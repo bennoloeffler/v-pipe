@@ -7,6 +7,7 @@ import model.Model
 import model.TaskInProject
 import model.WeekOrMonth
 import net.miginfocom.swing.MigLayout
+import newview.FileDifferPanel
 import newview.GridModel
 import newview.GridPanel
 import newview.NewLoadPanel
@@ -55,11 +56,14 @@ class View {
     def loadView = new NewLoadPanel(20, gridLoadModel)
     def pipelineLoadView = new NewLoadPanel(20, gridPipelineLoadModel)
     def projectDetails
+    FileDifferPanel fileDifferPanel
 
 
     View(Model model) {
         this.model = model
         frameIcon = new ImageIcon(getClass().getResource("/icons/vunds_icon_64x64_t.png")).getImage()
+        swing = new SwingBuilder()
+        fileDifferPanel = new FileDifferPanel(swing)
         build()
         projectDetails = new ProjectDetails(this)
 
@@ -78,7 +82,6 @@ class View {
         UIManager.put( "Component.focusWidth", 3 )
 
         //MigLayout ml = new MigLayout()
-        swing = new SwingBuilder()
         swing.registerBeanFactory('migLayout', MigLayout)
 
         // see: https://stackoverflow.com/questions/42833424/java-key-bindings-using-groovy-swing-builder/42834255
@@ -181,6 +184,7 @@ class View {
                     //accelerator: shortcut('P'),
                     shortDescription: 'gemessene Lauf-Zeiten auf Console printen'
             )
+
         })
 
         swing.build {
@@ -266,9 +270,13 @@ class View {
                                     verticalScrollBarPolicy: JScrollPane.VERTICAL_SCROLLBAR_ALWAYS) {
                                 //projectDetails.noDataPanel()
                             }
+
                             scrollPane(name: 'Info') {
                                 textArea(id: 'textAreaLog', editable: false, focusable: false)
                             }
+
+                            fileDifferPanel.buildPanel()
+
                         }
                     }
                 }
