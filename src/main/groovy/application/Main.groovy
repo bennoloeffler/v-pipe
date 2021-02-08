@@ -22,7 +22,7 @@ import java.awt.Desktop
  */
 class  Main {
 
-    static VERSION_STRING ='1.2.0-Templates'
+    static VERSION_STRING ='1.2.1-Templates'
 
     def singleRunMode = false // instead: Deamon is default
     def multiInstanceMode = false // instead SingleInstance is default
