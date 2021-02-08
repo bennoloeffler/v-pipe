@@ -50,6 +50,10 @@ class TaskInProject {
         this.description = description
     }
 
+    Object clone() {
+        return new TaskInProject(project, starting, ending, department, capacityNeeded, description)
+    }
+
     TaskInProject cloneFromTemplate(String otherProject, int dayShift) {
         def tip = new TaskInProject(otherProject, starting + dayShift, ending+dayShift, department, capacityNeeded, description)
         tip.fromTemplate = this
@@ -135,55 +139,58 @@ class TaskInProject {
     Map<String, Double> cache
     WeekOrMonth weekOrMonthLastTime
     Map<String, Double> getCapaDemandSplitIn(WeekOrMonth weekOrMonth) {
-        def t = RunTimer.getTimerAndStart('getCapaDemandSplitIn')
+        RunTimer.getTimerAndStart('getCapaDemandSplitIn').withCloseable {
 
-        assert starting < ending
-        //assert capacityNeeded > 0
-        if( ! hasChanged() && weekOrMonth == weekOrMonthLastTime) {
-            t.stop()
-            return cache
-        } else {
-            def resultMap = [:]
-            if (capacityNeeded == 0) {
-                t.stop()
+            assert starting < ending
+            //assert capacityNeeded > 0
+            if (!hasChanged() && weekOrMonth == weekOrMonthLastTime) {
+                //t.stop()
+                return cache
+            } else {
+                def resultMap = [:]
+                if (capacityNeeded == 0) {
+                    //t.stop()
+                    return resultMap as Map<String, Double>
+                }
+                if (weekOrMonth == WeekOrMonth.WEEK) {
+                    Date week = _getStartOfWeek(starting)
+//starting.getStartOfWeek() // not possible because of static comp
+                    while (week < ending) {
+                        double capNeededInThatWeek = getCapaNeeded(week, week + 7)
+                        def key = _getWeekYearStr(week)//week.getWeekYearStr() // not possible because of static comp
+                        resultMap[key] = capNeededInThatWeek
+                        week += 7
+                    }
+                } else {
+                    Date month = _getStartOfMonth(starting)
+                    //starting.getStartOfMonth() // not possible because of static comp
+                    Date nextMonth
+
+                    while (month < ending) {
+                        //use(TimeCategory) { // not possible because of static comp
+                        Calendar c = Calendar.getInstance()
+                        c.setTime(month)
+                        c.add(Calendar.MONTH, 1)
+                        nextMonth = c.getTime()
+                        //nextMonth = month + 1.month // not possible because of static comp
+                        //}
+                        def capNeededInThatMonth = getCapaNeeded(month, nextMonth)
+                        def key = _getMonthYearStr(month)
+                        //month.getMonthYearStr() // not possible because of static comp
+                        resultMap[key] = capNeededInThatMonth
+                        month = nextMonth
+                    }
+                }
+
+                // only for caching
+                cache = resultMap
+                startingLastTime = starting
+                endingLastTime = ending
+                capacityNeededLastTime = capacityNeeded
+                weekOrMonthLastTime = weekOrMonth
+                //t.stop()
                 return resultMap as Map<String, Double>
             }
-            if (weekOrMonth == WeekOrMonth.WEEK) {
-                Date week = _getStartOfWeek(starting)//starting.getStartOfWeek() // not possible because of static comp
-                while (week < ending) {
-                    double capNeededInThatWeek = getCapaNeeded(week, week + 7)
-                    def key = _getWeekYearStr(week)//week.getWeekYearStr() // not possible because of static comp
-                    resultMap[key] = capNeededInThatWeek
-                    week += 7
-                }
-            } else {
-                Date month = _getStartOfMonth(starting)
-                //starting.getStartOfMonth() // not possible because of static comp
-                Date nextMonth
-
-                while (month < ending) {
-                    //use(TimeCategory) { // not possible because of static comp
-                    Calendar c = Calendar.getInstance()
-                    c.setTime(month)
-                    c.add(Calendar.MONTH, 1)
-                    nextMonth = c.getTime()
-                    //nextMonth = month + 1.month // not possible because of static comp
-                    //}
-                    def capNeededInThatMonth = getCapaNeeded(month, nextMonth)
-                    def key = _getMonthYearStr(month) //month.getMonthYearStr() // not possible because of static comp
-                    resultMap[key] = capNeededInThatMonth
-                    month = nextMonth
-                }
-            }
-
-            // only for caching
-            cache = resultMap
-            startingLastTime = starting
-            endingLastTime = ending
-            capacityNeededLastTime = capacityNeeded
-            weekOrMonthLastTime = weekOrMonth
-            t.stop()
-            return resultMap as Map<String, Double>
         }
     }
 }

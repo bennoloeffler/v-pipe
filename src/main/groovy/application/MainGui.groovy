@@ -183,22 +183,11 @@ class MainGui {
         //
         // start EDT and init model
         //
-        try {
-            view.start {
-                controller.openDir('.')
-            }
-        } catch (VpipeDataException vde) {
-            JOptionPane.showMessageDialog(null,
-                    vde.message,
-                    "DATEN-FEHLER beim Start",
-                    JOptionPane.WARNING_MESSAGE)
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null,
-                    "Stacktrace speichern. Bitte.\nNochmal in Console starten.\nDann speichern.\nFehler: $e.message",
-                    "F I E S E R   FEHLER beim Start  :-(",
-                    JOptionPane.ERROR_MESSAGE)
-            throw e // to produce stacktrace on console...
+        view.start {
+            //controller.openDir('.')
+            model.currentDir = "."
         }
+
 
         SwingUtilities.invokeLater {
             // increase fonts in java 1.8

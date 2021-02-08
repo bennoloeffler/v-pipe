@@ -32,6 +32,13 @@ class  PipelineOriginalElement {
         poe
     }
 
+    PipelineOriginalElement clone() {
+        new PipelineOriginalElement(
+                project: project,
+                startDate: startDate,
+                endDate: endDate,
+                pipelineSlotsNeeded: pipelineSlotsNeeded)
+    }
     // TODO: move to abstract base class eg "StartEndDayElement"
     long getDaysOverlap(Date intervalStart, Date intervalEnd) {
         assert startDate < endDate

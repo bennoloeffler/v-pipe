@@ -20,7 +20,7 @@ class DataReaderTest extends Specification {
         def data = "p2 p1 4"
 
         when: 'reading'
-        def r = DataReader.readTemplates(data)
+        def r = DataReader.readScenario(data)
 
         then: 'two strings and one number'
         r[0][0] == 'p2'
@@ -34,7 +34,7 @@ class DataReaderTest extends Specification {
         def data = "p2, p1;   4 \n  \np_1, p__1   434 \n"
 
         when: 'reading'
-        def r = DataReader.readTemplates(data)
+        def r = DataReader.readScenario(data)
 
         then: 'works - second line read'
         r[1][0] == 'p_1'
@@ -47,7 +47,7 @@ class DataReaderTest extends Specification {
         def data = ""
 
         when: 'reading'
-        def r = DataReader.readTemplates(data)
+        def r = DataReader.readScenario(data)
 
         then: 'result is empty too - but no exception or null'
         r.size() == 0
@@ -58,7 +58,7 @@ class DataReaderTest extends Specification {
         def data = "p1 p2 p3 p4"
 
         when: 'reading'
-        def r = DataReader.readTemplates(data)
+        def r = DataReader.readScenario(data)
 
         then:
             VpipeDataException ex = thrown()
@@ -72,7 +72,7 @@ class DataReaderTest extends Specification {
         def data = "p1, p2, 5.6"
 
         when:
-        def r = DataReader.readTemplates(data)
+        def r = DataReader.readScenario(data)
 
         then:
         VpipeDataException ex = thrown()

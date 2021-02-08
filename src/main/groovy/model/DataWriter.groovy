@@ -56,8 +56,10 @@ class DataWriter {
                 DataReader.PIPELINING_FILE_NAME,
                 DataReader.DATESHIFT_FILE_NAME,
                 DataReader.CAPA_FILE_NAME,
-                DataReader.TEMPLATE_FILE_NAME,
+                DataReader.SCENARIO_FILE_NAME,
                 DataReader.SEQUENCE_FILE_NAME,
+                DataReader.PROJECT_TEMPLATE_FILE_NAME,
+                DataReader.PROJECT_TEMPLATE_FILE_NAME
         ]
 
         def bDir = FileSupport.backupDirName(DataReader.currentDir)
@@ -120,6 +122,15 @@ class DataWriter {
         if(model.pipelineElements) {
             writePipliningToFile()
         }
-        //wriiteDeliveriyDatetoFile()
+        if(model.templatesPlainTextCache) {
+            def f = new File(DataReader.get_PROJECT_TEMPLATE_FILE_NAME())
+            f.delete()
+            f << model.templatesPlainTextCache
+        }
+        if(model.templatesPipelineElementsPlainTextCache) {
+            def f = new File(DataReader.get_PIPELINING_TEMPLATE_FILE_NAME())
+            f.delete()
+            f << model.templatesPipelineElementsPlainTextCache
+        }
     }
 }

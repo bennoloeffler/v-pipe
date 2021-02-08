@@ -2,6 +2,7 @@ package application
 
 import model.DataWriter
 import model.Model
+import model.VpipeDataException
 import utils.RunTimer
 import utils.SystemInfo
 
@@ -22,7 +23,7 @@ class GlobalController {
     }
 
     def openActionPerformed = { ActionEvent e ->
-        String dir = chooseDir('Datenverzeichnis öffnen', (JComponent)(e.source))
+        String dir = chooseDir('Datenverzeichnis öffnen', (JComponent)(e.source), "Verzeichnis auswählen & Daten-Dateien von dort lesen")
         if (dir) {
             openDir(dir)
         }
@@ -30,20 +31,20 @@ class GlobalController {
     }
 
     def saveActionPerformed = { ActionEvent e ->
-        println("saveActionPerformed")
+        //println("saveActionPerformed")
         DataWriter dw = new DataWriter(model: model)
         dw.saveAll()
     }
 
     def exitActionPerformed = { ActionEvent e ->
-        println("exitActionPerformed")
+        //println("exitActionPerformed")
         //DataWriter dw = new DataWriter(model: model)
         checkSaveBeforeExit()
     }
 
     def saveAsActionPerformed = { ActionEvent e ->
-        println("saveActionPerformed")
-        String dir = chooseDir('Datenverzeichnis zum Speichern wählen', (JComponent)(e.source))
+        //println("saveActionPerformed")
+        String dir = chooseDir('Datenverzeichnis zum Speichern wählen', (JComponent)(e.source), "Verzeichnis auswählen & Daten-Dateien dort speichern")
         if (dir) {
             model.setCurrentDir(dir)
             DataWriter dw = new DataWriter(model: model)
@@ -52,7 +53,7 @@ class GlobalController {
     }
 
     def sortPipelineActionPerformed = {ActionEvent e ->
-        println("sortPipelineActionPerformed")
+        //println("sortPipelineActionPerformed")
         view.gridPipelineModel.sortProjectNamesToEnd()
     }
 
@@ -88,11 +89,12 @@ class GlobalController {
 
 
 
-    private String chooseDir(String dialogTitle, JComponent root) {
+    private String chooseDir(String dialogTitle, JComponent root, String applyButtonText) {
         String result = null
         JFileChooser fc = new JFileChooser(new File(model.currentDir))
         fc.setDialogTitle(dialogTitle)
-        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
+        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY, )
+        fc.setApproveButtonText(applyButtonText)
         int returnVal = fc.showOpenDialog(root)
 
         if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -122,30 +124,32 @@ class GlobalController {
     }
 
     def openDir(String dir) {
-        //try {
+        try {
             model.setCurrentDir(dir)
+            view.gridPipelineModel.setSelectedProject(null)
             model.readAllData() // in EDT
             view.pipelineView.setCursorToNow()
             view.loadView.setCursorToNow()
             if (model.pipelineElements) {
                 view.swing.pipelineLoadViewScrollPane.setVisible(true)
-                //((JSplitPane)(view.swing.spV1)).setBottomComponent(view.swing.spV3) // with pipeline
-                //view.swing.spH.setDividerLocation(900)
                 view.swing.spV1.setDividerLocation(500)
                 view.swing.spV2.setDividerLocation(500)
                 view.swing.spV3.setDividerLocation(120)
-                //view.pipelineLoadView.setVisible(true)
             } else {
                 view.swing.pipelineLoadViewScrollPane.setVisible(false)
-                //((JSplitPane)(view.swing.spV1)).setBottomComponent(view.swing.spSwap) // only load, without pipeline
-                //view.pipelineLoadView.setVisible(false)
-                //view.swing.spV1.setDividerLocation(500)
-                //view.swing.spV2.setDividerLocation(500)
-                //view.swing.spV3.setDividerLocation(120)
             }
-        //} catch (Exception e) {
-        //    e.printStackTrace()
-        //}
+        } catch (VpipeDataException vde) {
+            JOptionPane.showMessageDialog(null,
+                    vde.message,
+                    "DATEN-FEHLER beim Start",
+                    JOptionPane.WARNING_MESSAGE)
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null,
+                    "Stacktrace speichern. Bitte.\nNochmal in Console starten.\nDann speichern.\nFehler: $e.message",
+                    "F I E S E R   FEHLER beim Start  :-(",
+                    JOptionPane.ERROR_MESSAGE)
+            throw e // to produce stacktrace on console...
+        }
     }
 
 

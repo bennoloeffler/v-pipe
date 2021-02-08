@@ -3,6 +3,7 @@ package newview
 import groovy.beans.Bindable
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
+import groovy.util.logging.Log
 import utils.RunTimer
 
 import javax.swing.*
@@ -522,172 +523,174 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
     protected void paintComponent(Graphics g1d) {
         super.paintComponent(g1d)
         //println(this.name)
-        def t = RunTimer.getTimerAndStart("${this.name} GridPanel::paintComponent ")
+        RunTimer.getTimerAndStart("${this.name} GridPanel::paintComponent ").withCloseable {
 
-        Graphics2D g = g1d as Graphics2D
-        hints(g)
-        g.getClipBounds(r)
+            Graphics2D g = g1d as Graphics2D
+            hints(g)
+            g.getClipBounds(r)
 
-
-
-        //
-        // paint only elements inside clipBounds
-        //
-
-        for (int x in 0..model.sizeX - 1) {
-            for (int y in 0..model.sizeY - 1) {
-                int graphX = borderWidth + x * gridWidth + nameWidth
-                int graphY = borderWidth + y * gridWidth
-                if(graphX >= r.x-2*gridWidth && graphX <= r.x+2*gridWidth + r.width && graphY >= r.y-2*gridWidth && graphY <= r.y+2*gridWidth + r.height) {
-                    // TODO: println "x: $x (sizeX: $model.sizeX) y: $y (sizeY: $model.sizeY)"
-                    if(model.sizeX == 0 || model.sizeY == 0) {
-                        t.stop()
-                        return
-                    }
-                    GridElement e = model.getElement(x, y)
-                    assert e != null
-                    if (e != GridElement.nullElement || cursorX == x && cursorY == y) {
-                        Color c = getColor(y)
-                        g.setColor(c)
-                        drawGridElement(c, g, e, x, y)
-                    }
-                }
-            }
-        }
-
-
-        int offset = (gridWidth / 20) as int // shadow and space
-        int size = (int) ((gridWidth - offset) / 3) // size of shadow box and element box
-        if (gridWidth < 15) {
-            size = size * 2
-        }
-        int round = (size / 2) as int // corner diameter
-
-        if(mouseX>0) {
-            int gridX = (int)((mouseX-nameWidth-borderWidth)/gridWidth)
-            //int gridY = (int)((mouseY-borderWidth)/gridHeigth)
-            //println ("$gridX ")
-            // shadow
-            //g.setColor(nowBarShadowColor)
-            //g.fillRoundRect(nowGraphX + offset, +offset, size - 4, nowGraphY + borderWidth - 4, round, round)
-            // element in project color, integration phase color (orange), empty color (white)
-            g.setColor(mouseColor)
-            g.fillRoundRect((int)(borderWidth+nameWidth+gridX*gridWidth+gridWidth/4), borderWidth,  (int)(gridWidth/2), gridWidth*model.sizeY,  round, round)
-        }
-
-
-
-        //
-        // paint the cursor-indicator line above everything else
-        //
-
-        if(cursorX >=0 ) {
-            int nowGraphX = borderWidth + cursorX * gridWidth + (int) ((gridWidth - size) / 2) + nameWidth
-            int nowGraphY = borderWidth + model.sizeY * gridWidth // position end (right down)
-            g.setColor(cursorColor)
-            g.fillRoundRect(nowGraphX, 0, size - 4, nowGraphY + borderWidth - 4, round, round)
-
-            nowGraphX = borderWidth + model.sizeX * gridWidth - 4
-            nowGraphY = borderWidth + cursorY * gridWidth + (int) ((gridWidth - size) / 2)
-            g.setColor(cursorColor)
-            g.fillRoundRect(nameWidth, nowGraphY, nowGraphX, size - 4, round, round)
-        }
-
-        //
-        // paint the now-indicator row above everything else
-        //
-
-        if(model.nowX >=0 && model.nowX < model.sizeX) {
-            int nowGraphX = borderWidth + model.nowX * gridWidth + (int) ((gridWidth-4) / 4)  + nameWidth
-            // position start (left up)
-            int nowGraphY = borderWidth + model.sizeY * gridWidth // position end (right down)
-
-            // shadow
-            //g.setColor(nowBarShadowColor)
-            //g.fillRoundRect(nowGraphX + offset, +offset, size - 4, nowGraphY + borderWidth - 4, round, round)
-            // element in project color, integration phase color (orange), empty color (white)
-            g.setColor(nowBarColor)
-            g.fillRoundRect(nowGraphX, 0, (int)((gridWidth-4)/2), nowGraphY + borderWidth - 4, round, round)
-        }
-
-        //
-        // draw the line names
-        //
-        if(gridWidth > 0) {
-            int y = 0
-            model.getLineNames()
-            model.getLineNames().each { String projectName ->
-                int gridY = borderWidth + y * gridWidth
-                if (hightlightLinePattern && projectName =~ hightlightLinePattern) {
-
-                    g.setColor(cursorColor) //new Color(150,255,255,100))
-                    g.fillRoundRect(borderWidth, (int) (gridY + gridWidth / 2) - 2, nameWidth + borderWidth + gridWidth * model.sizeX, 4, round, round)
-                } else {
-                    g.setColor(Color.WHITE)
-                }
-                g.fillRoundRect(borderWidth, gridY, nameWidth - 4, gridWidth - 4, round, round)
-
-                if (gridWidth > 0) {
-                    // write (with shadow) some info
-                    float fontSize = gridWidth / 2
-                    g.getClipBounds(rBackup)
-                    Rectangle newClip = new Rectangle(borderWidth, gridY, nameWidth - 6, gridWidth - 6)
-                    g.setClip(newClip.intersection(rBackup))
-                    g.setFont(g.getFont().deriveFont((float) fontSize))
-                    g.setColor(Color.WHITE)
-                    g.drawString(projectName, borderWidth + (int) (gridWidth * 0.2), gridY + (int) (gridWidth * 2 / 3))
-                    g.setColor(Color.BLACK)
-                    g.drawString(projectName, borderWidth + (int) (gridWidth * 0.2) - 1, gridY + (int) (gridWidth * 2 / 3) - 1)
-                    g.setClip(rBackup)
-                }
-
-                y++
-            }
-
-            g.drawImage(frameIcon, (int) borderWidth, (int) (borderWidth + y * gridWidth), nameWidth - 4, nameWidth - 4, null)
 
             //
-            // draw the row names
+            // paint only elements inside clipBounds
             //
 
-            int x = 0
-            model.getColumnNames().each { String rowName ->
-                g.setColor(Color.WHITE)
-                int gridX = borderWidth + x * gridWidth + nameWidth
-                int gridY = borderWidth + (model.sizeY) * gridWidth
-                g.fillRoundRect(gridX, gridY, gridWidth - 4, nameWidth - 4, round, round)
-
-                if (gridWidth > 0) {
-                    // write (with shadow) some info
-                    float fontSize = gridWidth / 2
-                    g.setFont(g.getFont().deriveFont((float) fontSize))
-                    atBackup = g.getTransform()
-                    //Resets transform to rotation
-                    rotationTransform.setToRotation((double) Math.PI / 2)
-                    translateTransform.setToTranslation(gridX, gridY)
-                    //Chain the transforms (Note order matters)
-                    totalTransform.setToIdentity()
-                    totalTransform.concatenate(atBackup)
-                    totalTransform.concatenate(translateTransform)
-                    totalTransform.concatenate(rotationTransform)
-                    //at.rotate((double)(Math.PI / 2))
-                    g.setTransform(totalTransform)
-                    g.setColor(Color.WHITE)
-
-                    g.getClipBounds(rBackup)
-                    Rectangle newClip = new Rectangle(0, -gridWidth, nameWidth - 6, gridWidth)
-                    g.setClip(newClip.intersection(rBackup))
-
-                    g.drawString(rowName, (int) (gridWidth * 0.2), 0 - (int) (gridWidth * 0.2))
-                    g.setColor(Color.BLACK)
-                    g.drawString(rowName, (int) (gridWidth * 0.2) - 1, 0 - (int) (gridWidth * 0.2) - 1)
-                    g.setClip(rBackup)
-                    g.setTransform(atBackup)
+            for (int x in 0..model.sizeX - 1) {
+                for (int y in 0..model.sizeY - 1) {
+                    int graphX = borderWidth + x * gridWidth + nameWidth
+                    int graphY = borderWidth + y * gridWidth
+                    if (graphX >= r.x - 2 * gridWidth && graphX <= r.x + 2 * gridWidth + r.width && graphY >= r.y - 2 * gridWidth && graphY <= r.y + 2 * gridWidth + r.height) {
+                        // TODO: println "x: $x (sizeX: $model.sizeX) y: $y (sizeY: $model.sizeY)"
+                        if (model.sizeX == 0 || model.sizeY == 0) {
+                            //t.stop()
+                            return
+                        }
+                        GridElement e = model.getElement(x, y)
+                        assert e != null
+                        if (e != GridElement.nullElement || cursorX == x && cursorY == y) {
+                            Color c = getColor(y)
+                            g.setColor(c)
+                            drawGridElement(c, g, e, x, y)
+                        }
+                    }
                 }
-                x++
+            }
+
+
+            int offset = (gridWidth / 20) as int // shadow and space
+            int size = (int) ((gridWidth - offset) / 3) // size of shadow box and element box
+            if (gridWidth < 15) {
+                size = size * 2
+            }
+            int round = (size / 2) as int // corner diameter
+
+            if (mouseX > 0) {
+                int gridX = (int) ((mouseX - nameWidth - borderWidth) / gridWidth)
+                //int gridY = (int)((mouseY-borderWidth)/gridHeigth)
+                //println ("$gridX ")
+                // shadow
+                //g.setColor(nowBarShadowColor)
+                //g.fillRoundRect(nowGraphX + offset, +offset, size - 4, nowGraphY + borderWidth - 4, round, round)
+                // element in project color, integration phase color (orange), empty color (white)
+                g.setColor(mouseColor)
+                g.fillRoundRect((int) (borderWidth + nameWidth + gridX * gridWidth + gridWidth / 4), borderWidth, (int) (gridWidth / 2), gridWidth * model.sizeY, round, round)
+            }
+
+
+            //
+            // paint the cursor-indicator line above everything else
+            //
+
+            if (cursorX >= 0) {
+                int nowGraphX = borderWidth + cursorX * gridWidth + (int) ((gridWidth - size) / 2) + nameWidth
+                int nowGraphY = borderWidth + model.sizeY * gridWidth // position end (right down)
+                g.setColor(cursorColor)
+                g.fillRoundRect(nowGraphX, 0, size - 4, nowGraphY + borderWidth - 4, round, round)
+
+                nowGraphX = borderWidth + model.sizeX * gridWidth - 4
+                nowGraphY = borderWidth + cursorY * gridWidth + (int) ((gridWidth - size) / 2)
+                g.setColor(cursorColor)
+                g.fillRoundRect(nameWidth, nowGraphY, nowGraphX, size - 4, round, round)
+            }
+
+            //
+            // paint the now-indicator row above everything else
+            //
+
+            if (model.nowX >= 0 && model.nowX < model.sizeX) {
+                int nowGraphX = borderWidth + model.nowX * gridWidth + (int) ((gridWidth - 4) / 4) + nameWidth
+                // position start (left up)
+                int nowGraphY = borderWidth + model.sizeY * gridWidth // position end (right down)
+
+                // shadow
+                //g.setColor(nowBarShadowColor)
+                //g.fillRoundRect(nowGraphX + offset, +offset, size - 4, nowGraphY + borderWidth - 4, round, round)
+                // element in project color, integration phase color (orange), empty color (white)
+                g.setColor(nowBarColor)
+                g.fillRoundRect(nowGraphX, 0, (int) ((gridWidth - 4) / 2), nowGraphY + borderWidth - 4, round, round)
+            }
+
+            //
+            // draw the line names
+            //
+            if (gridWidth > 0) {
+                int y = 0
+                model.getLineNames()
+                model.getLineNames().each { String projectName ->
+                    int gridY = borderWidth + y * gridWidth
+                    try {
+                        if (hightlightLinePattern && projectName =~ hightlightLinePattern) {
+
+                            g.setColor(cursorColor) //new Color(150,255,255,100))
+                            g.fillRoundRect(borderWidth, (int) (gridY + gridWidth / 2) - 2, nameWidth + borderWidth + gridWidth * model.sizeX, 4, round, round)
+                        } else {
+                            g.setColor(Color.WHITE)
+                        }
+                    } catch (Exception e) {
+                        //println "problem with regex: " + hightlightLinePattern
+                    }
+                    g.fillRoundRect(borderWidth, gridY, nameWidth - 4, gridWidth - 4, round, round)
+
+                    if (gridWidth > 0) {
+                        // write (with shadow) some info
+                        float fontSize = gridWidth / 2
+                        g.getClipBounds(rBackup)
+                        Rectangle newClip = new Rectangle(borderWidth, gridY, nameWidth - 6, gridWidth - 6)
+                        g.setClip(newClip.intersection(rBackup))
+                        g.setFont(g.getFont().deriveFont((float) fontSize))
+                        g.setColor(Color.WHITE)
+                        g.drawString(projectName, borderWidth + (int) (gridWidth * 0.2), gridY + (int) (gridWidth * 2 / 3))
+                        g.setColor(Color.BLACK)
+                        g.drawString(projectName, borderWidth + (int) (gridWidth * 0.2) - 1, gridY + (int) (gridWidth * 2 / 3) - 1)
+                        g.setClip(rBackup)
+                    }
+
+                    y++
+                }
+
+                g.drawImage(frameIcon, (int) borderWidth, (int) (borderWidth + y * gridWidth), nameWidth - 4, nameWidth - 4, null)
+
+                //
+                // draw the row names
+                //
+
+                int x = 0
+                model.getColumnNames().each { String rowName ->
+                    g.setColor(Color.WHITE)
+                    int gridX = borderWidth + x * gridWidth + nameWidth
+                    int gridY = borderWidth + (model.sizeY) * gridWidth
+                    g.fillRoundRect(gridX, gridY, gridWidth - 4, nameWidth - 4, round, round)
+
+                    if (gridWidth > 0) {
+                        // write (with shadow) some info
+                        float fontSize = gridWidth / 2
+                        g.setFont(g.getFont().deriveFont((float) fontSize))
+                        atBackup = g.getTransform()
+                        //Resets transform to rotation
+                        rotationTransform.setToRotation((double) Math.PI / 2)
+                        translateTransform.setToTranslation(gridX, gridY)
+                        //Chain the transforms (Note order matters)
+                        totalTransform.setToIdentity()
+                        totalTransform.concatenate(atBackup)
+                        totalTransform.concatenate(translateTransform)
+                        totalTransform.concatenate(rotationTransform)
+                        //at.rotate((double)(Math.PI / 2))
+                        g.setTransform(totalTransform)
+                        g.setColor(Color.WHITE)
+
+                        g.getClipBounds(rBackup)
+                        Rectangle newClip = new Rectangle(0, -gridWidth, nameWidth - 6, gridWidth)
+                        g.setClip(newClip.intersection(rBackup))
+
+                        g.drawString(rowName, (int) (gridWidth * 0.2), 0 - (int) (gridWidth * 0.2))
+                        g.setColor(Color.BLACK)
+                        g.drawString(rowName, (int) (gridWidth * 0.2) - 1, 0 - (int) (gridWidth * 0.2) - 1)
+                        g.setClip(rBackup)
+                        g.setTransform(atBackup)
+                    }
+                    x++
+                }
             }
         }
-        t.stop()
     }
 
 

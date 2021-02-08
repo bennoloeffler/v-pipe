@@ -303,26 +303,26 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
     protected void paintComponent(Graphics g1d) {
 
         super.paintComponent(g1d)
-        def t = RunTimer.getTimerAndStart("${this.name} NewLoadPanel::paintComponent")
+        RunTimer.getTimerAndStart("${this.name} NewLoadPanel::paintComponent").withCloseable {
 
-        Graphics2D g = g1d as Graphics2D
-        g.getClipBounds(r)
-        hints(g)
+            Graphics2D g = g1d as Graphics2D
+            g.getClipBounds(r)
+            hints(g)
 
 
-        //
-        // paint elements
-        //
+            //
+            // paint elements
+            //
             //def drawIn = 0
             //def notIn = 0
             //println("m.sizeX: $model.sizeX, m.sizeY: $model.sizeY")
             //println("total: ${model.sizeX * model.sizeY}")
-            for (int y = 0; y < model.sizeY; y++ ) {
+            for (int y = 0; y < model.sizeY; y++) {
                 def maxValAndRed = model.getMaxValAndRed(y)
-                for(int x = 0; x < model.sizeX; x++ ) {
-                    int gridX = nameWidth + borderWidth + x*gridWidth
-                    int gridY = borderWidth + y*gridHeigth
-                    if(gridX >= r.x-2*gridWidth && gridX <= r.x+2*gridWidth + r.width && gridY >= r.y-2*gridHeigth && gridY <= r.y+2*gridWidth + r.height) {
+                for (int x = 0; x < model.sizeX; x++) {
+                    int gridX = nameWidth + borderWidth + x * gridWidth
+                    int gridY = borderWidth + y * gridHeigth
+                    if (gridX >= r.x - 2 * gridWidth && gridX <= r.x + 2 * gridWidth + r.width && gridY >= r.y - 2 * gridHeigth && gridY <= r.y + 2 * gridWidth + r.height) {
 //                    if(r.intersects(gridX, gridY, width, height)) {
                         //drawIn++
                         GridLoadElement element = model.getElement(x, y)
@@ -345,16 +345,13 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
                     //}
                 }
             }
-        //println("not $notIn + in: $drawIn")
-        int offset = (gridWidth / 20) as int // shadow and space
-        int size = (int) ((gridWidth - offset) / 3) // size of shadow box and element box
-        if (gridWidth < 15) {
-            size = size * 2
-        }
-        int round = (size / 2) as int // corner diameter
-
-
-
+            //println("not $notIn + in: $drawIn")
+            int offset = (gridWidth / 20) as int // shadow and space
+            int size = (int) ((gridWidth - offset) / 3) // size of shadow box and element box
+            if (gridWidth < 15) {
+                size = size * 2
+            }
+            int round = (size / 2) as int // corner diameter
 
 
             //
@@ -386,27 +383,27 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
                 g.fillRoundRect((int) (borderWidth + nameWidth + gridX * gridWidth + gridWidth / 4), borderWidth + gridY * gridHeigth, (int) (gridWidth / 2), gridHeigth, round, round)
             }
 
-        //
-        // paint the now-indicator row above everything else
-        //
+            //
+            // paint the now-indicator row above everything else
+            //
 
-        if (model.nowX >= 0) {
+            if (model.nowX >= 0) {
 
-            int nowGraphX = borderWidth + model.getNowX() * gridWidth + (int) ((gridWidth - 4) / 4) + nameWidth
-            // position start (left up)
-            int nowGraphY = borderWidth + model.getSizeY() * gridHeigth // position end (right down)
+                int nowGraphX = borderWidth + model.getNowX() * gridWidth + (int) ((gridWidth - 4) / 4) + nameWidth
+                // position start (left up)
+                int nowGraphY = borderWidth + model.getSizeY() * gridHeigth // position end (right down)
 
-            // shadow
-            //g.setColor(nowBarShadowColor)
-            //g.fillRoundRect(nowGraphX + offset, +offset, size - 4, nowGraphY + borderWidth - 4, round, round)
-            // element in project color, integration phase color (orange), empty color (white)
-            g.setColor(nowBarColor)
-            g.fillRoundRect(nowGraphX, 0, (int)((gridWidth-4)/2), nowGraphY + borderWidth - 4, round, round)
-        }
+                // shadow
+                //g.setColor(nowBarShadowColor)
+                //g.fillRoundRect(nowGraphX + offset, +offset, size - 4, nowGraphY + borderWidth - 4, round, round)
+                // element in project color, integration phase color (orange), empty color (white)
+                g.setColor(nowBarColor)
+                g.fillRoundRect(nowGraphX, 0, (int) ((gridWidth - 4) / 2), nowGraphY + borderWidth - 4, round, round)
+            }
 
-        //
-        // draw the department names
-        //
+            //
+            // draw the department names
+            //
 
 
             int y = 0
@@ -466,7 +463,7 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
 
             g.drawImage(frameIcon, (int) borderWidth, (int) (borderWidth + y * gridHeigth), nameWidth - 4, nameWidth - 4, null)
 
-        t.stop()
+        }
 
     }
 

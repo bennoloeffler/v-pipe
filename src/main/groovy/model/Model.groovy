@@ -3,27 +3,20 @@ package model
 import extensions.DateExtension
 import extensions.StringExtension
 import groovy.beans.Bindable
-import groovy.time.TimeCategory
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
-import org.codehaus.groovy.runtime.DefaultGroovyMethods
 import transform.DateShiftTransformer
 import transform.TemplateTransformer
+import utils.FileSupport
 import utils.RunTimer
 
 import java.time.Duration
 import java.time.LocalDate
-import java.time.Year
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
-import java.time.temporal.TemporalUnit
 
 import static extensions.DateHelperFunctions._getStartOfWeek
-import static extensions.DateHelperFunctions._getStartOfWeek
-import static extensions.DateHelperFunctions._getStartOfWeek
-import static extensions.DateHelperFunctions._getStartOfWeek
 import static extensions.DateHelperFunctions._sToD
-import static model.WeekOrMonth.MONTH
 import static model.WeekOrMonth.WEEK
 
 //@CompileStatic
@@ -63,6 +56,8 @@ class Model {
     // the original elements to feed into the pipeline
     List<PipelineOriginalElement> pipelineElements = []
 
+    List<PipelineOriginalElement> templatePipelineElements = []
+
 
     /**
      * key: project name
@@ -89,6 +84,8 @@ class Model {
      */
     Map<String, Map<String, YellowRedLimit>> capaAvailable = [:]
 
+    // all project template data
+    List<TaskInProject> templateList =[]
 
 
     List<String> projectSequence = []
@@ -98,20 +95,36 @@ class Model {
         setUpdateToggle(!updateToggle)
     }
 
+    /*
+     * Cache for saving templates and templates pipeline
+     */
+    String templatesPlainTextCache
+    String templatesPipelineElementsPlainTextCache
+
     /**
      * @param project
      * @return List of all Tasks with project name project
      */
     //@Memoized
     List<TaskInProject> getProject(String project) {
-        def t = RunTimer.getTimerAndStart('getProject')
-        def r = taskList.findAll {it.project == project}
-        def departments = getAllDepartments()
-        r = r.sort{a, b ->
-            departments.indexOf(a.department) - departments.indexOf(b.department)
+        def r
+        RunTimer.getTimerAndStart('getProject').withCloseable {
+            r = taskList.findAll { it.project == project }
+            def departments = getAllDepartments()
+            r = r.sort { a, b ->
+                departments.indexOf(a.department) - departments.indexOf(b.department)
+            }
         }
-        t.stop()
         r
+    }
+
+    def addProject(List<TaskInProject> tasks) {
+        assert(tasks && tasks.size() > 0)
+        projectSequence.add(0, tasks[0].project)
+        taskList.addAll(tasks)
+        reCalcCapaAvailableIfNeeded()
+
+        fireUpdate()
     }
 
 
@@ -147,34 +160,82 @@ class Model {
         e
     }
 
+    static List<TaskInProject> deepClone(List<TaskInProject> originals) {
+        def result = []
+        for (o in originals) {
+            result.add(o.clone())
+        }
+        result
+    }
+
+
+    PipelineOriginalElement copyPipelineFromTemplate(String templateName, String copyName, Date copyEndDate) {
+        PipelineOriginalElement pe =  templatePipelineElements.find { templateName == it.project }.clone()
+        assert pe
+        pe.project = copyName
+        def t = getTemplate(templateName)
+        def templateEndDate = (t*.ending).max()
+        def diff = copyEndDate - templateEndDate
+        pe.startDate += diff
+        pe.endDate += diff
+        pe
+    }
+
+
+    List<TaskInProject> copyFromTemplate(String templateName, String copyName, Date copyEndDate) {
+        if (getProject(copyName)) throw new RuntimeException("Projektname schon vorhanden: " + copyName)
+        if (Math.abs (getEndOfTasks() - copyEndDate) > 20*365)  throw new RuntimeException("Projekt-End-Datum ist 20 Jahre entfernt" + copyName)
+        def t = getTemplate(templateName)
+        def copy = deepClone(t)
+        copy*.project = copyName
+        def templateEndDate = (copy*.ending).max()
+        def diff = copyEndDate - templateEndDate
+        for(task in copy) {
+            task.starting += diff
+            task.ending += diff
+        }
+        copy
+    }
+
+
+    List<String> getAllTemplates() {
+        (templateList*.project).unique()
+    }
+
+
+    List<TaskInProject> getTemplate(String template) {
+        def t = templateList.findAll {it.project == template}
+        def departments = getAllDepartments()
+        t.sort{a, b ->
+            departments.indexOf(a.department) - departments.indexOf(b.department)
+        }
+    }
+
     /**
      * @return List of Strings with all projectNames found in
      */
     List<String> _getAllProjects() {
-        def t = RunTimer.getTimerAndStart('getAllProjects')
-        def r = (taskList*.project).unique()
-        t.stop()
-        r
+        RunTimer.getTimerAndStart('getAllProjects').withCloseable {
+            (taskList*.project).unique()
+        }
     }
 
     /**
      * @return the minimum time of all tasks
      */
     Date getStartOfTasks() {
-        def t = RunTimer.getTimerAndStart('getStartOfTasks')
-        def r = (taskList*.starting).min()
-        t.stop()
-        r
+        RunTimer.getTimerAndStart('getStartOfTasks').withCloseable {
+            (taskList*.starting).min()
+        }
     }
 
     /**
      * @return the maximum time of all tasks
      */
     Date getEndOfTasks() {
-        def t = RunTimer.getTimerAndStart('getEndOfTasks')
-        def r = (taskList*.ending).max()
-        t.stop()
-        r
+        RunTimer.getTimerAndStart('getEndOfTasks').withCloseable {
+            (taskList*.ending).max()
+        }
     }
 
 
@@ -185,40 +246,30 @@ class Model {
     //Duration oneMonth = Duration.of(1, ChronoUnit.MONTHS)
 
     List<String> getFullSeriesOfTimeKeys(WeekOrMonth weekOrMonth) {
-        def t = RunTimer.getTimerAndStart('getFullSeriesOfTimeKeys')
-
         def result = []
-
-        Date s = getStartOfTasks()
-        Date e = getEndOfTasks()
-
-        if(s && e) {
-            //use(TimeCategory) {
+        RunTimer.getTimerAndStart('getFullSeriesOfTimeKeys').withCloseable {
+            Date s = getStartOfTasks()
+            Date e = getEndOfTasks()
+            if (s && e) {
                 if (e - s > years20.toDays()) {
                     throw new VpipeDataException("Dauer von Anfang bis Ende\n" +
                             "der Tasks zu lange ( > 20 Jahre ): ${s.toString()} bis ${e.toString()}")
                 }
-            //}
-
-
-            if (weekOrMonth == WEEK) {
-                s = DateExtension.getStartOfWeek(s)
-                while (s < e) {
-                    result << DateExtension.getWeekYearStr(s)
-                    s = convertToDate(convertToLocalDate(s).plusDays(7))
-                }
-            } else {
-                s = DateExtension.getStartOfMonth(s)
-                while (s < e) {
-                    result << DateExtension.getMonthYearStr(s)
-                    //use(TimeCategory) {
+                if (weekOrMonth == WEEK) {
+                    s = DateExtension.getStartOfWeek(s)
+                    while (s < e) {
+                        result << DateExtension.getWeekYearStr(s)
+                        s = convertToDate(convertToLocalDate(s).plusDays(7))
+                    }
+                } else {
+                    s = DateExtension.getStartOfMonth(s)
+                    while (s < e) {
+                        result << DateExtension.getMonthYearStr(s)
                         s = convertToDate(convertToLocalDate(s).plusMonths(1))
-                    //}
+                    }
                 }
             }
-            //result.sort()
         }
-        t.stop()
         result
     }
 
@@ -240,19 +291,33 @@ class Model {
     List<String> allDepartmentsCache = []
 
     List<String> getAllDepartments() {
-
-
-        //def t = RunTimer.getTimerAndStart('getAllDepartments')
-        if(capaAvailable) {
-            capaAvailable.keySet().toList()
-        } else {
-            if (taskList.size() != sizeLastAccess) {
-                allDepartmentsCache = taskList*.department.unique()
-                sizeLastAccess = taskList.size()
+        RunTimer.getTimerAndStart('getAllDepartments').withCloseable {
+            if (capaAvailable) {
+                capaAvailable.keySet().toList()
+            } else {
+                if (taskList.size() != sizeLastAccess) {
+                    allDepartmentsCache = taskList*.department.unique()
+                    sizeLastAccess = taskList.size()
+                }
+                allDepartmentsCache
             }
-            allDepartmentsCache
         }
-        //t.stop()
+    }
+
+
+    void deleteProject(String projectToDelete) {
+        taskList.removeIf {
+            it.project == projectToDelete
+        }
+        if(pipelineElements) {
+            pipelineElements.removeIf {
+                it.project == projectToDelete
+            }
+        }
+
+        projectSequence.remove(projectToDelete)
+
+        fireUpdate()
     }
 
 
@@ -260,36 +325,33 @@ class Model {
     Date cachedEndOfTasks
 
     def reCalcCapaAvailableIfNeeded() {
-        def t = RunTimer.getTimerAndStart('reCalcCapaAvailableIfNeeded')
-        def currentStart = getStartOfTasks()
-        def currentEnd = getEndOfTasks()
-        if( ! (currentStart >= cachedStartOfTasks && currentEnd <= cachedEndOfTasks) ) {
-            if( jsonSlurp ) {
-                capaAvailable = calcCapa(jsonSlurp)
-            }
+        RunTimer.getTimerAndStart('reCalcCapaAvailableIfNeeded').withCloseable {
+            def currentStart = getStartOfTasks()
+            def currentEnd = getEndOfTasks()
+            //println "calc if needed..."
+            //println "current start: ${currentStart.toString()}  cached: ${cachedStartOfTasks?.toString()}"
+            //println "current end: ${currentEnd.toString()}  cached: ${cachedEndOfTasks?.toString()}"
+            if (!(currentStart >= cachedStartOfTasks && currentEnd <= cachedEndOfTasks)) {
+                if (jsonSlurp) {
+                    //println "CALC"
+                    capaAvailable = calcCapa(jsonSlurp)
+                }
+            } //else {println ("DONT CALC")}
+            cachedStartOfTasks = currentStart
+            cachedEndOfTasks = currentEnd
         }
-        cachedStartOfTasks = currentStart
-        cachedEndOfTasks = currentEnd
-        t.stop()
     }
 
     Closure<GString> fileErr = {"" as GString}
 
     @CompileStatic(TypeCheckingMode.SKIP)
     Map<String, Map<String, YellowRedLimit>> calcCapa(def jsonSlurp) {
-
         Map<String, Map<String, YellowRedLimit>> result = [:]
-
-        def t = RunTimer.getTimerAndStart('calcCapa')
-        t.withCloseable {
-
-
+        RunTimer.getTimerAndStart('calcCapa').withCloseable {
             this.jsonSlurp = jsonSlurp
-
             fileErr = { "Fehler beim Lesen der Datei ${DataReader.get_CAPA_FILE_NAME()}\n" }
-
-
             def timeKeys = getFullSeriesOfTimeKeys(WEEK)
+            println ("calcCapa von ${timeKeys[0]} to ${timeKeys[timeKeys.size()-1]}")
 
             // get the public holiday of that week and create a percentage based on 5 days (5-h)/5 (ph)
             if (!jsonSlurp.Kapa_Gesamt) {
@@ -382,7 +444,6 @@ class Model {
                 //println("$dep.key $capaMap")
                 result[(String) (dep.key)] = capaMap
             }
-            //t.stop()
         }
         result
     }
@@ -397,6 +458,7 @@ class Model {
 
     def checkPipelineInProject() {
         if(pipelineElements) {
+            checkOnePipelineToEachProject(taskList, pipelineElements, "PROJEKTE")
             fileErr = { " beim Lesen der Datei ${DataReader.get_PIPELINING_FILE_NAME()}\n" }
             pipelineElements.each {
                 List<TaskInProject> p = getProject(it.project)
@@ -416,6 +478,45 @@ class Model {
                 }
             }
         }
+    }
+
+
+    def checkPipelineTemplatesInTemplates() {
+        if(templatePipelineElements) {
+            checkOnePipelineToEachProject(templateList, templatePipelineElements, "VORLAGEN")
+            fileErr = { " beim Lesen der Datei ${DataReader.get_PIPELINING_TEMPLATE_FILE_NAME()}\n" }
+            templatePipelineElements.each {
+                List<TaskInProject> p = getTemplate(it.project)
+                if(p) {
+                    Date startOfPipeline = _getStartOfWeek(it.startDate)
+                    Date endOfPipeline = _getStartOfWeek(it.endDate) + 7
+                    Date startOfProject = _getStartOfWeek(p*.starting.min())
+                    Date endOfProject = _getStartOfWeek(p*.ending.max()) + 7
+                    if(startOfPipeline < startOfProject) {
+                        println("WARNUNG ${fileErr()}Projekt: $it.project... Integrations-Phase außerhalb des Projektes")
+                    }
+                    if(endOfPipeline > endOfProject) {
+                        println("WARNUNG ${fileErr()}Projekt: $it.project... Integrations-Phase außerhalb des Projektes")
+                    }
+                }else{
+                    throw new VpipeDataException("Fehler ${fileErr()}Projekt: $it.project existiert nicht in Template-Daten")
+                }
+            }
+        }
+    }
+
+    def checkOnePipelineToEachProject(List<TaskInProject> projects, List<PipelineOriginalElement> pipelineElements, String templateOrData) {
+
+        Set<String> pipProjects = pipelineElements*.project.unique().toSet()
+        Set<String> projProjects = projects*.project.unique().toSet()
+        Set<String> shouldBeAll = pipProjects.intersect(projProjects)
+
+        Set<String> projectsWithoutPipeline = projProjects.clone()
+        projectsWithoutPipeline.removeAll(shouldBeAll)
+        Set<String> pipelineWithoutProject = pipProjects.clone()
+        pipelineWithoutProject.removeAll(shouldBeAll)
+        if(projectsWithoutPipeline) throw new VpipeDataException(templateOrData + ": Projekte ohne Pipline-Element: " + projectsWithoutPipeline)
+        if(pipelineWithoutProject) throw new VpipeDataException(templateOrData + ": Pipeline-Element ohne Projekt: " + pipelineWithoutProject)
     }
 
     def check() {
@@ -454,6 +555,13 @@ class Model {
         capaAvailable = [:]
         jsonSlurp = ''
         projectSequence = []
+        templateList = []
+        templatePipelineElements = []
+        templatesPlainTextCache = null
+        templatesPipelineElementsPlainTextCache = null
+
+        cachedStartOfTasks = null
+        cachedEndOfTasks = null
     }
 
 
@@ -489,7 +597,7 @@ class Model {
             //
             // THEN read and create templated projects -> on top of shifts of originals with shift
             //
-            templateProjects = DataReader.readTemplates()
+            templateProjects = DataReader.readScenario()
             TemplateTransformer tt = new TemplateTransformer(this)
             tt.transform()
 
@@ -512,10 +620,28 @@ class Model {
             def added = all - intersect
             projectSequence = added + projectSequence
 
+            //
+            // templates - identical to tasks, but in different file and data structure
+            //
+            templateList = DataReader.readProjectTemplates()
+            templatesPlainTextCache = FileSupport.getTextOrEmpty(DataReader.get_PROJECT_TEMPLATE_FILE_NAME())
+
+            if (templateList && pipelineElements) {
+                if (new File(DataReader.get_PIPELINING_TEMPLATE_FILE_NAME()).exists()) {
+                    templatePipelineElements = DataReader.readPipeliningTemplates()
+                    templatesPipelineElementsPlainTextCache = FileSupport.getTextOrEmpty(DataReader.get_PIPELINING_TEMPLATE_FILE_NAME())
+                    checkPipelineTemplatesInTemplates()
+                } else {
+                    throw new VpipeDataException("Wenn Integrations-Phasen.txt und eine Vorlagen-Datei vorhanden sind\n " +
+                            "(Vorlagen-Projekt-Start-End-Abt-Kapa.txt) dann ist die Datei Vorlagen-Integrations-Phasen.txt notwendig.\n" +
+                            "\nETWAS VERSTÄNDLICHER:\nWenn es Integrationsphasen und Vorlagen gibt,\ndann braucht es auch" +
+                            " Vorlagen für die Integrationsphasen.")
+                }
+            }
+
         }catch(Exception e) {
             emtpyTheModel()
-            //println(e.message)
-            // e.printStackTrace()
+            //setCurrentDir("  ---   FEHLER BEIM LESEN DER DATEN!   ---")
             throw e
         } finally {
             setUpdateToggle(!getUpdateToggle())

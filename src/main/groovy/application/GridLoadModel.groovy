@@ -57,69 +57,68 @@ class GridLoadModel extends AbstractGridLoadModel  {
 
     void calcGridElements() {
         def oldElements = gridElements
-        def t = RunTimer.getTimerAndStart('GridLoadModel::calcGridElements')
-        gridElements = [:]
-        model.getAllDepartments().each { String department ->
-            gridElements[department] = [:]
-            model.getFullSeriesOfTimeKeys(weekOrMonth).each { String timeStr ->
-                Double yellowAbs = -1
-                Double redAbs = -1
-                CapaNeedDetails capaNeedDetailsAbsolut = absoluteLoadCalculator.getCapaNeeded(department, timeStr)
+        RunTimer.getTimerAndStart('GridLoadModel::calcGridElements').withCloseable {
+            gridElements = [:]
+            model.getAllDepartments().each { String department ->
+                gridElements[department] = [:]
+                model.getFullSeriesOfTimeKeys(weekOrMonth).each { String timeStr ->
+                    Double yellowAbs = -1
+                    Double redAbs = -1
+                    CapaNeedDetails capaNeedDetailsAbsolut = absoluteLoadCalculator.getCapaNeeded(department, timeStr)
 
-                //Double maxAbsolute = absoluteLoadCalculator.getMax(department)
+                    //Double maxAbsolute = absoluteLoadCalculator.getMax(department)
 
-                Double projectLoad = 0
-                capaNeedDetailsAbsolut.projects.each {
-                    if(it.originalTask.project == selectedProject) {
-                        projectLoad += it.projectCapaNeed
+                    Double projectLoad = 0
+                    capaNeedDetailsAbsolut.projects.each {
+                        if (it.originalTask.project == selectedProject) {
+                            projectLoad += it.projectCapaNeed
+                        }
                     }
+
+
+                    if (model.capaAvailable.size()) {
+                        assert model.capaAvailable[department][timeStr]
+                        yellowAbs = model.capaAvailable[department][timeStr].yellow
+                        redAbs = model.capaAvailable[department][timeStr].red
+                    } else {
+                        //projectLoad /= maxAbsolute
+                        //capaNeedDetailsAbsolut.totalCapaNeed /= maxAbsolute
+                    }
+                    def avail = oldElements[department]?.get(timeStr)
+                    if (avail) {
+                        avail.department = department
+                        avail.timeString = timeStr
+                        avail.load = capaNeedDetailsAbsolut.totalCapaNeed
+                        avail.loadProject = projectLoad
+                        avail.yellow = yellowAbs
+                        avail.red = redAbs
+                        avail.projectDetails = capaNeedDetailsAbsolut.projects
+                        gridElements[department][timeStr] = avail
+                    } else {
+                        gridElements[department][timeStr] = new GridLoadElement(department, timeStr, capaNeedDetailsAbsolut.totalCapaNeed, projectLoad, yellowAbs, redAbs, capaNeedDetailsAbsolut.projects)
+                    }
+
                 }
-
-
-
-                if(model.capaAvailable.size()) {
-                    assert model.capaAvailable[department][timeStr]
-                    yellowAbs = model.capaAvailable[department][timeStr].yellow
-                    redAbs = model.capaAvailable[department][timeStr].red
-                } else {
-                    //projectLoad /= maxAbsolute
-                    //capaNeedDetailsAbsolut.totalCapaNeed /= maxAbsolute
-                }
-                def avail = oldElements[department]?.get(timeStr)
-                if(avail) {
-                    avail.department = department
-                    avail.timeString = timeStr
-                    avail.load = capaNeedDetailsAbsolut.totalCapaNeed
-                    avail.loadProject = projectLoad
-                    avail.yellow = yellowAbs
-                    avail.red = redAbs
-                    avail.projectDetails = capaNeedDetailsAbsolut.projects
-                    gridElements[department][timeStr] = avail
-                } else {
-                    gridElements[department][timeStr] = new GridLoadElement(department, timeStr, capaNeedDetailsAbsolut.totalCapaNeed, projectLoad, yellowAbs, redAbs, capaNeedDetailsAbsolut.projects)
-                }
-
             }
         }
-        t.stop()
     }
 
     private void calcRowX() {
-        def t = RunTimer.getTimerAndStart('GridLoadModel::calcRowX')
+        RunTimer.getTimerAndStart('GridLoadModel::calcRowX').withCloseable {
 
-        nowXRowCache = -1
-        Date startOfGrid = _getStartOfWeek(model.getStartOfTasks())
-        Date endOfGrid = _getStartOfWeek(model.getEndOfTasks()) + 7
+            nowXRowCache = -1
+            Date startOfGrid = _getStartOfWeek(model.getStartOfTasks())
+            Date endOfGrid = _getStartOfWeek(model.getEndOfTasks()) + 7
 
-        Date now = new Date() // Date.newInstance()
-        int row = 0
-        for (Date w = startOfGrid; w < endOfGrid; w += 7) {
-            if (w <= now && now < w + 7) {
-                nowXRowCache = row
+            Date now = new Date() // Date.newInstance()
+            int row = 0
+            for (Date w = startOfGrid; w < endOfGrid; w += 7) {
+                if (w <= now && now < w + 7) {
+                    nowXRowCache = row
+                }
+                row++
             }
-            row++
         }
-        t.stop()
     }
 
     @Override

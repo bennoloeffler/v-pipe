@@ -57,15 +57,17 @@ class View {
     def pipelineLoadView = new NewLoadPanel(20, gridPipelineLoadModel)
     def projectDetails
     FileDifferPanel fileDifferPanel
-
+    ProjectTemplates projectTemplates
 
     View(Model model) {
         this.model = model
         frameIcon = new ImageIcon(getClass().getResource("/icons/vunds_icon_64x64_t.png")).getImage()
         swing = new SwingBuilder()
         fileDifferPanel = new FileDifferPanel(swing)
+        projectTemplates = new ProjectTemplates(this)
         build()
         projectDetails = new ProjectDetails(this)
+
 
         pipelineView.name = "pipelineView" // in order to have a specific name in "paintComponent... getRuntimer(...)"
         projectView.name = "projectView"
@@ -271,6 +273,9 @@ class View {
                                 //projectDetails.noDataPanel()
                             }
 
+                            scrollPane(name: 'Projekt-Vorlagen') {
+                                projectTemplates.buildDataPanel()
+                            }
                             scrollPane(name: 'Info') {
                                 textArea(id: 'textAreaLog', editable: false, focusable: false)
                             }

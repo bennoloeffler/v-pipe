@@ -81,33 +81,33 @@ class AbsoluteLoadCalculator {
 
 
     void calculate() {
-        def t = RunTimer.getTimerAndStart('AbsoluteLoadCalculator::calculate')
-
         Map<String, Map<String, CapaNeedDetails>> result = [:]
+        RunTimer.getTimerAndStart('AbsoluteLoadCalculator::calculate').withCloseable {
+            tasks.each {
 
-        tasks.each {
+                Map<String, Double> timekeyCapaMap = it.getCapaDemandSplitIn(weekOrMonth)
+                String department = it.department
 
-            Map<String, Double> timekeyCapaMap = it.getCapaDemandSplitIn(weekOrMonth)
-            String department = it.department
+                timekeyCapaMap.each { String timeKey, double capaValue ->
 
-            timekeyCapaMap.each { String timeKey, double capaValue ->
+                    // if there is not yet a department key and map: create
+                    if (!result[department]) {
+                        result[department] = [:]
+                    }
 
-                // if there is not yet a department key and map: create
-                if (!result[department]) {
-                    result[department] = [:]
-                }
-
-                if(result[department][timeKey]) {
-                    result [department][timeKey].totalCapaNeed += capaValue // add value
-                    result [department][timeKey].projects << new ProjectCapaNeedDetails(originalTask: it, projectCapaNeed: capaValue) // and details map entry
-                } else { // create first entry
-                    result[department][timeKey] = new CapaNeedDetails(
-                            totalCapaNeed: capaValue,
-                            projects: [ new ProjectCapaNeedDetails(originalTask: it, projectCapaNeed: capaValue)  ] ) // otherwise create
+                    if (result[department][timeKey]) {
+                        result[department][timeKey].totalCapaNeed += capaValue // add value
+                        result[department][timeKey].projects << new ProjectCapaNeedDetails(originalTask: it, projectCapaNeed: capaValue)
+                        // and details map entry
+                    } else { // create first entry
+                        result[department][timeKey] = new CapaNeedDetails(
+                                totalCapaNeed: capaValue,
+                                projects: [new ProjectCapaNeedDetails(originalTask: it, projectCapaNeed: capaValue)])
+                        // otherwise create
+                    }
                 }
             }
         }
-        t.stop()
         capaLoadAbsolut = result
     }
 

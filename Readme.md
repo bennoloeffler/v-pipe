@@ -37,14 +37,19 @@ Option: *Zugriff auf Datei-URLs zulassen* aktivieren
 - `v-pipe-gui.exe` (visuelle Darstellung - Doppelklick und los.)  
 - `lib` (ein paar Java-Bibliotheken. Finger weg ;-))  
 - `jre` (eine Java-Laufzeit-Umgebung. Nicht anfassen...)
-- `bsp-daten` (alle Daten-Dateien als funktionierende Beispiele)    
-    - `Projekt-Start-End-Abt-Kapa.txt` (Grunddaten: Alle Tasks)
-    - `Abteilungs-Kapazitaets-Angebot.txt` (Grundaten, optional: Kapa Abteilungen)
-    - `Integrations-Phasen.txt` (Grundaten, optional: Integrationsphasen der Projekte)
-    - `Projekt-Verschiebung.txt` (Szenarien, optional: Projekte schieben)
-    - `Template-Original-Verschiebung.txt` (Szenarien, optional: Projekte kopieren)
-    - `v-pipe-Auswertung.xlsx` (Vorlage für Visualisierung)
-    - `bsp-0x` (Verzeichnisse mit verschiedenen Spielarten der Dateien)  
+- `bsp-daten` (alle Daten-Dateien als funktionierende Beispiele)
+    - Grunddaten
+        - `Projekt-Start-End-Abt-Kapa.txt` (ERFORDERLICH: Alle Tasks)
+        - `Abteilungs-Kapazitaets-Angebot.txt` (OPTIONAL: Kapa Abteilungen)
+        - `Integrations-Phasen.txt` (OPTIONAL: Integrationsphasen der Projekte)
+    - Vorlagen
+        - `Vorlagen-Projekt-Start-End-Abt-Kapa.txt` (OPTIONAL: Alle Vorlagen, wie Tasks)
+        - `Vorlagen-Integrations-Phasen.txt` (OPTIONAL: Integrationsphasen der Vorlagen  
+          ERFORDERLICH, wenn: Vorlagen-Projekt-Start-End-Abt-Kapa.txt UND Integrations-Phasen.txt 
+    - Szenarien        
+        - `Projekt-Verschiebung.txt` (OPTIONAL: Projekte schieben)
+        - `Szenario-Kopie-Original-Verschiebung.txt` (OPTIONAL: Projekte kopieren+schieben)  
+ 
 
 
 ## Anwendung
@@ -77,8 +82,9 @@ Alle Arbeits-Dateien (Grunddaten und Ergebnise der Berechnungen)
 werden im Installations-Verzeichnis abgelegt. 
 Also z.B.: `c:\v-pipe`
 
-### Daten-Dateien
-
+# Daten-Dateien
+## Grunddaten 
+(Projekte, Kapa-Angebot, Integrations-Phasen)
 ## `Projekt-Start-End-Abt-Kapa.txt`  
 **Grunddaten (erforderlich):** alle Tasks aller Projekte  
 Enthält beispielsweise:   
@@ -175,6 +181,20 @@ Kapazitäts-Sprünge werden so beschrieben:
 Das Kapa_Profil ist optional.  
 Die Syntax der Datei ist JSON.  
 
+## Vorlagen
+## `Vorlagen-Projekt-Start-End-Abt-Kapa.txt`
+Exact wie `Vorlagen-Projekt-Start-End-Abt-Kapa.txt`...  
+nur dass es sich dabei um Vorlagen handelt und nicht um Projekte.   
+
+## `Vorlagen-Integrations-Phasen.txt`  
+p1 15.1.2020 18.1.2020 2  
+p2 30.3.2020 1.4.2020 1  
+Wie `Integrations-Phasen.txt`...  
+Mit zwei Unterschieden:
+1.) die erste Zeile enthält NICHT die Pipeline-Kapazität.
+2.) die Integrationsphasen beziehen sich auf die Vorlagen - nicht auf die Projekte.
+
+## Szenarien
 ## `Projekt-Verschiebung.txt`  
 **Szenario (optional):** Verschiebung aller Tasks einzelner Projekte  
 Enthält beispielsweise:  
@@ -191,7 +211,8 @@ Projekt-1-Neu-Ulm wird durch `-21` vorgezogen:
 Aus 31.6.2020 wird 10.6.2020.  
 
 
-## `Template-Original-Verschiebung.txt`  
+## `Szenario-Kopie-Original-Verschiebung.txt`
+hies vor Version 1.2.0 `Template-Original-Verschiebung.txt`  
 **Szeanrio (optional)** Kopie von Projekten  
 Enthält beispielsweise:  
 `pKopie P2 -12`    
@@ -201,7 +222,8 @@ Enthält beispielsweise:
 pKopie wird um -12 Tage geschoben. Und zwar nachdem  
 P2 durch die ursprüngliche Verschiebung +14 Tage verschoben wurde.  
 Der 14.8.2020 wird für pKopie duch `-12` zum 2.7.2020  
-
+Die Verschiebung durch `Projekt-Verschiebung.txt` wird  
+zuerst angewandt. Erst dann kommt diese hier dazu!
 
 
 
@@ -261,11 +283,19 @@ gleichzeitig gearbeitet werden soll.
 
 ### Features
 
-TODO: 2020-12-XX `1.3.0-RELEASE-operative-Grobplanung`
+TODO: 20XX-XX-XX `1.3.0-RELEASE-operative-Grobplanung`
 
-TODO: 2020-11-XX `1.2.0-Data-Input-Adapters`
+TODO: 20XX-XX-XX `1.2.0-Data-Input-Adapters`
+- plugins with several examples
 
-TODO: 2020-11-XX `1.1.0-Überlasten-glätten`
+TODO: 20XX-XX-XX `1.1.0-Überlasten-glätten`
+- monthly view (in addition to weekly)
+
+2021-02-07 `1.2.0-Szenario-Templates`
+- can model and use templates (Vorlagen)
+- delete projects in Detail-View (delete-Button)
+- vpipeGui does not open current working directory at startup any more 
+- fixed bug: caching problem with recalc of week-patterns and capa-model after model reloading fixed 
 
 2020-11-03 `1.1.0-Szenario-Differenzen`
 - compare files
@@ -412,4 +442,4 @@ http://docs.groovy-lang.org/2.4.0/html/gapi/groovy/json/JsonSlurper.html
 - verzeichnis help für Doku (bis auf Referenz.html)
 
 ## Feedback
-an: [benno.loeffler@gmx.de](mailto:benno.loeffler@gmx.de)
+an: benno.loeffler AT gmx.de

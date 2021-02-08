@@ -65,10 +65,10 @@ class TestDataHelper {
 
     static def cleanAllDataFiles() {
         List files = [DataReader.get_TASK_FILE_NAME(),
-                     DataReader.get_PIPELINING_FILE_NAME(),
-                     DataReader.get_DATESHIFT_FILE_NAME(),
-                     DataReader.get_CAPA_FILE_NAME(),
-                     DataReader.get_TEMPLATE_FILE_NAME(),
+                      DataReader.get_PIPELINING_FILE_NAME(),
+                      DataReader.get_DATESHIFT_FILE_NAME(),
+                      DataReader.get_CAPA_FILE_NAME(),
+                      DataReader.get_SCENARIO_FILE_NAME(),
         ]
         files.each {
             File f = new File(it)

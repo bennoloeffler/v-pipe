@@ -9,6 +9,7 @@ import javax.swing.ImageIcon
 import javax.swing.JButton
 import javax.swing.JComboBox
 import javax.swing.JComponent
+import javax.swing.JOptionPane
 import javax.swing.JTextField
 import javax.swing.UIManager
 import java.awt.Color
@@ -43,7 +44,6 @@ class ProjectDetails {
 
 
     def updateProjectDetails = {
-        println "UPDATE project details"
         def p = buildDataPanel()
         swing.projectDetailsScrollPane.setViewportView(p)
     }
@@ -56,13 +56,22 @@ class ProjectDetails {
 
             swing.actions({
                 action(id: 'applyProjectDetails',
-                        name: "Änderungen anwenden",
+                        name: "Änderungen übernehmen",
                         mnemonic: 'r',
                         closure: saveProjectDetails,
                         accelerator: shortcut('R'), //, KeyEvent.ALT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK),
                         focus: JComponent.WHEN_IN_FOCUSED_WINDOW,
                         //smallIcon: imageIcon(resource: "icons/folder_r1.png"),
-                        shortDescription: 'Details im Projekt übernehmen'
+                        shortDescription: 'geänderte Details in die Projektdaten übernehmen'
+                )
+                action(id: 'deleteProject',
+                        name: "Projekt löschen",
+                        //mnemonic: 'r',
+                        closure: deleteSelectedProject,
+                        //accelerator: shortcut('R'), //, KeyEvent.ALT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK),
+                        focus: JComponent.WHEN_IN_FOCUSED_WINDOW,
+                        //smallIcon: imageIcon(resource: "icons/folder_r1.png"),
+                        shortDescription: 'dieses Projekt löschen'
                 )
             })
 
@@ -82,7 +91,7 @@ class ProjectDetails {
                     }
                     panel(border: titledBorder('Tasks'), constraints: 'wrap') {
                         migLayout(layoutConstraints: "fill", columnConstraints: "[][200!][200!][150!][400!][][]", rowConstraints: "")
-                        button('Änderungen anwenden', action: applyProjectDetails, constraints: 'span, growx, wrap') // actionPerformed: saveProjectDetails
+                        button(id: 'applyDetails', 'Änderungen übernehmen', action: applyProjectDetails, constraints: 'span, growx, wrap') // actionPerformed: saveProjectDetails
 
                         label('Abteilung')
                         label('Start')
@@ -98,8 +107,9 @@ class ProjectDetails {
                     }
                     panel(border: titledBorder('Projektverwaltung'), constraints: 'wrap') {
                         migLayout(layoutConstraints: "fill", columnConstraints: "[][]", rowConstraints: "[][]")
-                        button("Projekt löschen", enabled: false)
-                        button("Projekt duplizieren", enabled: false, constraints: '')
+                        button("Projekt löschen", enabled: true, action: deleteProject)
+                        //button("Projekt duplizieren", enabled: true)
+                        //button("Projekt aus Vorlage", enabled: true, constraints: '')
                         //checkBox("Vorlage (wird nicht als Last gerechnet)", enabled: false, constraints: 'wrap')
 
                     }
@@ -145,11 +155,32 @@ class ProjectDetails {
         swing.build {
             panel {
                 migLayout(layoutConstraints: "fill", columnConstraints: "", rowConstraints: "")
-                label ("keine Daten", constraints: 'north')
+                label ("es ist kein Projekt ausgewählt - daher: hier keine Daten", constraints: 'north')
             }
         }
     }
 
+    def confirmDelete(project) {
+        int dialogButton = JOptionPane.YES_NO_OPTION
+        dialogButton = JOptionPane.showConfirmDialog(null, "$project \nwirlich  L Ö S C H E N ?", "HIRN EINSCHALTEN!", dialogButton)
+        if (dialogButton == JOptionPane.YES_OPTION) {
+            return true
+        }
+        if (dialogButton == JOptionPane.NO_OPTION) {
+            return false
+        }
+    }
+
+    def deleteSelectedProject = {
+        def p = view.gridPipelineModel.selectedProject
+        if(p) {
+            if(confirmDelete(p)) {
+                view.gridPipelineModel.setSelectedProject(null)
+                model.deleteProject(p)
+            }
+        }
+
+    }
 
     def saveProjectDetails = {
         if(checkProjectDetails()) {
@@ -188,9 +219,16 @@ class ProjectDetails {
             if( ! checkTextField(swing."capaNeeded-$idx", Double.class)) result = false
             if( ! checkTextField(swing."description-$idx", String.class)) result = false
             if(startValid && endValid) {
-                checkStartBeforeEnd(swing."planStart-$idx", swing."planFinish-$idx")
+                if( ! checkStartBeforeEnd(swing."planStart-$idx", swing."planFinish-$idx")) {
+                    result = false
+                }
             }
             idx++
+        }
+        if(result) {
+            swing.applyDetails.text = "Änderungen übernehmen"
+        } else {
+            swing.applyDetails.text = "bitte erst Fehler korrigieren... Dann: Änderungen übernehmen"
         }
         result
     }

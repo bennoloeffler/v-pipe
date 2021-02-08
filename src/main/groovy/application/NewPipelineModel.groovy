@@ -64,16 +64,17 @@ class NewPipelineModel extends GridModel {
      * from task-portfolio
      */
     private void updateGridElements() {
-        def t = RunTimer.getTimerAndStart('NewPipelineModel::updateGridElements')
         allProjectGridLines = []
-        if(model.taskList) {
-            model.projectSequence.each {
-                List<TaskInProject> projectTasks = model.getProject(it)
-                def gridElements = fromProjectTasks(projectTasks)
-                allProjectGridLines << gridElements
+        RunTimer.getTimerAndStart('NewPipelineModel::updateGridElements').withCloseable {
+            if (model.taskList) {
+                model.projectSequence.each {
+                    List<TaskInProject> projectTasks = model.getProject(it)
+                    def gridElements = fromProjectTasks(projectTasks)
+                    allProjectGridLines << gridElements
+                }
             }
         }
-        t.stop()
+        allProjectGridLines
     }
 
 

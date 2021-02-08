@@ -1,6 +1,6 @@
 package transform
 
-import core.VpipeException
+
 import groovy.transform.InheritConstructors
 import model.DataReader
 import model.TaskInProject
@@ -23,7 +23,7 @@ class TemplateTransformer extends Transformer {
                 List<TaskInProject> newProject = p.collect { it.cloneFromTemplate(templatedProject, dayShift) }
                 taskList.addAll(newProject)
             } else {
-                throw new VpipeDataException("Das Template-Projekt: $templatedProject\nin der Datei ${DataReader.get_TEMPLATE_FILE_NAME()} \nbezieht sich auf ein nicht existierendes\nOriginal-Projekt: $originalProject")
+                throw new VpipeDataException("Das Template-Projekt: $templatedProject\nin der Datei ${DataReader.get_SCENARIO_FILE_NAME()} \nbezieht sich auf ein nicht existierendes\nOriginal-Projekt: $originalProject")
             }
 
             // pipelining

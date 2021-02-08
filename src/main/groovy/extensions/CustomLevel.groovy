@@ -17,7 +17,6 @@ import java.util.logging.SimpleFormatter
  * TRACE, DEBUG, INFO, WARNING, ERROR
  */
 @InheritConstructors
-@Log
 class CustomLevel extends Level {
 
     static int getLevelValue(String name) {
