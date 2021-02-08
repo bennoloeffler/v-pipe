@@ -7,11 +7,11 @@ import model.TaskInProject
 import model.VpipeDataException
 
 @InheritConstructors
-class TemplateTransformer extends Transformer {
+class ScenarioTransformer extends Transformer {
 
     @Override
     void transform() {
-        model.templateProjects.each {
+        model.scenarioProjects.each {
 
             //tasks
             String templatedProject = it[0]

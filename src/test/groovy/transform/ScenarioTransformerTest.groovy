@@ -5,7 +5,7 @@ import model.VpipeDataException
 import spock.lang.Specification
 import testdata.TestDataHelper
 
-class TemplateTransformerTest extends Specification {
+class ScenarioTransformerTest extends Specification {
 
     Model m
 
@@ -13,8 +13,8 @@ class TemplateTransformerTest extends Specification {
 
         given:
             m = TestDataHelper.getPopulatedModel()
-            m.templateProjects = [ ['copy1', 'p1', 100], ['copy2', 'p2', 10],]
-            TemplateTransformer tt = new TemplateTransformer(m)
+            m.scenarioProjects = [['copy1', 'p1', 100], ['copy2', 'p2', 10],]
+            ScenarioTransformer tt = new ScenarioTransformer(m)
 
         when:
             tt.transform()
@@ -32,8 +32,8 @@ class TemplateTransformerTest extends Specification {
 
         given: 'model with tasks and one template request'
             m = TestDataHelper.getPopulatedModel()
-            m.templateProjects = [['p1-copy', 'p1-template-original', 17]]
-            TemplateTransformer tt = new TemplateTransformer(m)
+            m.scenarioProjects = [['p1-copy', 'p1-template-original', 17]]
+            ScenarioTransformer tt = new ScenarioTransformer(m)
 
         when: 'transforming'
             tt.transform()

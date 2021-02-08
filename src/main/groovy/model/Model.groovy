@@ -6,7 +6,7 @@ import groovy.beans.Bindable
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import transform.DateShiftTransformer
-import transform.TemplateTransformer
+import transform.ScenarioTransformer
 import utils.FileSupport
 import utils.RunTimer
 
@@ -42,7 +42,7 @@ class Model {
     List<TaskInProject> taskList =[]
 
     //
-    List<List> templateProjects =[]
+    List<List> scenarioProjects =[]
     // stable sorted project list
     //List<String> allProjectNames
 
@@ -351,7 +351,7 @@ class Model {
             this.jsonSlurp = jsonSlurp
             fileErr = { "Fehler beim Lesen der Datei ${DataReader.get_CAPA_FILE_NAME()}\n" }
             def timeKeys = getFullSeriesOfTimeKeys(WEEK)
-            println ("calcCapa von ${timeKeys[0]} to ${timeKeys[timeKeys.size()-1]}")
+            //println ("calcCapa von ${timeKeys[0]} to ${timeKeys[timeKeys.size()-1]}")
 
             // get the public holiday of that week and create a percentage based on 5 days (5-h)/5 (ph)
             if (!jsonSlurp.Kapa_Gesamt) {
@@ -550,7 +550,7 @@ class Model {
     def emtpyTheModel() {
         taskList = []
         projectDayShift = [:]
-        templateProjects = []
+        scenarioProjects = []
         pipelineElements = []
         capaAvailable = [:]
         jsonSlurp = ''
@@ -597,8 +597,8 @@ class Model {
             //
             // THEN read and create templated projects -> on top of shifts of originals with shift
             //
-            templateProjects = DataReader.readScenario()
-            TemplateTransformer tt = new TemplateTransformer(this)
+            scenarioProjects = DataReader.readScenario()
+            ScenarioTransformer tt = new ScenarioTransformer(this)
             tt.transform()
 
             //

@@ -52,7 +52,7 @@ class RunTimer implements Closeable{
         }
 
         def header = ["percent"       :'r',
-                      "what                                       ":'l',
+                      "what                                                ":'l',
                       "calls    "     :'l',
                       "time (m:s:ms) " :'l'
         ]

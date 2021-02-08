@@ -149,7 +149,8 @@ class ProjectTemplates {
                         label('Name des neuen Projektes:', constraints: "")
                         textField(id: 'templateName', enabled: true, text: "", constraints: 'w 600!, span 4, wrap')
                         label('End-Termin des neuen Projektes:')
-                        textField(id: 'templateFinish', text: (new Date().plus(365)).toString(), enabled: true, constraints: 'w 200!, span 3, wrap')
+                        textField(id: 'templateFinish', text: (new Date().plus(365)).toString(), enabled: true, constraints: 'w 200!')
+                        label('z.B. 17.2.2023', constraints: 'wrap')
                         button(id: 'copyTemplate', action: swing.cloneTemplate, enabled: false, constraints: 'span, growx, wrap') // actionPerformed: saveProjectDetails
                         label(id: 'templateProjectError', foreground: Color.RED, constraints: 'span, growx, wrap')
                     }
