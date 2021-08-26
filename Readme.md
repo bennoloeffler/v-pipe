@@ -14,15 +14,15 @@ Die Distribution ist ein `v-pipe-major.minor.bugfix-ReleaseName.zip`.
 Dieses Zip-File entpacken - ideal in das Verzeichnis:  
 `c:\v-pipe`. Aber auch gerne auf einen Memory-Stick. Tut auch.  
 In Win10 braucht man dazu keinen "Zipper".    
-1. Zipfile v-pipe-x.y.z-release.zip 'irgendwo' ablegen.  
+1. Zip-File v-pipe-x.y.z-release.zip 'irgendwo' ablegen.  
 2. Per Explorer (WIN+E) das v-pipe.zip 'anklicken'.
 Einfach im Explorer einmal draufklicken.  
 3. Inhalte des zip-files werden wie ein File-System angezeigt.  
 4. Oberes Verzeichnis (`v-pipe`) per Copy&Paste mit CTRL-C 'kopieren'  
 und nach C: einfügen. Also im Explorer auf C: klicken und per CTRL-V entpacken.  
 Fertig.
-5. Das klappt auch für einen Programm-Update.  
-eigene Datein-Dateien werden nicht überschrieben.  
+5. Das klappt auch für ein Programm-Update.  
+eigene Daten-Dateien werden nicht überschrieben.  
 Backup schadet trotzdem nicht.
 
 In C:\v-pipe liegen dann die Verzeichnisse und Dateien:
@@ -289,7 +289,18 @@ TODO: 20XX-XX-XX `1.2.0-Data-Input-Adapters`
 - plugins with several examples
 
 TODO: 20XX-XX-XX `1.1.0-Überlasten-glätten`
-- monthly view (in addition to weekly)
+- monthly view (in addition to weekly) (every week is an average of the last)
+
+### BUGS TO FIX / Urgent Features
+- adapter elegantly import project data
+- backlog of department for X weeks (in order to simulate "additional work")
+- copy from project (in three tabs (template, new, copy))
+- ask for save before opening (we need dirty flag)
+
+2021-08-26 `1.3.0-Create-Project`
+- create new Project from "nothing"
+- show task description in project tooltip
+
 
 2021-02-07 `1.2.0-Szenario-Templates`
 - can model and use templates (Vorlagen)

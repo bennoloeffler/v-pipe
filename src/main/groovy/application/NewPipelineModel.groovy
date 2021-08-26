@@ -155,7 +155,8 @@ class NewPipelineModel extends GridModel {
         }
 
         model.reCalcCapaAvailableIfNeeded()
-        model.setUpdateToggle(!model.getUpdateToggle())
+        //model.setUpdateToggle(!model.getUpdateToggle())
+        model.fireUpdate()
     }
 
     @Override

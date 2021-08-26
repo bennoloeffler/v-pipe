@@ -169,6 +169,15 @@ class View {
                     shortDescription: 'Projekt-Ansicht in gesondertem Fenster öffnen. Gerne mehrere. Multi-Monitor. Multi-View...'
             )
 
+            /*
+            action(id: 'monthViewAction',
+                    name: "Monats-Belastung, separat",
+                    //mnemonic: 'p',
+                    closure: { println "monthlyViewAction not connected to application..." },
+                    //accelerator: shortcut('P'),
+                    shortDescription: 'Monats-Ansicht in gesondertem Fenster öffnen.'
+            )*/
+
             // help
 
             action(id: 'helpAction',

@@ -91,7 +91,7 @@ class FileSupport {
      */
     static String backupDirName(String dirName) {
         assert dirName
-        dirName + '\\' + BACKUP_DIR + "\\" +  new DateTime().toString("yyyy-MM-ddHHmmss")
+        dirName + '\\' + BACKUP_DIR + "\\" +  new DateTime().toString("yyyy-MM-dd HH.mm.ss")
     }
 
     static def checkBackupDir() {

@@ -168,7 +168,8 @@ class NewProjectModel extends GridModel {
 
     def updateModelRecalcAndFire() {
         model.reCalcCapaAvailableIfNeeded()
-        model.setUpdateToggle(!model.getUpdateToggle())
+        //model.setUpdateToggle(!model.getUpdateToggle())
+        model.fireUpdate()
         updateGridElementsFromDomainModel()
     }
 
@@ -226,7 +227,10 @@ class NewProjectModel extends GridModel {
         if(y-shift == -1) {
             result.add("${model.getPipelineElement(projectName).pipelineSlotsNeeded}" as String)
         } else {
+            def d = project[y - shift].description
+            d = (d == null || d == "")?"keine Task-Info":d
             result.add("${project[y - shift].capacityNeeded}" as String)
+            result.add("$d" as String)
         }
         result
     }

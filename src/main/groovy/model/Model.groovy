@@ -197,6 +197,32 @@ class Model {
         copy
     }
 
+    PipelineOriginalElement createPipelineForProject (List<TaskInProject> project) {
+
+        // exactly ONE element in a newly created project!
+        assert project
+        assert project[0]
+        assert project.size() == 1
+
+        PipelineOriginalElement pe =  new PipelineOriginalElement(
+                project: project[0].project,
+                startDate: project[0].starting,
+                endDate: project[0].ending,
+                pipelineSlotsNeeded: 1
+        )
+        pe
+    }
+
+    List<TaskInProject> createProject(String copyName, Date copyEndDate) {
+        if (getProject(copyName)) throw new RuntimeException("Projektname schon vorhanden: " + copyName)
+        if (Math.abs (new Date() - copyEndDate) > 20*365)  throw new RuntimeException("Projekt-End-Datum ist 20 Jahre entfernt" + copyName)
+        //def result = [] // List<TaskInProject>
+        def d = "dummy-dep"
+        if(getAllDepartments().size()>0) {d=getAllDepartments()[0]}
+        def task = new TaskInProject(copyName, copyEndDate - 28 ,copyEndDate, d,10, "")
+        [task]
+    }
+
 
     List<String> getAllTemplates() {
         (templateList*.project).unique()
@@ -644,7 +670,8 @@ class Model {
             //setCurrentDir("  ---   FEHLER BEIM LESEN DER DATEN!   ---")
             throw e
         } finally {
-            setUpdateToggle(!getUpdateToggle())
+            //setUpdateToggle(!getUpdateToggle())
+            fireUpdate()
             t.stop()
         }
     }

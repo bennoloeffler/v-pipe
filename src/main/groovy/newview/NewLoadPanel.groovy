@@ -70,6 +70,7 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
     }
 
     NewLoadPanel(int gridWidth, AbstractGridLoadModel model) {
+        //setDoubleBuffered(false)
         setFocusable(true)
         this.model = model
         setGridWidth(gridWidth)

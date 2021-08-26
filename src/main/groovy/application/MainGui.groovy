@@ -43,7 +43,8 @@ class MainGui {
                 println "\nD A T E N - F E H L E R :\n" + thrown.getMessage()?:''
             } else {
                 println "PROBLEM. Programm ist gecrasht :-(:\n${thrown.getMessage()?:''}\n\nSTACKTRACE: (bitte an BEL)\n\n"
-                thrown.printStackTrace()
+                println thrown
+                //thrown.printStackTrace(outStream)
             }
             //todo logile
             //sleep(10000)
@@ -173,9 +174,6 @@ class MainGui {
             // sync scroll-pane values hScrollBarValueZoomingSync
             bind(target: view.loadView, targetProperty: 'hScrollBarValueZoomingSync', source: view.pipelineView, sourceProperty: 'hScrollBarValueZoomingSync')
             bind(target: view.pipelineLoadView, targetProperty: 'hScrollBarValueZoomingSync', source: view.pipelineView, sourceProperty: 'hScrollBarValueZoomingSync')
-
-
-
         }
 
 

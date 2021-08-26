@@ -163,6 +163,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
                                     <h1>${details[0]}</h1>
                                     <p>
                                         Kapa-Bedarf: ${details[1]}<br/>
+                                        ${(details.size()>2)?(details[2]+"<br/>"):"INTEGRATIONS-PHASE...<br/>"}
                                         $element.timeString<br/>
                                     </p>
                                 </body>
@@ -469,6 +470,8 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
      * @param model
      */
     GridPanel(int grid, GridModel model) {
+        //setDoubleBuffered(false)
+
         setFocusable(true)
         this.gridWidth = grid
         minMaxGridCheck()
