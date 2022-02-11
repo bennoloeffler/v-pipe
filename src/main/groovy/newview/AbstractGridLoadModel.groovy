@@ -20,6 +20,11 @@ class GridLoadElement {
     double red = -1 // as absulute value
     List<ProjectCapaNeedDetails> projectDetails
 
+    // all floating averages
+    double loadAvg
+    double yellowAvg
+    double redAvg
+
     static GridLoadElement nullElement = new GridLoadElement(
             department:'',
             timeString:'',
@@ -27,7 +32,6 @@ class GridLoadElement {
             yellow: -1,
             red: -1,
             projectDetails: [],
-
     )
 
     boolean asBoolean() {
@@ -41,7 +45,6 @@ abstract class AbstractGridLoadModel {
 
     @Bindable
     boolean updateToggle
-
 
 
     /**
@@ -60,7 +63,6 @@ abstract class AbstractGridLoadModel {
      * @return width or X size of the grid
      */
     abstract int getSizeX()
-
 
     /**
      * @return the column which is to be marked as "now" in the view

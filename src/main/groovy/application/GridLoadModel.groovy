@@ -24,7 +24,7 @@ class GridLoadModel extends AbstractGridLoadModel  {
 
     WeekOrMonth weekOrMonth = WeekOrMonth.WEEK
 
-    Map<String, Map<String, GridLoadElement>> gridElements =[:]
+    Map<String, Map<String, GridLoadElement>> gridElements =[:] //Map( department : Map( timeStr : GridLoadElement))
 
     AbsoluteLoadCalculator absoluteLoadCalculator
 
