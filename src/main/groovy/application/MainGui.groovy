@@ -20,8 +20,6 @@ import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 
 class MainGui {
-
-
     Model model
     View view
     GlobalController controller
