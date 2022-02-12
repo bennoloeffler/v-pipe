@@ -19,14 +19,14 @@ import java.awt.event.KeyEvent
 import static java.awt.Color.RED
 
 class ProjectDetails {
-    ImageIcon cut = null
-    ImageIcon copy = null
-
 
     View view
     Model model
     SwingBuilder swing
     Color fg = UIManager.getLookAndFeelDefaults().get("TextField.foreground") as Color
+
+    ImageIcon cut = null
+    ImageIcon copy = null
 
     static def scaleIcon(icon, scale) {
         Image img = icon.getImage()
@@ -35,8 +35,8 @@ class ProjectDetails {
     }
 
     ProjectDetails(View view) {
-        cut =  scaleIcon(new ImageIcon(getClass().getResource("/icons/cut.png")), 0.08)
-        copy = scaleIcon (new ImageIcon(getClass().getResource("/icons/copy.png")), 0.08)
+        cut =  scaleIcon(new ImageIcon(getClass().getResource("/icons/cut.png")), 0.04)
+        copy = scaleIcon (new ImageIcon(getClass().getResource("/icons/copy.png")), 0.04)
         this.view = view
         model = view.model // shortcut
         swing = view.swing // shortcut

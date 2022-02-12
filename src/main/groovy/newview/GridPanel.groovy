@@ -238,19 +238,22 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
     @CompileStatic(TypeCheckingMode.SKIP)
     void keyPressed(KeyEvent e){
 
-        if(KeyEvent.VK_I == e.getKeyCode()) {
+        int keyCode = e.getExtendedKeyCode()
+        //println e.toString()
+
+        if(KeyEvent.VK_I == keyCode) {
             //model.toggleIntegrationPhase(cursorX, cursorY)
         }
 
-        if(KeyEvent.VK_Z == e.getKeyCode()) {
+        if(KeyEvent.VK_Z == keyCode) {
             printZoomInfo()
         }
 
-        if(KeyEvent.VK_N == e.getKeyCode()) {
+        if(KeyEvent.VK_N == keyCode) {
             setCursorToNow()
         }
 
-        if(KeyEvent.VK_D == e.getKeyCode()) {
+        if(KeyEvent.VK_D == keyCode) {
             setDetailsToolTip(!detailsToolTip)
             if(detailsToolTip) {
                 MouseEvent phantom = new MouseEvent(
@@ -270,12 +273,15 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
             }
         }
 
-        if(KeyEvent.VK_PLUS == e.getKeyCode()) {
+        println "VK_PLUS: " + KeyEvent.VK_PLUS
+        println "ext k c: " + e.getExtendedKeyCode()
+
+        if(KeyEvent.VK_PLUS == e.getExtendedKeyCode()) {
             doZooming {gridWidth * 1.1}
             //registerScrollBarListener()
         }
 
-        if(KeyEvent.VK_MINUS == e.getKeyCode()) {
+        if(KeyEvent.VK_MINUS == e.getExtendedKeyCode()) {
             doZooming {gridWidth / 1.1}
             //registerScrollBarListener()
         }
@@ -283,10 +289,10 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
 
 
         //def redraw = [new Point(cursorX, cursorY)]
-        if(KeyEvent.VK_UP == e.getKeyCode())    {cursorY > 0              ? --cursorY :0; scrollToCursorXY()}
-        if(KeyEvent.VK_DOWN == e.getKeyCode())  {cursorY < model.sizeY-1  ? ++cursorY :0; scrollToCursorXY()}
-        if(KeyEvent.VK_LEFT == e.getKeyCode())  {cursorX > 0              ? setCursorX(cursorX-1) :0; scrollToCursorXY()}
-        if(KeyEvent.VK_RIGHT == e.getKeyCode()) {cursorX < model.sizeX-1  ? setCursorX(cursorX+1) :0; scrollToCursorXY()}
+        if(KeyEvent.VK_UP == keyCode)    {cursorY > 0              ? --cursorY :0; scrollToCursorXY()}
+        if(KeyEvent.VK_DOWN == keyCode)  {cursorY < model.sizeY-1  ? ++cursorY :0; scrollToCursorXY()}
+        if(KeyEvent.VK_LEFT == keyCode)  {cursorX > 0              ? setCursorX(cursorX-1) :0; scrollToCursorXY()}
+        if(KeyEvent.VK_RIGHT == keyCode) {cursorX < model.sizeX-1  ? setCursorX(cursorX+1) :0; scrollToCursorXY()}
 
         if(keyAndShiftPressed(e, KeyEvent.VK_UP)) {
             //println("SHIFT UP x: $cursorX y: $cursorY")
