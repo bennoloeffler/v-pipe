@@ -2,6 +2,7 @@ package application
 
 import groovy.beans.Bindable
 import groovy.transform.CompileStatic
+import groovy.transform.Memoized
 import groovy.transform.TypeCheckingMode
 import model.Model
 import model.PipelineOriginalElement
@@ -13,8 +14,12 @@ import utils.RunTimer
 
 import java.beans.PropertyChangeEvent
 import java.beans.PropertyChangeListener
+import java.util.concurrent.Callable
+import java.util.concurrent.Future
 
 import static extensions.DateHelperFunctions.*
+import java.util.concurrent.Executors
+
 
 //@CompileStatic
 class NewPipelineModel extends GridModel {
@@ -59,6 +64,8 @@ class NewPipelineModel extends GridModel {
 
     }
 
+    def threadPool = Executors.newFixedThreadPool(4)
+
     /**
      * create "the model" List<List<GridElement>> allProjectGridLines
      * from task-portfolio
@@ -67,11 +74,34 @@ class NewPipelineModel extends GridModel {
         allProjectGridLines = []
         RunTimer.getTimerAndStart('NewPipelineModel::updateGridElements').withCloseable {
             if (model.taskList) {
+                Date startOfGrid = _getStartOfWeek(model.getStartOfTasks())
+                Date endOfGrid = _getStartOfWeek(model.getEndOfTasks()) + 7
+                /*
+                try {
+
+                    List<Future<List<GridElement>>> futures = (model.projectSequence).collect {
+                        threadPool.submit({ ->
+                            fromProjectTasks(model.getProject(it), startOfGrid, endOfGrid)
+                        })
+                    } as List<Future<List<GridElement>>>;
+                    sleep(5)
+                    futures.each {
+                        List<GridElement> l = it.get()
+                        allProjectGridLines << l
+                    }
+                } catch (Exception e) {
+                    println e
+                }
+
+                 */
+
                 model.projectSequence.each {
                     List<TaskInProject> projectTasks = model.getProject(it)
-                    def gridElements = fromProjectTasks(projectTasks)
+                    def gridElements = fromProjectTasks(projectTasks, startOfGrid, endOfGrid)
                     allProjectGridLines << gridElements
                 }
+
+
             }
         }
         allProjectGridLines
@@ -82,38 +112,43 @@ class NewPipelineModel extends GridModel {
      * @param projectTasks tasks of one project
      * @return GridElements of one project
      */
-    List<GridElement> fromProjectTasks( List<TaskInProject> projectTasks) {
-        assert projectTasks
+    @Memoized
+    List<GridElement> fromProjectTasks( List<TaskInProject> projectTasks, startOfGrid, endOfGrid) {
         def gridElements = []
-        Date startOfGrid = _getStartOfWeek(model.getStartOfTasks())
-        Date endOfGrid = _getStartOfWeek(model.getEndOfTasks()) + 7
-        Date startOfProject = _getStartOfWeek(projectTasks*.starting.min())
-        Date endOfProject = _getStartOfWeek(projectTasks*.ending.max()) + 7
-        def fromToDateString = "${_dToS(startOfProject)} - ${_dToS(endOfProject)}"
+        try {
+            assert projectTasks
+            //Date startOfGrid = _getStartOfWeek(model.getStartOfTasks())
+            //Date endOfGrid = _getStartOfWeek(model.getEndOfTasks()) + 7
+            Date startOfProject = _getStartOfWeek(projectTasks*.starting.min())
+            Date endOfProject = _getStartOfWeek(projectTasks*.ending.max()) + 7
+            def fromToDateString = "${_dToS(startOfProject)} - ${_dToS(endOfProject)}"
 
-        Date now = new Date() // Date.newInstance()
-        int row = 0
-        for (Date w = startOfGrid; w < endOfGrid; w += 7) {
-            if(w <= now && now < w + 7) {
-                nowXRowCache = row
+            Date now = new Date() // Date.newInstance()
+            int row = 0
+            for (Date w = startOfGrid; w < endOfGrid; w += 7) {
+                if(w <= now && now < w + 7) {
+                    nowXRowCache = row
 
-            }
-            row ++
-            if (w >= startOfProject && w < endOfProject) {
-                boolean integrationPhase = false
-                if(model.pipelineElements) {
-                    PipelineOriginalElement element = model.getPipelineElement(projectTasks[0].project)
-                    long overlap = element.getDaysOverlap(w, w+7)
-                    if(overlap){ integrationPhase = true }
                 }
-                gridElements << new GridElement(
-                        project: projectTasks[0].project,
-                        department: '',
-                        timeString: fromToDateString,
-                        integrationPhase: integrationPhase)
-            } else {
-                gridElements << GridElement.nullElement
+                row ++
+                if (w >= startOfProject && w < endOfProject) {
+                    boolean integrationPhase = false
+                    if(model.pipelineElements) {
+                        PipelineOriginalElement element = model.getPipelineElement(projectTasks[0].project)
+                        long overlap = element.getDaysOverlap(w, w+7)
+                        if(overlap){ integrationPhase = true }
+                    }
+                    gridElements << new GridElement(
+                            project: projectTasks[0].project,
+                            department: '',
+                            timeString: fromToDateString,
+                            integrationPhase: integrationPhase)
+                } else {
+                    gridElements << GridElement.nullElement
+                }
             }
+        } catch (Exception e) {
+            println e
         }
 
         return gridElements

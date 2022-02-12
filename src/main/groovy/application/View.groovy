@@ -239,7 +239,7 @@ class View {
 
                 label("Projekt suchen: ", foreground:GRAY)
                 textField(id: 'searchTextField', toolTipText: 'Tutorial & Experimente: regex101.com', constraints: 'width 100')
-m                label("    Zeit: ", foreground:GRAY)
+                label("    Zeit: ", foreground:GRAY)
                 label("", id: 'timeLabel', foreground:highlightColor)
                 label("    Projekt: ", foreground:GRAY)
                 label("", id: 'projectLabel', foreground:highlightColor)

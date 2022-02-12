@@ -1,5 +1,6 @@
 package extensions
 
+import groovy.transform.Memoized
 import org.joda.time.DateTime
 
 /**
@@ -16,6 +17,7 @@ class DateHelperFunctions {
      * @param d
      * @return monday
      */
+    @Memoized
     static Date _getStartOfWeek(Date d) {
         def dt = new DateTime(d)
         def startOfWeek = dt.withDayOfWeek(1)
@@ -27,6 +29,7 @@ class DateHelperFunctions {
      * @param d
      * @return the first of the month
      */
+    @Memoized
     static Date _getStartOfMonth(Date d) {
         def dt = new DateTime(d)
         def startOfMonth = dt.withDayOfMonth(1)
@@ -38,6 +41,7 @@ class DateHelperFunctions {
      * @param d Date
      * @return String like "2020-W01", with the last days after week 52 in 2019 looking like "2020-W01"
      */
+    @Memoized
     static String _getWeekYearStr(Date d) {
         cal.setTime(d)
         int year = cal.get(Calendar.YEAR)
@@ -57,6 +61,7 @@ class DateHelperFunctions {
      * @param d Date
      * @return String like "2020-M11", where 1..Jan, 12..Dec
      */
+    @Memoized
     static String _getMonthYearStr(Date d) {
         cal.setTime(d)
         int year = cal.get(Calendar.YEAR)
@@ -68,6 +73,7 @@ class DateHelperFunctions {
      * @param d
      * @return "dd.MM.yyyy" (01.01.2020)
      */
+    @Memoized
     static String _dToS(Date d) {
         assert d != null
         d.format("dd.MM.yyyy")
@@ -77,6 +83,7 @@ class DateHelperFunctions {
      * @param s "dd.MM.yyyy"
      * @return Date
      */
+    @Memoized
     static Date _sToD(String s) {
         assert s != null
         Date.parse("dd.MM.yyyy", s)
@@ -87,6 +94,7 @@ class DateHelperFunctions {
      * @param s "yyyy-Www" 2020-W01
      * @return Date
      */
+    @Memoized
     static Date _wToD(String s) {
         assert s != null
         int year = s[0..3].toInteger()

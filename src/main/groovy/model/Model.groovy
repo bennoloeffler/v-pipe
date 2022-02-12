@@ -19,6 +19,8 @@ import static extensions.DateHelperFunctions._getStartOfWeek
 import static extensions.DateHelperFunctions._sToD
 import static model.WeekOrMonth.WEEK
 
+
+
 //@CompileStatic
 class Model {
 
@@ -40,6 +42,15 @@ class Model {
 
     // all project tasks data
     List<TaskInProject> taskList =[]
+
+    /*
+    Map<String, Date> promisedProjectDeliveryDates = [:]
+
+    String getDeliveryDate(String project) {
+        promisedProjectDeliveryDates [project]
+        new Date()
+    }
+     */
 
     //
     List<List> scenarioProjects =[]

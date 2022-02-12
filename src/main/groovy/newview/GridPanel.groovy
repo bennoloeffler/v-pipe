@@ -273,8 +273,8 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
             }
         }
 
-        println "VK_PLUS: " + KeyEvent.VK_PLUS
-        println "ext k c: " + e.getExtendedKeyCode()
+        //println "VK_PLUS: " + KeyEvent.VK_PLUS
+        //println "ext k c: " + e.getExtendedKeyCode()
 
         if(KeyEvent.VK_PLUS == e.getExtendedKeyCode()) {
             doZooming {gridWidth * 1.1}
