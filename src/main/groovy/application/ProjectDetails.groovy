@@ -19,8 +19,8 @@ import java.awt.event.KeyEvent
 import static java.awt.Color.RED
 
 class ProjectDetails {
-    ImageIcon cut = scaleIcon(new ImageIcon(getClass().getResource("/icons/cut.png")), 0.08)
-    ImageIcon copy = scaleIcon (new ImageIcon(getClass().getResource("/icons/copy.png")), 0.08)
+    ImageIcon cut = null
+    ImageIcon copy = null
 
 
     View view
@@ -35,6 +35,8 @@ class ProjectDetails {
     }
 
     ProjectDetails(View view) {
+        cut =  scaleIcon(new ImageIcon(getClass().getResource("/icons/cut.png")), 0.08)
+        copy = scaleIcon (new ImageIcon(getClass().getResource("/icons/copy.png")), 0.08)
         this.view = view
         model = view.model // shortcut
         swing = view.swing // shortcut
