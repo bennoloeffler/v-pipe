@@ -4,6 +4,7 @@ import groovy.beans.Bindable
 import groovy.transform.CompileStatic
 import groovy.transform.Memoized
 import groovy.transform.TypeCheckingMode
+import groovyx.gpars.GParsPool
 import model.Model
 import model.PipelineOriginalElement
 import model.TaskInProject
@@ -95,16 +96,32 @@ class NewPipelineModel extends GridModel {
 
                  */
 
+
+                /*
                 model.projectSequence.each {
                     List<TaskInProject> projectTasks = model.getProject(it)
                     def gridElements = fromProjectTasks(projectTasks, startOfGrid, endOfGrid)
                     allProjectGridLines << gridElements
+                }*/
+
+
+                //def new_allProjectGridLines = []
+                GParsPool.withPool {
+                    //new_allProjectGridLines =
+                    allProjectGridLines =
+                            model.projectSequence.collectParallel { String projectName ->
+                                List<TaskInProject> projectTasks = model.getProject(projectName)
+                                fromProjectTasks(projectTasks, startOfGrid, endOfGrid)
+                            } as List<List<GridElement>>
                 }
+                //allProjectGridLines = new_allProjectGridLines
+                //println new_allProjectGridLines
+
 
 
             }
         }
-        allProjectGridLines
+
     }
 
 
@@ -119,8 +136,12 @@ class NewPipelineModel extends GridModel {
             assert projectTasks
             //Date startOfGrid = _getStartOfWeek(model.getStartOfTasks())
             //Date endOfGrid = _getStartOfWeek(model.getEndOfTasks()) + 7
-            Date startOfProject = _getStartOfWeek(projectTasks*.starting.min())
-            Date endOfProject = _getStartOfWeek(projectTasks*.ending.max()) + 7
+            Date startOfTasks = _getStartOfWeek(projectTasks*.starting.min())
+            Date endOfTasks = _getStartOfWeek(projectTasks*.ending.max()) + 7
+            def deliveryDate = model.getDeliveryDate(projectTasks[0].project)
+            def endOfProject = endOfTasks > deliveryDate ? endOfTasks : deliveryDate
+            def startOfProject = startOfTasks < deliveryDate ? startOfTasks : deliveryDate
+
             def fromToDateString = "${_dToS(startOfProject)} - ${_dToS(endOfProject)}"
 
             Date now = new Date() // Date.newInstance()
@@ -128,7 +149,6 @@ class NewPipelineModel extends GridModel {
             for (Date w = startOfGrid; w < endOfGrid; w += 7) {
                 if(w <= now && now < w + 7) {
                     nowXRowCache = row
-
                 }
                 row ++
                 if (w >= startOfProject && w < endOfProject) {
@@ -138,11 +158,26 @@ class NewPipelineModel extends GridModel {
                         long overlap = element.getDaysOverlap(w, w+7)
                         if(overlap){ integrationPhase = true }
                     }
-                    gridElements << new GridElement(
-                            project: projectTasks[0].project,
-                            department: '',
-                            timeString: fromToDateString,
-                            integrationPhase: integrationPhase)
+                    boolean isDeliveryDate = deliveryDate >= w && deliveryDate < w+7
+                    if (w >= startOfTasks && w < endOfTasks) {
+                        gridElements << new GridElement(
+                                project: projectTasks[0].project,
+                                department: '',
+                                timeString: fromToDateString,
+                                integrationPhase: integrationPhase,
+                                deliveryDate: isDeliveryDate
+                        )
+                    } else {
+                        if (isDeliveryDate) {
+                            gridElements << new GridElement(
+                                    project: projectTasks[0].project,
+                                    department: '',
+                                    timeString: fromToDateString,
+                                    integrationPhase: integrationPhase,
+                                    deliveryDate: isDeliveryDate
+                            )
+                        }
+                    }
                 } else {
                     gridElements << GridElement.nullElement
                 }

@@ -2,8 +2,11 @@ package newview
 
 import groovy.beans.Bindable
 import groovy.transform.CompileStatic
+import groovy.transform.TypeChecked
 import groovy.transform.TypeCheckingMode
 import groovy.util.logging.Log
+import groovyx.gpars.GParsPool
+import groovyx.gpars.TransparentParallel
 import utils.RunTimer
 
 import javax.swing.*
@@ -164,7 +167,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
                                     <p>
                                         Kapa-Bedarf: ${details[1]}<br/>
                                         ${(details.size()>2)?(details[2]+"<br/>"):"INTEGRATIONS-PHASE...<br/>"}
-                                        $element.timeString<br/>
+                                        ${element ? element.timeString : ""} <br/>
                                     </p>
                                 </body>
                              </html>                                
@@ -522,13 +525,22 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
         }
     }
 
+    @CompileStatic(TypeCheckingMode.SKIP)
+    static ArrayList getList(int x) {
+        new ArrayList<>(0..x).makeConcurrent() as ArrayList<Integer>
+    }
+
     Rectangle r = new Rectangle()
     /**
      * heart of painting
      * @param g1d
      */
     @Override
-    @CompileStatic
+    //@CompileStatic
+    //@TypeChecked
+
+    //@CompileDynamic
+
     protected void paintComponent(Graphics g1d) {
         super.paintComponent(g1d)
         //println(this.name)
@@ -543,22 +555,26 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
             // paint only elements inside clipBounds
             //
 
-            for (int x in 0..model.sizeX - 1) {
-                for (int y in 0..model.sizeY - 1) {
-                    int graphX = borderWidth + x * gridWidth + nameWidth
-                    int graphY = borderWidth + y * gridWidth
-                    if (graphX >= r.x - 2 * gridWidth && graphX <= r.x + 2 * gridWidth + r.width && graphY >= r.y - 2 * gridWidth && graphY <= r.y + 2 * gridWidth + r.height) {
-                        // TODO: println "x: $x (sizeX: $model.sizeX) y: $y (sizeY: $model.sizeY)"
-                        if (model.sizeX == 0 || model.sizeY == 0) {
-                            //t.stop()
-                            return
-                        }
-                        GridElement e = model.getElement(x, y)
-                        assert e != null
-                        if (e != GridElement.nullElement || cursorX == x && cursorY == y) {
-                            Color c = getColor(y)
-                            g.setColor(c)
-                            drawGridElement(c, g, e, x, y)
+            //for (int x in 0..model.sizeX - 1) {
+            GParsPool.withPool {
+                ArrayList<Integer> l = getList(model.sizeX)
+                l.each { int x ->
+                    for (int y in 0..model.sizeY - 1) {
+                        int graphX = borderWidth + x * gridWidth + nameWidth
+                        int graphY = borderWidth + y * gridWidth
+                        if (graphX >= r.x - 2 * gridWidth && graphX <= r.x + 2 * gridWidth + r.width && graphY >= r.y - 2 * gridWidth && graphY <= r.y + 2 * gridWidth + r.height) {
+                            // TODO: println "x: $x (sizeX: $model.sizeX) y: $y (sizeY: $model.sizeY)"
+                            if (model.sizeX == 0 || model.sizeY == 0) {
+                                //t.stop()
+                                return
+                            }
+                            GridElement e = model.getElement(x, y)
+
+                            if (e != null && (e != GridElement.nullElement || cursorX == x && cursorY == y)) {
+                                Color c = getColor(y)
+                                g.setColor(c)
+                                drawGridElement(c, g, e, x, y)
+                            }
                         }
                     }
                 }
@@ -737,39 +753,45 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
         //g.fillRoundRect(graphX+offset, graphY+offset, size-4, size-4, round, round)
 
         // element in project color, integration phase color (orange), empty color (white)
-        assert e != null
-        g.setColor( e.integrationPhase ? Color.orange : (e == e.nullElement ? Color.WHITE : c) )
+        if( e != null) {
+            g.setColor(e.integrationPhase ? Color.orange : (e == e.nullElement ? Color.WHITE : c))
 
-        // or current mouse location color (overwrites even more)
-        if(x==gridMouseX && y == gridMouseY) {
-            //println "x $x, y $y (gmx $gridMouseX, gmy $gridMouseY)"
-            g.setColor(new Color(255,0,0,150))
-        } //g.setColor(Color.LIGHT_GRAY)}
-        g.fillRoundRect(graphX, graphY, size-4 , size-4, round, round)
-        //g.fillRoundRect(graphX, graphY, size-4 , size-4, round, round)
+            // or current mouse location color (overwrites even more)
+            if (x == gridMouseX && y == gridMouseY) {
+                //println "x $x, y $y (gmx $gridMouseX, gmy $gridMouseY)"
+                g.setColor(new Color(255, 0, 0, 150))
+            } //g.setColor(Color.LIGHT_GRAY)}
+            g.fillRoundRect(graphX, graphY, size - 4, size - 4, round, round)
+            if (e.deliveryDate) {
+                g.setColor(Color.RED)
+                g.fillRect(graphX + 4, graphY + 4, size - 8, size - 8,)
+            }
 
-
-        // or cursor color (overwrites everything)
-        if(x==cursorX && y == cursorY) {
-            g.setColor(cursorColor)
-            g.fillRoundRect(graphX, graphY, size-4 , size-4, round, round)
-        }
+            //g.fillRoundRect(graphX, graphY, size-4 , size-4, round, round)
 
 
-        if(gridWidth>1000) {
-            // write (with shadow) some info
-            // TODO: use Clip, Transform, Paint, Font and Composite
-            float fontSize = 20.0 * gridWidth / 60
+            // or cursor color (overwrites everything)
+            if (x == cursorX && y == cursorY) {
+                g.setColor(cursorColor)
+                g.fillRoundRect(graphX, graphY, size - 4, size - 4, round, round)
+            }
 
-            g.getClipBounds(rBackup)
-            Rectangle newClip = new Rectangle(graphX, graphY, size - 6, size - 6)
-            g.setClip(newClip.intersection(rBackup))
-            g.setFont(g.getFont().deriveFont((float) fontSize))
-            g.setColor(Color.WHITE)
-            g.drawString(e.project, graphX + (int) (gridWidth * 0.2), graphY + (int) (gridWidth / 2))
-            g.setColor(Color.BLACK)
-            g.drawString(e.project, graphX + (int) (gridWidth * 0.2 - 1), graphY + (int) (gridWidth / 2 - 1))
-            g.setClip(rBackup)
+
+            if (gridWidth > 1000) {
+                // write (with shadow) some info
+                // TODO: use Clip, Transform, Paint, Font and Composite
+                float fontSize = 20.0 * gridWidth / 60
+
+                g.getClipBounds(rBackup)
+                Rectangle newClip = new Rectangle(graphX, graphY, size - 6, size - 6)
+                g.setClip(newClip.intersection(rBackup))
+                g.setFont(g.getFont().deriveFont((float) fontSize))
+                g.setColor(Color.WHITE)
+                g.drawString(e.project, graphX + (int) (gridWidth * 0.2), graphY + (int) (gridWidth / 2))
+                g.setColor(Color.BLACK)
+                g.drawString(e.project, graphX + (int) (gridWidth * 0.2 - 1), graphY + (int) (gridWidth / 2 - 1))
+                g.setClip(rBackup)
+            }
         }
     }
 

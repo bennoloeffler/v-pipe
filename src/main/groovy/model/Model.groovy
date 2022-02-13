@@ -43,14 +43,19 @@ class Model {
     // all project tasks data
     List<TaskInProject> taskList =[]
 
-    /*
+
     Map<String, Date> promisedProjectDeliveryDates = [:]
 
-    String getDeliveryDate(String project) {
-        promisedProjectDeliveryDates [project]
-        new Date()
+    Date getDeliveryDate(String project) {
+        def date = promisedProjectDeliveryDates[project]
+        if (! date) {
+            def projectTasks = getProject(project)
+            date = (projectTasks*.ending).max()
+            promisedProjectDeliveryDates[project] = date
+        }
+        date
     }
-     */
+
 
     //
     List<List> scenarioProjects =[]
@@ -119,13 +124,13 @@ class Model {
     //@Memoized
     List<TaskInProject> getProject(String project) {
         def r
-        RunTimer.getTimerAndStart('getProject').withCloseable {
+        //RunTimer.getTimerAndStart('getProject').withCloseable {
             r = taskList.findAll { it.project == project }
             def departments = getAllDepartments()
             r = r.sort { a, b ->
                 departments.indexOf(a.department) - departments.indexOf(b.department)
             }
-        }
+        //}
         r
     }
 
@@ -328,7 +333,7 @@ class Model {
     List<String> allDepartmentsCache = []
 
     List<String> getAllDepartments() {
-        RunTimer.getTimerAndStart('getAllDepartments').withCloseable {
+        //RunTimer.getTimerAndStart('getAllDepartments').withCloseable {
             if (capaAvailable) {
                 capaAvailable.keySet().toList()
             } else {
@@ -338,7 +343,7 @@ class Model {
                 }
                 allDepartmentsCache
             }
-        }
+        //}
     }
 
 

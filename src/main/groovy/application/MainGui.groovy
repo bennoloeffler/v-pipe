@@ -42,7 +42,7 @@ class MainGui {
             } else {
                 println "PROBLEM. Programm ist gecrasht :-(:\n${thrown.getMessage()?:''}\n\nSTACKTRACE: (bitte an BEL)\n\n"
                 println thrown
-                //thrown.printStackTrace(outStream)
+                thrown.printStackTrace()
             }
             //todo logile
             //sleep(10000)
