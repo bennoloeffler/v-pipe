@@ -86,7 +86,9 @@ class ProjectDetails {
                         label('Projekt-Name:', constraints: "")
                         textField(id: 'projectName', enabled: false, text: p, constraints: 'w 600!, span 4, wrap')
                         label('Liefer-Termin:')
-                        textField(id: 'planFinishProject', text: model.getDeliveryDate(p).toString(), enabled: true, constraints: 'w 200!, span 3, wrap')
+                        textField(id: 'planFinishProject', text: model.getDeliveryDate(p).toString(),
+                                toolTipText: "alter Wert:  " + model.getDeliveryDate(p).toString(),
+                                enabled: true, constraints: 'w 200!, span 3, wrap')
                         //label('Wahrscheinlichkeit:')
                         //textField(id: 'probability', text: 100, enabled: false, constraints: 'w 100!')
                         //label('[%]', constraints: '')
@@ -209,10 +211,11 @@ class ProjectDetails {
 
 
     def checkProjectDetails = {
-        println "CEHCK project details"
+        //println "CEHCK project details"
         def result = true
         def p = view.gridPipelineModel.selectedProject
         List<TaskInProject> project = model.getProject(p)
+        if( ! checkTextField(swing."planFinishProject", Date.class)) result = false
         def idx = 0
         for(task in project) {
             def startValid = true

@@ -131,7 +131,7 @@ class NewPipelineModel extends GridModel {
                         long overlap = element.getDaysOverlap(w, w+7)
                         if(overlap){ integrationPhase = true }
                     }
-                    boolean isDeliveryDate = deliveryDate >= w && deliveryDate <= w+7
+                    boolean isDeliveryDate = deliveryDate >= w && deliveryDate < w+7
                     if (w >= startOfTasks && w < endOfTasks) {
                         gridElements << new GridElement(
                                 project: projectTasks[0].project,

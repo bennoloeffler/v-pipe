@@ -86,7 +86,7 @@ class NewProjectModel extends GridModel {
                 nowXRowCache = row
             }
             row ++
-            boolean isDeliveryDate = deliveryDate >= w && deliveryDate <= w+7
+            boolean isDeliveryDate = deliveryDate >= w && deliveryDate < w+7
 
             if (w >= startOfTask && w < endOfTask) {
                 gridElements << new GridElement(projectTask.project, projectTask.department, fromToDateString, false, isDeliveryDate)
