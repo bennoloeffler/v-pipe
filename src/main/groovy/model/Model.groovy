@@ -44,8 +44,8 @@ class Model {
     List<TaskInProject> taskList =[]
 
 
-//    Map<String, Date> promisedProjectDeliveryDates = [:]
-/*
+    Map<String, Date> promisedProjectDeliveryDates = [:]
+
     Date getDeliveryDate(String project) {
         def date = promisedProjectDeliveryDates[project]
         if (! date) {
@@ -55,7 +55,6 @@ class Model {
         }
         date
     }
- */
 
 
 
@@ -273,7 +272,18 @@ class Model {
         }
     }
 
-/*
+
+    /**
+     * @return the maximum time of all tasks
+     */
+    Date getEndOfTasks() {
+        RunTimer.getTimerAndStart('getEndOfTasks').withCloseable {
+            (taskList*.ending).max()
+        }
+    }
+
+
+
     Date getStartOfProjects() {
         Date minDelDate = promisedProjectDeliveryDates.values().min()
         Date start = getStartOfTasks()
@@ -287,17 +297,7 @@ class Model {
         maxDelDate && maxDelDate > end ? maxDelDate : end
     }
 
-    */
 
-
-    /**
-     * @return the maximum time of all tasks
-     */
-    Date getEndOfTasks() {
-        RunTimer.getTimerAndStart('getEndOfTasks').withCloseable {
-            (taskList*.ending).max()
-        }
-    }
 
 
     /**
@@ -309,8 +309,8 @@ class Model {
     List<String> getFullSeriesOfTimeKeys(WeekOrMonth weekOrMonth) {
         def result = []
         RunTimer.getTimerAndStart('getFullSeriesOfTimeKeys').withCloseable {
-            Date s = getStartOfTasks()
-            Date e = getEndOfTasks()
+            Date s = getStartOfProjects()
+            Date e = getEndOfProjects()
             if (s && e) {
                 if (e - s > years20.toDays()) {
                     throw new VpipeDataException("Dauer von Anfang bis Ende\n" +
@@ -610,7 +610,7 @@ class Model {
 
     def emptyTheModel() {
         taskList = []
-        //promisedProjectDeliveryDates = [:]
+        promisedProjectDeliveryDates = [:]
         projectDayShift = [:]
         scenarioProjects = []
         pipelineElements = []

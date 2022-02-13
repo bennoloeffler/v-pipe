@@ -759,15 +759,15 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
             // or current mouse location color (overwrites even more)
             if (x == gridMouseX && y == gridMouseY) {
                 //println "x $x, y $y (gmx $gridMouseX, gmy $gridMouseY)"
-                g.setColor(new Color(255, 0, 0, 150))
+                g.setColor(new Color(0, 0, 255, 150))
             } //g.setColor(Color.LIGHT_GRAY)}
             g.fillRoundRect(graphX, graphY, size - 4, size - 4, round, round)
-            /*
+
             if (e.deliveryDate) {
                 g.setColor(Color.RED)
-                g.fillRect(graphX + 4, graphY + 4, size - 8, size - 8,)
+                g.fillRoundRect((graphX+size/3) as int, (graphY+size/3) as int, size/3-offset as int, size/3-offset as int, round, round)
             }
-             */
+
 
             //g.fillRoundRect(graphX, graphY, size-4 , size-4, round, round)
 

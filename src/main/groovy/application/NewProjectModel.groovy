@@ -47,20 +47,17 @@ class NewProjectModel extends GridModel {
 
             allProjectGridLines = []
             if (projectName) {
+                Date startOfGrid = _getStartOfWeek(model.getStartOfProjects())
+                Date endOfGrid = _getStartOfWeek(model.getEndOfProjects()) + 7
                 if (model.pipelineElements) {
-                    allProjectGridLines << fromPipelineElement(model.getPipelineElement(projectName), model.taskList)
+                    allProjectGridLines << fromPipelineElement(model.getPipelineElement(projectName), startOfGrid, endOfGrid)
                 }
-                //def departments = model.getAllDepartments()
-                //println(departments)
                 project = model.getProject(projectName)
-                //project = project.sort{-it.ending.time}
-                //project = project.sort{a, b ->
-                //    departments.indexOf(a.department) - departments.indexOf(b.department)
-                //}
                 project.each {
-                    allProjectGridLines << fromTask(it, model.taskList)
+                    allProjectGridLines << fromTask(it, startOfGrid, endOfGrid)
                 }
             }
+            allProjectGridLines
         }
     }
 
@@ -69,15 +66,17 @@ class NewProjectModel extends GridModel {
      * @param projectTasks tasks of one project
      * @return GridElements of one project
      */
-    List<GridElement> fromTask(TaskInProject projectTask, List<TaskInProject> all) {
+    List<GridElement> fromTask(TaskInProject projectTask, Date startOfGrid, Date endOfGrid) {
         nowXRowCache = - 1
         assert projectTask
-        assert all
         def gridElements = []
+        def deliveryDate = model.getDeliveryDate(projectTask.project)
         Date startOfTask = _getStartOfWeek(projectTask.starting)
         Date endOfTask = _getStartOfWeek(projectTask.ending) + 7
-        Date startOfGrid = _getStartOfWeek(all*.starting.min())
-        Date endOfGrid = _getStartOfWeek(all*.ending.max()) + 7
+        Date startOfProject = _getStartOfWeek(deliveryDate < projectTask.starting  ? deliveryDate : projectTask.starting)
+        Date endOfProject = _getStartOfWeek(deliveryDate > projectTask.ending ? deliveryDate : projectTask.ending ) + 7
+
+
         def fromToDateString = "${_dToS(startOfTask)} - ${_dToS(endOfTask)}"
 
         Date now = new Date()
@@ -87,10 +86,16 @@ class NewProjectModel extends GridModel {
                 nowXRowCache = row
             }
             row ++
+            boolean isDeliveryDate = deliveryDate >= w && deliveryDate <= w+7
+
             if (w >= startOfTask && w < endOfTask) {
-                gridElements << new GridElement(projectTask.project, projectTask.department, fromToDateString, false)
+                gridElements << new GridElement(projectTask.project, projectTask.department, fromToDateString, false, isDeliveryDate)
             } else {
-                gridElements << GridElement.nullElement
+                if (isDeliveryDate) {
+                    gridElements << new GridElement(projectTask.project, projectTask.department, fromToDateString, false, isDeliveryDate)
+                } else {
+                    gridElements << GridElement.nullElement
+                }
             }
         }
 
@@ -98,13 +103,13 @@ class NewProjectModel extends GridModel {
         return gridElements
     }
 
-    List<GridElement> fromPipelineElement(PipelineOriginalElement element, List<TaskInProject> all) {
+    List<GridElement> fromPipelineElement(PipelineOriginalElement element, Date startOfGrid, Date endOfGrid) {
         assert element
         def gridElements = []
+
         Date startOfTask = _getStartOfWeek(element.startDate)
         Date endOfTask = _getStartOfWeek(element.endDate) + 7
-        Date startOfGrid = _getStartOfWeek(all*.starting.min())
-        Date endOfGrid = _getStartOfWeek(all*.ending.max()) + 7
+
         def fromToDateString = "${_dToS(startOfTask)} - ${_dToS(endOfTask)}"
 
         for (Date w = startOfGrid; w < endOfGrid; w += 7) {
