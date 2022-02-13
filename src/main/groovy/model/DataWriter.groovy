@@ -2,11 +2,6 @@ package model
 
 import utils.FileSupport
 
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.StandardCopyOption
-
-
 class DataWriter {
 
     Model model
@@ -59,7 +54,8 @@ class DataWriter {
                 DataReader.SCENARIO_FILE_NAME,
                 DataReader.SEQUENCE_FILE_NAME,
                 DataReader.PROJECT_TEMPLATE_FILE_NAME,
-                DataReader.PROJECT_TEMPLATE_FILE_NAME
+                DataReader.PROJECT_TEMPLATE_FILE_NAME,
+                DataReader.PROJECT_DELIVERY_DATE_FILE_NAME
         ]
 
         def bDir = FileSupport.backupDirName(DataReader.currentDir)
@@ -79,14 +75,25 @@ class DataWriter {
     }
 
 
-
-
     def writeSequenceToFile() {
         def f = new File(DataReader.get_SEQUENCE_FILE_NAME())
         f.delete()
 
         model.projectSequence.each {
             f << "$it\n"
+        }
+        /*
+        f.withObjectOutputStream { out ->
+            out.writeObject(model.projectSequence)
+        }*/
+    }
+
+    def writeDeliveryDatesToFile() {
+        def f = new File(DataReader.get_PROJECT_DELIVERY_DATE_FILE_NAME())
+        f.delete()
+
+        model.deliveryDates.each {
+            f << "$it.key ${it.value.toString()}\n"
         }
         /*
         f.withObjectOutputStream { out ->
@@ -115,6 +122,7 @@ class DataWriter {
         backup()
 
         writeTasksToFile()
+        writeDeliveryDatesToFile()
         if(model.capaAvailable) {
             writeCapaToFile()
         }

@@ -86,10 +86,10 @@ class ProjectDetails {
                         label('Projekt-Name:', constraints: "")
                         textField(id: 'projectName', enabled: false, text: p, constraints: 'w 600!, span 4, wrap')
                         label('Liefer-Termin:')
-                        textField(id: 'planFinish', enabled: false, constraints: 'w 200!, span 3, wrap')
-                        label('Wahrscheinlichkeit:')
-                        textField(id: 'probability', text: 100, enabled: false, constraints: 'w 100!')
-                        label('[%]', constraints: '')
+                        textField(id: 'planFinishProject', text: model.getDeliveryDate(p).toString(), enabled: true, constraints: 'w 200!, span 3, wrap')
+                        //label('Wahrscheinlichkeit:')
+                        //textField(id: 'probability', text: 100, enabled: false, constraints: 'w 100!')
+                        //label('[%]', constraints: '')
                     }
                     panel(border: titledBorder('Tasks'), constraints: 'wrap') {
                         migLayout(layoutConstraints: "fill", columnConstraints: "[][200!][200!][150!][400!][][]", rowConstraints: "")
@@ -198,6 +198,7 @@ class ProjectDetails {
                 task.description = swing."description-$idx".text
                 idx++
             }
+            model.deliveryDates.put(p, swing."planFinishProject".text.toDate())
             model.reCalcCapaAvailableIfNeeded()
             model.fireUpdate()
             //model.setUpdateToggle(!model.updateToggle)

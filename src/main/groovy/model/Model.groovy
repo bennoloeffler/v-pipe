@@ -44,14 +44,14 @@ class Model {
     List<TaskInProject> taskList =[]
 
 
-    Map<String, Date> promisedProjectDeliveryDates = [:]
+    Map<String, Date> deliveryDates = [:]
 
     Date getDeliveryDate(String project) {
-        def date = promisedProjectDeliveryDates[project]
+        def date = deliveryDates[project]
         if (! date) {
             def projectTasks = getProject(project)
             date = (projectTasks*.ending).max()
-            promisedProjectDeliveryDates[project] = date
+            deliveryDates[project] = date
         }
         date
     }
@@ -285,14 +285,14 @@ class Model {
 
 
     Date getStartOfProjects() {
-        Date minDelDate = promisedProjectDeliveryDates.values().min()
+        Date minDelDate = deliveryDates.values().min()
         Date start = getStartOfTasks()
         def result = (minDelDate && minDelDate < start) ? minDelDate : start
         result
     }
 
     Date getEndOfProjects() {
-        Date maxDelDate = promisedProjectDeliveryDates.values().max()
+        Date maxDelDate = deliveryDates.values().max()
         Date end = getEndOfTasks()
         maxDelDate && maxDelDate > end ? maxDelDate : end
     }
@@ -610,7 +610,7 @@ class Model {
 
     def emptyTheModel() {
         taskList = []
-        promisedProjectDeliveryDates = [:]
+        deliveryDates = [:]
         projectDayShift = [:]
         scenarioProjects = []
         pipelineElements = []
@@ -639,6 +639,9 @@ class Model {
             // ordinary tasks
             //
             taskList = DataReader.readTasks()
+
+            deliveryDates = DataReader.readPromisedDeliveryDates()
+
 
             //
             // read the integrationPhaseData

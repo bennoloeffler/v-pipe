@@ -14,14 +14,15 @@ class DataReader {
 
     static String currentDir = "test" // overwrite this for application!
 
-    private static String TASK_FILE_NAME = "Projekt-Start-End-Abt-Kapa.txt"
-    private static String PIPELINING_FILE_NAME = "Integrations-Phasen.txt"
-    private static String DATESHIFT_FILE_NAME = "Projekt-Verschiebung.txt"
-    private static String CAPA_FILE_NAME = "Abteilungs-Kapazitaets-Angebot.txt"
-    private static String SCENARIO_FILE_NAME = "Szenario-Kopie-Original-Verschiebung.txt"
-    private static String SEQUENCE_FILE_NAME = "Projekt_Sequenz.txt"
-    private static String PROJECT_TEMPLATE_FILE_NAME = "Vorlagen-Projekt-Start-End-Abt-Kapa.txt"
-    private static String PIPELINE_TEMPLATE_FILE_NAME = "Vorlagen-Integrations-Phasen.txt"
+     static String TASK_FILE_NAME = "Projekt-Start-End-Abt-Kapa.txt"
+     static String PIPELINING_FILE_NAME = "Integrations-Phasen.txt"
+     static String DATESHIFT_FILE_NAME = "Projekt-Verschiebung.txt"
+     static String CAPA_FILE_NAME = "Abteilungs-Kapazitaets-Angebot.txt"
+     static String SCENARIO_FILE_NAME = "Szenario-Kopie-Original-Verschiebung.txt"
+     static String SEQUENCE_FILE_NAME = "Projekt_Sequenz.txt"
+     static String PROJECT_TEMPLATE_FILE_NAME = "Vorlagen-Projekt-Start-End-Abt-Kapa.txt"
+     static String PIPELINE_TEMPLATE_FILE_NAME = "Vorlagen-Integrations-Phasen.txt"
+    static String PROJECT_DELIVERY_DATE_FILE_NAME = "Projekt-Liefertermin.txt"
 
     static String path(String fileName){
         currentDir + "/" + fileName
@@ -29,6 +30,10 @@ class DataReader {
 
     static String get_PROJECT_TEMPLATE_FILE_NAME() {
         path PROJECT_TEMPLATE_FILE_NAME
+    }
+
+    static String get_PROJECT_DELIVERY_DATE_FILE_NAME() {
+        path PROJECT_DELIVERY_DATE_FILE_NAME
     }
 
     static String get_TASK_FILE_NAME() {
@@ -148,6 +153,21 @@ class DataReader {
         if(!templates && !taskList){throw new VpipeDataException("${get_TASK_FILE_NAME()} enthält keine Daten")}
         if( taskList.size() > 3000 ){println("W A R N U N G:\n${(templates ? get_PROJECT_TEMPLATE_FILE_NAME(): get_TASK_FILE_NAME())} enthält ${taskList.size()} Datensätze. GUI wird seeeehr LANGSAM...")}
         return taskList
+    }
+
+    static Map<String, Date> readPromisedDeliveryDates() {
+        def result = new HashMap<String, Date>()
+        try {
+            String text = FileSupport.getTextOrEmpty(get_PROJECT_DELIVERY_DATE_FILE_NAME())
+            List<List<String>> splitLines =  FileSupport.toSplitAndTrimmedLines(text)
+            splitLines.each {
+                result.put(it[0], it[1].toDate())
+            }
+        } catch (Exception e) {
+            throw new VpipeDataException(get_PROJECT_DELIVERY_DATE_FILE_NAME() + "\nVermutlich Fehler beim parsen von \nDatum (--> 22.4.2020)\n Grund: ${e.getMessage()}")
+
+        }
+        result
     }
 
 
