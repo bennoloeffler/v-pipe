@@ -22,7 +22,7 @@ import java.awt.Desktop
  */
 class  Main {
 
-    static VERSION_STRING ='1.3.0-Create-Project'
+    static VERSION_STRING ='1.4.0-ALPHA-Gpars-and-DeliveryDate'
 
     def singleRunMode = false // instead: Deamon is default
     def multiInstanceMode = false // instead SingleInstance is default
