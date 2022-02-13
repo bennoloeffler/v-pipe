@@ -288,19 +288,23 @@ TODO: 20XX-XX-XX `1.3.0-RELEASE-operative-Grobplanung`
 TODO: 20XX-XX-XX `1.2.0-Data-Input-Adapters`
 - plugins with several examples
 
-TODO: 20XX-XX-XX `1.1.0-Überlasten-glätten`
+TODO: 20XX-XX-XX `1.5.0-Überlast-Monats-glätten`
 - monthly view (in addition to weekly) (every week is an average of the last)
 
 ### BUGS TO FIX / Urgent Features
+- save delivery-date, and read if file available
 - adapter elegantly import project data
 - backlog of department for X weeks (in order to simulate "additional work")
 - copy from project (in three tabs (template, new, copy))
 - ask for save before opening (we need dirty flag)
 
+2022-02-13 `1.4.4-Delivery-Date`
+- create delivery date from last task
+- keep, (save NOT YET!) and visualize that delivery date 
+
 2021-08-26 `1.3.0-Create-Project`
 - create new Project from "nothing"
 - show task description in project tooltip
-
 
 2021-02-07 `1.2.0-Szenario-Templates`
 - can model and use templates (Vorlagen)
