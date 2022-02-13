@@ -77,25 +77,6 @@ class NewPipelineModel extends GridModel {
             if (model.taskList) {
                 Date startOfGrid = _getStartOfWeek(model.getStartOfTasks())
                 Date endOfGrid = _getStartOfWeek(model.getEndOfTasks()) + 7
-                /*
-                try {
-
-                    List<Future<List<GridElement>>> futures = (model.projectSequence).collect {
-                        threadPool.submit({ ->
-                            fromProjectTasks(model.getProject(it), startOfGrid, endOfGrid)
-                        })
-                    } as List<Future<List<GridElement>>>;
-                    sleep(5)
-                    futures.each {
-                        List<GridElement> l = it.get()
-                        allProjectGridLines << l
-                    }
-                } catch (Exception e) {
-                    println e
-                }
-
-                 */
-
 
                 /*
                 model.projectSequence.each {
@@ -104,24 +85,15 @@ class NewPipelineModel extends GridModel {
                     allProjectGridLines << gridElements
                 }*/
 
-
-                //def new_allProjectGridLines = []
                 GParsPool.withPool {
-                    //new_allProjectGridLines =
                     allProjectGridLines =
                             model.projectSequence.collectParallel { String projectName ->
                                 List<TaskInProject> projectTasks = model.getProject(projectName)
                                 fromProjectTasks(projectTasks, startOfGrid, endOfGrid)
                             } as List<List<GridElement>>
                 }
-                //allProjectGridLines = new_allProjectGridLines
-                //println new_allProjectGridLines
-
-
-
             }
         }
-
     }
 
 
@@ -138,11 +110,11 @@ class NewPipelineModel extends GridModel {
             //Date endOfGrid = _getStartOfWeek(model.getEndOfTasks()) + 7
             Date startOfTasks = _getStartOfWeek(projectTasks*.starting.min())
             Date endOfTasks = _getStartOfWeek(projectTasks*.ending.max()) + 7
-            def deliveryDate = model.getDeliveryDate(projectTasks[0].project)
-            def endOfProject = endOfTasks > deliveryDate ? endOfTasks : deliveryDate
-            def startOfProject = startOfTasks < deliveryDate ? startOfTasks : deliveryDate
+            //def deliveryDate = model.getDeliveryDate(projectTasks[0].project)
+            //def endOfProject = _getStartOfWeek(endOfTasks > deliveryDate ? endOfTasks : deliveryDate)
+            //def startOfProject = _getStartOfWeek(startOfTasks < deliveryDate ? startOfTasks : deliveryDate + 7)
 
-            def fromToDateString = "${_dToS(startOfProject)} - ${_dToS(endOfProject)}"
+            def fromToDateString = "${_dToS(startOfTasks)} - ${_dToS(endOfTasks)}"
 
             Date now = new Date() // Date.newInstance()
             int row = 0
@@ -151,23 +123,23 @@ class NewPipelineModel extends GridModel {
                     nowXRowCache = row
                 }
                 row ++
-                if (w >= startOfProject && w < endOfProject) {
+                if (w >= startOfTasks && w < endOfTasks) {
                     boolean integrationPhase = false
                     if(model.pipelineElements) {
                         PipelineOriginalElement element = model.getPipelineElement(projectTasks[0].project)
                         long overlap = element.getDaysOverlap(w, w+7)
                         if(overlap){ integrationPhase = true }
                     }
-                    boolean isDeliveryDate = deliveryDate >= w && deliveryDate < w+7
-                    if (w >= startOfTasks && w < endOfTasks) {
+                    //boolean isDeliveryDate = deliveryDate >= w && deliveryDate < w+7
+                    //if (w >= startOfTasks && w < endOfTasks) {
                         gridElements << new GridElement(
                                 project: projectTasks[0].project,
                                 department: '',
                                 timeString: fromToDateString,
                                 integrationPhase: integrationPhase,
-                                deliveryDate: isDeliveryDate
+                      //          deliveryDate: isDeliveryDate
                         )
-                    } else {
+                    /*} else {
                         if (isDeliveryDate) {
                             gridElements << new GridElement(
                                     project: projectTasks[0].project,
@@ -177,7 +149,7 @@ class NewPipelineModel extends GridModel {
                                     deliveryDate: isDeliveryDate
                             )
                         }
-                    }
+                    }*/
                 } else {
                     gridElements << GridElement.nullElement
                 }

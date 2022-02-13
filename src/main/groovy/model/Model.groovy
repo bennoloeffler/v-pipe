@@ -44,8 +44,8 @@ class Model {
     List<TaskInProject> taskList =[]
 
 
-    Map<String, Date> promisedProjectDeliveryDates = [:]
-
+//    Map<String, Date> promisedProjectDeliveryDates = [:]
+/*
     Date getDeliveryDate(String project) {
         def date = promisedProjectDeliveryDates[project]
         if (! date) {
@@ -55,6 +55,8 @@ class Model {
         }
         date
     }
+ */
+
 
 
     //
@@ -270,6 +272,23 @@ class Model {
             (taskList*.starting).min()
         }
     }
+
+/*
+    Date getStartOfProjects() {
+        Date minDelDate = promisedProjectDeliveryDates.values().min()
+        Date start = getStartOfTasks()
+        def result = (minDelDate && minDelDate < start) ? minDelDate : start
+        result
+    }
+
+    Date getEndOfProjects() {
+        Date maxDelDate = promisedProjectDeliveryDates.values().max()
+        Date end = getEndOfTasks()
+        maxDelDate && maxDelDate > end ? maxDelDate : end
+    }
+
+    */
+
 
     /**
      * @return the maximum time of all tasks
@@ -589,8 +608,9 @@ class Model {
     // loading & saving
     //
 
-    def emtpyTheModel() {
+    def emptyTheModel() {
         taskList = []
+        //promisedProjectDeliveryDates = [:]
         projectDayShift = [:]
         scenarioProjects = []
         pipelineElements = []
@@ -613,7 +633,7 @@ class Model {
         def t = RunTimer.getTimerAndStart('Model::readAllData')
         try {
 
-            emtpyTheModel()
+            emptyTheModel()
 
             //
             // ordinary tasks
@@ -682,7 +702,7 @@ class Model {
             }
 
         }catch(Exception e) {
-            emtpyTheModel()
+            emptyTheModel()
             //setCurrentDir("  ---   FEHLER BEIM LESEN DER DATEN!   ---")
             throw e
         } finally {

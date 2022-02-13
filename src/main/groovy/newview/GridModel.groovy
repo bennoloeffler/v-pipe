@@ -11,7 +11,7 @@ class GridElement {
     String project // project
     String department // department
     String timeString
-    boolean deliveryDate = false
+    //boolean deliveryDate = false
     //String fromToDateString
     boolean integrationPhase // integration?
     //static GridElement nullElement = new GridElement(project:'', department:'', timeString:'', fromToDateString:'', integrationPhase: false)
