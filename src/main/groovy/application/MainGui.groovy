@@ -180,8 +180,9 @@ class MainGui {
         // start EDT and init model
         //
         view.start {
-            //controller.openDir('.')
-            model.currentDir = "."
+            String dirToOpen ="./bsp-daten"
+            controller.openDir(dirToOpen)
+            model.currentDir = dirToOpen
         }
 
 

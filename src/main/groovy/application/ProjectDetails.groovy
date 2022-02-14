@@ -79,31 +79,31 @@ class ProjectDetails {
 
             swing.build {
                 panel {
-                    migLayout(layoutConstraints: "", columnConstraints: "[]", rowConstraints: "[][]")
+                    migLayout(layoutConstraints: "", columnConstraints: "[][]", rowConstraints: "[][]")
 
                     panel(border: titledBorder('Projekt'), constraints: 'wrap') {
-                        migLayout(layoutConstraints: "fill", columnConstraints: "[][]", rowConstraints: "[][]1[]")
+                        migLayout(layoutConstraints: "fill", columnConstraints: "[right]rel[fill, grow]", rowConstraints: "[][]")
                         label('Projekt-Name:', constraints: "")
-                        textField(id: 'projectName', enabled: false, text: p, constraints: 'w 600!, span 4, wrap')
-                        label('Liefer-Termin:')
+                        textField(id: 'projectName', enabled: true, text: p, constraints: 'w 10:300:1000, growx, wrap')
+                        label('Liefer-Termin (ex-works):')
                         textField(id: 'planFinishProject', text: model.getDeliveryDate(p).toString(),
                                 toolTipText: "alter Wert:  " + model.getDeliveryDate(p).toString(),
-                                enabled: true, constraints: 'w 200!, span 3, wrap')
+                                enabled: true, constraints: 'w 10:300:1000, growx, wrap')
                         //label('Wahrscheinlichkeit:')
                         //textField(id: 'probability', text: 100, enabled: false, constraints: 'w 100!')
                         //label('[%]', constraints: '')
                     }
                     panel(border: titledBorder('Tasks'), constraints: 'wrap') {
-                        migLayout(layoutConstraints: "fill", columnConstraints: "[][200!][200!][150!][400!][][]", rowConstraints: "")
+                        migLayout(layoutConstraints: "fill", columnConstraints: "[][][][][][][]", rowConstraints: "")
                         button(id: 'applyDetails', 'Änderungen übernehmen', action: applyProjectDetails, constraints: 'span, growx, wrap') // actionPerformed: saveProjectDetails
 
-                        label('Abteilung')
-                        label('Start')
-                        label('Ende')
-                        label('Last')
-                        label('Bezeichnung', constraints: 'growx')
-                        label("löschen    ") // for button cut
-                        label("duplizieren  ", constraints: 'wrap') // for button copy
+                        label('  Abteilung')
+                        label('  Start')
+                        label('  Ende')
+                        label('  Last')
+                        label('  Info')
+                        label("  löschen    ") // for button cut
+                        label("  duplizieren  ", constraints: 'wrap') // for button copy
                         def idx = 0
                         for(task in project) {
                             buildProjectLine(idx++, task.department, task.starting, task.ending, task.capacityNeeded, task.description)
@@ -166,7 +166,7 @@ class ProjectDetails {
 
     def confirmDelete(project) {
         int dialogButton = JOptionPane.YES_NO_OPTION
-        dialogButton = JOptionPane.showConfirmDialog(null, "$project \nwirlich  L Ö S C H E N ?", "HIRN EINSCHALTEN!", dialogButton)
+        dialogButton = JOptionPane.showConfirmDialog(null, "\n\n$project \n\nwirklich  L Ö S C H E N ?", "HIRN EINSCHALTEN!", dialogButton)
         if (dialogButton == JOptionPane.YES_OPTION) {
             return true
         }
