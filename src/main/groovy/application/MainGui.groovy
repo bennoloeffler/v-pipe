@@ -144,7 +144,7 @@ class MainGui {
         // bind components together
         //
         view.swing.build() {
-            bind(target: view.swing.currentPath, targetProperty: 'text', source: model, sourceProperty: "currentDir", converter: { v -> v.toUpperCase()})
+            bind(target: view.swing.currentPath, targetProperty: 'text', source: model, sourceProperty: "currentDir", converter: { v -> v}) // v.toUpperCase()
 
             // sync pipelineView with loadView and projectView (details of witch project?)
             bind(target: view.gridLoadModel, targetProperty: 'selectedProject', source: view.gridPipelineModel, sourceProperty: 'selectedProject')

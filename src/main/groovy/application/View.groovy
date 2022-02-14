@@ -248,15 +248,15 @@ class View {
                 label("    Pfad: ", foreground:GRAY)
                 label(id:'currentPath', constraints:  'wrap')
 
-                splitPane(id: 'spH', orientation: JSplitPane.HORIZONTAL_SPLIT, continuousLayout:true, dividerLocation: 1600, constraints: 'grow, span') {
+                splitPane(id: 'spH', orientation: JSplitPane.HORIZONTAL_SPLIT, continuousLayout:true, dividerLocation: 800, constraints: 'grow, span') {
 
-                    splitPane(id: 'spV1', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: 1000) {
+                    splitPane(id: 'spV1', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: 500) {
 
                         scrollPane (horizontalScrollBarPolicy: JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS) {
                             widget(pipelineView)
                         }
 
-                        splitPane(id: 'spV3', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: 200) {
+                        splitPane(id: 'spV3', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: 100) {
 
                             scrollPane(id: 'pipelineLoadViewScrollPane', horizontalScrollBarPolicy: JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS) {
                                 widget( pipelineLoadView)
@@ -268,7 +268,7 @@ class View {
                         }
                     }
 
-                    splitPane(id: 'spV2', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: 500) {
+                    splitPane(id: 'spV2', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: 400) {
 
                         scrollPane {
                             widget(projectView)

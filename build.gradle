@@ -56,9 +56,10 @@ task createGui(type: edu.sc.seis.launch4j.tasks.Launch4jLibraryTask) {
  * set that to local copy
  */
 def jre = "jre"
-def jrePath = "C:\\Program Files\\Java\\jre1.8.0_172"
-//def jrePath = "C:\\Program Files\\Java\\jre1.8.0_201"
+
+//def jrePath = "C:\\Program Files\\Java\\jre1.8.0_172" // WIN11
 //def jrePath = "C:\\Program Files\\Java\\jre-9.0.4" // does not scale so fine in the Grid-Panel...
+def jrePath = "/Users/benno/Library/Java/JavaVirtualMachines/liberica-1.8.0_322" // macos
 def tempDist = "$buildDir/dist/v-pipe"
 def exampleDir = "$tempDist/bsp-daten"
 
@@ -132,6 +133,11 @@ task copyExeLibsJRE {
 */
         copy {
             from "ersterStart.md"
+            into tempDist
+        }
+
+        copy {
+            from "v-pipe-macos.sh"
             into tempDist
         }
 
