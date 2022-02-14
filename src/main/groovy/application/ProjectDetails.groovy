@@ -35,8 +35,8 @@ class ProjectDetails {
     }
 
     ProjectDetails(View view) {
-        cut =  scaleIcon(new ImageIcon(getClass().getResource("/icons/cut.png")), 0.04)
-        copy = scaleIcon (new ImageIcon(getClass().getResource("/icons/copy.png")), 0.04)
+        cut =  scaleIcon(new ImageIcon(getClass().getResource("/icons/cut.png")), 0.03 * MainGui.scaleY)
+        copy = scaleIcon (new ImageIcon(getClass().getResource("/icons/copy.png")), 0.03 * MainGui.scaleY)
         this.view = view
         model = view.model // shortcut
         swing = view.swing // shortcut
