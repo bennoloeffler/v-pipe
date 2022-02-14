@@ -158,6 +158,11 @@ task copyExeLibsJRE {
         }
 
         copy {
+            from "dock-icon.png"
+            into tempDist
+        }
+
+        copy {
             from "Readme.html.url"
             into tempDist
         }

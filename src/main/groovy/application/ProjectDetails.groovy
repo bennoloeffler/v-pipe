@@ -293,7 +293,12 @@ class ProjectDetails {
             }
         }else if (type == Date){
             try {
-                textField.text.toDate()
+                Date then = textField.text.toDate()
+                Date now = new Date()
+                if (Math.abs(now - then) > 10 * 365) {
+                    markError(textField, "Datum ist mehr als 10 Jahre entfernt")
+                    result = false
+                }
             } catch(Exception e) {
                 markError(textField, "kein gültiges Datum tt.mm.jjjj...")
                 result = false
