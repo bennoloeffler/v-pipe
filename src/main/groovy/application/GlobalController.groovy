@@ -131,13 +131,14 @@ class GlobalController {
             view.pipelineView.setCursorToNow()
             view.loadView.setCursorToNow()
             if (model.pipelineElements) {
+                //view.swing.spV1.setDividerLocation((int)(300 * MainGui.scaleY))
+                //view.swing.spV2.setDividerLocation((int)(100 * MainGui.scaleY))
+                view.swing.spV3.setDividerLocation(((int)(100 * MainGui.scaleY)))
                 view.swing.pipelineLoadViewScrollPane.setVisible(true)
-                view.swing.spV1.setDividerLocation(500)
-                view.swing.spV2.setDividerLocation(500)
-                view.swing.spV3.setDividerLocation(120)
             } else {
                 view.swing.pipelineLoadViewScrollPane.setVisible(false)
             }
+            //view.swing.frame.validate()
         } catch (VpipeDataException vde) {
             JOptionPane.showMessageDialog(null,
                     vde.message,

@@ -5,17 +5,12 @@ import model.Model
 import model.VpipeDataException
 
 import javax.swing.JFrame
-import javax.swing.JMenuBar
-import javax.swing.JOptionPane
 import javax.swing.JTextArea
 import javax.swing.SwingUtilities
 import javax.swing.ToolTipManager
-import javax.swing.UIDefaults
-import javax.swing.UIManager
-import javax.swing.plaf.FontUIResource
+import java.awt.Dimension
 import java.awt.Font
-import java.awt.Graphics2D
-import java.awt.RenderingHints
+import java.awt.Toolkit
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 
@@ -23,6 +18,9 @@ class MainGui {
     Model model
     View view
     GlobalController controller
+
+    static def scaleX = 1.0;
+    static def scaleY = 1.0;
 
     static class ExceptionHandler implements Thread.UncaughtExceptionHandler {
 
@@ -57,6 +55,10 @@ class MainGui {
         Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler())
         System.setProperty("sun.awt.exception.handler",
                 ExceptionHandler.class.getName())
+
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        scaleX = screenSize.getWidth() / 1000.0 // 1000 as virt size => 1000 * screenWidhRatio
+        scaleY = screenSize.getHeight() / 1000.0
 
         new MainGui().glueAndStart()
     }
@@ -181,7 +183,7 @@ class MainGui {
         //
         view.start {
             String dirToOpen ="./bsp-daten"
-            controller.openDir(dirToOpen)
+            //controller.openDir(dirToOpen)
             model.currentDir = dirToOpen
         }
 

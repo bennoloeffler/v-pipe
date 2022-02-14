@@ -248,15 +248,22 @@ class View {
                 label("    Pfad: ", foreground:GRAY)
                 label(id:'currentPath', constraints:  'wrap')
 
-                splitPane(id: 'spH', orientation: JSplitPane.HORIZONTAL_SPLIT, continuousLayout:true, dividerLocation: 800, constraints: 'grow, span') {
+                // left | right
+                splitPane(id: 'spH', orientation: JSplitPane.HORIZONTAL_SPLIT, continuousLayout:true, dividerLocation: (int)(500 * MainGui.scaleX), constraints: 'grow, span') {
 
-                    splitPane(id: 'spV1', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: 500) {
+                    // pipeline
+                    // --------
+                    //  IP + Load
+                    splitPane(id: 'spV1', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: (int)(300 * MainGui.scaleY)) {
 
                         scrollPane (horizontalScrollBarPolicy: JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS) {
                             widget(pipelineView)
                         }
 
-                        splitPane(id: 'spV3', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: 100) {
+                        // IP
+                        // ----
+                        // Load
+                        splitPane(id: 'spV3', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: (int)(100 * MainGui.scaleY)) {
 
                             scrollPane(id: 'pipelineLoadViewScrollPane', horizontalScrollBarPolicy: JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS) {
                                 widget( pipelineLoadView)
@@ -268,7 +275,10 @@ class View {
                         }
                     }
 
-                    splitPane(id: 'spV2', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: 400) {
+                    // Project
+                    // -------
+                    // Details
+                    splitPane(id: 'spV2', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: (int)(300 * MainGui.scaleY)) {
 
                         scrollPane {
                             widget(projectView)

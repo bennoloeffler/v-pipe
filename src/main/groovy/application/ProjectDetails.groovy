@@ -84,7 +84,7 @@ class ProjectDetails {
                     panel(border: titledBorder('Projekt'), constraints: 'wrap') {
                         migLayout(layoutConstraints: "fill", columnConstraints: "[right]rel[fill, grow]", rowConstraints: "[][]")
                         label('Projekt-Name:', constraints: "")
-                        textField(id: 'projectName', enabled: true, text: p, constraints: 'w 10:300:1000, growx, wrap')
+                        textField(id: 'projectName', enabled: false, text: p, constraints: 'w 10:300:1000, growx, wrap')
                         label('Liefer-Termin (ex-works):')
                         textField(id: 'planFinishProject', text: model.getDeliveryDate(p).toString(),
                                 toolTipText: "alter Wert:  " + model.getDeliveryDate(p).toString(),
@@ -133,8 +133,8 @@ class ProjectDetails {
             textField(id: "planFinish-$idx", text: ending.toString(), toolTipText: "alter Wert:  " + ending.toString(), actionPerformed: checkProjectDetails)
             textField(id: "capaNeeded-$idx", text: capacityNeeded as String, toolTipText: "alter Wert:  " + (capacityNeeded as String), actionPerformed: checkProjectDetails)
             textField(id: "description-$idx", text: description, toolTipText: "alter Wert:  $description", constraints: 'growx', actionPerformed: checkProjectDetails)
-            button("", icon: cut, constraints: 'growx', actionPerformed: deleteLine.curry(idx))
-            button("", icon: copy, constraints: "growx, wrap", actionPerformed: copyLine.curry(idx))
+            button("", icon: cut, constraints: 'growy, growx', actionPerformed: deleteLine.curry(idx))
+            button("", icon: copy, constraints: "growy, growx, wrap", actionPerformed: copyLine.curry(idx))
         }
     }
 
