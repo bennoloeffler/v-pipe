@@ -22,7 +22,7 @@ import java.awt.Desktop
  */
 class  Main {
 
-    static VERSION_STRING ='1.4.3-DeliveryDate'
+    static VERSION_STRING ='1.4.4-delivery-date-macos'
 
     def singleRunMode = false // instead: Deamon is default
     def multiInstanceMode = false // instead SingleInstance is default

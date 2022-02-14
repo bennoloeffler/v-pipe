@@ -295,9 +295,8 @@ TODO: 20XX-XX-XX `1.5.0-Überlast-Monats-glätten`
 - adapter elegantly import project data
 - backlog of department for X weeks (in order to simulate "additional work")
 - copy from project (in three tabs (template, new, copy))
-- ask for save before opening (we need dirty flag)
 
-2022-02-13 `1.4.4-Delivery-Date`
+2022-02-13 `1.4.4-delivery-date-macos`
 - create delivery date from last task, if not available
 - save, change and visualize delivery date 
 
