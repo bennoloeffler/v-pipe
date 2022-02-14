@@ -210,7 +210,9 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
     @CompileStatic(TypeCheckingMode.SKIP)
     void keyPressed(KeyEvent e){
 
-        if(KeyEvent.VK_D == e.getKeyCode()) {
+        int keyCode = e.getExtendedKeyCode()
+
+        if(KeyEvent.VK_D == keyCode) {
             setDetailsToolTip(detailsToolTip.next())
             if(detailsToolTip == ToolTipDetails.some || detailsToolTip == ToolTipDetails.details) {
                 MouseEvent phantom = new MouseEvent(
@@ -230,19 +232,19 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
             }
         }
 
-        if(KeyEvent.VK_S == e.getKeyCode()) {
+        if(KeyEvent.VK_S == keyCode) {
             //openFile()
         }
 
-        if(KeyEvent.VK_N == e.getKeyCode()) {
+        if(KeyEvent.VK_N == keyCode) {
             setCursorToNow()
         }
 
-        if(KeyEvent.VK_PLUS == e.getKeyCode()) { doZooming {gridWidth * 1.1} }
-        if(KeyEvent.VK_MINUS == e.getKeyCode()) { doZooming {gridWidth / 1.1} }
+        if(KeyEvent.VK_PLUS == keyCode) { doZooming {gridWidth * 1.1} }
+        if(KeyEvent.VK_MINUS == keyCode) { doZooming {gridWidth / 1.1} }
 
-        if(KeyEvent.VK_LEFT == e.getKeyCode())  {cursorX > 0              ? setCursorX(cursorX-1) :0 ; scrollToCursorX()}
-        if(KeyEvent.VK_RIGHT == e.getKeyCode()) {cursorX < model.sizeX-1  ? setCursorX(cursorX+1) :0 ; scrollToCursorX()}
+        if(KeyEvent.VK_LEFT == keyCode)  {cursorX > 0              ? setCursorX(cursorX-1) :0 ; scrollToCursorX()}
+        if(KeyEvent.VK_RIGHT == keyCode) {cursorX < model.sizeX-1  ? setCursorX(cursorX+1) :0 ; scrollToCursorX()}
 
 
         //scrollToCursorX()

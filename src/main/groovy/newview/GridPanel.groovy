@@ -766,7 +766,8 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
 
             if (e.deliveryDate) {
                 g.setColor(Color.RED)
-                g.fillRoundRect((graphX+size/3) as int, (graphY+size/3) as int, size/3-offset as int, size/3-offset as int, round, round)
+                //g.drawRoundRect((graphX+(size-4)/3) as int, (graphY+(size-4)/3) as int, (size-4)/3 as int, (size-4)/3 as int, round, round)
+                g.drawRoundRect(graphX, graphY, size - 4, size - 4, round, round)
             }
 
 

@@ -9,7 +9,6 @@ import utils.SystemInfo
 import javax.swing.JComponent
 import javax.swing.JFileChooser
 import javax.swing.JOptionPane
-import javax.swing.JSplitPane
 import java.awt.event.ActionEvent
 
 class GlobalController {
@@ -23,11 +22,12 @@ class GlobalController {
     }
 
     def openActionPerformed = { ActionEvent e ->
-        String dir = chooseDir('Datenverzeichnis öffnen', (JComponent)(e.source), "Verzeichnis auswählen & Daten-Dateien von dort lesen")
-        if (dir) {
-            openDir(dir)
+        if(checkSave(false)) {
+            String dir = chooseDir('Datenverzeichnis öffnen', (JComponent) (e.source), "Verzeichnis auswählen & Daten-Dateien von dort lesen")
+            if (dir) {
+                openDir(dir)
+            }
         }
-
     }
 
     def saveActionPerformed = { ActionEvent e ->
@@ -39,7 +39,7 @@ class GlobalController {
     def exitActionPerformed = { ActionEvent e ->
         //println("exitActionPerformed")
         //DataWriter dw = new DataWriter(model: model)
-        checkSaveBeforeExit()
+        checkSave(true)
     }
 
     def saveAsActionPerformed = { ActionEvent e ->
@@ -109,18 +109,20 @@ class GlobalController {
     }
 
 
-    private void checkSaveBeforeExit() {
+    private boolean checkSave(doExitThen) {
         int dialogButton = JOptionPane.YES_NO_CANCEL_OPTION
         dialogButton = JOptionPane.showConfirmDialog(null, "Speichern?", "HIRN EINSCHALTEN!", dialogButton)
         if (dialogButton == JOptionPane.YES_OPTION) {
             saveActionPerformed(null)
+        }
+        if (dialogButton == JOptionPane.CANCEL_OPTION) {
+            return false
+        }
+        if (doExitThen) {
             view.swing.frame.dispose()
             System.exit(0)
         }
-        if (dialogButton == JOptionPane.NO_OPTION) {
-            view.swing.frame.dispose()
-            System.exit(0)
-        }
+        return true
     }
 
     def openDir(String dir) {
