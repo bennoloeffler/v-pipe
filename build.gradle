@@ -2,6 +2,8 @@
  * User guide available at https://docs.gradle.org/4.0/userguide/tutorial_groovy_projects.html
  */
 
+import org.gradle.internal.os.OperatingSystem
+
 //apply plugin: 'idea'
 //apply plugin: 'groovy'
 //apply plugin: 'edu.sc.seis.launch4j'
@@ -56,10 +58,49 @@ task createGui(type: edu.sc.seis.launch4j.tasks.Launch4jLibraryTask) {
  * set that to local copy
  */
 def jre = "jre"
+def jrePath ="NOT SET YET"
+
+println "native os.name = " + System.getProperty("os.name").toLowerCase()
+
+def getOsName() {
+    String osName = System.getProperty("os.name").toLowerCase();
+    if (osName.contains("linux")) {
+        return ("linux");
+    } else if (osName.contains("mac os x") || osName.contains("darwin") || osName.contains("osx")) {
+        return ("macos");
+    } else if (osName.contains("windows")) {
+        return ("windows");
+    } else if (osName.contains("sunos") || osName.contains("solaris")) {
+        return ("solaris");
+    } else if (osName.contains("freebsd")) {
+        return ("freebsd");
+    }
+    return ("unix");
+}
+
+if (getOsName() == "linux") {
+    // Consider Linux.
+    println "NO JRE YET for Linux"
+    Thread.sleep(10000)
+} else if (getOsName() == "windows") {
+    // Consider Windows.
+    jrePath = "C:\\Program Files\\Java\\jre1.8.0_172" // WIN11
+    println "jre for WIN: " + jrePath
+} else if (getOsName() == "macos") {
+    // Consider OS X.
+    jrePath = "/Users/benno/Library/Java/JavaVirtualMachines/liberica-1.8.0_322" // macos
+    println "jre for macos: " + jrePath
+} else {
+    // Unknown OS.
+    println "*********  Unknown OS  *********"
+    Thread.sleep(10000)
+
+}
+
 
 //def jrePath = "C:\\Program Files\\Java\\jre1.8.0_172" // WIN11
 //def jrePath = "C:\\Program Files\\Java\\jre-9.0.4" // does not scale so fine in the Grid-Panel...
-def jrePath = "/Users/benno/Library/Java/JavaVirtualMachines/liberica-1.8.0_322" // macos
+//def jrePath = "/Users/benno/Library/Java/JavaVirtualMachines/liberica-1.8.0_322" // macos
 def tempDist = "$buildDir/dist/v-pipe"
 def exampleDir = "$tempDist/bsp-daten"
 
