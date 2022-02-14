@@ -51,10 +51,10 @@ class View {
     GridPipelineLoadModel gridPipelineLoadModel = new GridPipelineLoadModel(model)
     GridModel gridProjectModel = new NewProjectModel(model)
 
-    def pipelineView = new GridPanel(20, gridPipelineModel)
-    def projectView = new GridPanel(20, gridProjectModel)
-    def loadView = new NewLoadPanel(20, gridLoadModel)
-    def pipelineLoadView = new NewLoadPanel(20, gridPipelineLoadModel)
+    def pipelineView = new GridPanel(10 * MainGui.scaleX as int, gridPipelineModel)
+    def projectView = new GridPanel(10 * MainGui.scaleX as int, gridProjectModel)
+    def loadView = new NewLoadPanel(10 * MainGui.scaleX as int, gridLoadModel)
+    def pipelineLoadView = new NewLoadPanel(10 * MainGui.scaleX as int, gridPipelineLoadModel)
     def projectDetails
     FileDifferPanel fileDifferPanel
     ProjectTemplates projectTemplates
@@ -326,7 +326,7 @@ class View {
     int i = 0
 
     def openPipelineWindow() {
-        def newPipelineView = new GridPanel(20, gridPipelineModel)
+        def newPipelineView = new GridPanel(10 * MainGui.scaleX as int, gridPipelineModel)
         swing.edt {
 
             frame(id: "framePipeline+${i++}", iconImage: frameIcon,
@@ -341,7 +341,7 @@ class View {
     }
 
     def openLoadWindow() {
-        def newLoadView = new NewLoadPanel(20, gridLoadModel)
+        def newLoadView = new NewLoadPanel(10 * MainGui.scaleX as int, gridLoadModel)
         swing.edt {
             frame(id: "frameLoad+${i++}", iconImage: frameIcon,
                     title: "v-pipe: Abt.-Belastung", locationRelativeTo: null, show: true, pack:true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
@@ -356,7 +356,7 @@ class View {
 
 
     def openPipelineLoadWindow() {
-        def newLoadView = new NewLoadPanel(20, gridPipelineLoadModel)
+        def newLoadView = new NewLoadPanel(10 * MainGui.scaleX as int, gridPipelineLoadModel)
         swing.edt {
             frame(id: "framePipelineLoad+${i++}", iconImage: frameIcon,
                     title: "v-pipe: IP-Belastung", locationRelativeTo: null, show: true, pack:true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
@@ -371,7 +371,7 @@ class View {
 
 
     def openProjectWindow() {
-        def newProjectView = new GridPanel(20, gridProjectModel)
+        def newProjectView = new GridPanel(10 * MainGui.scaleX as int, gridProjectModel)
         swing.edt {
             frame(id: "frameProjectLoad+${i++}", iconImage: frameIcon,
                     title: "v-pipe: Projekt", locationRelativeTo: null, show: true, pack:true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {

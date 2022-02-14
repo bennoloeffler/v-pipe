@@ -469,6 +469,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
         println("visible rect: $visRect")
         def prefSize = getPreferredSize()
         println("pref size: $prefSize")
+        println("gridWidth:  $gridWidth")
     }
 
 
