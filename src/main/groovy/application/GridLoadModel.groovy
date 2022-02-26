@@ -3,6 +3,7 @@ package application
 import core.AbsoluteLoadCalculator
 import core.CapaNeedDetails
 import groovy.beans.Bindable
+import model.DayIntervalCalculator
 import model.Model
 import model.WeekOrMonth
 import newview.AbstractGridLoadModel
@@ -52,6 +53,7 @@ class GridLoadModel extends AbstractGridLoadModel {
         RunTimer.getTimerAndStart('GridLoadModel::updateAllFromModelData').withCloseable {
             absoluteLoadCalculator = new AbsoluteLoadCalculator(model.taskList)
             calcGridElements()
+            calcAverageValues()
             calcRowX()
         }
         setUpdateToggle(!getUpdateToggle())
@@ -162,6 +164,24 @@ class GridLoadModel extends AbstractGridLoadModel {
         return model.getFullSeriesOfTimeKeys(weekOrMonth)
     }
 
-
-
+    void calcAverageValues() {
+        /*
+        model.getAllDepartments().each { String department ->
+            model.getFullSeriesOfTimeKeys(weekOrMonth).each { String timeStr ->
+            }
+        }
+         */
+        //gridElements[department][timeStr]
+        //abstract GridLoadElement getElement(int x, int y)
+        //abstract int getSizeY()
+        //abstract int getSizeX()
+        model.getAllDepartments().each { String department ->
+            def ma = { gridElements[department]*.getValue().load } as MovingAverage
+            def maList = ma.getAverageValues()
+            def i = 0
+            gridElements[department].each {
+                it.value.loadMovingAvg = maList[i++]
+            }
+        }
+    }
 }

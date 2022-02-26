@@ -15,7 +15,7 @@ import groovy.transform.CompileStatic
 //@CompileStatic //otherwise tests fail
 trait MovingAverage {
 
-    int howMany = 3
+    int howMany = 5
 
     abstract List<Double> getBaseValues()
 
@@ -25,11 +25,13 @@ trait MovingAverage {
         def result = []
         def allVals = getBaseValues()
         def s = allVals.size()
-        for (idx  in 0..s-1) {
-            def subVals = allVals.subList(idx, Math.min(idx+howMany, s))
-            result << subVals.sum() / subVals.size()
+        if(s) {
+            for (idx in 0..s - 1) {
+                def subVals = allVals.subList(idx, Math.min(idx + howMany, s))
+                result << subVals.sum() / subVals.size()
+            }
         }
-        result
+        result as List<Double>
     }
 }
 

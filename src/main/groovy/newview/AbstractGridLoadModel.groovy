@@ -20,10 +20,8 @@ class GridLoadElement {
     double red = -1 // as absulute value
     List<ProjectCapaNeedDetails> projectDetails
 
-    // all floating averages
-    double loadAvg
-    double yellowAvg
-    double redAvg
+    // all moving averages
+    double loadMovingAvg
 
     static GridLoadElement nullElement = new GridLoadElement(
             department:'',

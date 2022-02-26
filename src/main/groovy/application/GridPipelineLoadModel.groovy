@@ -41,6 +41,7 @@ class GridPipelineLoadModel extends AbstractGridLoadModel {
     void updateAllFromModelData() {
         RunTimer.getTimerAndStart('GridPipelineLoadModel::updateAllFromModelData').withCloseable {
             calcGridElements()
+            calcAverageValues()
             calcRowX()
         }
         setUpdateToggle(!getUpdateToggle())
@@ -126,4 +127,28 @@ class GridPipelineLoadModel extends AbstractGridLoadModel {
     List<String> getXNames() {
         return model.getFullSeriesOfTimeKeys(weekOrMonth)
     }
+
+    void calcAverageValues() {
+        /*
+        model.getAllDepartments().each { String department ->
+            model.getFullSeriesOfTimeKeys(weekOrMonth).each { String timeStr ->
+            }
+        }
+         */
+        //gridElements[department][timeStr]
+        //abstract GridLoadElement getElement(int x, int y)
+        //abstract int getSizeY()
+        //abstract int getSizeX()
+            def ma = {
+                def r = gridElements.values()*.load
+                r
+            } as MovingAverage
+            def maList = ma.getAverageValues()
+            def i = 0
+            gridElements.each {
+                it.value.loadMovingAvg = maList[i++]
+            }
+    }
+
+
 }

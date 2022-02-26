@@ -21,21 +21,21 @@ class DayIntervalCalculatorTest extends GroovyTestCase {
 
     void testAdaptMinMaxDateOnlyOne() {
         def startEndIntervals = [ci("1.1.1970", "4.7.2018")]
-        dic.adaptMinMaxDate(startEndIntervals)
+        dic.expandMinMaxDate(startEndIntervals)
         assert dic.minDate == "1.1.1970".toDate()
         assert dic.maxDate == "4.7.2018".toDate()
     }
 
     void testAdaptMinMaxDateNone() {
-        shouldFail {dic.adaptMinMaxDate([])}
-        shouldFail {dic.adaptMinMaxDate(null)}
+        shouldFail {dic.expandMinMaxDate([])}
+        shouldFail {dic.expandMinMaxDate(null)}
     }
 
     void testAdaptMinMaxDateMany() {
         def startEndIntervals = [
                 ci("1.1.1970", "4.7.2018"),
                 ci("1.1.1974", "4.7.2019")]
-        dic.adaptMinMaxDate(startEndIntervals)
+        dic.expandMinMaxDate(startEndIntervals)
         assert dic.minDate == "1.1.1970".toDate()
         assert dic.maxDate == "4.7.2019".toDate()
     }
@@ -44,7 +44,7 @@ class DayIntervalCalculatorTest extends GroovyTestCase {
         def startEndIntervals = [
                 ci("1.1.1970", "4.7.2018"),
                 ci("1.1.1974", "4.7.2019")]
-        def interval = dic.adaptMinMaxDate(startEndIntervals)
+        def interval = dic.expandMinMaxDate(startEndIntervals)
         assert interval.start == "1.1.1970".toDate()
         assert interval.end == "4.7.2019".toDate()
     }
@@ -53,7 +53,7 @@ class DayIntervalCalculatorTest extends GroovyTestCase {
         def startEndIntervals = [
                 ci("1.1.1970", "4.7.2018"),
                 ci("1.1.1974", "4.7.2019")]
-        def interval = dic.adaptMinMaxDate(startEndIntervals)
+        def interval = dic.expandMinMaxDate(startEndIntervals)
         assert interval.start == "1.1.1970".toDate()
         assert interval.end == "4.7.2019".toDate()
 
@@ -61,7 +61,7 @@ class DayIntervalCalculatorTest extends GroovyTestCase {
         startEndIntervals = [
                 ci("1.1.1969", "4.7.2004"),
                 ci("1.1.1974", "4.7.1990")]
-        interval = dic.adaptMinMaxDate(startEndIntervals)
+        interval = dic.expandMinMaxDate(startEndIntervals)
         assert interval.start == "1.1.1969".toDate() // adapted
         assert interval.end == "4.7.2019".toDate() // NOT adapted
 

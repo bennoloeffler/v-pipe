@@ -40,10 +40,19 @@ trait StartEndInterval {
 
 class DayIntervalCalculator {
 
-    Date minDate = "1.1.2100".toDate()
-    Date maxDate = "1.1.1970".toDate()
+    Date minDate
+    Date maxDate
 
-    StartEndInterval adaptMinMaxDate(List<StartEndInterval> intervals) {
+    DayIntervalCalculator() {
+        resetMinMaxDate()
+    }
+
+    void resetMinMaxDate() {
+        minDate = "1.1.2100".toDate()
+        maxDate = "1.1.1970".toDate()
+    }
+
+    StartEndInterval expandMinMaxDate(List<StartEndInterval> intervals) {
         assert intervals && intervals.size() > 0
         intervals.each {
             if (it.start < (minDate as Date)) minDate = it.start
@@ -55,13 +64,6 @@ class DayIntervalCalculator {
         r.end = maxDate
         r
     }
-
-    /*
-    List<Date> calcFullyMinMaxDate(List<StartEndInterval> intervals){
-        minDate = "1.1.2100".toDate()
-        maxDate = "1.1.1970".toDate()
-        adaptMinMaxDate(intervals)
-    }*/
 
 }
 

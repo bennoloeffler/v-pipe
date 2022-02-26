@@ -182,8 +182,10 @@ class MainGui {
         // start EDT and init model
         //
         view.start {
-            String dirToOpen ="./bsp-daten"
-            //controller.openDir(dirToOpen)
+            // bsp-daten/bsp-04-szenario-aus-verschiebung-und-template
+            //String dirToOpen ="./bsp-daten"
+            String dirToOpen ="./bsp-daten/bsp-04-szenario-aus-verschiebung-und-template"
+            controller.openDir(dirToOpen)
             model.currentDir = dirToOpen
         }
 

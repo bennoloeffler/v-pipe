@@ -7,9 +7,6 @@ import groovy.transform.Canonical
 import groovy.transform.CompileStatic
 import org.pcollections.*
 
-import java.time.LocalDate
-import java.time.chrono.ChronoLocalDate
-
 @Canonical
 @AutoClone(style=AutoCloneStyle.COPY_CONSTRUCTOR)
 class TaskOfProject implements StartEndInterval {
@@ -117,7 +114,7 @@ class ModelNew {
     def setAllTasks(Project p, List<TaskOfProject> ts) {
         createHistoryEntryForUndo()
         p.allTasks = TreePVector.from(ts)
-        adaptMinMaxDate(ts as List<StartEndInterval>)
+        expandMinMaxDate(ts as List<StartEndInterval>)
         data = data.plus("projects", projects.plus(p.name, p))
         fireUpdate()
     }

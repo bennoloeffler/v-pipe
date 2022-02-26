@@ -204,7 +204,7 @@ class View {
                     size:[(int)(screenDimension.width), (int)(screenDimension.height - 50)],
                     location: [0,0],
                     iconImage: frameIcon,
-                    title: 'v-pipe    |  +/- = Zoom  |  Pfeile = Cursor bewegen  |  Shift+Pfeile = Projekt bewegen  |  d = Details an/aus  |  n = now  |  Strg+Pfeile = Tasks vergr./verkl.',
+                    title: 'v-pipe:  +/- = Zoom  |  Pfeile = Cursor bewegen  |  Shift+Pfeile = Projekt bewegen  |  d = Details an/aus  |  n = now  |  Strg+Pfeile = Tasks vergr./verkl.  |  m = Mittelwert',
                     locationRelativeTo: null,
                     show: true,
                     defaultCloseOperation: JFrame.DO_NOTHING_ON_CLOSE) {

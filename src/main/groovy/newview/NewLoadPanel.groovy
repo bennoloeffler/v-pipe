@@ -10,6 +10,7 @@ import javax.swing.JPanel
 import javax.swing.JToolTip
 import javax.swing.SwingUtilities
 import javax.swing.ToolTipManager
+import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.Font
@@ -17,6 +18,7 @@ import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.Point
 import java.awt.Rectangle
+import java.awt.Stroke
 import java.awt.event.FocusEvent
 import java.awt.event.FocusListener
 import java.awt.event.KeyEvent
@@ -32,6 +34,9 @@ enum ToolTipDetails {
     no, some, details
 }
 
+enum ShowAverageValue {
+    no, yes
+}
 @CompileStatic
 class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, FocusListener, PanelBasics {
 
@@ -44,6 +49,8 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
     //int nameWidth
 
     @Bindable ToolTipDetails detailsToolTip = ToolTipDetails.some
+
+    ShowAverageValue showAverageValue = ShowAverageValue.yes
 
     @Bindable hScrollBarValueZoomingSync
 
@@ -212,6 +219,10 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
 
         int keyCode = e.getExtendedKeyCode()
 
+        if(KeyEvent.VK_M == keyCode) {
+            setShowAverageValue(showAverageValue.next())
+        }
+
         if(KeyEvent.VK_D == keyCode) {
             setDetailsToolTip(detailsToolTip.next())
             if(detailsToolTip == ToolTipDetails.some || detailsToolTip == ToolTipDetails.details) {
@@ -339,6 +350,7 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
                                     maxValAndRed,
                                     element.yellow,
                                     element.red,
+                                    element.loadMovingAvg,
                                     gridX,
                                     gridY)
                         }
@@ -486,7 +498,7 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
     }
 
     @CompileStatic
-    def drawGridElementYelloRed(Graphics2D g,  Double val, Double valProject, Double max, Double yellow, Double red, int x, int y) {
+    def drawGridElementYelloRed(Graphics2D g,  Double val, Double valProject, Double max, Double yellow, Double red, Double avg, int x, int y) {
 
         RunTimer.getTimerAndStart("${this.name} NewLoadPanel::drawGridElementYelloRed").withCloseable {
 
@@ -538,6 +550,17 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
             g.fillRoundRect(x + (int) (sizeX * 0.2), y + percentShiftProject, sizeX - 4 - (int) (sizeX * 0.4), (int) (percentProject * (sizeY - 4)), round, round)
 
 
+            //
+            // draw average
+            //
+            if(showAverageValue == ShowAverageValue.yes) {
+                Double percentAvg = (Double) (avg / max)
+                percentShift = (int) ((sizeY - 4) - percentAvg * (sizeY - 4))
+                g.setColor(Color.CYAN)
+                g.drawLine(x, y + percentShift, x + sizeX - 4, y + percentShift)
+                //g.setColor(Color.BLUE)
+                g.drawLine(x, y + 1 + percentShift, x + sizeX - 4, y + 1 + percentShift)
+            }
             //
             // draw max-line of yellow and read
             //
