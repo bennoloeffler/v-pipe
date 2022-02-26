@@ -63,7 +63,7 @@ class DataWriter {
 
         filesToMove.each { fileName ->
             File from = new File( DataReader.path(fileName))
-            File to = new File(bDir + '\\' + fileName)
+            File to = new File(bDir + '/' + fileName)
             //def r = from.renameTo(to)
             //println(to.getCanonicalPath())
             //to.createNewFile()

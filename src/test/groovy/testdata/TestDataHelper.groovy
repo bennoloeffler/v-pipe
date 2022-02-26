@@ -4,7 +4,7 @@ import core.LoadCalculator
 import model.DataReader
 import model.Model
 import model.TaskInProject
-import model.PipelineOriginalElement
+import model.PipelineElement
 
 class TestDataHelper {
 
@@ -60,7 +60,7 @@ class TestDataHelper {
     }
 
     static def pe(pr, s, e, c) {
-        new PipelineOriginalElement(project: pr, startDate: s, endDate: e, pipelineSlotsNeeded: c)
+        new PipelineElement(project: pr, startDate: s, endDate: e, pipelineSlotsNeeded: c)
     }
 
     static def cleanAllDataFiles() {

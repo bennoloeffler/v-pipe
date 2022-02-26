@@ -1,6 +1,6 @@
 package transform
 
-import model.PipelineOriginalElement
+import model.PipelineElement
 
 import static testdata.TestDataHelper.pe
 
@@ -14,8 +14,8 @@ class PipelineTest extends GroovyTestCase {
 
         Pipeline p = new Pipeline(1)
 
-        List<PipelineOriginalElement> l = [pe('p1', '22.4.2020'.toDate(),'23.4.2020'.toDate(), 1),
-                                           pe('p2', '22.4.2020'.toDate(),'23.4.2020'.toDate(), 1)]
+        List<PipelineElement> l = [pe('p1', '22.4.2020'.toDate(),'23.4.2020'.toDate(), 1),
+                                   pe('p2', '22.4.2020'.toDate(),'23.4.2020'.toDate(), 1)]
         l.each {
             p.addNext(it)
         }
@@ -31,10 +31,10 @@ class PipelineTest extends GroovyTestCase {
      */
     void testGetProjectShift() {
         Pipeline p = new Pipeline(1)
-        PipelineOriginalElement poe = pe('p1', '22.4.2020'.toDate(),'22.4.2020'.toDate(), 1)
+        PipelineElement poe = pe('p1', '22.4.2020'.toDate(),'22.4.2020'.toDate(), 1)
 
-        List<PipelineOriginalElement> l = [pe('p1', '22.4.2020'.toDate(),'23.4.2020'.toDate(), 1),
-                                           pe('p2', '22.4.2020'.toDate(),'23.4.2020'.toDate(), 1)]
+        List<PipelineElement> l = [pe('p1', '22.4.2020'.toDate(),'23.4.2020'.toDate(), 1),
+                                   pe('p2', '22.4.2020'.toDate(),'23.4.2020'.toDate(), 1)]
         l.each {
             p.addNext(it)
         }
@@ -51,10 +51,10 @@ class PipelineTest extends GroovyTestCase {
 
         Pipeline p = new Pipeline(2)
 
-        List<PipelineOriginalElement> l = [pe('p1', '22.4.2020'.toDate(),'23.4.2020'.toDate(), 1),
-                                           pe('p2', '22.4.2020'.toDate(),'25.4.2020'.toDate(), 1),
-                                           pe('p3', '22.4.2020'.toDate(),'23.4.2020'.toDate(), 1),
-                                           pe('p4', '22.4.2020'.toDate(),'23.4.2020'.toDate(), 1)]
+        List<PipelineElement> l = [pe('p1', '22.4.2020'.toDate(),'23.4.2020'.toDate(), 1),
+                                   pe('p2', '22.4.2020'.toDate(),'25.4.2020'.toDate(), 1),
+                                   pe('p3', '22.4.2020'.toDate(),'23.4.2020'.toDate(), 1),
+                                   pe('p4', '22.4.2020'.toDate(),'23.4.2020'.toDate(), 1)]
         l.each {
             p.addNext(it)
         }
@@ -100,10 +100,10 @@ class PipelineTest extends GroovyTestCase {
 
         Pipeline p = new Pipeline(2)
 
-        List<PipelineOriginalElement> l = [pe('p1', '1.4.2020'.toDate(),'2.4.2020'.toDate(), 1),
-                                           pe('p2', '1.4.2020'.toDate(),'3.4.2020'.toDate(), 1),
-                                           pe('p3', '1.4.2020'.toDate(),'3.4.2020'.toDate(), 2), // HERE!
-                                           pe('p4', '1.4.2020'.toDate(),'3.4.2020'.toDate(), 1)]
+        List<PipelineElement> l = [pe('p1', '1.4.2020'.toDate(),'2.4.2020'.toDate(), 1),
+                                   pe('p2', '1.4.2020'.toDate(),'3.4.2020'.toDate(), 1),
+                                   pe('p3', '1.4.2020'.toDate(),'3.4.2020'.toDate(), 2), // HERE!
+                                   pe('p4', '1.4.2020'.toDate(),'3.4.2020'.toDate(), 1)]
 
         l.each {
             p.addNext(it)
@@ -155,10 +155,10 @@ class PipelineTest extends GroovyTestCase {
 
         Pipeline p = new Pipeline(2)
 
-        List<PipelineOriginalElement> l = [pe('p1', '1.4.2020'.toDate(),'6.4.2020'.toDate(), 1),
-                                           pe('p2', '1.4.2020'.toDate(),'3.4.2020'.toDate(), 1),
-                                           pe('p3', '1.4.2020'.toDate(),'3.4.2020'.toDate(), 2), // HERE!
-                                           pe('p4', '1.4.2020'.toDate(),'30.4.2020'.toDate(), 2)]
+        List<PipelineElement> l = [pe('p1', '1.4.2020'.toDate(),'6.4.2020'.toDate(), 1),
+                                   pe('p2', '1.4.2020'.toDate(),'3.4.2020'.toDate(), 1),
+                                   pe('p3', '1.4.2020'.toDate(),'3.4.2020'.toDate(), 2), // HERE!
+                                   pe('p4', '1.4.2020'.toDate(),'30.4.2020'.toDate(), 2)]
 
         l.each {
             p.addNext(it)

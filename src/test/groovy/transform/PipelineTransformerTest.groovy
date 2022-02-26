@@ -1,10 +1,10 @@
 package transform
 
-import core.LoadCalculator
+
 import core.VpipeException
 import model.DataReader
 import model.Model
-import model.PipelineOriginalElement
+import model.PipelineElement
 import testdata.TestDataHelper
 
 import static testdata.TestDataHelper.pe
@@ -14,7 +14,7 @@ import static testdata.TestDataHelper.t
 class PipelineTransformerTest extends GroovyTestCase {
 
     File f
-    List<PipelineOriginalElement> listOfPOEs
+    List<PipelineElement> listOfPOEs
 
     void setUp() {
         f = new File(DataReader.get_PIPELINING_FILE_NAME())

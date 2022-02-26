@@ -8,12 +8,6 @@ import utils.FileSupport
 import groovy.transform.ToString
 import utils.RunTimer
 
-/*
-class CapaDetailsEntry {
-    BigDecimal value
-    Map<String, Double> projectDetails // percentage of all project of valueAbs (sum of projectDetails = 100% = valueAbs)
-}*/
-
 /**
  * this does the raw data calculation:
  * call calcDepartmentWeekLoad
@@ -30,17 +24,7 @@ class LoadCalculator {
     Map<String, Map<String, Double>> depTimeLoadMap // compared to maxRed, if capaAvailable
     Map<String, Double> maxRed // the maximum red value (> red limit) or red limit (if value < red limit)
 
-
-    // new data
-    //Map<String, Map<String, CapaDetailsEntry>> capaLoadAbsolut = [:] // compared to maxRed, if capaAvailable
-    //Map<String, Map<String, CapaDetailsEntry>> capaLoadPercent = [:] // compared to maxPercent, if capaAvailable
-    //Map<String, Double> maxAbsolut = [:] // the maximum value
-    //Map<String, Double> maxPercent = [:] // the maximum red value (> red limit) or red limit (if value < red limit)
-    //String currentProject = ""
-
-
-    //@Delegate
-    Model model //= new Model()
+    Model model
 
 
     LoadCalculator(Model model = null) {

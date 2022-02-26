@@ -18,11 +18,16 @@ import java.time.temporal.ChronoUnit
 import static extensions.DateHelperFunctions._getStartOfWeek
 import static extensions.DateHelperFunctions._sToD
 import static model.WeekOrMonth.WEEK
+import org.pcollections.*;
 
 
-
+// TODO make Compile Static
+// TODO use PCollections in order to create undo-history
 //@CompileStatic
 class Model {
+
+    PSet<String> set = HashTreePSet.empty();
+
 
     @Bindable
     boolean updateToggle
@@ -40,52 +45,39 @@ class Model {
         firePropertyChange('currentDir', this.currentDir, this.currentDir = new File(currentDir).getCanonicalPath().toString())
     }
 
+    //--------------------------------
+    //
+    //   DATA of the MODEL
+    //
+    //--------------------------------
+
     // all project tasks data
     List<TaskInProject> taskList =[]
 
-
+    // the corresponding delivery date
     Map<String, Date> deliveryDates = [:]
 
-    Date getDeliveryDate(String project) {
-        def date = deliveryDates[project]
-        if (! date) {
-            def projectTasks = getProject(project)
-            date = (projectTasks*.ending).max()
-            deliveryDates[project] = date
-        }
-        date
-    }
-
-
-
-    //
+    // this copies and moves the projects from taskList
     List<List> scenarioProjects =[]
-    // stable sorted project list
-    //List<String> allProjectNames
-
-    //
-    // pipeline data
-    //
 
     // maximum number of parallel slots in pipeline
     int maxPipelineSlots = 0
 
-    // the original elements to feed into the pipeline
-    List<PipelineOriginalElement> pipelineElements = []
+    // the pipeline elements (to put into the pipeline). One for every project.
+    List<PipelineElement> pipelineElements = []
 
-    List<PipelineOriginalElement> templatePipelineElements = []
+    // those are the pipeline elements for templates
+    List<PipelineElement> templatePipelineElements = []
 
 
     /**
      * key: project name
      * value: integer, representing the shift of the project:
-     * +7 = delay one week to the future.
+     * +7 = all tasks one week to the future.
      * 0 = no shift.
-     * -7 = due date one week earlier.
+     * -7 = all dates one week earlier.
      */
     Map<String, Integer> projectDayShift = [:]
-
-    // capa available data
 
     /**
      * Cache for recalc of capaAvailable.
@@ -104,7 +96,7 @@ class Model {
     // all project template data
     List<TaskInProject> templateList =[]
 
-
+    // the sequence (e.g. if the user moves a project up or down)
     List<String> projectSequence = []
 
 
@@ -117,6 +109,19 @@ class Model {
      */
     String templatesPlainTextCache
     String templatesPipelineElementsPlainTextCache
+
+
+
+    Date getDeliveryDate(String project) {
+        def date = deliveryDates[project]
+        if (! date) {
+            def projectTasks = getProject(project)
+            date = (projectTasks*.ending).max()
+            deliveryDates[project] = date
+        }
+        date
+    }
+
 
     /**
      * @param project
@@ -170,8 +175,8 @@ class Model {
     }
 
 
-    PipelineOriginalElement getPipelineElement(String project) {
-        PipelineOriginalElement e = pipelineElements.find {
+    PipelineElement getPipelineElement(String project) {
+        PipelineElement e = pipelineElements.find {
             it.project == project
         }
         e
@@ -186,8 +191,8 @@ class Model {
     }
 
 
-    PipelineOriginalElement copyPipelineFromTemplate(String templateName, String copyName, Date copyEndDate) {
-        PipelineOriginalElement pe =  templatePipelineElements.find { templateName == it.project }.clone()
+    PipelineElement copyPipelineFromTemplate(String templateName, String copyName, Date copyEndDate) {
+        PipelineElement pe =  templatePipelineElements.find { templateName == it.project }.clone()
         assert pe
         pe.project = copyName
         def t = getTemplate(templateName)
@@ -214,14 +219,14 @@ class Model {
         copy
     }
 
-    PipelineOriginalElement createPipelineForProject (List<TaskInProject> project) {
+    PipelineElement createPipelineForProject (List<TaskInProject> project) {
 
         // exactly ONE element in a newly created project!
         assert project
         assert project[0]
         assert project.size() == 1
 
-        PipelineOriginalElement pe =  new PipelineOriginalElement(
+        PipelineElement pe =  new PipelineElement(
                 project: project[0].project,
                 startDate: project[0].starting,
                 endDate: project[0].ending,
@@ -566,7 +571,7 @@ class Model {
         }
     }
 
-    def checkOnePipelineToEachProject(List<TaskInProject> projects, List<PipelineOriginalElement> pipelineElements, String templateOrData) {
+    def checkOnePipelineToEachProject(List<TaskInProject> projects, List<PipelineElement> pipelineElements, String templateOrData) {
 
         Set<String> pipProjects = pipelineElements*.project.unique().toSet()
         Set<String> projProjects = projects*.project.unique().toSet()

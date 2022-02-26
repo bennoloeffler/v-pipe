@@ -31,6 +31,8 @@ dependencies {
     implementation name: 'flatlaf-0.37'
     implementation name: 'miglayout-4.0-swing' //ADD LOCAL LIB... it does not download...
     implementation group: 'org.codehaus.gpars', name: 'gpars', version: '1.2.1'
+    implementation 'org.pcollections:pcollections:3.1.4'
+
 
     //implementation 'net.java.balloontip:balloontip:1.2.4.1'
 
@@ -183,7 +185,7 @@ task copyExeLibsJRE {
         }
 
         copy {
-            from "v-pipe-macos.sh"
+            from "v-pipe-macos.sh.command"
             into tempDist
         }
 

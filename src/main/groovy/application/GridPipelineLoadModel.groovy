@@ -13,7 +13,7 @@ import java.beans.PropertyChangeEvent
 
 import static extensions.DateHelperFunctions._getStartOfWeek
 
-class GridPipelineLoadModel extends AbstractGridLoadModel  {
+class GridPipelineLoadModel extends AbstractGridLoadModel {
 
     Model model
 
@@ -28,6 +28,8 @@ class GridPipelineLoadModel extends AbstractGridLoadModel  {
     def updateCallback = {
         updateAllFromModelData()
     }
+
+
 
     GridPipelineLoadModel(Model model, WeekOrMonth weekOrMonth = WeekOrMonth.WEEK) {
         this.model = model

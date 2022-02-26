@@ -1,6 +1,6 @@
 package model
 
-import groovy.transform.Immutable
+
 import org.joda.time.Interval
 
 /**
@@ -8,7 +8,7 @@ import org.joda.time.Interval
  */
 //@Immutable
 //@ToString
-class  PipelineOriginalElement {
+class PipelineElement {
 
     String project
     Date startDate
@@ -23,8 +23,8 @@ class  PipelineOriginalElement {
         "Pipline-Element($project ${startDate.toString()} ${endDate.toString()} $pipelineSlotsNeeded)"
     }
 
-    PipelineOriginalElement cloneFromTemplate(String otherProject, int dayShift) {
-        def poe = new PipelineOriginalElement(
+    PipelineElement cloneFromTemplate(String otherProject, int dayShift) {
+        def poe = new PipelineElement(
                 project: otherProject,
                 startDate: this.startDate + dayShift,
                 endDate: this.endDate + dayShift,
@@ -32,14 +32,14 @@ class  PipelineOriginalElement {
         poe
     }
 
-    PipelineOriginalElement clone() {
-        new PipelineOriginalElement(
+    PipelineElement clone() {
+        new PipelineElement(
                 project: project,
                 startDate: startDate,
                 endDate: endDate,
                 pipelineSlotsNeeded: pipelineSlotsNeeded)
     }
-    // TODO: move to abstract base class eg "StartEndDayElement"
+    // TODO: TRAIT... move to abstract base class eg "StartEndDayElement"
     long getDaysOverlap(Date intervalStart, Date intervalEnd) {
         assert startDate < endDate
         assert intervalStart < intervalEnd

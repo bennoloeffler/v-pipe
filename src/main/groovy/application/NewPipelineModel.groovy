@@ -1,12 +1,9 @@
 package application
 
 import groovy.beans.Bindable
-import groovy.transform.CompileStatic
-import groovy.transform.Memoized
-import groovy.transform.TypeCheckingMode
 import groovyx.gpars.GParsPool
 import model.Model
-import model.PipelineOriginalElement
+import model.PipelineElement
 import model.TaskInProject
 import model.WeekOrMonth
 import newview.GridElement
@@ -15,12 +12,8 @@ import utils.RunTimer
 
 import java.beans.PropertyChangeEvent
 import java.beans.PropertyChangeListener
-import java.util.concurrent.Callable
-import java.util.concurrent.Future
 
 import static extensions.DateHelperFunctions.*
-import java.util.concurrent.Executors
-
 
 //@CompileStatic
 class NewPipelineModel extends GridModel {
@@ -127,7 +120,7 @@ class NewPipelineModel extends GridModel {
                 if (w >= startOfProject && w <= endOfProject) {
                     boolean integrationPhase = false
                     if(model.pipelineElements) {
-                        PipelineOriginalElement element = model.getPipelineElement(projectTasks[0].project)
+                        PipelineElement element = model.getPipelineElement(projectTasks[0].project)
                         long overlap = element.getDaysOverlap(w, w+7)
                         if(overlap){ integrationPhase = true }
                     }
@@ -195,7 +188,7 @@ class NewPipelineModel extends GridModel {
             it.starting += shift
         }
         if(model.pipelineElements) {
-            PipelineOriginalElement pe = model.getPipelineElement(projectName)
+            PipelineElement pe = model.getPipelineElement(projectName)
             pe.startDate += shift
             pe.endDate += shift
         }

@@ -2,7 +2,7 @@ package application
 
 import groovy.swing.SwingBuilder
 import model.Model
-import model.PipelineOriginalElement
+import model.PipelineElement
 
 import javax.swing.JComponent
 import javax.swing.JList
@@ -134,7 +134,7 @@ class ProjectTemplates {
             def theCopy = model.createProject(projectName, projectDate)
 
             // copy pipeline...
-            PipelineOriginalElement thePipelineCopy = null
+            PipelineElement thePipelineCopy = null
             if (model.pipelineElements) {
                 thePipelineCopy = model.createPipelineForProject(theCopy)
                 assert thePipelineCopy
@@ -160,7 +160,7 @@ class ProjectTemplates {
             def theCopy = model.copyFromTemplate(templateName, projectName, projectDate)
 
             // copy pipeline...
-            PipelineOriginalElement  thePipelineCopy = null
+            PipelineElement thePipelineCopy = null
             if(model.pipelineElements) {
                 thePipelineCopy = model.copyPipelineFromTemplate(templateName, projectName, projectDate)
                 assert thePipelineCopy

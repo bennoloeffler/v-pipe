@@ -176,7 +176,7 @@ class DataReader {
      */
     static class PipelineResult {
         Integer maxPipelineSlots
-        List<PipelineOriginalElement> elements
+        List<PipelineElement> elements
     }
     static PipelineResult readPipelining() {
         String text = FileSupport.getTextOrEmpty(get_PIPELINING_FILE_NAME())
@@ -190,7 +190,7 @@ class DataReader {
 
     static PipelineResult parsePipelining(List<List<String>> splitLines) {
         int maxPipelineSlots = 0
-        List<PipelineOriginalElement> pipelineElements = []
+        List<PipelineElement> pipelineElements = []
         if(splitLines) {
             try {
                 maxPipelineSlots = splitLines[0][0].toInteger()
@@ -218,7 +218,7 @@ class DataReader {
                     if(line[3].toInteger() > maxPipelineSlots) {
                         throw new VpipeDataException(errMsg() +"\nerforderliche Pipeline-Slots (${line[3].toInteger()}) größer als Maximum($maxPipelineSlots)")
                     }
-                    def pe = new PipelineOriginalElement(
+                    def pe = new PipelineElement(
                             project: line[0],
                             startDate: start,
                             endDate: end,
@@ -245,18 +245,18 @@ class DataReader {
     /**
      * pipeline templates
      */
-    static List<PipelineOriginalElement> readPipeliningTemplates() {
+    static List<PipelineElement> readPipeliningTemplates() {
         String text = FileSupport.getTextOrEmpty(get_PIPELINING_TEMPLATE_FILE_NAME())
         return readPipeliningTemplates(text)
     }
 
-    static List<PipelineOriginalElement>  readPipeliningTemplates(String text) {
+    static List<PipelineElement>  readPipeliningTemplates(String text) {
         List<List<String>> splitLines =  FileSupport.toSplitAndTrimmedLines(text)
         return parsePipeliningTemplates(splitLines)
     }
 
-    static List<PipelineOriginalElement>  parsePipeliningTemplates(List<List<String>> splitLines) {
-        List<PipelineOriginalElement> pipelineElements = []
+    static List<PipelineElement>  parsePipeliningTemplates(List<List<String>> splitLines) {
+        List<PipelineElement> pipelineElements = []
 
         if(splitLines.size()>0) {
             (0..splitLines.size()-1).each {
@@ -276,7 +276,7 @@ class DataReader {
                     if(line[3].toInteger() > maxPipelineSlots) {
                         throw new VpipeDataException(errMsg() +"\nerforderliche Pipeline-Slots (${line[3].toInteger()}) größer als Maximum($maxPipelineSlots)")
                     }*/
-                    def pe = new PipelineOriginalElement(
+                    def pe = new PipelineElement(
                             project: line[0],
                             startDate: start,
                             endDate: end,

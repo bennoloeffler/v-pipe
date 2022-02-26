@@ -3,7 +3,7 @@ package application
 import groovy.beans.Bindable
 import groovy.transform.CompileStatic
 import model.Model
-import model.PipelineOriginalElement
+import model.PipelineElement
 import model.TaskInProject
 import model.WeekOrMonth
 import newview.GridElement
@@ -103,7 +103,7 @@ class NewProjectModel extends GridModel {
         return gridElements
     }
 
-    List<GridElement> fromPipelineElement(PipelineOriginalElement element, Date startOfGrid, Date endOfGrid) {
+    List<GridElement> fromPipelineElement(PipelineElement element, Date startOfGrid, Date endOfGrid) {
         assert element
         def gridElements = []
 

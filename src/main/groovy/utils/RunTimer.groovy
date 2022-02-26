@@ -117,17 +117,29 @@ class RunTimer implements Closeable{
     }
 
     static void main(String[] args) {
-        def t0 = getTimerAndStart("someShortest")
+        def t0 = getTimerAndStart("almostNoTime")
         t0.stop()
-        def t = getTimerAndStart("someLongest#2")
+        def t = getTimerAndStart("longest")
         sleep(500)
         t.stop()
-        t = getTimerAndStart("someLongest#2")
+        t = getTimerAndStart("longest")
         sleep(200)
         t.stop()
-        def t2 = getTimerAndStart("someOther")
+        def t2 = getTimerAndStart("inBetween")
         sleep(100)
         t2.stop()
+
+        // AutoClose... even with Exception...
+        try {
+            getTimerAndStart("belsMethodWithException").withCloseable {
+                sleep(100)
+            }
+            getTimerAndStart("belsMethodWithException").withCloseable {
+                sleep(100)
+                throw new RuntimeException("fuck...")
+            }
+        } catch(Exception e) {}
+
         printTimerResults()
     }
 

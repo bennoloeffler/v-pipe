@@ -183,7 +183,7 @@ class MainGui {
         //
         view.start {
             String dirToOpen ="./bsp-daten"
-            controller.openDir(dirToOpen)
+            //controller.openDir(dirToOpen)
             model.currentDir = dirToOpen
         }
 

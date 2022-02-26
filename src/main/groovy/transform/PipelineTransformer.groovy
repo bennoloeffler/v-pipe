@@ -1,13 +1,11 @@
 package transform
 
 import model.DataReader
-import model.Model
-import model.PipelineOriginalElement
+import model.PipelineElement
 import model.TaskInProject
 import model.VpipeDataException
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
-import groovy.transform.Immutable
 import groovy.transform.InheritConstructors
 
 
@@ -18,7 +16,7 @@ import groovy.transform.InheritConstructors
 class PipelineCalcElement {
     Date startDateCalc
     Date endDateCalc
-    PipelineOriginalElement originalElement
+    PipelineElement originalElement
 
     String toString() { // for the Dates to be readable
         "Pipline-Ergebnis(${startDateCalc.toString()} ${endDateCalc.toString()} <-- ${originalElement.toString()})"
@@ -92,7 +90,7 @@ class Pipeline {
      * Or distribute it, when it occupies more that one slot.
      * @param poe
      */
-    def addNext(PipelineOriginalElement poe) {
+    def addNext(PipelineElement poe) {
         if (poe.pipelineSlotsNeeded > pipeline.size()) {
             throw new VpipeDataException("Staffelungs-Element braucht mehr Slots ($poe.pipelineSlotsNeeded)\nals verfügbar (${pipeline.size()}).\n${poe.toString()}")
         }
