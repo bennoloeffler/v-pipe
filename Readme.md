@@ -304,6 +304,12 @@ gleichzeitig gearbeitet werden soll.
 ### BUGS to fix
 - start on macos directly in from dropbox (on Caros mac)
 
+### Next Release
+1.6.0
+- can only open valid data folders
+- can create new model from GUI
+- simplified creation of capadity model
+
 ### Release History
 
 2022-02-27 `1.5.0-average-load`

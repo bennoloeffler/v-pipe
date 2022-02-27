@@ -1,5 +1,6 @@
 package application
 
+import model.DataReader
 import model.DataWriter
 import model.Model
 import model.VpipeDataException
@@ -9,6 +10,7 @@ import utils.SystemInfo
 import javax.swing.JComponent
 import javax.swing.JFileChooser
 import javax.swing.JOptionPane
+import javax.swing.filechooser.FileFilter
 import java.awt.event.ActionEvent
 
 class GlobalController {
@@ -22,7 +24,7 @@ class GlobalController {
     }
 
     def openActionPerformed = { ActionEvent e ->
-        if(checkSave(false)) {
+        if (checkSave(false)) {
             String dir = chooseDir('Datenverzeichnis öffnen', (JComponent) (e.source), "Verzeichnis auswählen & Daten-Dateien von dort lesen")
             if (dir) {
                 openDir(dir)
@@ -44,7 +46,7 @@ class GlobalController {
 
     def saveAsActionPerformed = { ActionEvent e ->
         //println("saveActionPerformed")
-        String dir = chooseDir('Datenverzeichnis zum Speichern wählen', (JComponent)(e.source), "Verzeichnis auswählen & Daten-Dateien dort speichern")
+        String dir = chooseDir('Datenverzeichnis zum Speichern wählen', (JComponent) (e.source), "Verzeichnis auswählen & Daten-Dateien dort speichern")
         if (dir) {
             model.setCurrentDir(dir)
             DataWriter dw = new DataWriter(model: model)
@@ -52,7 +54,7 @@ class GlobalController {
         }
     }
 
-    def sortPipelineActionPerformed = {ActionEvent e ->
+    def sortPipelineActionPerformed = { ActionEvent e ->
         //println("sortPipelineActionPerformed")
         view.gridPipelineModel.sortProjectNamesToEnd()
     }
@@ -73,28 +75,59 @@ class GlobalController {
         view.openProjectWindow()
     }
 
-    def helpActionPerformed = {ActionEvent e ->
+    def helpActionPerformed = { ActionEvent e ->
         Main.openBrowserWithHelp()
     }
 
-    def printPerformanceActionPerformed = {ActionEvent e ->
+    def printPerformanceActionPerformed = { ActionEvent e ->
         println(SystemInfo.getSystemInfoTable())
         println(RunTimer.getResultTable())
     }
 
-    def compareActionPerformed = {ActionEvent e ->
+    def compareActionPerformed = { ActionEvent e ->
         println(e.getSource())
     }
 
 
-
-
     private String chooseDir(String dialogTitle, JComponent root, String applyButtonText) {
         String result = null
-        JFileChooser fc = new JFileChooser(new File(model.currentDir))
+        JFileChooser fc = new JFileChooser(new File(model.currentDir)) {
+            void approveSelection() {
+                def absDataFileName = getSelectedFile().getAbsolutePath() +"/" + DataReader.TASK_FILE_NAME
+                if (getSelectedFile().isDirectory() &&
+                        (new File(absDataFileName).exists())) {
+                    super.approveSelection()
+                }
+            }
+
+        }
         fc.setDialogTitle(dialogTitle)
-        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY, )
+        fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES)
         fc.setApproveButtonText(applyButtonText)
+        fc.setApproveButtonToolTipText("Im gewählten Verzeichnis müssen gültige Daten liegen.")
+
+        /*
+        FileFilter ff = new FileFilter() {
+             boolean accept(File f) {
+                if (f.isDirectory()) return true
+                DataWriter.ALL_DATA_FILES.each { fileName ->
+                    //println "check: " + fileName + " in? " + f.absolutePath.toString()
+                    if (f.absolutePath.contains(fileName)) {
+                        println "found: " + fileName + " in: " + f.absolutePath
+                        return true
+                    }
+                }
+                return false
+            }
+
+            @Override
+            String getDescription() {
+                return "alle v-pipe Daten-Dateien"
+            }
+        }
+        fc.setFileFilter(ff)
+         */
+
         int returnVal = fc.showOpenDialog(root)
 
         if (returnVal == JFileChooser.APPROVE_OPTION) {

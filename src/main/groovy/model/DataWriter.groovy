@@ -44,24 +44,25 @@ class DataWriter {
         f << data
     }
 
+    static List<String> ALL_DATA_FILES = [
+            DataReader.TASK_FILE_NAME,
+            DataReader.PIPELINING_FILE_NAME,
+            DataReader.DATESHIFT_FILE_NAME,
+            DataReader.CAPA_FILE_NAME,
+            DataReader.SCENARIO_FILE_NAME,
+            DataReader.SEQUENCE_FILE_NAME,
+            DataReader.PROJECT_TEMPLATE_FILE_NAME,
+            DataReader.PROJECT_TEMPLATE_FILE_NAME,
+            DataReader.PROJECT_DELIVERY_DATE_FILE_NAME
+    ]
 
     def backup() {
-        def filesToMove = [
-                DataReader.TASK_FILE_NAME,
-                DataReader.PIPELINING_FILE_NAME,
-                DataReader.DATESHIFT_FILE_NAME,
-                DataReader.CAPA_FILE_NAME,
-                DataReader.SCENARIO_FILE_NAME,
-                DataReader.SEQUENCE_FILE_NAME,
-                DataReader.PROJECT_TEMPLATE_FILE_NAME,
-                DataReader.PROJECT_TEMPLATE_FILE_NAME,
-                DataReader.PROJECT_DELIVERY_DATE_FILE_NAME
-        ]
+
 
         def bDir = FileSupport.backupDirName(DataReader.currentDir)
         assert new File(bDir).mkdirs()
 
-        filesToMove.each { fileName ->
+        ALL_DATA_FILES.each { fileName ->
             File from = new File( DataReader.path(fileName))
             File to = new File(bDir + '/' + fileName)
             //def r = from.renameTo(to)
