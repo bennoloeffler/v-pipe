@@ -165,18 +165,9 @@ class GridLoadModel extends AbstractGridLoadModel {
     }
 
     void calcAverageValues() {
-        /*
-        model.getAllDepartments().each { String department ->
-            model.getFullSeriesOfTimeKeys(weekOrMonth).each { String timeStr ->
-            }
-        }
-         */
-        //gridElements[department][timeStr]
-        //abstract GridLoadElement getElement(int x, int y)
-        //abstract int getSizeY()
-        //abstract int getSizeX()
         model.getAllDepartments().each { String department ->
             def ma = { gridElements[department]*.getValue().load } as MovingAverage
+            ma.howMany = 5
             def maList = ma.getAverageValues()
             def i = 0
             gridElements[department].each {
@@ -184,4 +175,5 @@ class GridLoadModel extends AbstractGridLoadModel {
             }
         }
     }
+
 }

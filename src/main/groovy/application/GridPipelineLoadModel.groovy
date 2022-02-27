@@ -30,7 +30,6 @@ class GridPipelineLoadModel extends AbstractGridLoadModel {
     }
 
 
-
     GridPipelineLoadModel(Model model, WeekOrMonth weekOrMonth = WeekOrMonth.WEEK) {
         this.model = model
         this.weekOrMonth = weekOrMonth
@@ -119,7 +118,7 @@ class GridPipelineLoadModel extends AbstractGridLoadModel {
 
     @Override
     List<String> getYNames() {
-        return  model.pipelineElements ? ['IP-Belastung'] : []
+        return model.pipelineElements ? ['IP-Belastung'] : []
 
     }
 
@@ -129,25 +128,15 @@ class GridPipelineLoadModel extends AbstractGridLoadModel {
     }
 
     void calcAverageValues() {
-        /*
-        model.getAllDepartments().each { String department ->
-            model.getFullSeriesOfTimeKeys(weekOrMonth).each { String timeStr ->
-            }
+        def ma = {
+            gridElements.values()*.load
+        } as MovingAverage
+        ma.howMany = 5
+        def maList = ma.getAverageValues()
+        def i = 0
+        gridElements.each {
+            it.value.loadMovingAvg = maList[i++]
         }
-         */
-        //gridElements[department][timeStr]
-        //abstract GridLoadElement getElement(int x, int y)
-        //abstract int getSizeY()
-        //abstract int getSizeX()
-            def ma = {
-                def r = gridElements.values()*.load
-                r
-            } as MovingAverage
-            def maList = ma.getAverageValues()
-            def i = 0
-            gridElements.each {
-                it.value.loadMovingAvg = maList[i++]
-            }
     }
 
 

@@ -13,6 +13,10 @@ class MovingAverageTest extends GroovyTestCase {
 
     def ma = { -> [1, 2, 3, 4, 5, 6] } as MovingAverage
 
+    def maEmpty = { -> [] } as MovingAverage
+
+    def maNull = { -> null } as MovingAverage
+
     void testGetResult() {
         ma.howMany = 3
         assert ma.getAverageValues() == [2, 3, 4, 5, 5.5, 6]
@@ -42,4 +46,13 @@ class MovingAverageTest extends GroovyTestCase {
         longestMA.howMany = 100
         longestMA.getAverageValues() // works...
     }
+
+    void testGetResultEmpty() {
+        assert maEmpty.getAverageValues() == []
+    }
+
+    void testGetResultNull() {
+        assert maNull.getAverageValues() == []
+    }
+
 }
