@@ -8,14 +8,21 @@ Es gibt die Möglichkeit, Projekte zu verschieben
 und Portfolio-Szenarien zu modellieren.  
 Quickstart- Video? [Hier Klicken...](https://loom.com/share/folder/098a2ada42f647bfbbcc89e4d0e4a202)
 
-## Installation
+## Start direkt in der V&S-Dropbox
+Auf der Dropbox liegt eine lauffähige Installation.
+1. Den Produkt-Ordner "01_CCPM" synchronisieren.
+2. Doppelklick auf:
+   VundS/A_Leistungsteams/A_02_Leistungserstellung/A_0205_Produkte/
+   01_CCPM/06_V-Pipe/start-v-pipe-macos
 
-Die Distribution ist ein `v-pipe-major.minor.bugfix-ReleaseName.zip`.  
+## Lokale Installation
+Die Distribution ist ein `v-pipe-major.minor.bugfix-ReleaseName.zip`.    
+Beispiel: v-pipe-1.4.4.zip  
 Dieses Zip-File entpacken - ideal in das Verzeichnis:  
 `c:\v-pipe`. Aber auch gerne auf einen Memory-Stick. Tut auch.  
 In Win10 braucht man dazu keinen "Zipper".    
 1. Zip-File v-pipe-x.y.z-release.zip 'irgendwo' ablegen.  
-2. Per Explorer (WIN+E) das v-pipe.zip 'anklicken'.
+2. Im Explorer (WIN+E) das v-pipe.zip 'anklicken'.
 Einfach im Explorer einmal draufklicken.  
 3. Inhalte des zip-files werden wie ein File-System angezeigt.  
 4. Oberes Verzeichnis (`v-pipe`) per Copy&Paste mit CTRL-C 'kopieren'  
@@ -34,7 +41,8 @@ in den Einstellungen des Plugins unter
 Einstellungen/Erweiterungen/MarkdownPreviewPlus:  
 Option: *Zugriff auf Datei-URLs zulassen* aktivieren 
 - `v-pipe.exe` (der Starter - Doppelklick und los geht's.)
-- `v-pipe-gui.exe` (visuelle Darstellung - Doppelklick und los.)  
+- `v-pipe-gui.exe` (WIN-Starter: visuelle Darstellung - Doppelklick und los.)  
+- `v-pipe-macos.sh.command` (MACOS-Starter - Doppelklick)
 - `lib` (ein paar Java-Bibliotheken. Finger weg ;-))  
 - `jre` (eine Java-Laufzeit-Umgebung. Nicht anfassen...)
 - `bsp-daten` (alle Daten-Dateien als funktionierende Beispiele)
@@ -54,12 +62,12 @@ Option: *Zugriff auf Datei-URLs zulassen* aktivieren
 
 ## Anwendung
 
-### Start von v-pipe  
+### Start von v-pipe, wenn die Daten bereinigt werden müssen...  
 
 Einfach Doppelklick auf `v-pipe.exe`. Das startet den  
 Deamon-Mode: v-pipe lauert jetzt auf Veränderungen  
 der Daten-Dateien und zeigt Fehlermeldungen oder rechnet.  
-Mit v-pipe-exe bekommt man die Daten schnell konsistent.  
+Mit v-pipe.exe bekommt man die Daten schnell konsistent.  
 Wenn die Daten konstistent sind, dann graphische Oberfläche starten:  
 `v-pipe-gui.exe` (startet nur, wenn konsistente Daten da sind...)
 
@@ -281,20 +289,25 @@ gleichzeitig gearbeitet werden soll.
 
 ## Realease
 
-### Features
+### Planned Features
 
-TODO: 20XX-XX-XX `1.3.0-RELEASE-operative-Grobplanung`
-
-TODO: 20XX-XX-XX `1.2.0-Data-Input-Adapters`
-- plugins with several examples
-
-TODO: 20XX-XX-XX `1.5.0-Überlast-Monats-glätten`
-- monthly view (in addition to weekly) (every week is an average of the last)
-
-### BUGS TO FIX / Urgent Features
+- settings file für user: aktuelles Verzeichnis, details, offene Fenster, Window-Size, Splitter, ...
+- Finanz-Zahlen und damit Durchsatz-Kennzahlen
+- Daten-Bereinigungs-Modus in GUI
+- Monats-weise Darstellung auch in GUI
 - adapter elegantly import project data
 - backlog of department for X weeks (in order to simulate "additional work")
 - copy from project (in three tabs (template, new, copy))
+- monthly view (in addition to weekly) (every week is an average of the last)
+
+### BUGS to fix
+- start on macos directly in from dropbox (on Caros mac)
+
+### Release History
+
+2022-02-27 `1.5.0-average-load`
+- show load average (5 weeks moving average) by pressing 'a'
+- created starter for dropbox
 
 2022-02-13 `1.4.4-delivery-date-macos`
 - create delivery date from last task, if not available
@@ -417,42 +430,16 @@ Das ist nur vernünftig in verschiedenen Verzeichnissen!
 - Lesen von Projekt-Start-End-Abt-Kapa.txt   
 - Schreiben von Department-Load-Result.txt
 
-### Bugs fixed
-- Department-Load-Result.txt ist ne Sparce-Matrix
-
-  
-### Bekannte Bugs und Feature-Requests  
-
-#### Bugs  
- 
-- Es scheint so, als ob v-pipe beim ersten Start zweimal nacheinander startet.  
-bzw. als ob kurz nach dem Start ein Neustart erfolgt. Harmlos, aber irritierend.
-Vermutlich der Virenscanner...
-- Der Sync der horizontalen Scrollbar funktioniert erst nachdem einmal gezoomt wurde.
 
 
-#### Features (zukünftig, angedacht) 
+
+## Features (zukünftig, angedacht, ideen - bisher nicht geplant) 
 
 wären nützlich - Nützlichkeit in absteigender Reihenfolge:  
 
-- Pipelining ohne "quetschen" - mit Löchen, die Termin-orientiert entstehen.  
-Also mäßige Auslastung. Dafür wäre es praktisch, 3 "Staffelungen" zu haben:
-1.) OPTION FILL PIPELINE: _tight (also ohne Lücken), 2: _gap (also mit Lücken, wenn Termine dazu führen) 
-2.) OPTION SORT_PROJECTS: sort_in_file, sort_pipeline_end_date, sort_project_end_date,  
-_search_latest (search the next one, that is latest compared to its delivery date)
-3:) vernünftig scheint: _gap und _search_latest 
+- Automatisches Pipelining
+- Monte-Carlo Simulation für "wenns gut läuft / wenns schlecht läuft"
 - Kommentare in Datenfiles erlauben. Solche: //
-- File-Polling in Excel (2s-readIfNewerThan10Sec and Paste) -   
-damit es eine Online-Visualisierung gibt.
-- Darstellung des Projektportfolios (kritischen Pfade, Staffelung, Kapa-Peaks)
-- Logging mit einfacher Konfigurierbarkeit durch Property-File  
-- Start Option Kommando-Zeile: Arbeitsverzeichnnis - eines oder mehrere
-- Start Optionen auch in Konfig-File ablegbar - inbesondere Arbeitsverzeichnisse  
-- Kapazitäts-Belastung auf Basis der Daten-Datei Abteilungs-Kapazitäts-Angebot.txt
-- Ausgabe der Kapa-Belastung in der Ergebnis-Datei Abteilungs-Prozent-Auslastung.txt
-- read by Json-Format:   
-http://docs.groovy-lang.org/2.4.0/html/gapi/groovy/json/JsonSlurper.html
-- verzeichnis help für Doku (bis auf Referenz.html)
 
 ## Feedback
 an: benno.loeffler AT gmx.de
