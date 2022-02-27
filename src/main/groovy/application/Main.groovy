@@ -22,7 +22,7 @@ import java.awt.Desktop
  */
 class  Main {
 
-    static VERSION_STRING ='1.5.0-average-load'
+    static VERSION_STRING ='1.6.0-ipco-pax-edition'
 
     def singleRunMode = false // instead: Deamon is default
     def multiInstanceMode = false // instead SingleInstance is default
