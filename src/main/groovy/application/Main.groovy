@@ -164,10 +164,11 @@ class  Main {
 
     static void openBrowserWithHelp() {
         if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-            String path = new File("Referenz.html").absolutePath.replace('\\', ('/'))
-            path.replace(' ', '%20')
+            //String path = new File("Referenz.html").absolutePath.replace('\\', ('/'))
+            //path.replace(' ', '%20')
             //path = java.net.URLEncoder.encode(path, "UTF-8")
-            Desktop.getDesktop().browse(new URI("file:/$path"))
+            //Desktop.getDesktop().browse(new URI("file:/$path"))
+            Desktop.getDesktop().browse(new URI("https://github.com/bennoloeffler/v-pipe/blob/master/Readme.md"))
         }
     }
 }

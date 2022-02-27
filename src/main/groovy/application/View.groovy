@@ -185,7 +185,7 @@ class View {
                     //mnemonic: 'p',
                     closure: { println "helpPerformanceAction not connected to application..." },
                     //accelerator: shortcut('P'),
-                    shortDescription: 'zeige die aktuelle Hilfe-Datei im Inter-Netz. Online :-(. Aktuelle Version...'
+                    shortDescription: 'zeige die aktuellste Hilfe-Datei im Internet.'
             )
 
             action(id: 'printPerformanceAction',
