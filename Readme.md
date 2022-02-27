@@ -299,6 +299,7 @@ gleichzeitig gearbeitet werden soll.
 - backlog of department for X weeks (in order to simulate "additional work")
 - copy from project (in three tabs (template, new, copy))
 - monthly view (in addition to weekly) (every week is an average of the last)
+- ask for save only if changed - see "dirty-state"
 
 ### BUGS to fix
 - start on macos directly in from dropbox (on Caros mac)
