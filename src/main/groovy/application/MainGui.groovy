@@ -183,9 +183,9 @@ class MainGui {
         //
         view.start {
             // bsp-daten/bsp-04-szenario-aus-verschiebung-und-template
-            //String dirToOpen ="./bsp-daten"
-            String dirToOpen ="./bsp-daten/bsp-04-szenario-aus-verschiebung-und-template"
-            controller.openDir(dirToOpen)
+            String dirToOpen ="."
+            //String dirToOpen ="./bsp-daten/bsp-04-szenario-aus-verschiebung-und-template"
+            //controller.openDir(dirToOpen)
             model.currentDir = dirToOpen
         }
 
