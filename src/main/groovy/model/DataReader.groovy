@@ -2,8 +2,10 @@ package model
 
 import groovy.json.JsonSlurper
 import groovy.time.TimeCategory
+import groovy.yaml.YamlSlurper
 import utils.FileSupport
 import utils.RunTimer
+import groovy.yaml.YamlBuilder
 
 /**
  * reading and parsing data
@@ -344,11 +346,34 @@ class DataReader {
         File f = new File(get_CAPA_FILE_NAME())
         if(f.exists()) {
             try {
-                def slurper = new JsonSlurper()
-                result = slurper.parseText(f.text)
-                capaTextCache = f.text
+                def fileContent = f.text
+                if(fileContent.startsWith("---")) {
+                    def slurper = new JsonSlurper()
+                    result = slurper.parseText(fileContent)
+                } else {
+                    def slurper = new YamlSlurper()
+                    result = slurper.parseText(fileContent)
+                }
+                /*
+                File fy = new File(get_CAPA_FILE_NAME()+".yaml")
+                println("------------------ json file ------------------------")
+                println(f.text)
+                println("------------------- slurper result -----------------------")
+                println(result)
+                def yaml = new YamlBuilder()
+                yaml(result)
+                println("----------------yaml to string --------------------------")
+                println(yaml.toString())
+                fy.text = yaml.toString()
+                def yamlSlurper = new YamlSlurper()
+                def yamlResult = yamlSlurper.parse(new File(get_CAPA_FILE_NAME()+".yaml"))
+                println("----- COMPARE -----------------------")
+                println("yamlResult: " + yamlResult)
+                println("jsonResult: " + result)
+                 */
+                capaTextCache = fileContent
             } catch (Exception e) {
-                throw new VpipeDataException("Problem in JSON-Format von Datei ${get_CAPA_FILE_NAME()}:\n${e.getMessage()}")
+                throw new VpipeDataException("Problem in JSON / YAML - Format von Datei ${get_CAPA_FILE_NAME()}:\n${e.getMessage()}")
             }
         }
         result

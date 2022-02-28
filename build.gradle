@@ -2,6 +2,8 @@
  * User guide available at https://docs.gradle.org/4.0/userguide/tutorial_groovy_projects.html
  */
 
+
+import edu.sc.seis.launch4j.tasks.Launch4jLibraryTask
 import org.gradle.internal.os.OperatingSystem
 
 //apply plugin: 'idea'
@@ -23,11 +25,13 @@ repositories {
 
 
 dependencies {
-    implementation 'joda-time:joda-time:2.10.6'
-    implementation 'org.codehaus.groovy:groovy-all:2.4.10'
+    implementation 'joda-time:joda-time:2.10.13'
+    implementation 'org.codehaus.groovy:groovy-all:3.0.8'
+    implementation group: 'org.codehaus.groovy', name: 'groovy-dateutil', version: '3.0.8'
+    implementation group: 'org.codehaus.groovy', name: 'groovy-yaml', version: '3.0.8'
     //implementation "org.codehaus.groovy:groovy-all:2.5.7"
-    implementation 'org.tinylog:tinylog-impl:2.1.2'
-    implementation 'org.tinylog:tinylog-api:2.1.2'
+    implementation 'org.tinylog:tinylog-impl:2.4.1'
+    implementation 'org.tinylog:tinylog-api:2.4.1'
     implementation name: 'flatlaf-0.37'
     implementation name: 'miglayout-4.0-swing' //ADD LOCAL LIB... it does not download...
     implementation group: 'org.codehaus.gpars', name: 'gpars', version: '1.2.1'
@@ -36,10 +40,10 @@ dependencies {
 
     //implementation 'net.java.balloontip:balloontip:1.2.4.1'
 
-    testCompile 'junit:junit:4.12'
+    testCompile 'junit:junit:4.13.2'
 
     //testCompile "org.spockframework:spock-core:1.3-groovy-2.5"
-    testCompile group: 'org.spockframework', name: 'spock-core', version: '1.3-groovy-2.4'
+    testCompile group: 'org.spockframework', name: 'spock-core', version: '2.0-groovy-3.0'
 }
 
 launch4j {
@@ -49,7 +53,7 @@ launch4j {
 }
 
 
-task createGui(type: edu.sc.seis.launch4j.tasks.Launch4jLibraryTask) {
+task createGui(type: Launch4jLibraryTask) {
     outfile = 'v-pipe-gui.exe'
     mainClassName = 'application.MainGui'
     //jvmOptions =['-Dsun.java2d.uiScale=1.5'] // does only work with java9 properly

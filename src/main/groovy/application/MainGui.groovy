@@ -41,8 +41,9 @@ class MainGui {
                 println "PROBLEM. Programm ist gecrasht :-(:\n${thrown.getMessage()?:''}\n\nSTACKTRACE: (bitte an BEL)\n\n"
                 println thrown
                 thrown.printStackTrace()
+                println ""
             }
-            //todo logile
+            //todo ex to central logile
             //sleep(10000)
             //System.exit(-1)
         }

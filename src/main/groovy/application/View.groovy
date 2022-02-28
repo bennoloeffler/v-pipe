@@ -11,6 +11,7 @@ import newview.FileDifferPanel
 import newview.GridModel
 import newview.GridPanel
 import newview.NewLoadPanel
+import newview.ResourceCapacityEditor
 
 import javax.swing.BoxLayout
 import javax.swing.Icon
@@ -58,6 +59,7 @@ class View {
     def projectDetails
     FileDifferPanel fileDifferPanel
     ProjectTemplates projectTemplates
+    ResourceCapacityEditor resourceCapacityEditor
 
     View(Model model) {
         this.model = model
@@ -65,6 +67,7 @@ class View {
         swing = new SwingBuilder()
         fileDifferPanel = new FileDifferPanel(swing)
         projectTemplates = new ProjectTemplates(this)
+        resourceCapacityEditor = new ResourceCapacityEditor(swing, model)
         build()
         projectDetails = new ProjectDetails(this)
 
@@ -300,6 +303,10 @@ class View {
                             }
 
                             fileDifferPanel.buildPanel()
+
+                            scrollPane(name: 'Ressosurcen & Kapa') {
+                                resourceCapacityEditor.buildPanel()
+                            }
 
                         }
                     }

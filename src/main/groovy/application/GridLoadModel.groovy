@@ -3,16 +3,17 @@ package application
 import core.AbsoluteLoadCalculator
 import core.CapaNeedDetails
 import groovy.beans.Bindable
-import model.DayIntervalCalculator
 import model.Model
 import model.WeekOrMonth
 import newview.AbstractGridLoadModel
 import newview.GridLoadElement
 import utils.RunTimer
 
+
 import java.beans.PropertyChangeEvent
 
 import static extensions.DateHelperFunctions._getStartOfWeek
+
 // TODO
 // 1 GridLoadModelSparce with x and y and shiftX (korrekt x and y when saving (and drawing), set ShiftX to 0 when loading)
 // 2 GridLoadModelSparce --> iterate (and draw) only those, that are there
@@ -28,7 +29,7 @@ class GridLoadModel extends AbstractGridLoadModel {
 
     WeekOrMonth weekOrMonth = WeekOrMonth.WEEK
 
-    Map<String, Map<String, GridLoadElement>> gridElements =[:] //Map( department : Map( timeStr : GridLoadElement))
+    Map<String, Map<String, GridLoadElement>> gridElements = [:] //Map( department : Map( timeStr : GridLoadElement))
 
     AbsoluteLoadCalculator absoluteLoadCalculator
 
@@ -138,7 +139,7 @@ class GridLoadModel extends AbstractGridLoadModel {
 
     @Override
     int getSizeX() {
-        gridElements.values()?gridElements.values()[0].size():0
+        gridElements.values() ? gridElements.values()[0].size() : 0
     }
 
     @Override
@@ -149,7 +150,7 @@ class GridLoadModel extends AbstractGridLoadModel {
     @Override
     double getMaxValAndRed(int y) {
         def maxLoad = absoluteLoadCalculator.getMax(model.getAllDepartments()[y])
-        def maxRed = gridElements[model.getAllDepartments()[y]].entrySet()*.value.max {it.red}
+        def maxRed = gridElements[model.getAllDepartments()[y]].entrySet()*.value.max { it.red }
         Math.max(maxLoad, maxRed.red)
     }
 

@@ -84,7 +84,7 @@ class Model {
      * this is needed, because the size of time keys depend on
      * the position of tasks - and that changes when projects are moved
      */
-    private def jsonSlurp = ""
+    def jsonSlurp = ""
 
     /**
      * key: department -->
@@ -411,11 +411,15 @@ class Model {
     Closure<GString> fileErr = {"" as GString}
 
     @CompileStatic(TypeCheckingMode.SKIP)
-    Map<String, Map<String, YellowRedLimit>> calcCapa(def jsonSlurp) {
+    Map<String, Map<String, YellowRedLimit>> calcCapa(def jsonSlurp, boolean withFileNameInErrorMessage = true) {
         Map<String, Map<String, YellowRedLimit>> result = [:]
         RunTimer.getTimerAndStart('calcCapa').withCloseable {
             this.jsonSlurp = jsonSlurp
-            fileErr = { "Fehler beim Lesen der Datei ${DataReader.get_CAPA_FILE_NAME()}\n" }
+            if (withFileNameInErrorMessage) {
+                fileErr = { "Fehler beim Lesen der Datei ${DataReader.get_CAPA_FILE_NAME()}\n" }
+            } else {
+                fileErr = {""}
+            }
             def timeKeys = getFullSeriesOfTimeKeys(WEEK)
             //println ("calcCapa von ${timeKeys[0]} to ${timeKeys[timeKeys.size()-1]}")
 
@@ -702,8 +706,9 @@ class Model {
                     templatesPipelineElementsPlainTextCache = FileSupport.getTextOrEmpty(DataReader.get_PIPELINING_TEMPLATE_FILE_NAME())
                     checkPipelineTemplatesInTemplates()
                 } else {
-                    throw new VpipeDataException("Wenn Integrations-Phasen.txt und eine Vorlagen-Datei vorhanden sind\n " +
-                            "(Vorlagen-Projekt-Start-End-Abt-Kapa.txt) dann ist die Datei Vorlagen-Integrations-Phasen.txt notwendig.\n" +
+                    throw new VpipeDataException("Wenn die Dateien Integrations-Phasen.txt und\n" +
+                            "Vorlagen-Projekt-Start-End-Abt-Kapa.txt vorhanden sind\n " +
+                            "dann ist die Datei Vorlagen-Integrations-Phasen.txt notwendig.\n" +
                             "\nETWAS VERSTÄNDLICHER:\nWenn es Integrationsphasen und Vorlagen gibt,\ndann braucht es auch" +
                             " Vorlagen für die Integrationsphasen.")
                 }

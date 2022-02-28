@@ -178,14 +178,22 @@ Enthält beispielsweise:
 
 
 **Bedeutung:** der Abschnitt `Kapa_Gesamt` beinhaltet Feiertage und ein Kapa_Profil  
-in Prozent. Der Abschnitt `Abteilungen` beinhaltet Abteilungsnamen und  
+in Prozent. Die Prozent-Angaben gelten jeweils genau für diese eine Woche und alle Abteilungen.  
+Der Abschnitt `Abteilungen` beinhaltet Abteilungsnamen und  
 darunter jeweils zwei Infos:  
-`Kapa`: rote und gelbe Kapazitätsgrenze. Diese Einteilung dient lediglich der   
-Visualisierung.  
+`Kapa`: rote und gelbe Kapazitätsgrenze. Diese Einteilung dient der   
+Visualisierung von grünem, gelbem und rotem Bereich. Die grün->gelbe Grenze entpricht 100%.  
 `Kapa_Profil`: Dort kann das Kapa-Profil der Gesamt-Firma  
-(in KWs und Prozent) überschrieben werden.  
+(in KWs und Prozent) überschrieben werden. Wenn also im Gesamtprofil 50% 
+für 4 Wochen im Sommer eingetragen ist, dann kann das für die Produktion trotzdem überschrieben   
+werden. Bei einem Eisproduzenten würde für die Sommer-Monate vielleicht die halbe Firma Urlaub
+machen (50%) in der Produktion wären aber extrem viele Leihkräfte da (150%).
 Kapazitäts-Sprünge werden so beschrieben:  
 `"2020-24": { "gelb": 140, "rot": 250 }`  
+Sie gelten nicht **für** sondern **ab** der angegebenen KW.
+Sie werden "multipliziert" mit den Gesamt-Prozent-Wochen-Werten - falls es diese gibt. 
+Wenn es Abteilungs-spezifische Prozent-Wochen-Werte gibt, dann werden die globalen 
+Prozent-Werte dieser Wochen ignoriert.  
 Das Kapa_Profil ist optional.  
 Die Syntax der Datei ist JSON.  
 
@@ -307,8 +315,8 @@ gleichzeitig gearbeitet werden soll.
 ### Next Release
 1.6.0
 - can only open valid data folders
+- simplified creation of capacity model
 - can create new model from GUI
-- simplified creation of capadity model
 
 ### Release History
 
