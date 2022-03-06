@@ -41,16 +41,72 @@ class ResourceCapacityEditor {
 
             JTextPane t = this.swing.capaTextFile
             def yb = new YamlBuilder()
-            yb(this.model.jsonSlurp)
+            String capaYamlText = ""
+            if (this.model.jsonSlurp) {
+                yb(this.model.jsonSlurp)
+                capaYamlText = yb.toString()
+                capaYamlText = capaYamlText.replace("---\n", "")
+            }
             //t.setText(DataReader.capaTextCache?:"keine Kapazitätsinformation")
-            t.setText(yb.toString()?:"keine Kapazitätsinformation")
+            t.setText(capaYamlText)
             checkYaml()
         }
     }
 
-    def saveRessources = {
+    def createNewCapaModel = {
+        def allDeps = this.model.getAllDepartments() ?: []
+        String capaStart =
+                '''Kapa_Gesamt:
 
-        println "saveResourcen"
+  Feiertage:
+  - "1.1.2020"
+  - "10.04.2020"
+
+  Kapa_Profil:
+    "2020-W21": 50
+    "2020-W22": 50
+    
+Kapa_Abteilungen:
+
+'''
+        def kapaDep =
+                '''    Kapa:
+      gelb: 340
+      rot: 460
+      
+'''
+        String allDepsJoined = allDeps.collect { "\n  " + it + ":\n$kapaDep" }.join("")
+
+        String capaEnd =
+                '''\n  exotische_Beispiel_Res:
+    Kapa:
+      gelb: 200
+      rot: 400
+    Kapa_Profil:
+      "2020-W01": 100 # nur in KW
+      "2020-W02": 100 # nur in KW
+      "2020-W34": # ab dann
+        gelb: 120
+        rot: 150
+      "2020-W35": # ab dann
+        gelb: 200
+        rot: 400
+  
+  
+  zweite_Beispiel_Res:
+    Kapa:
+      gelb: 160
+      rot: 200
+    Kapa_Profil: {} # Profil leer
+  '''
+        swing.capaTextFile.text = capaStart + allDepsJoined + capaEnd
+        checkYaml()
+    }
+
+    def saveRessources = {
+        JTextPane ta = swing.capaTextFile
+        model.saveRessources("---\n" + ta.text)
+        //println "saveResourcen"
     }
 
     String checkDuplicateRessourceName() {
@@ -58,20 +114,20 @@ class ResourceCapacityEditor {
         return null
     }
 
-    def renameResource ={
+    def renameResource = {
         println "rename Resource"
         String oldName = swing.resourcesList.selectedValue
         String errMessage = ""
-        if(oldName) {
+        if (oldName) {
             String newName = swing.newRessourceName.text.replace(" ", "_")
-            if(! model.allDepartments.contains(newName)) {
-                if(newName?.size() > 0) {
+            if (!model.allDepartments.contains(newName)) {
+                if (newName?.size() > 0) {
                     model.renameDepartment(oldName, newName)
                     return
                 } else {
                     errMessage = "Neuer Name fehlt. Bitte eintragen."
                 }
-            }  else {
+            } else {
                 errMessage = "Neuer Name ($newName) existiert schon."
             }
         } else {
@@ -81,9 +137,9 @@ class ResourceCapacityEditor {
                 swing.manageResourcesPanel as Component,
                 errMessage,
                 "Fehler",
-                JOptionPane.OK_OPTION,
-                JOptionPane.WARNING_MESSAGE
-                )
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.ERROR_MESSAGE,
+        )
     }
 
     def createResource = {
@@ -91,41 +147,47 @@ class ResourceCapacityEditor {
         def yl = swing.yellowLimit.text
         try {
             yl = Double.parseDouble(yl)
-        } catch (Exception e){
+        } catch (Exception e) {
             yl = 0
         }
         def rl = swing.redLimit.text
         try {
             rl = Double.parseDouble(rl)
-        } catch (Exception e){
+        } catch (Exception e) {
             rl = 0
         }
         String rn = swing.resourceName.text.trim()
-        rn.replace(" ", "_")
-        if(rn.size() == 0) {
+        rn = rn.replace(" ", "_")
+        if (rn.size() == 0) {
             rn = "Ressource_" + Math.abs(new Random().nextInt())
         }
         String result = "  $rn:\n    Kapa:\n      gelb: $yl\n      rot: $rl\n"
         swing.capaTextFile.text += result
         checkYaml()
-        if(!checkDuplicateRessourceName()){
+        if (!checkDuplicateRessourceName()) {
             saveRessources()
         }
     }
 
     def checkDepartments(capaAvailable) {
         List<String> depsTasks = model.taskList*.department.unique()
-        Set<String> depsCapa= capaAvailable.keySet()
-        List<String> remain = (List<String>)(depsTasks.clone())
+        Set<String> depsCapa = capaAvailable.keySet()
+        List<String> remain = (List<String>) (depsTasks.clone())
         remain.removeAll(depsCapa)
-        if(remain) {
+        if (remain) {
             "Abteilungen werden genutzt,\nfehlen aber hier:\n$remain"
-        } else {null}
+        } else {
+            null
+        }
     }
 
     boolean checkYaml() {
         JTextPane ta = swing.capaTextFile
         JTextArea tf = swing.errorMessageCapaEdit
+        JButton b = swing.yamlSaveButton
+        b.setEnabled(false)
+        JButton byc = swing.yamlCreateButton
+        byc.setEnabled(true)
 
         try {
             def slurper = new YamlSlurper()
@@ -139,11 +201,13 @@ class ResourceCapacityEditor {
                 return false
             } else {
                 def doubleRessourceName = checkDuplicateRessourceName()
-                if(!doubleRessourceName) {
+                if (!doubleRessourceName) {
                     tf.text = "keine Fehler... alles dufte."
                     ta.setForeground(fg)
+                    byc.setEnabled(false)
+                    b.setEnabled(true)
                     return true
-                }else{
+                } else {
                     tf.text = "doppelt vergebene Ressourcennamen: xyz"
                     ta.setForeground(Color.RED)
                 }
@@ -162,8 +226,28 @@ class ResourceCapacityEditor {
     def buildPanel() {
         swing.build {
             panel(id: "manageResourcesPanel", name: 'Ressosurcen & Kapa') {
-
                 migLayout(layoutConstraints: "", rowConstraints: "[][]", columnConstraints: "[]")
+                panel(border: titledBorder('Ressourcen bearbeiten'), constraints: 'wrap') {
+                    migLayout(layoutConstraints: "fill", columnConstraints: "[][][][]", rowConstraints: "[]")
+                    //button("kopieren", actionPerformed: createResource, constraints: "")
+                    //button("umbenennen", actionPerformed: renameResource, constraints: "")
+                    label("Hier alles bis auf Ressourcen-Namen editieren", constraints: '')
+                    label("Gibt's Fehler?", constraints: 'wrap')
+
+                    //scrollPane(constraints: "span 2, grow") {
+                    //list(id: 'resourcesList', constraints: "grow")
+                    //}
+
+                    scrollPane(id: 'capaTextFileScrollPane', constraints: "h ${(int) (150 * MainGui.scaleY)}!, w ${(int) (300 * MainGui.scaleY)}!, growx, growy".toString()) {
+                        textPane(id: 'capaTextFile', model.jsonSlurp, font: new Font(Font.MONOSPACED, Font.PLAIN, 12))
+                    }
+                    scrollPane(constraints: "w ${(int) (250 * MainGui.scaleY)}!, growy, growx, wrap".toString()) {
+                        textArea(id: "errorMessageCapaEdit")
+                    }
+                    button(id: "yamlSaveButton", "speichern", actionPerformed: saveRessources, constraints: "span, grow, wrap")
+                    button(id: "yamlCreateButton", "Kapa-Profil neu erstellen", actionPerformed: createNewCapaModel, constraints: "span, grow, wrap")
+
+                }
                 panel(border: titledBorder('neue Ressource anlegen'), constraints: 'wrap') {
                     migLayout(layoutConstraints: "fill", columnConstraints: "[][][][][]", rowConstraints: "[][]")
                     label("Name", constraints: '')
@@ -176,7 +260,6 @@ class ResourceCapacityEditor {
                     label("Wochenkapazität absolutes Maximum mit allen Flex-Möglichkeiten h, Kg, m, ...", constraints: 'wrap')
                     button("neu erzeugen und speichern", actionPerformed: createResource, constraints: "span, growx, wrap")
                 }
-                //label(id: 'fileA', "noch nichts gewählt", constraints: 'wrap, growx')
                 panel(border: titledBorder('Ressource umbenennen'), constraints: 'wrap') {
                     migLayout(layoutConstraints: "fill", columnConstraints: "[][][][]", rowConstraints: "[]")
                     //button("kopieren", actionPerformed: createResource, constraints: "")
@@ -184,50 +267,26 @@ class ResourceCapacityEditor {
                     label("neuer Name für die selektierte Ressource:", constraints: 'wrap')
                     textField(id: "newRessourceName", "", constraints: 'grow, wrap')
                     button("umbenennen und speichern", actionPerformed: renameResource, constraints: "grow, wrap")
-
-
-                }
-                panel(border: titledBorder('Ressourcen bearbeiten'), constraints: 'wrap') {
-                    migLayout(layoutConstraints: "fill", columnConstraints: "[][][][]", rowConstraints: "[]")
-                    //button("kopieren", actionPerformed: createResource, constraints: "")
-                    //button("umbenennen", actionPerformed: renameResource, constraints: "")
-                    label("Hier alles bis auf Ressourcen-Namen editieren", constraints: '')
-                    label("Gibt's Fehler?", constraints: 'wrap')
-
-                    //scrollPane(constraints: "span 2, grow") {
-                    //list(id: 'resourcesList', constraints: "grow")
-                    //}
-
-                    scrollPane(id: 'capaTextFileScrollPane', constraints: "h ${(int)(150 * MainGui.scaleY)}!, w ${(int)(300 * MainGui.scaleY)}!, growx, growy".toString()) {
-                        textPane(id: 'capaTextFile', model.jsonSlurp, font: new Font(Font.MONOSPACED, Font.PLAIN, 12))//, constraints: "grow")
-                    }
-                    scrollPane(constraints: "w ${(int) (250 * MainGui.scaleY)}!, growy, growx, wrap".toString()) {
-                        textArea(id: "errorMessageCapaEdit")
-                    }
-                    button("speichern", actionPerformed: saveRessources, constraints: "span, grow, wrap")
-
                 }
             }
-            //label(id: 'fileA', "noch nichts gewählt", constraints: 'wrap, growx')
-            //button('Vergleichs-Datei B auswählen', actionPerformed: readFileB)
-            //label(id: 'fileB', "noch nichts gewählt", constraints: "wrap, growx")
-            //scrollPane(constraints: "span, grow") {
-            //    textPane(id: 'diffTextArea', text: "ein Beispiel...", contentType: 'html', editorKit: new HTMLEditorKit())
-            //}
+
+            //
+            // line numbers in JTextPane
+            //
             JTextPane ta = swing.capaTextFile
             JScrollPane sp = swing.capaTextFileScrollPane
             TextLineNumber ln = new TextLineNumber(ta)
             sp.setRowHeaderView(ln)
 
             ta.addKeyListener(new KeyListener() {
-                void keyTyped(KeyEvent e) {checkYaml()}
-                void keyPressed(KeyEvent e) {checkYaml()}
-                void keyReleased(KeyEvent e) {checkYaml()}
+                void keyTyped(KeyEvent e) { checkYaml() }
+
+                void keyPressed(KeyEvent e) { checkYaml() }
+
+                void keyReleased(KeyEvent e) { checkYaml() }
             })
         }
-        //swing.diffTextArea.setEditorKit(new HTMLEditorKit())
     }
-
 }
 
 

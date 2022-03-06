@@ -1,6 +1,5 @@
 package extensions
 
-import javafx.scene.control.SelectionMode
 import org.pcollections.HashTreePMap
 import org.pcollections.PMap
 import org.pcollections.PVector

@@ -2,11 +2,10 @@ package model
 
 import groovy.json.JsonSlurper
 import groovy.time.TimeCategory
+import groovy.yaml.YamlBuilder
 import groovy.yaml.YamlSlurper
 import utils.FileSupport
 import utils.RunTimer
-import groovy.yaml.YamlBuilder
-
 /**
  * reading and parsing data
  */
@@ -341,19 +340,27 @@ class DataReader {
     /**
      * @return def jsonSlurp
      */
-    static def  readCapa() {
+    static def  readCapa(boolean fromCapaTextCache = false) {
+        if(fromCapaTextCache) {
+            def slurper = new YamlSlurper()
+            return slurper.parseText(capaTextCache)
+        }
+        capaTextCache = null
         def result =[:]
         File f = new File(get_CAPA_FILE_NAME())
         if(f.exists()) {
             try {
-                def fileContent = f.text
-                if(fileContent.startsWith("---")) {
+                def fileContent = f.text.trim()
+                if(fileContent.startsWith("{")) {
                     def slurper = new JsonSlurper()
                     result = slurper.parseText(fileContent)
-                } else {
+                    def yaml = new YamlBuilder()
+                    yaml(result)
+                    fileContent = yaml.toString()
+                } else if(fileContent.startsWith("---")) {
                     def slurper = new YamlSlurper()
                     result = slurper.parseText(fileContent)
-                }
+                } else {throw new RuntimeException("did not find '---' (yaml) nor '{' at the beginning of file!")}
                 /*
                 File fy = new File(get_CAPA_FILE_NAME()+".yaml")
                 println("------------------ json file ------------------------")

@@ -3,10 +3,11 @@ package model
 import extensions.DateExtension
 import extensions.StringExtension
 import groovy.beans.Bindable
-import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import groovy.yaml.YamlSlurper
+import org.pcollections.HashTreePSet
+import org.pcollections.PSet
 import transform.DateShiftTransformer
 import transform.ScenarioTransformer
 import utils.FileSupport
@@ -20,8 +21,6 @@ import java.time.temporal.ChronoUnit
 import static extensions.DateHelperFunctions._getStartOfWeek
 import static extensions.DateHelperFunctions._sToD
 import static model.WeekOrMonth.WEEK
-import org.pcollections.*;
-
 
 // TODO make Compile Static
 // TODO use PCollections in order to create undo-history
@@ -622,6 +621,7 @@ class Model {
         scenarioProjects = []
         pipelineElements = []
         capaAvailable = [:]
+        DataReader.capaTextCache = null
         jsonSlurp = ''
         projectSequence = []
         templateList = []
@@ -723,12 +723,20 @@ class Model {
         }
     }
 
+    void saveRessources(String yaml) {
+        DataReader.capaTextCache = yaml
+        jsonSlurp = DataReader.readCapa(true)
+        capaAvailable = calcCapa(jsonSlurp)
+        fireUpdate()
+    }
+
     void renameDepartment(String oldName, String newName) {
         taskList.each {
             if (it.department == oldName) {
                 it.department = newName
             }
         }
+
         //deliveryDates = [:]
         //projectDayShift = [:]
         //scenarioProjects = []
@@ -736,17 +744,10 @@ class Model {
         //capaAvailable = [:]
 
         DataReader.capaTextCache = DataReader.capaTextCache.replace(oldName, newName)
-        if (DataReader.capaTextCache.startsWith("---")) {
-            def slurper = new JsonSlurper()
-            jsonSlurp = slurper.parseText(DataReader.capaTextCache)
-        } else {
-            def slurper = new YamlSlurper()
-            jsonSlurp = slurper.parseText(DataReader.capaTextCache)
-        }
+        def slurper = new YamlSlurper()
+        jsonSlurp = slurper.parseText(DataReader.capaTextCache)
+
         capaAvailable = calcCapa(jsonSlurp)
-        if (capaAvailable) {
-            check()
-        }
         //projectSequence = []
         templateList.each { if (it.department == oldName) { it.department = newName } }
         //templatePipelineElements = []
@@ -755,5 +756,6 @@ class Model {
         //templatesPipelineElementsPlainTextCache = null
         //cachedStartOfTasks = null
         //cachedEndOfTasks = null
+        fireUpdate()
     }
 }
