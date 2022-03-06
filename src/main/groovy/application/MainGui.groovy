@@ -58,7 +58,7 @@ class MainGui {
                 ExceptionHandler.class.getName())
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        scaleX = screenSize.getWidth() / 1000.0 // 1000 as virt size => 1000 * screenWidhRatio
+        scaleX = screenSize.getWidth() / 1000.0 // 1000 as virt size => xSize = 1000 * scaleX
         scaleY = screenSize.getHeight() / 1000.0
 
         new MainGui().glueAndStart()
@@ -84,6 +84,10 @@ class MainGui {
     def glueAndStart() {
 
 
+        System.setProperty("apple.laf.useScreenMenuBar", "true");
+        // TODO: add macos gestures for zooming windows:
+        // https://stackoverflow.com/questions/48535595/what-replaces-gestureutilities-in-java-9
+
         model = new Model()
         view = new View(model)
         controller = new GlobalController(model, view)
@@ -100,7 +104,7 @@ class MainGui {
 
 
         //
-        // connect exit-action to X - symbol on window
+        // connect exit-action to X-symbol on window
         //
         def disposeCallback = new WindowAdapter() {
             @Override

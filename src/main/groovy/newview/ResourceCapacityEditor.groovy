@@ -1,26 +1,16 @@
 package newview
 
 import application.MainGui
-import groovy.json.JsonSlurper
 import groovy.swing.SwingBuilder
 import groovy.yaml.YamlBuilder
 import groovy.yaml.YamlSlurper
-import model.DataReader
 import model.Model
-import model.VpipeDataException
 
-import javax.swing.JList
-import javax.swing.JPanel
-import javax.swing.JScrollPane
-import javax.swing.JTextArea
-import javax.swing.JTextField
-import javax.swing.JTextPane
-import javax.swing.ListSelectionModel
-import javax.swing.UIManager
-import java.awt.Color
-import java.awt.Font
+import javax.swing.*
+import java.awt.*
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
+import java.util.List
 
 //TODO: Profil mit einem Feiertag und einem Kapa_Profil Eintrag - Kommentar: können gelöscht werden
 //TODO: Profil kann ohne Feiertage und ohne Kapa-Profil gelesen werden
@@ -28,6 +18,8 @@ import java.awt.event.KeyListener
 //TODO: Button: wenn es keine Kapa gibt: createNewCapaProfile
 //TODO: Button: applyCapa
 //TODO: implement Rename Button
+//TODO: Rename in tasks and other elements, see: emptyTheModel()
+//TODO: fireUpdate
 class ResourceCapacityEditor {
 
     SwingBuilder swing
@@ -56,19 +48,42 @@ class ResourceCapacityEditor {
         }
     }
 
-    def renameResource = {
-        println "rename Resource"
-        //
-        //TODO:
+    def saveRessources = {
 
-        //TODO: checkUnique
-        //TODO: rename in yaml
-        //TODO: Rename in tasks and other elements, see: emptyTheModel()
-        //TODO: fireUpdate
+        println "saveResourcen"
     }
 
-    void checkRessourceData() {
+    String checkDuplicateRessourceName() {
+        println "checkDuplicateRessourceName"
+        return null
+    }
 
+    def renameResource ={
+        println "rename Resource"
+        String oldName = swing.resourcesList.selectedValue
+        String errMessage = ""
+        if(oldName) {
+            String newName = swing.newRessourceName.text.replace(" ", "_")
+            if(! model.allDepartments.contains(newName)) {
+                if(newName?.size() > 0) {
+                    model.renameDepartment(oldName, newName)
+                    return
+                } else {
+                    errMessage = "Neuer Name fehlt. Bitte eintragen."
+                }
+            }  else {
+                errMessage = "Neuer Name ($newName) existiert schon."
+            }
+        } else {
+            errMessage = "Keine Ressource zum umbenennen ausgewählt."
+        }
+        JOptionPane.showConfirmDialog(
+                swing.manageResourcesPanel as Component,
+                errMessage,
+                "Fehler",
+                JOptionPane.OK_OPTION,
+                JOptionPane.WARNING_MESSAGE
+                )
     }
 
     def createResource = {
@@ -93,6 +108,9 @@ class ResourceCapacityEditor {
         String result = "  $rn:\n    Kapa:\n      gelb: $yl\n      rot: $rl\n"
         swing.capaTextFile.text += result
         checkYaml()
+        if(!checkDuplicateRessourceName()){
+            saveRessources()
+        }
     }
 
     def checkDepartments(capaAvailable) {
@@ -105,7 +123,7 @@ class ResourceCapacityEditor {
         } else {null}
     }
 
-    def checkYaml() {
+    boolean checkYaml() {
         JTextPane ta = swing.capaTextFile
         JTextArea tf = swing.errorMessageCapaEdit
 
@@ -118,13 +136,22 @@ class ResourceCapacityEditor {
             if (renameDepartmentsErr) {
                 tf.text = renameDepartmentsErr
                 ta.setForeground(Color.RED)
+                return false
             } else {
-                tf.text = "keine Fehler... alles dufte."
-                ta.setForeground(fg)
+                def doubleRessourceName = checkDuplicateRessourceName()
+                if(!doubleRessourceName) {
+                    tf.text = "keine Fehler... alles dufte."
+                    ta.setForeground(fg)
+                    return true
+                }else{
+                    tf.text = "doppelt vergebene Ressourcennamen: xyz"
+                    ta.setForeground(Color.RED)
+                }
             }
         } catch (Throwable e) {
             ta.setForeground(Color.RED)
             tf.text = e.getMessage()
+            return false
             //ta.invalidate()
             //tf.invalidate()
         }
@@ -134,7 +161,7 @@ class ResourceCapacityEditor {
 
     def buildPanel() {
         swing.build {
-            panel(name: 'Ressosurcen & Kapa') {
+            panel(id: "manageResourcesPanel", name: 'Ressosurcen & Kapa') {
 
                 migLayout(layoutConstraints: "", rowConstraints: "[][]", columnConstraints: "[]")
                 panel(border: titledBorder('neue Ressource anlegen'), constraints: 'wrap') {
@@ -147,15 +174,15 @@ class ResourceCapacityEditor {
                     label("rote Grenze", constraints: '')
                     textField(id: "redLimit", "200", constraints: '')
                     label("Wochenkapazität absolutes Maximum mit allen Flex-Möglichkeiten h, Kg, m, ...", constraints: 'wrap')
-                    button("neu", actionPerformed: createResource, constraints: "span, growx, wrap")
+                    button("neu erzeugen und speichern", actionPerformed: createResource, constraints: "span, growx, wrap")
                 }
                 //label(id: 'fileA', "noch nichts gewählt", constraints: 'wrap, growx')
                 panel(border: titledBorder('Ressource umbenennen'), constraints: 'wrap') {
                     migLayout(layoutConstraints: "fill", columnConstraints: "[][][][]", rowConstraints: "[]")
                     //button("kopieren", actionPerformed: createResource, constraints: "")
-                    list(id: 'resourcesList', listSelectionModel: ListSelectionModel.SINGLE_SELECTION, constraints: "span 1 4, grow")
+                    list(id: 'resourcesList', selectionMode: ListSelectionModel.SINGLE_SELECTION, constraints: "span 1 4, grow")
                     label("neuer Name für die selektierte Ressource:", constraints: 'wrap')
-                    textField(id: "", "", constraints: 'grow, wrap')
+                    textField(id: "newRessourceName", "", constraints: 'grow, wrap')
                     button("umbenennen und speichern", actionPerformed: renameResource, constraints: "grow, wrap")
 
 
@@ -177,6 +204,8 @@ class ResourceCapacityEditor {
                     scrollPane(constraints: "w ${(int) (250 * MainGui.scaleY)}!, growy, growx, wrap".toString()) {
                         textArea(id: "errorMessageCapaEdit")
                     }
+                    button("speichern", actionPerformed: saveRessources, constraints: "span, grow, wrap")
+
                 }
             }
             //label(id: 'fileA', "noch nichts gewählt", constraints: 'wrap, growx')

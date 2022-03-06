@@ -3,14 +3,21 @@ package learn.swingbuilder
 import groovy.beans.Bindable
 import groovy.swing.SwingBuilder
 
-import javax.swing.JFrame
-import javax.swing.JSplitPane
-import javax.swing.JTree
+import javax.swing.*
 import javax.swing.tree.DefaultMutableTreeNode
-import javax.swing.tree.TreeNode
 import java.awt.BorderLayout as BL
 
-// https://web.archive.org/web/20140702234352/http://groovy.codehaus.org/Swing+Builder
+/**
+ * @see Swing Docu https://docs.oracle.com/javase/tutorial/uiswing/components/filechooser.html
+ * @see GINA p.247 http://index-of.es/Java/Groovy%20in%20Action.pdf
+ * @see OLD docu SwingBuilder https://web.archive.org/web/20140702234352/http://groovy.codehaus.org/Swing+Builder
+ * @see SLIDES https://de.slideshare.net/aalmiray/javaone-ts5098-groovy-swingbuilder?qid=58967b6f-7007-4c0a-9dc2-148194f618c8&v=&b=&from_search=2
+ * @see OLD article 1 https://uberconf.com/blog/andres_almiray/2009/11/building_rich_swing_applications_with_groovy__part_i
+ * @see OLD article 2 https://uberconf.com/blog/andres_almiray/2009/11/building_rich_swing_applications_with_groovy__part_iI
+ * @see OLD article 3 https://uberconf.com/blog/andres_almiray/2009/12/building_rich_swing_applications_with_groovy__part_iii
+ * @see OLD article 4 https://uberconf.com/blog/andres_almiray/2009/12/building_rich_swing_applications_with_groovy__part_iv
+ * @see Beispiel deutsch: https://docplayer.org/9822371-Programmieren-lernen-mit-groovy-graphische-oberflaechen-guis-graphical-user-interfaces.html
+ */
 class ExamplesFromWebpage {
 
 
@@ -56,7 +63,7 @@ class ExamplesFromWebpage {
 
         swing.edt {
             frame(title:'Frame', defaultCloseOperation:JFrame.EXIT_ON_CLOSE, pack:true, show:true) {
-                vbox {
+                vbox() {
                     widget(sharedPanel())
                     widget(sharedPanel())
                 }
@@ -125,7 +132,7 @@ class ExamplesFromWebpage {
         def swing = new SwingBuilder()
         swing.edt {
             frame(title:'Frame', defaultCloseOperation:JFrame.EXIT_ON_CLOSE, pack:true, show:true) {
-                vbox {
+                vbox() {
                     label(text: "decoupled...")
                     widget(sharedPanel(swing, "count", theModel, {v->v?"= $v  (+5)":"zerrro"}, theController.countPlusFive))
                     widget(sharedPanel(swing, "count", theModel, theController.countMinusThree))

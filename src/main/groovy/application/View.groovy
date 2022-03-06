@@ -37,6 +37,10 @@ import java.awt.Toolkit
 
 import static java.awt.Color.*
 
+/**
+ * @see https://docs.oracle.com/javase/tutorial/uiswing/components/filechooser.html
+ *
+ */
 class View {
 
     Image frameIcon
@@ -90,7 +94,7 @@ class View {
         swing.registerBeanFactory('migLayout', MigLayout)
 
         // see: https://stackoverflow.com/questions/42833424/java-key-bindings-using-groovy-swing-builder/42834255
-        swing.actions({
+        swing.actions() {
 
             // file
 
@@ -199,7 +203,7 @@ class View {
                     shortDescription: 'gemessene Lauf-Zeiten auf Console printen'
             )
 
-        })
+        }
 
         swing.build {
 
@@ -283,7 +287,7 @@ class View {
                     // Details
                     splitPane(id: 'spV2', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: (int)(300 * MainGui.scaleY)) {
 
-                        scrollPane {
+                        scrollPane() {
                             widget(projectView)
                         }
 
