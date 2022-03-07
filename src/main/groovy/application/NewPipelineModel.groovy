@@ -206,8 +206,9 @@ class NewPipelineModel extends GridModel {
     @Override
     def swap(int y, int withY) {
         model.projectSequence.swap(y, withY)
-        updateGridElements()
-        this.setUpdateToggle(!this.getUpdateToggle()) // just to fire an PropertyChange to the view
+        //updateGridElements()
+        //this.setUpdateToggle(!this.getUpdateToggle()) // just to fire an PropertyChange to the view
+        model.fireUpdate()
     }
 
     @Override

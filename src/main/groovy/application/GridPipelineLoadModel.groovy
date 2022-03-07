@@ -1,15 +1,11 @@
 package application
 
-import core.AbsoluteLoadCalculator
-import core.CapaNeedDetails
-import groovy.beans.Bindable
+
 import model.Model
 import model.WeekOrMonth
 import newview.AbstractGridLoadModel
 import newview.GridLoadElement
 import utils.RunTimer
-
-import java.beans.PropertyChangeEvent
 
 import static extensions.DateHelperFunctions._getStartOfWeek
 
@@ -76,8 +72,8 @@ class GridPipelineLoadModel extends AbstractGridLoadModel {
     private void calcRowX() {
         RunTimer.getTimerAndStart('GridPipelineLoadModel::calcRowX').withCloseable {
             nowXRowCache = -1
-            Date startOfGrid = _getStartOfWeek(model.getStartOfTasks())
-            Date endOfGrid = _getStartOfWeek(model.getEndOfTasks()) + 7
+            Date startOfGrid = _getStartOfWeek(model.getStartOfProjects())
+            Date endOfGrid = _getStartOfWeek(model.getEndOfProjects()) + 7
 
             Date now = new Date() // Date.newInstance()
             int row = 0

@@ -110,12 +110,12 @@ Kapa_Abteilungen:
     }
 
     String checkDuplicateRessourceName() {
-        println "checkDuplicateRessourceName"
+        //println "checkDuplicateRessourceName"
         return null
     }
 
     def renameResource = {
-        println "rename Resource"
+        //println "rename Resource"
         String oldName = swing.resourcesList.selectedValue
         String errMessage = ""
         if (oldName) {
@@ -143,7 +143,7 @@ Kapa_Abteilungen:
     }
 
     def createResource = {
-        println "create Resource"
+        //println "create Resource"
         def yl = swing.yellowLimit.text
         try {
             yl = Double.parseDouble(yl)

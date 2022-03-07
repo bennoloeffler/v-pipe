@@ -113,8 +113,8 @@ class GridLoadModel extends AbstractGridLoadModel {
         RunTimer.getTimerAndStart('GridLoadModel::calcRowX').withCloseable {
 
             nowXRowCache = -1
-            Date startOfGrid = _getStartOfWeek(model.getStartOfTasks())
-            Date endOfGrid = _getStartOfWeek(model.getEndOfTasks()) + 7
+            Date startOfGrid = _getStartOfWeek(model.getStartOfProjects())
+            Date endOfGrid = _getStartOfWeek(model.getEndOfProjects()) + 7
 
             Date now = new Date() // Date.newInstance()
             int row = 0

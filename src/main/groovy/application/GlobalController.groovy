@@ -7,9 +7,7 @@ import model.VpipeDataException
 import utils.RunTimer
 import utils.SystemInfo
 
-import javax.swing.JComponent
-import javax.swing.JFileChooser
-import javax.swing.JOptionPane
+import javax.swing.*
 import javax.swing.filechooser.FileFilter
 import java.awt.event.ActionEvent
 
@@ -21,11 +19,17 @@ class GlobalController {
     GlobalController(Model model, View view) {
         this.model = model
         this.view = view
+        Timer timer = new Timer(10000, saveTimerAction);
+        timer.setRepeats(true)
+        timer.start();
     }
 
     def openActionPerformed = { ActionEvent e ->
         if (checkSave(false)) {
-            String dir = chooseDir('Datenverzeichnis öffnen', (JComponent) (e.source), "Verzeichnis auswählen & Daten-Dateien von dort lesen")
+            JCheckBoxMenuItem i = view.swing.checkBoxMenuContSaving
+            i.setSelected(false)
+            toggleContinouosSaveAsActionPerformed(null)
+            String dir = chooseDir('Datenverzeichnis öffnen', (JComponent) (e.source), "Verzeichnis auswählen & Daten-Dateien von dort lesen", true)
             if (dir) {
                 openDir(dir)
             }
@@ -34,8 +38,28 @@ class GlobalController {
 
     def saveActionPerformed = { ActionEvent e ->
         //println("saveActionPerformed")
-        DataWriter dw = new DataWriter(model: model)
-        dw.saveAll()
+        if (model.isDirty()) {
+            DataWriter dw = new DataWriter(model: model)
+            dw.saveAll()
+        }
+    }
+
+
+    boolean autoSave = false
+    def saveTimerAction = {
+        if (model.isDirty() && autoSave) {
+            view.swing.doLater {    //doOutside crashes
+                DataWriter dw = new DataWriter(model: model)
+                dw.saveAll()
+                println "gespeichert..."
+            }
+        }
+    }
+
+    def toggleContinouosSaveAsActionPerformed = { ActionEvent e ->
+        JCheckBoxMenuItem i = view.swing.checkBoxMenuContSaving
+        autoSave = i.isSelected()
+        println "Auto-Speichern: " + (autoSave?"an":"aus")
     }
 
     def exitActionPerformed = { ActionEvent e ->
@@ -46,7 +70,7 @@ class GlobalController {
 
     def saveAsActionPerformed = { ActionEvent e ->
         //println("saveActionPerformed")
-        String dir = chooseDir('Datenverzeichnis zum Speichern wählen', (JComponent) (e.source), "Verzeichnis auswählen & Daten-Dateien dort speichern")
+        String dir = chooseDir('Datenverzeichnis zum Speichern wählen', (JComponent) (e.source), "Verzeichnis auswählen & Daten-Dateien dort speichern", false)
         if (dir) {
             model.setCurrentDir(dir)
             DataWriter dw = new DataWriter(model: model)
@@ -82,58 +106,95 @@ class GlobalController {
     def printPerformanceActionPerformed = { ActionEvent e ->
         println(SystemInfo.getSystemInfoTable())
         println(RunTimer.getResultTable())
+        runMultiThreadedTest()
     }
 
     def compareActionPerformed = { ActionEvent e ->
         println(e.getSource())
     }
 
+    JFileChooser fc = null
 
-    private String chooseDir(String dialogTitle, JComponent root, String applyButtonText) {
+    private String chooseDir(String dialogTitle, JComponent root, String applyButtonText, boolean open) {
         String result = null
-        JFileChooser fc = new JFileChooser(new File(model.currentDir)) {
-            void approveSelection() {
-                def absDataFileName = getSelectedFile().getAbsolutePath() +"/" + DataReader.TASK_FILE_NAME
-                if (getSelectedFile().isDirectory() &&
-                        (new File(absDataFileName).exists())) {
-                    super.approveSelection()
+        def currentOpen = { open }
+        if (!fc) {
+            fc = new JFileChooser(new File(model.currentDir)) {
+
+                def acceptVPipeDir() {
+                    if (currentOpen()) {
+                        def checkPath1 = getSelectedFile().getAbsolutePath() + "/" + DataReader.TASK_FILE_NAME
+                        def rightDirectorySelected = new File(checkPath1).exists()
+                        def rightFileSelected = false
+                        if (getSelectedFile().isFile()) {
+                            def checkPath2 = getSelectedFile().parentFile.getAbsolutePath() + "/" + DataReader.TASK_FILE_NAME
+                            rightFileSelected = new File(checkPath2).exists()
+                        }
+                        return rightDirectorySelected || rightFileSelected
+                    } else {
+                        return true
+                    }
+                }
+
+                void approveSelection() {
+                    if (acceptVPipeDir()) {
+                        super.approveSelection()
+                    }
                 }
             }
 
+            //fc.resetChoosableFileFilters()
+            //fc.setAcceptAllFileFilterUsed(false)
+            fc.setFileFilter(new FileFilter() {
+                @Override
+                boolean accept(File f) {
+
+                    def checkPath = f.getAbsolutePath() + "/" + DataReader.TASK_FILE_NAME
+                    def checkNeigbour = f.parentFile.getAbsolutePath() + "/" + DataReader.TASK_FILE_NAME
+                    def pathExists = new File(checkPath).exists()
+                    def neighbourExists = new File(checkNeigbour).exists()
+                    return pathExists || neighbourExists || f.isDirectory()
+
+                    /*
+
+                // DOES NOT WORK???
+                DataWriter.ALL_DATA_FILES.each {
+                    if(f.isFile()){
+                        String dataFileName = it
+                        String checkFileName = f.getName()
+                        //Thread.start{println "${dataFileName == checkFileName} --> $dataFileName ==? $checkFileName"}
+                        if(dataFileName == checkFileName) {
+                            //Thread.start{println f.getAbsolutePath()}
+                            return true
+                        }
+                    }
+                }
+
+                return f.isDirectory()
+
+                 */
+                }
+
+                @Override
+                String getDescription() {
+                    return "$DataReader.TASK_FILE_NAME available?"
+                }
+            })
         }
         fc.setDialogTitle(dialogTitle)
         fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES)
         fc.setApproveButtonText(applyButtonText)
         fc.setApproveButtonToolTipText("Im gewählten Verzeichnis müssen gültige Daten liegen.")
 
-        /*
-        FileFilter ff = new FileFilter() {
-             boolean accept(File f) {
-                if (f.isDirectory()) return true
-                DataWriter.ALL_DATA_FILES.each { fileName ->
-                    //println "check: " + fileName + " in? " + f.absolutePath.toString()
-                    if (f.absolutePath.contains(fileName)) {
-                        println "found: " + fileName + " in: " + f.absolutePath
-                        return true
-                    }
-                }
-                return false
-            }
-
-            @Override
-            String getDescription() {
-                return "alle v-pipe Daten-Dateien"
-            }
-        }
-        fc.setFileFilter(ff)
-         */
-
         int returnVal = fc.showOpenDialog(root)
 
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File dir = fc.getSelectedFile()
-            File rootDir = fc.getCurrentDirectory()
-            result = "$rootDir.absolutePath/$dir.name"
+            if (!dir.isDirectory()) {
+                dir = dir.parentFile
+            }
+            //File rootDir = fc.getCurrentDirectory()
+            result = dir.absolutePath
             println("Verzeichnis: $result")
         } else {
             println("Verzeichnis-Wechsel abgebrochen.")
@@ -143,14 +204,16 @@ class GlobalController {
 
 
     private boolean checkSave(doExitThen) {
-        int dialogButton = JOptionPane.YES_NO_CANCEL_OPTION
-        dialogButton = JOptionPane.showConfirmDialog(null, "Speichern?", "HIRN EINSCHALTEN!", dialogButton)
-        if (dialogButton == JOptionPane.YES_OPTION) {
-            saveActionPerformed(null)
+        if (model.isDirty()) {
+            def dialogButton = JOptionPane.showConfirmDialog(null, "Speichern?", "HIRN EINSCHALTEN!", JOptionPane.YES_NO_CANCEL_OPTION)
+            if (dialogButton == JOptionPane.YES_OPTION) {
+                saveActionPerformed(null)
+            }
+            if (dialogButton == JOptionPane.CANCEL_OPTION) {
+                return false
+            }
         }
-        if (dialogButton == JOptionPane.CANCEL_OPTION) {
-            return false
-        }
+
         if (doExitThen) {
             view.swing.frame.dispose()
             System.exit(0)
@@ -168,11 +231,12 @@ class GlobalController {
             if (model.pipelineElements) {
                 //view.swing.spV1.setDividerLocation((int)(300 * MainGui.scaleY))
                 //view.swing.spV2.setDividerLocation((int)(100 * MainGui.scaleY))
-                view.swing.spV3.setDividerLocation(((int)(100 * MainGui.scaleY)))
+                view.swing.spV3.setDividerLocation(((int) (100 * MainGui.scaleY)))
                 view.swing.pipelineLoadViewScrollPane.setVisible(true)
             } else {
                 view.swing.pipelineLoadViewScrollPane.setVisible(false)
             }
+            println "Daten-Verzeichnis: " + dir
             //view.swing.frame.validate()
         } catch (VpipeDataException vde) {
             JOptionPane.showMessageDialog(null,

@@ -1,4 +1,10 @@
 package extensions
+
+import groovy.transform.CompileStatic
+
+import java.time.LocalDate
+import java.time.ZoneId
+
 /**
  * extends date to provide clear "toString".
  * See: https://groovy-lang.org/metaprogramming.html#_extension_modules
@@ -28,5 +34,18 @@ class DateExtension {
 
     static String getMonthYearStr(Date d) {
         return DateHelperFunctions._getMonthYearStr(d)
+    }
+
+    @CompileStatic
+    static LocalDate convertToLocalDate(Date dateToConvert) {
+        dateToConvert.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate()
+    }
+
+    static Date convertToDate(LocalDate dateToConvert) {
+        Date.from(dateToConvert.atStartOfDay()
+                .atZone(ZoneId.systemDefault())
+                .toInstant())
     }
 }

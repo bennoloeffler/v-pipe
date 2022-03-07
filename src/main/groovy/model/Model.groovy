@@ -14,18 +14,27 @@ import utils.FileSupport
 import utils.RunTimer
 
 import java.time.Duration
-import java.time.LocalDate
-import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 
 import static extensions.DateHelperFunctions._getStartOfWeek
 import static extensions.DateHelperFunctions._sToD
 import static model.WeekOrMonth.WEEK
 
-// TODO make Compile Static
-// TODO use PCollections in order to create undo-history
-//@CompileStatic
+@CompileStatic
 class Model {
+
+    /**
+     * this is because the autosave runs in own thread
+     */
+    final private Object theLock = new Object()
+    public setThreadSaveDirty(boolean dirty){
+        synchronized(theLock) {
+            setDirty(dirty)
+        }
+    }
+
+    @Bindable
+    boolean dirty = false
 
     PSet<String> set = HashTreePSet.empty();
 
@@ -102,7 +111,10 @@ class Model {
 
 
     def fireUpdate() {
-        setUpdateToggle(!updateToggle)
+        setThreadSaveDirty(true)
+        synchronized (theLock) {
+            setUpdateToggle(!updateToggle)
+        }
     }
 
     /*
@@ -127,16 +139,13 @@ class Model {
      * @param project
      * @return List of all Tasks with project name project
      */
-    //@Memoized
     List<TaskInProject> getProject(String project) {
         def r
-        //RunTimer.getTimerAndStart('getProject').withCloseable {
         r = taskList.findAll { it.project == project }
         def departments = getAllDepartments()
         r = r.sort { a, b ->
             departments.indexOf(a.department) - departments.indexOf(b.department)
         }
-        //}
         r
     }
 
@@ -324,31 +333,18 @@ class Model {
                     s = DateExtension.getStartOfWeek(s)
                     while (s < e) {
                         result << DateExtension.getWeekYearStr(s)
-                        s = convertToDate(convertToLocalDate(s).plusDays(7))
+                        s = DateExtension.convertToDate(DateExtension.convertToLocalDate(s).plusDays(7))
                     }
                 } else {
                     s = DateExtension.getStartOfMonth(s)
                     while (s < e) {
                         result << DateExtension.getMonthYearStr(s)
-                        s = convertToDate(convertToLocalDate(s).plusMonths(1))
+                        s = DateExtension.convertToDate(DateExtension.convertToLocalDate(s).plusMonths(1))
                     }
                 }
             }
         }
         result
-    }
-
-    @CompileStatic
-    LocalDate convertToLocalDate(Date dateToConvert) {
-        dateToConvert.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate()
-    }
-
-    Date convertToDate(LocalDate dateToConvert) {
-        Date.from(dateToConvert.atStartOfDay()
-                .atZone(ZoneId.systemDefault())
-                .toInstant())
     }
 
 
@@ -391,8 +387,8 @@ class Model {
 
     def reCalcCapaAvailableIfNeeded() {
         RunTimer.getTimerAndStart('reCalcCapaAvailableIfNeeded').withCloseable {
-            def currentStart = getStartOfTasks()
-            def currentEnd = getEndOfTasks()
+            def currentStart = getStartOfProjects()
+            def currentEnd = getEndOfProjects()
             //println "calc if needed..."
             //println "current start: ${currentStart.toString()}  cached: ${cachedStartOfTasks?.toString()}"
             //println "current end: ${currentEnd.toString()}  cached: ${cachedEndOfTasks?.toString()}"
@@ -578,11 +574,11 @@ class Model {
 
         Set<String> pipProjects = pipelineElements*.project.unique().toSet()
         Set<String> projProjects = projects*.project.unique().toSet()
-        Set<String> shouldBeAll = pipProjects.intersect(projProjects)
+        Collection<String> shouldBeAll = pipProjects.intersect(projProjects)
 
-        Set<String> projectsWithoutPipeline = projProjects.clone()
+        Set<String> projectsWithoutPipeline = new HashSet<String>(projProjects)
         projectsWithoutPipeline.removeAll(shouldBeAll)
-        Set<String> pipelineWithoutProject = pipProjects.clone()
+        Set<String> pipelineWithoutProject = new HashSet<String>(pipProjects)
         pipelineWithoutProject.removeAll(shouldBeAll)
         if (projectsWithoutPipeline) throw new VpipeDataException(templateOrData + ": Projekte ohne Pipline-Element: " + projectsWithoutPipeline)
         if (pipelineWithoutProject) throw new VpipeDataException(templateOrData + ": Pipeline-Element ohne Projekt: " + pipelineWithoutProject)
@@ -591,7 +587,7 @@ class Model {
     def check() {
         List<String> depsTasks = taskList*.department.unique()
         Set<String> depsCapa = capaAvailable.keySet()
-        List<String> remain = (List<String>) (depsTasks.clone())
+        List<String> remain = new ArrayList(depsTasks)
         remain.removeAll(depsCapa)
         if (remain) throw new VpipeDataException("${fileErr()}Für folgende Abteilungen ist keine Kapa definiert: $remain")
     }
@@ -599,7 +595,7 @@ class Model {
     Double percentageLeftAfterPublicHoliday(String week, List listOfPubHoliday) {
         Double p = 1.0d
         Date startOfWeek = StringExtension.toDateFromYearWeek(week)
-        Date endOfWeek = convertToDate(convertToLocalDate(startOfWeek).plusDays(5)) // exclude Sa and Su
+        Date endOfWeek = DateExtension.convertToDate(DateExtension.convertToLocalDate(startOfWeek).plusDays(5)) // exclude Sa and Su
         for (String day in listOfPubHoliday) {
             def date = _sToD(day)
             if (date >= startOfWeek && date < endOfWeek) {
@@ -631,6 +627,8 @@ class Model {
 
         cachedStartOfTasks = null
         cachedEndOfTasks = null
+
+        setThreadSaveDirty(true)
     }
 
 
@@ -721,6 +719,7 @@ class Model {
             fireUpdate()
             t.stop()
         }
+        setThreadSaveDirty(false)
     }
 
     void saveRessources(String yaml) {

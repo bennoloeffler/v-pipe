@@ -8,6 +8,7 @@ import javax.swing.JFrame
 import javax.swing.JTextArea
 import javax.swing.SwingUtilities
 import javax.swing.ToolTipManager
+import java.awt.Color
 import java.awt.Dimension
 import java.awt.Font
 import java.awt.Toolkit
@@ -35,10 +36,10 @@ class MainGui {
         }
 
         void handleException(String tname, Throwable thrown) {
-            if(thrown instanceof VpipeDataException) {
-                println "\nD A T E N - F E H L E R :\n" + thrown.getMessage()?:''
+            if (thrown instanceof VpipeDataException) {
+                println "\nD A T E N - F E H L E R :\n" + thrown.getMessage() ?: ''
             } else {
-                println "PROBLEM. Programm ist gecrasht :-(:\n${thrown.getMessage()?:''}\n\nSTACKTRACE: (bitte an BEL)\n\n"
+                println "PROBLEM. Programm ist gecrasht :-(:\n${thrown.getMessage() ?: ''}\n\nSTACKTRACE: (bitte an BEL)\n\n"
                 println thrown
                 thrown.printStackTrace()
                 println ""
@@ -71,7 +72,7 @@ class MainGui {
             out.println(s)
             //Graphics2D g = getLogArea().getGraphics()
             //g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            getLogArea().append(s+'\n')
+            getLogArea().append(s + '\n')
             getLogArea().setCaretPosition(getLogArea().getDocument().getLength())
         }
     }
@@ -99,8 +100,9 @@ class MainGui {
         System.setOut(outStream)
         //System.setErr(errStream)
         JTextArea la = getLogArea()
-        la.setFont(new Font("Monospaced", Font.PLAIN, 25))
+        la.setFont(new Font("Monospaced", Font.PLAIN, (int) (scaleX * 8)))
         println("Programm-Version: $Main.VERSION_STRING")
+        println "Scalierung: x: ${(1000 * scaleX) as int}   y: ${(1000 * scaleY) as int}"
 
 
         //
@@ -113,7 +115,7 @@ class MainGui {
                 controller.exitActionPerformed(null)
             }
         }
-        ((JFrame)view.swing.frame).addWindowListener(disposeCallback)
+        ((JFrame) view.swing.frame).addWindowListener(disposeCallback)
 
 
         //
@@ -130,6 +132,7 @@ class MainGui {
         view.swing.openAction.closure = controller.&openActionPerformed
         view.swing.saveAction.closure = controller.&saveActionPerformed
         view.swing.saveAsAction.closure = controller.&saveAsActionPerformed
+        view.swing.toggleContinouosSaveAsAction.closure = controller.&toggleContinouosSaveAsActionPerformed
         view.swing.exitAction.closure = controller.&exitActionPerformed
 
         // Tool
@@ -146,12 +149,16 @@ class MainGui {
         view.swing.printPerformanceAction.closure = controller.&printPerformanceActionPerformed
 
 
-
         //
         // bind components together
         //
         view.swing.build() {
-            bind(target: view.swing.currentPath, targetProperty: 'text', source: model, sourceProperty: "currentDir", converter: { v -> v}) // v.toUpperCase()
+            bind(target: view.swing.currentPath, targetProperty: 'text', source: model, sourceProperty: "currentDir", converter: { v -> v })
+            bind(target: view.swing.saveIndicator, targetProperty: 'foreground', source: model, sourceProperty: "dirty", converter: { v ->
+                v ? Color.RED : Color.GRAY
+            })
+
+            // v.toUpperCase()
 
             // sync pipelineView with loadView and projectView (details of witch project?)
             bind(target: view.gridLoadModel, targetProperty: 'selectedProject', source: view.gridPipelineModel, sourceProperty: 'selectedProject')
@@ -182,16 +189,15 @@ class MainGui {
         }
 
 
-
         //
         // start EDT and init model
         //
         view.start {
-            String dirToOpen ="./bsp-daten"
+            String dirToOpen = "./bsp-daten"
             String currentStartPath = new File(".").absolutePath
             if (currentStartPath.contains("projects")) {
                 // if in development mode
-                dirToOpen ="./bsp-daten/bsp-04-szenario-aus-verschiebung-und-template"
+                dirToOpen = "./test2"
                 controller.openDir(dirToOpen)
             }
             model.currentDir = dirToOpen

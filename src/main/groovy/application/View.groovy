@@ -16,6 +16,7 @@ import newview.ResourceCapacityEditor
 import javax.swing.BoxLayout
 import javax.swing.Icon
 import javax.swing.ImageIcon
+import javax.swing.JCheckBoxMenuItem
 import javax.swing.JComponent
 import javax.swing.JFrame
 import javax.swing.JLabel
@@ -124,6 +125,14 @@ class View {
                     shortDescription: 'anderes Daten-Verzeichnis wählen und Dateien speichern'
             )
 
+            action(id: 'toggleContinouosSaveAsAction',
+                    name: "kontinuierlich speichern",
+                    //mnemonic: 's',
+                    closure: { println "toggleContinouosSaveAsAction not connected to application..." },
+                    //accelerator: shortcut('S'),
+                    shortDescription: 'alle 10 sec speichern'
+            )
+
             action(id: 'exitAction',
                     name: "beenden",
                     //mnemonic: 'p',
@@ -222,6 +231,7 @@ class View {
                         menuItem(openAction)
                         menuItem(saveAction)
                         menuItem(saveAsAction)
+                        checkBoxMenuItem(id: "checkBoxMenuContSaving", toggleContinouosSaveAsAction)
                         menuItem(exitAction)
                     }
 
@@ -253,6 +263,7 @@ class View {
                 label("    Abt: ", foreground:GRAY)
                 label("", id: 'depLabel', foreground:highlightColor)
                 label("    Pfad: ", foreground:GRAY)
+                label(id:'saveIndicator',"*", foreground:GRAY)
                 label(id:'currentPath', constraints:  'wrap')
 
                 // left | right
@@ -342,7 +353,7 @@ class View {
 
             frame(id: "framePipeline+${i++}", iconImage: frameIcon,
                     title: "v-pipe: Staffelung", locationRelativeTo: null, show: true, pack:true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
-                scrollPane {
+                scrollPane() {
                     widget(newPipelineView)
                 }
             }
@@ -356,7 +367,7 @@ class View {
         swing.edt {
             frame(id: "frameLoad+${i++}", iconImage: frameIcon,
                     title: "v-pipe: Abt.-Belastung", locationRelativeTo: null, show: true, pack:true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
-                scrollPane {
+                scrollPane() {
                     widget(newLoadView)
                 }
             }
@@ -371,7 +382,7 @@ class View {
         swing.edt {
             frame(id: "framePipelineLoad+${i++}", iconImage: frameIcon,
                     title: "v-pipe: IP-Belastung", locationRelativeTo: null, show: true, pack:true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
-                scrollPane {
+                scrollPane() {
                     widget(newLoadView, name: "monthLoad$i++")
                 }
             }
@@ -386,7 +397,7 @@ class View {
         swing.edt {
             frame(id: "frameProjectLoad+${i++}", iconImage: frameIcon,
                     title: "v-pipe: Projekt", locationRelativeTo: null, show: true, pack:true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
-                scrollPane {
+                scrollPane() {
                     widget(newProjectView, name: "monthLoad$i++")
                 }
             }
