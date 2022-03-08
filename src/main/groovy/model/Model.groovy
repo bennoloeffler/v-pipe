@@ -23,16 +23,6 @@ import static model.WeekOrMonth.WEEK
 @CompileStatic
 class Model {
 
-    /**
-     * this is because the autosave runs in own thread
-     */
-    final private Object theLock = new Object()
-    public setThreadSaveDirty(boolean dirty){
-        synchronized(theLock) {
-            setDirty(dirty)
-        }
-    }
-
     @Bindable
     boolean dirty = false
 
@@ -111,10 +101,8 @@ class Model {
 
 
     def fireUpdate() {
-        setThreadSaveDirty(true)
-        synchronized (theLock) {
-            setUpdateToggle(!updateToggle)
-        }
+        setDirty(true)
+        setUpdateToggle(!updateToggle)
     }
 
     /*
@@ -595,7 +583,8 @@ class Model {
     Double percentageLeftAfterPublicHoliday(String week, List listOfPubHoliday) {
         Double p = 1.0d
         Date startOfWeek = StringExtension.toDateFromYearWeek(week)
-        Date endOfWeek = DateExtension.convertToDate(DateExtension.convertToLocalDate(startOfWeek).plusDays(5)) // exclude Sa and Su
+        Date endOfWeek = DateExtension.convertToDate(DateExtension.convertToLocalDate(startOfWeek).plusDays(5))
+        // exclude Sa and Su
         for (String day in listOfPubHoliday) {
             def date = _sToD(day)
             if (date >= startOfWeek && date < endOfWeek) {
@@ -628,7 +617,7 @@ class Model {
         cachedStartOfTasks = null
         cachedEndOfTasks = null
 
-        setThreadSaveDirty(true)
+        setDirty(true)
     }
 
 
@@ -712,14 +701,15 @@ class Model {
 
         } catch (Exception e) {
             emptyTheModel()
+            // TODO: doing what now?
+            // TODO: protect directory from overwriting
             //setCurrentDir("  ---   FEHLER BEIM LESEN DER DATEN!   ---")
             throw e
         } finally {
-            //setUpdateToggle(!getUpdateToggle())
             fireUpdate()
             t.stop()
         }
-        setThreadSaveDirty(false)
+        setDirty(false)
     }
 
     void saveRessources(String yaml) {
@@ -736,25 +726,14 @@ class Model {
             }
         }
 
-        //deliveryDates = [:]
-        //projectDayShift = [:]
-        //scenarioProjects = []
-        //pipelineElements = []
-        //capaAvailable = [:]
-
         DataReader.capaTextCache = DataReader.capaTextCache.replace(oldName, newName)
         def slurper = new YamlSlurper()
         jsonSlurp = slurper.parseText(DataReader.capaTextCache)
-
         capaAvailable = calcCapa(jsonSlurp)
-        //projectSequence = []
+
         templateList.each { if (it.department == oldName) { it.department = newName } }
-        //templatePipelineElements = []
         templatesPlainTextCache = templatesPlainTextCache.replace(oldName, newName)
 
-        //templatesPipelineElementsPlainTextCache = null
-        //cachedStartOfTasks = null
-        //cachedEndOfTasks = null
         fireUpdate()
     }
 }

@@ -141,6 +141,6 @@ class DataWriter {
             f.delete()
             f << model.templatesPipelineElementsPlainTextCache
         }
-        model.setThreadSaveDirty(false)
+        //model.setThreadSaveDirty(false)
     }
 }

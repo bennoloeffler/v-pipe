@@ -37,10 +37,10 @@ class GlobalController {
     }
 
     def saveActionPerformed = { ActionEvent e ->
-        //println("saveActionPerformed")
         if (model.isDirty()) {
             DataWriter dw = new DataWriter(model: model)
             dw.saveAll()
+            model.setDirty(false)
         }
     }
 
@@ -48,10 +48,15 @@ class GlobalController {
     boolean autoSave = false
     def saveTimerAction = {
         if (model.isDirty() && autoSave) {
-            view.swing.doLater {    //doOutside crashes
+            view.swing.doOutside {
+                def start = System.currentTimeMillis()
                 DataWriter dw = new DataWriter(model: model)
                 dw.saveAll()
-                println "gespeichert..."
+                def end = System.currentTimeMillis()
+                println "gespeichert... ${end - start}ms"
+                view.swing.doLater {
+                    model.setDirty(false)
+                }
             }
         }
     }
@@ -59,27 +64,24 @@ class GlobalController {
     def toggleContinouosSaveAsActionPerformed = { ActionEvent e ->
         JCheckBoxMenuItem i = view.swing.checkBoxMenuContSaving
         autoSave = i.isSelected()
-        println "Auto-Speichern: " + (autoSave?"an":"aus")
+        println "Auto-Speichern: " + (autoSave ? "an" : "aus")
     }
 
     def exitActionPerformed = { ActionEvent e ->
-        //println("exitActionPerformed")
-        //DataWriter dw = new DataWriter(model: model)
         checkSave(true)
     }
 
     def saveAsActionPerformed = { ActionEvent e ->
-        //println("saveActionPerformed")
         String dir = chooseDir('Datenverzeichnis zum Speichern wählen', (JComponent) (e.source), "Verzeichnis auswählen & Daten-Dateien dort speichern", false)
         if (dir) {
             model.setCurrentDir(dir)
             DataWriter dw = new DataWriter(model: model)
             dw.saveAll()
+            model.setDirty(false)
         }
     }
 
     def sortPipelineActionPerformed = { ActionEvent e ->
-        //println("sortPipelineActionPerformed")
         view.gridPipelineModel.sortProjectNamesToEnd()
     }
 
@@ -106,7 +108,6 @@ class GlobalController {
     def printPerformanceActionPerformed = { ActionEvent e ->
         println(SystemInfo.getSystemInfoTable())
         println(RunTimer.getResultTable())
-        runMultiThreadedTest()
     }
 
     def compareActionPerformed = { ActionEvent e ->
@@ -143,8 +144,6 @@ class GlobalController {
                 }
             }
 
-            //fc.resetChoosableFileFilters()
-            //fc.setAcceptAllFileFilterUsed(false)
             fc.setFileFilter(new FileFilter() {
                 @Override
                 boolean accept(File f) {
@@ -154,25 +153,21 @@ class GlobalController {
                     def pathExists = new File(checkPath).exists()
                     def neighbourExists = new File(checkNeigbour).exists()
                     return pathExists || neighbourExists || f.isDirectory()
-
                     /*
-
-                // DOES NOT WORK???
-                DataWriter.ALL_DATA_FILES.each {
-                    if(f.isFile()){
-                        String dataFileName = it
-                        String checkFileName = f.getName()
-                        //Thread.start{println "${dataFileName == checkFileName} --> $dataFileName ==? $checkFileName"}
-                        if(dataFileName == checkFileName) {
-                            //Thread.start{println f.getAbsolutePath()}
-                            return true
+                    // DOES NOT WORK???
+                    DataWriter.ALL_DATA_FILES.each {
+                        if(f.isFile()){
+                            String dataFileName = it
+                            String checkFileName = f.getName()
+                            //Thread.start{println "${dataFileName == checkFileName} --> $dataFileName ==? $checkFileName"}
+                            if(dataFileName == checkFileName) {
+                                //Thread.start{println f.getAbsolutePath()}
+                                return true
+                            }
                         }
                     }
-                }
-
-                return f.isDirectory()
-
-                 */
+                    return f.isDirectory()
+                     */
                 }
 
                 @Override
@@ -193,7 +188,6 @@ class GlobalController {
             if (!dir.isDirectory()) {
                 dir = dir.parentFile
             }
-            //File rootDir = fc.getCurrentDirectory()
             result = dir.absolutePath
             println("Verzeichnis: $result")
         } else {
@@ -225,19 +219,16 @@ class GlobalController {
         try {
             model.setCurrentDir(dir)
             view.gridPipelineModel.setSelectedProject(null)
-            model.readAllData() // in EDT
+            model.readAllData()
             view.pipelineView.setCursorToNow()
             view.loadView.setCursorToNow()
             if (model.pipelineElements) {
-                //view.swing.spV1.setDividerLocation((int)(300 * MainGui.scaleY))
-                //view.swing.spV2.setDividerLocation((int)(100 * MainGui.scaleY))
                 view.swing.spV3.setDividerLocation(((int) (100 * MainGui.scaleY)))
                 view.swing.pipelineLoadViewScrollPane.setVisible(true)
             } else {
                 view.swing.pipelineLoadViewScrollPane.setVisible(false)
             }
             println "Daten-Verzeichnis: " + dir
-            //view.swing.frame.validate()
         } catch (VpipeDataException vde) {
             JOptionPane.showMessageDialog(null,
                     vde.message,
@@ -251,6 +242,4 @@ class GlobalController {
             throw e // to produce stacktrace on console...
         }
     }
-
-
 }
