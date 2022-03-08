@@ -98,7 +98,7 @@ Kapa_Abteilungen:
       gelb: 160
       rot: 200
     Kapa_Profil: {} # Profil leer
-  '''
+'''
         swing.capaTextFile.text = capaStart + allDepsJoined + capaEnd
         checkYaml()
     }

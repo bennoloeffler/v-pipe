@@ -1,17 +1,10 @@
 package application
 
-
 import model.Model
 import model.VpipeDataException
 
-import javax.swing.JFrame
-import javax.swing.JTextArea
-import javax.swing.SwingUtilities
-import javax.swing.ToolTipManager
-import java.awt.Color
-import java.awt.Dimension
-import java.awt.Font
-import java.awt.Toolkit
+import javax.swing.*
+import java.awt.*
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 
@@ -125,67 +118,11 @@ class MainGui {
         ToolTipManager.sharedInstance().setInitialDelay(500)
 
 
-        //
-        // glue view and application together
-        //
-        // File
-        view.swing.openAction.closure = controller.&openActionPerformed
-        view.swing.saveAction.closure = controller.&saveActionPerformed
-        view.swing.saveAsAction.closure = controller.&saveAsActionPerformed
-        view.swing.toggleContinouosSaveAsAction.closure = controller.&toggleContinouosSaveAsActionPerformed
-        view.swing.exitAction.closure = controller.&exitActionPerformed
-
-        // Tool
-        view.swing.sortPipelineAction.closure = controller.&sortPipelineActionPerformed
-
-        // View
-        view.swing.pipelineViewAction.closure = controller.&pipelineViewActionPerformed
-        view.swing.loadViewAction.closure = controller.&loadViewActionPerformed
-        view.swing.pipelineLoadViewAction.closure = controller.&pipelineLoadViewActionPerformed
-        view.swing.projectViewAction.closure = controller.&projectViewActionPerformed
-
-        // Help
-        view.swing.helpAction.closure = controller.&helpActionPerformed
-        view.swing.printPerformanceAction.closure = controller.&printPerformanceActionPerformed
-
 
         //
-        // bind components together
+        // bind components together, see View
         //
         view.swing.build() {
-            bind(target: view.swing.currentPath, targetProperty: 'text', source: model, sourceProperty: "currentDir", converter: { v -> v })
-            bind(target: view.swing.saveIndicator, targetProperty: 'foreground', source: model, sourceProperty: "dirty", converter: { v ->
-                v ? Color.RED : Color.GRAY
-            })
-
-            // v.toUpperCase()
-
-            // sync pipelineView with loadView and projectView (details of witch project?)
-            bind(target: view.gridLoadModel, targetProperty: 'selectedProject', source: view.gridPipelineModel, sourceProperty: 'selectedProject')
-            bind(target: view.gridProjectModel, targetProperty: 'projectName', source: view.gridPipelineModel, sourceProperty: 'selectedProject')
-
-            // sync zoom factor of load views
-            bind(target: view.pipelineLoadView, targetProperty: 'gridWidth', source: view.pipelineView, sourceProperty: 'gridWidth')
-            bind(target: view.loadView, targetProperty: 'gridWidth', source: view.pipelineView, sourceProperty: 'gridWidth')
-
-            // sync cursorX: central node ist the pipelineView
-            bind(target: view.projectView, targetProperty: 'cursorX', source: view.pipelineView, sourceProperty: 'cursorX')
-            bind(target: view.loadView, targetProperty: 'cursorX', source: view.pipelineView, sourceProperty: 'cursorX')
-            bind(target: view.pipelineLoadView, targetProperty: 'cursorX', source: view.pipelineView, sourceProperty: 'cursorX')
-
-            bind(target: view.pipelineView, targetProperty: 'cursorX', source: view.loadView, sourceProperty: 'cursorX')
-            bind(target: view.pipelineView, targetProperty: 'cursorX', source: view.projectView, sourceProperty: 'cursorX')
-            bind(target: view.pipelineView, targetProperty: 'cursorX', source: view.pipelineLoadView, sourceProperty: 'cursorX')
-
-            // sync indicators in tools and status line
-            bind(target: view.pipelineView, targetProperty: 'hightlightLinePattern', source: view.swing.searchTextField, sourceProperty: 'text')
-            bind(target: view.swing.timeLabel, targetProperty: 'text', source: view.pipelineView, sourceProperty: 'nowString')
-            bind(target: view.swing.projectLabel, targetProperty: 'text', source: view.gridPipelineModel, sourceProperty: 'selectedProject')
-            bind(target: view.swing.depLabel, targetProperty: 'text', source: view.gridProjectModel, sourceProperty: 'departmentName')
-
-            // sync scroll-pane values hScrollBarValueZoomingSync
-            bind(target: view.loadView, targetProperty: 'hScrollBarValueZoomingSync', source: view.pipelineView, sourceProperty: 'hScrollBarValueZoomingSync')
-            bind(target: view.pipelineLoadView, targetProperty: 'hScrollBarValueZoomingSync', source: view.pipelineView, sourceProperty: 'hScrollBarValueZoomingSync')
         }
 
 

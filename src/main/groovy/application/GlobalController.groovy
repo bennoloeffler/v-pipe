@@ -11,6 +11,11 @@ import javax.swing.*
 import javax.swing.filechooser.FileFilter
 import java.awt.event.ActionEvent
 
+// TODO: keep users from saving, when model is emtpy or new and you are in a valid directory (e.g. force safe as...)
+// TODO: after startup, disable "save", when dirty: enable (disable/enable the action)
+// TODO: check, if exit kills the current automatic save operation (wait for save to have happened)
+// TODO:
+//
 class GlobalController {
 
     Model model
@@ -19,10 +24,66 @@ class GlobalController {
     GlobalController(Model model, View view) {
         this.model = model
         this.view = view
+        addLastDirsToRecentMenu()
         Timer timer = new Timer(10000, saveTimerAction);
         timer.setRepeats(true)
         timer.start();
+
+
+        //
+        // glue view and controller together
+        //
+
+        // File
+        view.swing.openAction.closure = openActionPerformed
+        view.swing.saveAction.closure = saveActionPerformed
+        view.swing.saveAsAction.closure = saveAsActionPerformed
+        view.swing.toggleContinouosSaveAsAction.closure = toggleContinouosSaveAsActionPerformed
+        view.swing.exitAction.closure = exitActionPerformed
+
+        // Tool
+        view.swing.sortPipelineAction.closure = sortPipelineActionPerformed
+
+        // View
+        view.swing.pipelineViewAction.closure = pipelineViewActionPerformed
+        view.swing.loadViewAction.closure = loadViewActionPerformed
+        view.swing.pipelineLoadViewAction.closure = pipelineLoadViewActionPerformed
+        view.swing.projectViewAction.closure = projectViewActionPerformed
+
+        // Help
+        view.swing.helpAction.closure = helpActionPerformed
+        view.swing.printPerformanceAction.closure = printPerformanceActionPerformed
+
+
     }
+
+    def addLastDirsToRecentMenu() {
+        def last = UserSettingsStore.instance
+                .getLastOpenedDataFolders().reverse().take(25)
+        JMenu m = view.swing.recentMenuItem
+        m.removeAll()
+        def allRecentMenuItems = last.collect { String dir ->
+            def nameOnly = dir.split("/").last()
+            new JMenuItem(
+                    view.swing.action(
+                            name: nameOnly,
+                            closure: {
+                                if (checkSave(false)) {
+                                    openDir(dir)
+                                }
+                            },
+                            shortDescription: dir
+                    ))
+        }
+        allRecentMenuItems.each {m.add(it)}
+    }
+
+    def addToRecentMenu(dir) {
+        UserSettingsStore.instance.addLastOpenedDataFolder(dir)
+        addLastDirsToRecentMenu()
+    }
+
+
 
     def openActionPerformed = { ActionEvent e ->
         if (checkSave(false)) {
@@ -78,6 +139,7 @@ class GlobalController {
             DataWriter dw = new DataWriter(model: model)
             dw.saveAll()
             model.setDirty(false)
+            addToRecentMenu(dir)
         }
     }
 
@@ -228,6 +290,7 @@ class GlobalController {
             } else {
                 view.swing.pipelineLoadViewScrollPane.setVisible(false)
             }
+            addToRecentMenu(dir)
             println "Daten-Verzeichnis: " + dir
         } catch (VpipeDataException vde) {
             JOptionPane.showMessageDialog(null,

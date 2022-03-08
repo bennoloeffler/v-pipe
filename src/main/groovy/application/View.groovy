@@ -1,4 +1,3 @@
-
 package application
 
 import com.formdev.flatlaf.FlatLightLaf
@@ -36,6 +35,7 @@ import java.awt.Image
 import java.awt.TextField
 import java.awt.Toolkit
 
+import static application.ProjectDetails.*
 import static java.awt.Color.*
 
 /**
@@ -87,40 +87,85 @@ class View {
 
     void build() {
 
+        // https://iconarchive.com/show/outline-icons-by-iconsmind.html
+        // DONT DO '-' in ressource file names... wont work.
+        //def url = new URL("https://icons.iconarchive.com/icons/iconsmind/outline/24/Bulleted-List-icon.png")
+        //def url = getClass().getResource("/icons/open.png")
+        //recentImageIcon =  scaleIcon(new ImageIcon(url), 0.5 * MainGui.scaleY)
+
+
+
+        def saveAs = new URL("https://icons.iconarchive.com/icons/iconsmind/outline/24/Data-icon.png")
+        saveAs =  scaleIcon(new ImageIcon(saveAs), 0.5 * MainGui.scaleY)
+
+        def saveCont = new URL("https://icons.iconarchive.com/icons/iconsmind/outline/24/Arrow-Refresh-icon.png")
+        saveCont =  scaleIcon(new ImageIcon(saveCont), 0.5 * MainGui.scaleY)
+
+        def exit = new URL("https://icons.iconarchive.com/icons/icons8/ios7/24/Data-Export-icon.png")
+        exit =  scaleIcon(new ImageIcon(exit), 0.5 * MainGui.scaleY)
+
+
+        def projectViewIcon = new URL("https://icons.iconarchive.com/icons/icons8/windows-8/24/Time-Gantt-Chart-icon.png")
+        projectViewIcon =  scaleIcon(new ImageIcon(projectViewIcon), 0.5 * MainGui.scaleY)
+
+        def loadViewIcon = new URL("https://icons.iconarchive.com/icons/icons8/ios7/24/Data-Bar-Chart-icon.png")
+        loadViewIcon =  scaleIcon(new ImageIcon(loadViewIcon), 0.5 * MainGui.scaleY)
+
+        def portfolioViewIcon = new URL("https://icons.iconarchive.com/icons/iconsmind/outline/24/Add-SpaceBeforeParagraph-icon.png")
+        portfolioViewIcon =  scaleIcon(new ImageIcon(portfolioViewIcon), 0.5 * MainGui.scaleY)
+
+
         Color highlightColor = new Color(80, 130, 220, 255)
         FlatLightLaf.install()
-        UIManager.put( "Component.focusWidth", 3 )
+        UIManager.put("Component.focusWidth", 3)
 
         //MigLayout ml = new MigLayout()
         swing.registerBeanFactory('migLayout', MigLayout)
 
-        // see: https://stackoverflow.com/questions/42833424/java-key-bindings-using-groovy-swing-builder/42834255
-        swing.actions() {
+        swing.build {
 
-            // file
+            def i = {String iconPath, double scale = 0.5 ->
+                scaleIcon(imageIcon(resource: iconPath), scale * MainGui.scaleY )
+            }
+
+            // TODO: move actions to Controller, see
+            // see: https://stackoverflow.com/questions/42833424/java-key-bindings-using-groovy-swing-builder/42834255
+            // https://stackoverflow.com/questions/9370326/default-action-button-icons-in-java
+
+
+            action(id: 'newAction',
+                    name: "neues Modell",
+                    //mnemonic: 'o',
+                    closure: { println "openAction not connected to application..." },
+                    //accelerator: shortcut('O'),
+                    smallIcon: i("/icons/new-model.png", 0.3),
+                    shortDescription: 'neues Modell mit Beispiel-Projekt und Beispiel-Ressource erzeugen'
+            )
 
             action(id: 'openAction',
                     name: "oeffnen",
                     mnemonic: 'o',
                     closure: { println "openAction not connected to application..." },
                     accelerator: shortcut('O'),
-                    focus: JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT,
-                    //smallIcon: imageIcon(resource: "icons/folder_r1.png"),
+                    smallIcon: i("/icons/open.png"),
                     shortDescription: 'Verzeichnis mit Daten-Datein öffnen - alle Dateien darin'
             )
+
 
             action(id: 'saveAction',
                     name: "speichern",
                     mnemonic: 's',
                     closure: { println "saveAction not connected to application..." },
+                    smallIcon: i("/icons/save.png"),
                     accelerator: shortcut('S'),
                     shortDescription: 'alle Daten ins aktuelle Daten-Verzeichnis sichern'
             )
 
+
             action(id: 'saveAsAction',
                     name: "speichern als...",
-                    //mnemonic: 's',
                     closure: { println "saveAsAction not connected to application..." },
+                    smallIcon: i("/icons/save-as.png"),
                     //accelerator: shortcut('S'),
                     shortDescription: 'anderes Daten-Verzeichnis wählen und Dateien speichern'
             )
@@ -129,7 +174,7 @@ class View {
                     name: "kontinuierlich speichern",
                     //mnemonic: 's',
                     closure: { println "toggleContinouosSaveAsAction not connected to application..." },
-                    //accelerator: shortcut('S'),
+                    smallIcon: i("/icons/save-cont.png", 0.6),
                     shortDescription: 'alle 10 sec speichern'
             )
 
@@ -138,6 +183,7 @@ class View {
                     //mnemonic: 'p',
                     closure: { println "exitAction not connected to application..." },
                     //accelerator: shortcut('P'),
+                    smallIcon: i("/icons/exit-it.png", 0.3),
                     shortDescription: 'v-pipe beenden - und vorher nochmal speichern ;-)'
             )
 
@@ -158,6 +204,7 @@ class View {
                     //mnemonic: 'p',
                     closure: { println "pipelineViewAction not connected to application..." },
                     //accelerator: shortcut('P'),
+                    //smallIcon: portfolioViewIcon,
                     shortDescription: 'Staffelung in gesondertem Fenster öffnen. Gerne mehrere. Multi-Monitor. Multi-View...'
             )
 
@@ -165,6 +212,7 @@ class View {
                     name: "Abt-Belastungs-Ansicht, separat",
                     //mnemonic: 'p',
                     closure: { println "loadViewAction not connected to application..." },
+                    //smallIcon: loadViewIcon,
                     //accelerator: shortcut('P'),
                     shortDescription: 'Abt-Belastung in gesondertem Fenster öffnen. Gerne mehrere. Multi-Monitor. Multi-View...'
             )
@@ -181,6 +229,7 @@ class View {
                     name: "Projekt-Ansicht, separat",
                     //mnemonic: 'p',
                     closure: { println "projectViewAction not connected to application..." },
+                    //smallIcon: projectViewIcon,
                     //accelerator: shortcut('P'),
                     shortDescription: 'Projekt-Ansicht in gesondertem Fenster öffnen. Gerne mehrere. Multi-Monitor. Multi-View...'
             )
@@ -212,13 +261,10 @@ class View {
                     shortDescription: 'gemessene Lauf-Zeiten auf Console printen'
             )
 
-        }
 
-        swing.build {
-
-            f = frame(id: 'frame',
-                    size:[(int)(screenDimension.width), (int)(screenDimension.height - 50)],
-                    location: [0,0],
+            def f = frame(id: 'frame',
+                    size: [(int) (screenDimension.width), (int) (screenDimension.height - 50)],
+                    location: [0, 0],
                     iconImage: frameIcon,
                     title: 'v-pipe:  +/- = Zoom  |  Pfeile = Cursor bewegen  |  Shift+Pfeile = Projekt bewegen  |  d = Details an/aus  |  n = now  |  Strg+Pfeile = Tasks vergr./verkl.  |  m = Mittelwert',
                     locationRelativeTo: null,
@@ -227,64 +273,66 @@ class View {
 
                 menuBar(id: 'menuBar') {
 
-                    menu(text:'Dateien', mnemonic:'D') {
+                    menu(text: 'Dateien', mnemonic: 'D') {
+                        menuItem(newAction)
                         menuItem(openAction)
+                        menu(id: "recentMenuItem", "Letzte öffnen", icon: scaleIcon(imageIcon("/icons/recent.png"), 0.5))
                         menuItem(saveAction)
                         menuItem(saveAsAction)
                         checkBoxMenuItem(id: "checkBoxMenuContSaving", toggleContinouosSaveAsAction)
                         menuItem(exitAction)
                     }
 
-                    menu(text:'Werkzeug', mnemonic:'W') {
+                    menu(text: 'Werkzeug', mnemonic: 'W') {
                         menuItem(sortPipelineAction)
                     }
 
-                    menu(text:'Ansicht', mnemonic:'A') {
+                    menu(text: 'Ansicht', mnemonic: 'A') {
                         menuItem(pipelineViewAction)
                         menuItem(loadViewAction)
                         menuItem(pipelineLoadViewAction)
                         menuItem(projectViewAction)
                     }
 
-                    menu(text:'Hilfe', mnemonic:'H') {
+                    menu(text: 'Hilfe', mnemonic: 'H') {
                         menuItem(helpAction)
                         menuItem(printPerformanceAction)
                     }
                 }
 
-                migLayout(layoutConstraints:"fill", columnConstraints:"[][][][][][][][][][][grow]", rowConstraints:"[][grow]")
+                migLayout(layoutConstraints: "fill", columnConstraints: "[][][][][][][][][][][grow]", rowConstraints: "[][grow]")
 
-                label("Projekt suchen: ", foreground:GRAY)
+                label("Projekt suchen: ", foreground: GRAY)
                 textField(id: 'searchTextField', toolTipText: 'Tutorial & Experimente: regex101.com', constraints: 'width 100')
-                label("    Zeit: ", foreground:GRAY)
-                label("", id: 'timeLabel', foreground:highlightColor)
-                label("    Projekt: ", foreground:GRAY)
-                label("", id: 'projectLabel', foreground:highlightColor)
-                label("    Abt: ", foreground:GRAY)
-                label("", id: 'depLabel', foreground:highlightColor)
-                label("    Pfad: ", foreground:GRAY)
-                label(id:'saveIndicator',"*", foreground:GRAY)
-                label(id:'currentPath', constraints:  'wrap')
+                label("    Zeit: ", foreground: GRAY)
+                label("", id: 'timeLabel', foreground: highlightColor)
+                label("    Projekt: ", foreground: GRAY)
+                label("", id: 'projectLabel', foreground: highlightColor)
+                label("    Abt: ", foreground: GRAY)
+                label("", id: 'depLabel', foreground: highlightColor)
+                label("    Pfad: ", foreground: GRAY)
+                label(id: 'saveIndicator', "*", foreground: GRAY)
+                label(id: 'currentPath', constraints: 'wrap')
 
                 // left | right
-                splitPane(id: 'spH', orientation: JSplitPane.HORIZONTAL_SPLIT, continuousLayout:true, dividerLocation: (int)(500 * MainGui.scaleX), constraints: 'grow, span') {
+                splitPane(id: 'spH', orientation: JSplitPane.HORIZONTAL_SPLIT, continuousLayout: true, dividerLocation: (int) (500 * MainGui.scaleX), constraints: 'grow, span') {
 
                     // pipeline
                     // --------
                     //  IP + Load
-                    splitPane(id: 'spV1', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: (int)(300 * MainGui.scaleY)) {
+                    splitPane(id: 'spV1', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: (int) (300 * MainGui.scaleY)) {
 
-                        scrollPane (horizontalScrollBarPolicy: JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS) {
+                        scrollPane(horizontalScrollBarPolicy: JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS) {
                             widget(pipelineView)
                         }
 
                         // IP
                         // ----
                         // Load
-                        splitPane(id: 'spV3', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: (int)(100 * MainGui.scaleY)) {
+                        splitPane(id: 'spV3', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: (int) (100 * MainGui.scaleY)) {
 
                             scrollPane(id: 'pipelineLoadViewScrollPane', horizontalScrollBarPolicy: JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS) {
-                                widget( pipelineLoadView)
+                                widget(pipelineLoadView)
                             }
 
                             scrollPane(id: 'spSwap', horizontalScrollBarPolicy: JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS) {
@@ -296,7 +344,7 @@ class View {
                     // Project
                     // -------
                     // Details
-                    splitPane(id: 'spV2', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: (int)(300 * MainGui.scaleY)) {
+                    splitPane(id: 'spV2', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: (int) (300 * MainGui.scaleY)) {
 
                         scrollPane() {
                             widget(projectView)
@@ -304,7 +352,7 @@ class View {
 
                         tabbedPane(id: 'tabs', tabLayoutPolicy: JTabbedPane.SCROLL_TAB_LAYOUT) {
 
-                            scrollPane (id: 'projectDetailsScrollPane',
+                            scrollPane(id: 'projectDetailsScrollPane',
                                     name: 'Projekt-Details',
                                     verticalScrollBarPolicy: JScrollPane.VERTICAL_SCROLLBAR_ALWAYS) {
                                 //projectDetails.noDataPanel()
@@ -327,8 +375,52 @@ class View {
                     }
                 }
             }
+            bind(target: currentPath, targetProperty: 'text', source: model, sourceProperty: "currentDir", converter: { String v ->
+                JLabel cp = currentPath
+                cp.setToolTipText(v)
+                def l = v.size()
+                if (l > 80) {
+                    def r = v[0..20]+ "  [...]  " + v[l-60..l-1]
+                    return r
+                } else {
+                    return v
+                }
+            })
+            bind(target: saveIndicator, targetProperty: 'foreground', source: model, sourceProperty: "dirty", converter: { v ->
+                v ? RED : GRAY
+            })
+
+            // sync pipelineView with loadView and projectView (details of witch project?)
+            bind(target: gridLoadModel, targetProperty: 'selectedProject', source: gridPipelineModel, sourceProperty: 'selectedProject')
+            bind(target: gridProjectModel, targetProperty: 'projectName', source: gridPipelineModel, sourceProperty: 'selectedProject')
+
+            // sync zoom factor of load views
+            bind(target: pipelineLoadView, targetProperty: 'gridWidth', source: pipelineView, sourceProperty: 'gridWidth')
+            bind(target: loadView, targetProperty: 'gridWidth', source: pipelineView, sourceProperty: 'gridWidth')
+
+            // sync cursorX: central node ist the pipelineView
+            bind(target: projectView, targetProperty: 'cursorX', source: pipelineView, sourceProperty: 'cursorX')
+            bind(target: loadView, targetProperty: 'cursorX', source: pipelineView, sourceProperty: 'cursorX')
+            bind(target: pipelineLoadView, targetProperty: 'cursorX', source: pipelineView, sourceProperty: 'cursorX')
+
+            bind(target: pipelineView, targetProperty: 'cursorX', source: loadView, sourceProperty: 'cursorX')
+            bind(target: pipelineView, targetProperty: 'cursorX', source: projectView, sourceProperty: 'cursorX')
+            bind(target: pipelineView, targetProperty: 'cursorX', source: pipelineLoadView, sourceProperty: 'cursorX')
+
+            // sync indicators in tools and status line
+            bind(target: pipelineView, targetProperty: 'hightlightLinePattern', source: searchTextField, sourceProperty: 'text')
+            bind(target: timeLabel, targetProperty: 'text', source: pipelineView, sourceProperty: 'nowString')
+            bind(target: projectLabel, targetProperty: 'text', source: gridPipelineModel, sourceProperty: 'selectedProject')
+            bind(target: depLabel, targetProperty: 'text', source: gridProjectModel, sourceProperty: 'departmentName')
+
+            // sync scroll-pane values hScrollBarValueZoomingSync
+            bind(target: loadView, targetProperty: 'hScrollBarValueZoomingSync', source: pipelineView, sourceProperty: 'hScrollBarValueZoomingSync')
+            bind(target: pipelineLoadView, targetProperty: 'hScrollBarValueZoomingSync', source: pipelineView, sourceProperty: 'hScrollBarValueZoomingSync')
+
         }
-        ((JScrollPane)(swing.projectDetailsScrollPane)).verticalScrollBar.setUnitIncrement(10)
+        ((JScrollPane) (swing.projectDetailsScrollPane)).verticalScrollBar.setUnitIncrement(10)
+
+
     }
 
 
@@ -352,7 +444,7 @@ class View {
         swing.edt {
 
             frame(id: "framePipeline+${i++}", iconImage: frameIcon,
-                    title: "v-pipe: Staffelung", locationRelativeTo: null, show: true, pack:true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
+                    title: "v-pipe: Staffelung", locationRelativeTo: null, show: true, pack: true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
                 scrollPane() {
                     widget(newPipelineView)
                 }
@@ -366,7 +458,7 @@ class View {
         def newLoadView = new NewLoadPanel(10 * MainGui.scaleX as int, gridLoadModel)
         swing.edt {
             frame(id: "frameLoad+${i++}", iconImage: frameIcon,
-                    title: "v-pipe: Abt.-Belastung", locationRelativeTo: null, show: true, pack:true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
+                    title: "v-pipe: Abt.-Belastung", locationRelativeTo: null, show: true, pack: true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
                 scrollPane() {
                     widget(newLoadView)
                 }
@@ -381,7 +473,7 @@ class View {
         def newLoadView = new NewLoadPanel(10 * MainGui.scaleX as int, gridPipelineLoadModel)
         swing.edt {
             frame(id: "framePipelineLoad+${i++}", iconImage: frameIcon,
-                    title: "v-pipe: IP-Belastung", locationRelativeTo: null, show: true, pack:true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
+                    title: "v-pipe: IP-Belastung", locationRelativeTo: null, show: true, pack: true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
                 scrollPane() {
                     widget(newLoadView, name: "monthLoad$i++")
                 }
@@ -396,7 +488,7 @@ class View {
         def newProjectView = new GridPanel(10 * MainGui.scaleX as int, gridProjectModel)
         swing.edt {
             frame(id: "frameProjectLoad+${i++}", iconImage: frameIcon,
-                    title: "v-pipe: Projekt", locationRelativeTo: null, show: true, pack:true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
+                    title: "v-pipe: Projekt", locationRelativeTo: null, show: true, pack: true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
                 scrollPane() {
                     widget(newProjectView, name: "monthLoad$i++")
                 }

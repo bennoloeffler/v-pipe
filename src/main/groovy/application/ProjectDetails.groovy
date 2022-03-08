@@ -4,17 +4,9 @@ import groovy.swing.SwingBuilder
 import model.Model
 import model.TaskInProject
 
-import javax.swing.Icon
-import javax.swing.ImageIcon
-import javax.swing.JButton
-import javax.swing.JComboBox
-import javax.swing.JComponent
-import javax.swing.JOptionPane
-import javax.swing.JTextField
-import javax.swing.UIManager
-import java.awt.Color
-import java.awt.Image
-import java.awt.event.KeyEvent
+import javax.swing.*
+import java.awt.*
+import java.util.List
 
 import static java.awt.Color.RED
 
@@ -56,7 +48,14 @@ class ProjectDetails {
         if(p) {
             List<TaskInProject> project = model.getProject(p)
 
+            /*
             swing.actions({
+
+            })
+             */
+
+            swing.build {
+
                 action(id: 'applyProjectDetails',
                         name: "Änderungen übernehmen",
                         mnemonic: 'r',
@@ -75,10 +74,8 @@ class ProjectDetails {
                         //smallIcon: imageIcon(resource: "icons/folder_r1.png"),
                         shortDescription: 'dieses Projekt löschen'
                 )
-            })
 
-            swing.build {
-                panel {
+                panel() {
                     migLayout(layoutConstraints: "", columnConstraints: "[][]", rowConstraints: "[][]")
 
                     panel(border: titledBorder('Projekt'), constraints: 'wrap') {
@@ -157,7 +154,7 @@ class ProjectDetails {
 
     def noDataPanel() {
         swing.build {
-            panel {
+            panel() {
                 migLayout(layoutConstraints: "fill", columnConstraints: "", rowConstraints: "")
                 label ("es ist kein Projekt ausgewählt - daher: hier keine Daten", constraints: 'north')
             }
