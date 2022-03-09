@@ -39,7 +39,7 @@ class PipelineElement {
                 endDate: endDate,
                 pipelineSlotsNeeded: pipelineSlotsNeeded)
     }
-    // TODO: TRAIT... move to abstract base class eg "StartEndDayElement"
+    // todo: TRAIT... move to abstract base class eg "StartEndDayElement"
     long getDaysOverlap(Date intervalStart, Date intervalEnd) {
         assert startDate < endDate
         assert intervalStart < intervalEnd

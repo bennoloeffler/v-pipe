@@ -181,9 +181,6 @@ class NewProjectModel extends GridModel {
 
     @Override
     def toggleIntegrationPhase(int x, int y) {
-        // TODO: Write to other model first...
-        // TODO: connect integration phase
-        //allProjectGridLines[y][x].integrationPhase = ! allProjectGridLines[y][x].integrationPhase
     }
 
     @Override

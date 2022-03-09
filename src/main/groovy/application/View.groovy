@@ -128,8 +128,7 @@ class View {
                 scaleIcon(imageIcon(resource: iconPath), scale * MainGui.scaleY )
             }
 
-            // TODO: move actions to Controller, see
-            // see: https://stackoverflow.com/questions/42833424/java-key-bindings-using-groovy-swing-builder/42834255
+            // https://stackoverflow.com/questions/42833424/java-key-bindings-using-groovy-swing-builder/42834255
             // https://stackoverflow.com/questions/9370326/default-action-button-icons-in-java
 
 

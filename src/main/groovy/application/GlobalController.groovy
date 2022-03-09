@@ -13,8 +13,7 @@ import java.awt.event.ActionEvent
 
 // TODO: keep users from saving, when model is emtpy or new and you are in a valid directory (e.g. force safe as...)
 // TODO: after startup, disable "save", when dirty: enable (disable/enable the action)
-// TODO: check, if exit kills the current automatic save operation (wait for save to have happened)
-// TODO:
+// TODO: hypothesis: exit kills the current automatic save operation FIX: wait for save to have happened)
 //
 class GlobalController {
 

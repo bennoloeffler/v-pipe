@@ -12,14 +12,7 @@ import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
 import java.util.List
 
-//TODO: Profil mit einem Feiertag und einem Kapa_Profil Eintrag - Kommentar: können gelöscht werden
-//TODO: Profil kann ohne Feiertage und ohne Kapa-Profil gelesen werden
-//TODO: Umbenennen.
-//TODO: Button: wenn es keine Kapa gibt: createNewCapaProfile
-//TODO: Button: applyCapa
-//TODO: implement Rename Button
-//TODO: Rename in tasks and other elements, see: emptyTheModel()
-//TODO: fireUpdate
+
 class ResourceCapacityEditor {
 
     SwingBuilder swing
@@ -58,10 +51,14 @@ class ResourceCapacityEditor {
         String capaStart =
                 '''Kapa_Gesamt:
 
+# hier keine Einträge?
+# dann: Feiertage: []
+# oder: Kapa_Profil: {}
+
   Feiertage:
   - "1.1.2020"
   - "10.04.2020"
-
+  
   Kapa_Profil:
     "2020-W21": 50
     "2020-W22": 50
@@ -78,22 +75,23 @@ Kapa_Abteilungen:
         String allDepsJoined = allDeps.collect { "\n  " + it + ":\n$kapaDep" }.join("")
 
         String capaEnd =
-                '''\n  exotische_Beispiel_Res:
+                '''\n  Beispiel_Ress_1:
     Kapa:
       gelb: 200
       rot: 400
     Kapa_Profil:
+      #ueberschreibt die Firmen-Werte
       "2020-W01": 100 # nur in KW
       "2020-W02": 100 # nur in KW
+      #ueberschreibt den Ressourcen-Standard
       "2020-W34": # ab dann
         gelb: 120
         rot: 150
-      "2020-W35": # ab dann
+      "2020-W38": # ab dann
         gelb: 200
         rot: 400
-  
-  
-  zweite_Beispiel_Res:
+
+  Beispiel_Ress_2:
     Kapa:
       gelb: 160
       rot: 200

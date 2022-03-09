@@ -232,7 +232,7 @@ class PTest extends Specification {
      * this model shows 3 elements:
      * - a persistent data using PCollections model held by an AtomicReference
      * - an API, that relies on P helper functions inspired by clojure
-     * - TODO: rxgroovy to make it reactive
+     * - todo: rxgroovy to make it reactive
      *   https://github.com/Petikoch/Java_MVVM_with_Swing_and_RxJava_Examples
      */
     static class ReactiveModel {

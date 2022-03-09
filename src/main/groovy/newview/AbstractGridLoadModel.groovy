@@ -2,7 +2,6 @@ package newview
 
 import core.ProjectCapaNeedDetails
 
-//import core.ProjectCapaNeedDetails // TODO: SÜNDE! ABHÄNGIGKEIT!
 import groovy.beans.Bindable
 import groovy.transform.TupleConstructor
 
@@ -79,7 +78,6 @@ abstract class AbstractGridLoadModel {
     abstract List<String> getYNames()
 
 
-    // TODO:
     abstract List<String> getXNames()
 
 }

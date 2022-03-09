@@ -68,7 +68,7 @@ class P {
             } else if (value instanceof Map) {
                 [key, pMap(value)]
             } else {
-                // TODO: check, if Mutable object...
+                // todo: check, if Mutable object...
                 // meaning: something else than:
                 // String, int, double, ... and NOT Immutable
                 [key, value]

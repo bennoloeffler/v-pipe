@@ -2,11 +2,8 @@ package newview
 
 import groovy.beans.Bindable
 import groovy.transform.CompileStatic
-import groovy.transform.TypeChecked
 import groovy.transform.TypeCheckingMode
-import groovy.util.logging.Log
 import groovyx.gpars.GParsPool
-import groovyx.gpars.TransparentParallel
 import utils.RunTimer
 
 import javax.swing.*
@@ -14,7 +11,6 @@ import java.awt.*
 import java.awt.event.*
 import java.beans.PropertyChangeEvent
 import java.beans.PropertyChangeListener
-
 /**
  * custom JPanel with a grid and a red cursor in that grid,
  * that is moved with arrow keys: UP, RIGHT, DOWN, LEFT.
@@ -558,13 +554,12 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
 
             //for (int x in 0..model.sizeX - 1) {
             GParsPool.withPool {
-                ArrayList<Integer> l = getList(model.sizeX)
+                ArrayList<Integer> l = getList(model.sizeX-1)
                 l.each { int x ->
                     for (int y in 0..model.sizeY - 1) {
                         int graphX = borderWidth + x * gridWidth + nameWidth
                         int graphY = borderWidth + y * gridWidth
                         if (graphX >= r.x - 2 * gridWidth && graphX <= r.x + 2 * gridWidth + r.width && graphY >= r.y - 2 * gridWidth && graphY <= r.y + 2 * gridWidth + r.height) {
-                            // TODO: println "x: $x (sizeX: $model.sizeX) y: $y (sizeY: $model.sizeY)"
                             if (model.sizeX == 0 || model.sizeY == 0) {
                                 //t.stop()
                                 return
@@ -782,8 +777,9 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
 
 
             if (gridWidth > 1000) {
-                // write (with shadow) some info
-                // TODO: use Clip, Transform, Paint, Font and Composite
+
+                // PERFORMANCE IDEA: use Clip, Transform, Paint, Font and Composite
+
                 float fontSize = 20.0 * gridWidth / 60
 
                 g.getClipBounds(rBackup)

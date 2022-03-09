@@ -14,7 +14,7 @@ import java.beans.PropertyChangeEvent
 
 import static extensions.DateHelperFunctions._getStartOfWeek
 
-// TODO
+// Performance IDEA
 // 1 GridLoadModelSparce with x and y and shiftX (korrekt x and y when saving (and drawing), set ShiftX to 0 when loading)
 // 2 GridLoadModelSparce --> iterate (and draw) only those, that are there
 // 3 make creating model simple by calculating x and y ONCE while start and when changing a project or task

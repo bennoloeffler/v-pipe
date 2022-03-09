@@ -33,13 +33,12 @@ class GridDemoModel extends GridModel {
      * @return an element of the grid (GridElement nullElement - if there is no element in the grid)
      */
     GridElement getElement(int x, int y) {
-        //assert y < data.size()
-        //assert x < data[y].size()
+        assert y < data.size()
+        assert x < data[y].size()
         if (y >= data.size() || x >= data[y].size()) {
             println("x: $x, y: $y")
-            println("y-max: ${data.size()}, x-max: ${data[y].size()}")
+            println("y-max: ${data.size()-1}, x-max: ${data[y].size()-1}")
             return GridElement.nullElement
-
         }
         def d = data[y][x]
         List<String> split = d.split(/\./)
