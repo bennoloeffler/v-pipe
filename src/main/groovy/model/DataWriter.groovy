@@ -130,17 +130,5 @@ class DataWriter {
             }
         }
 
-        // TODO: Remove templatesPlainTextCache and unify writing
-        /*
-        if(model.templatesPlainTextCache) {
-            def f = new File(DataReader.get_PROJECT_TEMPLATE_FILE_NAME())
-            f.delete()
-            f << model.templatesPlainTextCache
-        }
-        if(model.templatesPipelineElementsPlainTextCache) {
-            def f = new File(DataReader.get_PIPELINING_TEMPLATE_FILE_NAME())
-            f.delete()
-            f << model.templatesPipelineElementsPlainTextCache
-        }*/
     }
 }

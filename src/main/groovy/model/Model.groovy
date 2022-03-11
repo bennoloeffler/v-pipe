@@ -110,12 +110,6 @@ class Model {
         setUpdateToggle(!updateToggle)
     }
 
-    /*
-     * Cache for saving templates and templates pipeline
-     */
-    //String templatesPlainTextCache
-    //String templatesPipelineElementsPlainTextCache
-
 
     Date getDeliveryDate(String project) {
         def date = deliveryDates[project]
@@ -617,8 +611,6 @@ class Model {
         projectSequence = []
         templateList = []
         templatePipelineElements = []
-        //templatesPlainTextCache = null
-        //templatesPipelineElementsPlainTextCache = null
 
         cachedStartOfTasks = null
         cachedEndOfTasks = null
@@ -728,7 +720,6 @@ class Model {
     /**
      * dont forget: view.gridPipelineModel.setSelectedProject(null)
      */
-    // TODO: into gui
     void renameProject(String oldName, String newName) {
         def changeTask = { TaskInProject t -> if (t.project == oldName) t.project = newName }
         taskList.each changeTask
@@ -763,7 +754,6 @@ class Model {
         capaAvailable = calcCapa(jsonSlurp)
 
         templateList.each { if (it.department == oldName) { it.department = newName } }
-        //templatesPlainTextCache = templatesPlainTextCache.replace(oldName, newName)
 
         fireUpdate()
     }
