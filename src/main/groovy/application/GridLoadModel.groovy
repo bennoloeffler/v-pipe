@@ -149,9 +149,16 @@ class GridLoadModel extends AbstractGridLoadModel {
 
     @Override
     double getMaxValAndRed(int y) {
-        def maxLoad = absoluteLoadCalculator.getMax(model.getAllDepartments()[y])
-        def maxRed = gridElements[model.getAllDepartments()[y]].entrySet()*.value.max { it.red }
-        Math.max(maxLoad, maxRed.red)
+
+        def d = model.getAllDepartments()[y]
+        //println "$y: $d"
+        //println gridElements[d].entrySet()
+        def maxLoad = absoluteLoadCalculator.getMax(d)
+        def maxRed = gridElements[d].entrySet()*.value.max { it.red }
+        if(maxRed) {
+            Math.max(maxLoad, maxRed.red)
+        }
+        else { 1.0} // if there is no load at all...
     }
 
     @Override

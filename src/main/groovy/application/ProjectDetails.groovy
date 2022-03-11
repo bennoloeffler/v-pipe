@@ -22,13 +22,13 @@ class ProjectDetails {
 
     static def scaleIcon(icon, scale) {
         Image img = icon.getImage()
-        Image newImg = img.getScaledInstance( (int)(img.getHeight(null) * scale), (int)(img.getWidth(null)*scale),  Image.SCALE_SMOOTH )
-        new ImageIcon( newImg )
+        Image newImg = img.getScaledInstance((int) (img.getHeight(null) * scale), (int) (img.getWidth(null) * scale), Image.SCALE_SMOOTH)
+        new ImageIcon(newImg)
     }
 
     ProjectDetails(View view) {
-        cut =  scaleIcon(new ImageIcon(getClass().getResource("/icons/cut.png")), 0.03 * MainGui.scaleY)
-        copy = scaleIcon (new ImageIcon(getClass().getResource("/icons/copy.png")), 0.03 * MainGui.scaleY)
+        cut = scaleIcon(new ImageIcon(getClass().getResource("/icons/cut.png")), 0.03 * MainGui.scaleY)
+        copy = scaleIcon(new ImageIcon(getClass().getResource("/icons/copy.png")), 0.03 * MainGui.scaleY)
         this.view = view
         model = view.model // shortcut
         swing = view.swing // shortcut
@@ -45,7 +45,7 @@ class ProjectDetails {
 
     def buildDataPanel() {
         def p = view.gridPipelineModel.selectedProject
-        if(p) {
+        if (p) {
             List<TaskInProject> project = model.getProject(p)
 
             /*
@@ -60,7 +60,7 @@ class ProjectDetails {
                         name: "Änderungen übernehmen",
                         mnemonic: 'r',
                         closure: saveProjectDetails,
-                        accelerator: shortcut('R'), //, KeyEvent.ALT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK),
+                        //accelerator: shortcut('R'), //, KeyEvent.ALT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK),
                         focus: JComponent.WHEN_IN_FOCUSED_WINDOW,
                         //smallIcon: imageIcon(resource: "icons/folder_r1.png"),
                         shortDescription: 'geänderte Details in die Projektdaten übernehmen'
@@ -81,7 +81,9 @@ class ProjectDetails {
                     panel(border: titledBorder('Projekt'), constraints: 'wrap') {
                         migLayout(layoutConstraints: "fill", columnConstraints: "[right]rel[fill, grow]", rowConstraints: "[][]")
                         label('Projekt-Name:', constraints: "")
-                        textField(id: 'projectName', enabled: false, text: p, constraints: 'w 10:300:1000, growx, wrap')
+                        textField(id: 'projectName', enabled: true, text: p, constraints: 'w 10:300:1000, growx, wrap',
+                                actionPerformed: checkProjectDetails,
+                                toolTipText: "alter Wert:  " + p)
                         label('Liefer-Termin (ex-works):')
                         textField(id: 'planFinishProject', text: model.getDeliveryDate(p).toString(),
                                 toolTipText: "alter Wert:  " + model.getDeliveryDate(p).toString(),
@@ -92,7 +94,8 @@ class ProjectDetails {
                     }
                     panel(border: titledBorder('Tasks'), constraints: 'wrap') {
                         migLayout(layoutConstraints: "fill", columnConstraints: "[][][][][][][]", rowConstraints: "")
-                        button(id: 'applyDetails', 'Änderungen übernehmen', action: applyProjectDetails, constraints: 'span, growx, wrap') // actionPerformed: saveProjectDetails
+                        button(id: 'applyDetails', 'Änderungen übernehmen', action: applyProjectDetails, constraints: 'span, growx, wrap')
+                        // actionPerformed: saveProjectDetails
 
                         label('  Abteilung')
                         label('  Start')
@@ -102,7 +105,7 @@ class ProjectDetails {
                         label("  löschen    ") // for button cut
                         label("  duplizieren  ", constraints: 'wrap') // for button copy
                         def idx = 0
-                        for(task in project) {
+                        for (task in project) {
                             buildProjectLine(idx++, task.department, task.starting, task.ending, task.capacityNeeded, task.description)
                         }
                     }
@@ -123,7 +126,7 @@ class ProjectDetails {
     }
 
 
-    def buildProjectLine(def idx, def department, def starting, def ending, def capacityNeeded, def description){
+    def buildProjectLine(def idx, def department, def starting, def ending, def capacityNeeded, def description) {
         swing.build {
             comboBox(id: "department-$idx", items: model.allDepartments, selectedItem: department, toolTipText: "alter Wert:  $department")
             textField(id: "planStart-$idx", text: starting.toString(), toolTipText: "alter Wert:  " + starting.toString(), actionPerformed: checkProjectDetails)
@@ -135,17 +138,17 @@ class ProjectDetails {
         }
     }
 
-    def deleteLine = {int idx, evt ->
+    def deleteLine = { int idx, evt ->
         def p = view.gridPipelineModel.selectedProject
-        if(p) {
+        if (p) {
             model.deleteProjectTask(idx, p)
             model.fireUpdate()
         }
     }
 
-    def copyLine = {idx, evt ->
+    def copyLine = { idx, evt ->
         def p = view.gridPipelineModel.selectedProject
-        if(p) {
+        if (p) {
             model.copyProjectTask(idx, p)
             model.fireUpdate()
         }
@@ -156,7 +159,7 @@ class ProjectDetails {
         swing.build {
             panel() {
                 migLayout(layoutConstraints: "fill", columnConstraints: "", rowConstraints: "")
-                label ("es ist kein Projekt ausgewählt - daher: hier keine Daten", constraints: 'north')
+                label("es ist kein Projekt ausgewählt - daher: hier keine Daten", constraints: 'north')
             }
         }
     }
@@ -174,8 +177,8 @@ class ProjectDetails {
 
     def deleteSelectedProject = {
         def p = view.gridPipelineModel.selectedProject
-        if(p) {
-            if(confirmDelete(p)) {
+        if (p) {
+            if (confirmDelete(p)) {
                 view.gridPipelineModel.setSelectedProject(null)
                 model.deleteProject(p)
             }
@@ -184,12 +187,11 @@ class ProjectDetails {
     }
 
     def saveProjectDetails = {
-        if(checkProjectDetails()) {
-            println "SAVE project details"
+        if (checkProjectDetails()) {
             def p = view.gridPipelineModel.selectedProject
             List<TaskInProject> project = model.getProject(p)
             def idx = 0
-            for(task in project) {
+            for (task in project) {
                 task.department = swing."department-$idx".selectedItem as String
                 task.starting = swing."planStart-$idx".text.toDate()
                 task.ending = swing."planFinish-$idx".text.toDate()
@@ -197,9 +199,16 @@ class ProjectDetails {
                 task.description = swing."description-$idx".text
                 idx++
             }
-            model.deliveryDates.put(p, swing."planFinishProject".text.toDate())
+            model.deliveryDates.put(p, swing.planFinishProject.text.toDate())
+
+            if (view.gridPipelineModel.selectedProject != swing.projectName.text) {
+                model.renameProject(view.gridPipelineModel.selectedProject, swing.projectName.text)
+                view.gridPipelineModel.selectedProject = swing.projectName.text
+            }
+
             model.reCalcCapaAvailableIfNeeded()
             model.fireUpdate()
+
             //model.setUpdateToggle(!model.updateToggle)
         } else {
             println "NOT SAVING project details - found errors..."
@@ -208,30 +217,40 @@ class ProjectDetails {
 
 
     def checkProjectDetails = {
-        //println "CEHCK project details"
         def result = true
+        if (!checkTextField(swing.planFinishProject, Date.class)) {
+            result = false
+        }
+        def idx = 0
         def p = view.gridPipelineModel.selectedProject
         List<TaskInProject> project = model.getProject(p)
-        if( ! checkTextField(swing."planFinishProject", Date.class)) result = false
-        def idx = 0
-        for(task in project) {
+        for (task in project) {
             def startValid = true
             def endValid = true
-            if( ! checkTextField(swing."planStart-$idx", Date.class)) {result = false; startValid = false}
-            if( ! checkTextField(swing."planFinish-$idx", Date.class)) {result = false; endValid = false}
-            if( ! checkTextField(swing."capaNeeded-$idx", Double.class)) result = false
-            if( ! checkTextField(swing."description-$idx", String.class)) result = false
-            if(startValid && endValid) {
-                if( ! checkStartBeforeEnd(swing."planStart-$idx", swing."planFinish-$idx")) {
+            if (!checkTextField(swing."planStart-$idx", Date.class)) {
+                result = false; startValid = false
+            }
+            if (!checkTextField(swing."planFinish-$idx", Date.class)) {
+                result = false; endValid = false
+            }
+            if (!checkTextField(swing."capaNeeded-$idx", Double.class)) result = false
+            if (!checkTextField(swing."description-$idx", String.class)) result = false
+            if (startValid && endValid) {
+                if (!checkStartBeforeEnd(swing."planStart-$idx", swing."planFinish-$idx")) {
                     result = false
                 }
             }
             idx++
         }
-        if(result) {
+        if (result) {
             swing.applyDetails.text = "Änderungen übernehmen"
         } else {
             swing.applyDetails.text = "bitte erst Fehler korrigieren... Dann: Änderungen übernehmen"
+        }
+        if (view.gridPipelineModel.selectedProject != swing.projectName.text) {
+            if (!checkProjectName()) {
+                result = false
+            }
         }
         result
     }
@@ -239,7 +258,7 @@ class ProjectDetails {
 
     static def markError(JTextField textField, String error) {
         textField.setForeground(RED)
-        textField.setToolTipText(error + "  ($textField.text)\n"+ textField.getToolTipText())
+        textField.setToolTipText(error + "  ($textField.text)\n" + textField.getToolTipText())
 
     }
 
@@ -247,21 +266,21 @@ class ProjectDetails {
     def markValid(JTextField textField) {
         textField.setForeground(fg)
         String[] split = textField.getToolTipText().split("\n")
-        if(split.size() > 1) {
-            textField.setToolTipText(split[split.size()-1])
+        if (split.size() > 1) {
+            textField.setToolTipText(split[split.size() - 1])
         }
     }
 
 
-    def checkStartBeforeEnd(JTextField textFieldStart, JTextField textFieldEnd){
+    def checkStartBeforeEnd(JTextField textFieldStart, JTextField textFieldEnd) {
         def result = true
         Date start = textFieldStart.text.toDate()
         Date end = textFieldEnd.text.toDate()
-        if(start >= end) {
+        if (start >= end) {
             markError(textFieldStart, "Start >= Ende...")
             markError(textFieldEnd, "Start >= Ende...")
             result = false
-        } else if(end - start > 20*365 ) {
+        } else if (end - start > 20 * 365) {
             markError(textFieldStart, "Start bis Ende mehr als 20 Jahre...")
             markError(textFieldEnd, "Start bis Ende mehr als 20 Jahre...")
             result = false
@@ -272,23 +291,37 @@ class ProjectDetails {
         result
     }
 
+    def checkProjectName() {
+        JTextField pn = swing.projectName
+        String val = pn.text
+        if (val.contains(" ") || val.contains("\t")) {
+            markError(pn, "enthält Leerzeichen...")
+            return false
+        }
+        if (model.getProject(val)) {
+            markError(pn, "es gibt schon ein Projekt mit den Namen $val")
+            return false
+        }
+        markValid(pn)
+        return true
+    }
 
-    def checkTextField = {JTextField textField, Class type ->
+    def checkTextField = { JTextField textField, Class type ->
         def result = true
-        if(type == Double) {
+        if (type == Double) {
             try {
                 textField.text.toDouble()
-            } catch(Exception e) {
+            } catch (Exception e) {
                 markError(textField, "keine Gleitkommazahl...")
                 result = false
             }
-        }else if(type == String){
+        } else if (type == String) {
             def val = textField.text
-            if(val.contains(" ") || val.contains("\t")) {
+            if (val.contains(" ") || val.contains("\t")) {
                 markError(textField, "enthält Leerzeichen...")
                 result = false
             }
-        }else if (type == Date){
+        } else if (type == Date) {
             try {
                 Date then = textField.text.toDate()
                 Date now = new Date()
@@ -296,7 +329,7 @@ class ProjectDetails {
                     markError(textField, "Datum ist mehr als 10 Jahre entfernt")
                     result = false
                 }
-            } catch(Exception e) {
+            } catch (Exception e) {
                 markError(textField, "kein gültiges Datum tt.mm.jjjj...")
                 result = false
             }

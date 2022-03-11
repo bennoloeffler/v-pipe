@@ -147,7 +147,6 @@ class Model {
         projectSequence.add(0, tasks[0].project)
         taskList.addAll(tasks)
         reCalcCapaAvailableIfNeeded()
-
         fireUpdate()
     }
 
@@ -208,7 +207,9 @@ class Model {
 
     List<TaskInProject> copyFromTemplate(String templateName, String copyName, Date copyEndDate) {
         if (getProject(copyName)) throw new RuntimeException("Projektname schon vorhanden: " + copyName)
-        if (Math.abs(getEndOfTasks() - copyEndDate) > 20 * 365) throw new RuntimeException("Projekt-End-Datum ist 20 Jahre entfernt" + copyName)
+
+        def now = new Date()
+        if (Math.abs(now - copyEndDate) > 20 * 365) throw new RuntimeException("Projekt-End-Datum ist 20 Jahre entfernt" + copyName)
         def t = getTemplate(templateName)
         def copy = deepClone(t)
         copy*.project = copyName
@@ -577,12 +578,12 @@ class Model {
         if (pipelineWithoutProject) throw new VpipeDataException(templateOrData + ": Pipeline-Element ohne Projekt: " + pipelineWithoutProject)
     }
 
-    def check() {
-        List<String> depsTasks = taskList*.department.unique()
+    def check(List<TaskInProject> tasks) {
+        List<String> depsTasks = tasks*.department.unique()
         Set<String> depsCapa = capaAvailable.keySet()
         List<String> remain = new ArrayList(depsTasks)
         remain.removeAll(depsCapa)
-        if (remain) throw new VpipeDataException("${fileErr()}Für folgende Abteilungen ist keine Kapa definiert: $remain")
+        if (remain) throw new VpipeDataException("${fileErr()}Für folgende Abteilungen (Projekte oder Vorlagen) ist keine Kapa definiert: $remain")
     }
 
     Double percentageLeftAfterPublicHoliday(String week, List listOfPubHoliday) {
@@ -672,7 +673,7 @@ class Model {
             if (jsonSlurp) {
                 capaAvailable = calcCapa(jsonSlurp)
                 if (capaAvailable) {
-                    check()
+                    check(taskList)
                 }
             }
 
@@ -688,12 +689,13 @@ class Model {
             // templates - identical to tasks, but in different file and data structure
             //
             templateList = DataReader.readProjectTemplates()
-            //templatesPlainTextCache = FileSupport.getTextOrEmpty(DataReader.get_PROJECT_TEMPLATE_FILE_NAME())
+            if (capaAvailable) {
+                check(templateList)
+            }
 
             if (templateList && pipelineElements) {
                 if (new File(DataReader.get_TEMPLATE_PIPELINING_FILE_NAME()).exists()) {
                     templatePipelineElements = DataReader.readPipeliningTemplates()
-                    //templatesPipelineElementsPlainTextCache = FileSupport.getTextOrEmpty(DataReader.get_PIPELINING_TEMPLATE_FILE_NAME())
                     checkPipelineTemplatesInTemplates()
                 } else {
                     throw new VpipeDataException("Wenn die Dateien Integrations-Phasen.txt und\n" +
@@ -706,9 +708,8 @@ class Model {
 
         } catch (Exception e) {
             emptyTheModel()
-            // TODO: doing what now?
-            // TODO: protect directory from overwriting
-            //setCurrentDir("  ---   FEHLER BEIM LESEN DER DATEN!   ---")
+            // TODO: test that
+            setEmptyDir()
             throw e
         } finally {
             setDirty(false)
@@ -727,6 +728,7 @@ class Model {
     /**
      * dont forget: view.gridPipelineModel.setSelectedProject(null)
      */
+    // TODO: into gui
     void renameProject(String oldName, String newName) {
         def changeTask = { TaskInProject t -> if (t.project == oldName) t.project = newName }
         taskList.each changeTask
@@ -743,9 +745,9 @@ class Model {
         deliveryDates.put(newName, deliveryDates.get(oldName))
         deliveryDates.remove(oldName)
 
-        // ??? List<List> scenarioProjects = []
-        // ??? Map<String, Integer> projectDayShift = [:]
-        fireUpdate()
+        // PROBLEM: because current view.gridPipelineModel.selectedProject
+        // needs to be set also and THEN fired. so fire from outside... Sorry
+        //fireUpdate()
     }
 
     void renameDepartment(String oldName, String newName) {
@@ -823,6 +825,7 @@ class Model {
 
         setProjectsAndTemplatesSwapped (! projectsAndTemplatesSwapped)
 
+        reCalcCapaAvailableIfNeeded()
         fireUpdate()
     }
 

@@ -11,13 +11,13 @@ import java.awt.event.WindowEvent
 
 // HERE is the place for all TODO s (TODO = release, todo = remainder)
 // related with the next release
-// 1. practice clean code. https://issuu.com/softhouse/docs/cleancode_5minutes_120523/16
-//    - make tests functional again and part of the createDistribution task
-//    - implement a "new Model"
+// TODO practice clean code. https://issuu.com/softhouse/docs/cleancode_5minutes_120523/16
+//      make tests functional again and part of the createDistribution task
+
 // RELEASE 2.0 do all in Gui (MIK edition) with video starting from help
-// 2.0 template-mode
+// 2.0 new Model, new Project, rename Project, templates and pipelines in GUI --> YOU DONT NEED THE FILES.
 // 2.1 months in Gui
-// 2.2 watch files
+// 2.2 watch files (inside v-pipe in a text area, so that scenarios and shifts can be realized)
 // 3.0 Operational: create “rueckmeldung” in folder -> verbleibend
 
 class MainGui {

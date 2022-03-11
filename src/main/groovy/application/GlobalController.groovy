@@ -179,6 +179,7 @@ class GlobalController {
             a = view.swing.saveAsAction
             a.setEnabled(true)
         }
+        model.fireUpdate()
     }
 
     def pipelineViewActionPerformed = { ActionEvent e ->

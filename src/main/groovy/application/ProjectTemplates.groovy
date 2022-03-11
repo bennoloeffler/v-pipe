@@ -4,12 +4,8 @@ import groovy.swing.SwingBuilder
 import model.Model
 import model.PipelineElement
 
-import javax.swing.JComponent
-import javax.swing.JList
-import javax.swing.ListSelectionModel
-import javax.swing.SwingUtilities
-import java.awt.BorderLayout
-import java.awt.Color
+import javax.swing.*
+import java.awt.*
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 
@@ -157,6 +153,7 @@ class ProjectTemplates {
             String templateName = swing.templateList.selectedValue
             String projectName = swing.templateName.text
             Date projectDate = swing.templateFinish.text.toDate()
+            assert projectDate
             def theCopy = model.copyFromTemplate(templateName, projectName, projectDate)
 
             // copy pipeline...
@@ -179,7 +176,9 @@ class ProjectTemplates {
     def buildDataPanel() {
         def t = model.allTemplates
         //if(t) {
-            swing.actions({
+
+            swing.build {
+
                 action(id: 'cloneTemplate',
                         name: "neues Projekt aus Vorlage erzeugen",
                         //mnemonic: 'r',
@@ -199,10 +198,7 @@ class ProjectTemplates {
                         shortDescription: 'neues Projekt mit einem Task und dem ersten Department und Dauer 4 Wochen erzeugen'
                 )
 
-            })
-
-            swing.build {
-                panel {
+                panel() {
                     migLayout(layoutConstraints: "", columnConstraints: "[]", rowConstraints: "[][]")
 
                     panel(border: titledBorder('Projekt gaaanz neu'), constraints: 'wrap 50') {
@@ -264,7 +260,7 @@ class ProjectTemplates {
 
     def noDataPanel() {
         swing.build {
-            panel {
+            panel() {
                 migLayout(layoutConstraints: "fill", columnConstraints: "", rowConstraints: "")
                 label ("keine Projektvorlagen in Datei Vorlagen.txt", constraints: 'north')
             }
