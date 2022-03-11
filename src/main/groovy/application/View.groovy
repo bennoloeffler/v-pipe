@@ -39,8 +39,20 @@ import static application.ProjectDetails.*
 import static java.awt.Color.*
 
 /**
- * @see https://docs.oracle.com/javase/tutorial/uiswing/components/filechooser.html
+ * @see https://docs.oracle.com/javase/tutorial/uiswing/components/
  *
+ * MVC with swing. BELs interpretation:
+ * Model knows nothing - its observed and firing changes to an interface
+ * View knows Model - but only to "bind". Holds swings actions. Holds the adaper-models (like JTableModel).
+ * Controller knows Model and View. It connedts swings actions to real code that works on model.
+ * @see GINA p.247 http://index-of.es/Java/Groovy%20in%20Action.pdf
+ * @see OLD docu SwingBuilder https://web.archive.org/web/20140702234352/http://groovy.codehaus.org/Swing+Builder
+ * @see SLIDES https://de.slideshare.net/aalmiray/javaone-ts5098-groovy-swingbuilder?qid=58967b6f-7007-4c0a-9dc2-148194f618c8&v=&b=&from_search=2
+ * @see OLD article 1 https://uberconf.com/blog/andres_almiray/2009/11/building_rich_swing_applications_with_groovy__part_i
+ * @see OLD article 2 https://uberconf.com/blog/andres_almiray/2009/11/building_rich_swing_applications_with_groovy__part_iI
+ * @see OLD article 3 https://uberconf.com/blog/andres_almiray/2009/12/building_rich_swing_applications_with_groovy__part_iii
+ * @see OLD article 4 https://uberconf.com/blog/andres_almiray/2009/12/building_rich_swing_applications_with_groovy__part_iv
+ * @see Beispiel deutsch: https://docplayer.org/9822371-Programmieren-lernen-mit-groovy-graphische-oberflaechen-guis-graphical-user-interfaces.html
  */
 class View {
 
@@ -132,10 +144,10 @@ class View {
             // https://stackoverflow.com/questions/9370326/default-action-button-icons-in-java
 
 
-            action(id: 'newAction',
+            action(id: 'newModelAction',
                     name: "neues Modell",
                     //mnemonic: 'o',
-                    closure: { println "openAction not connected to application..." },
+                    closure: { println "newModelAction not connected to application..." },
                     //accelerator: shortcut('O'),
                     smallIcon: i("/icons/new-model.png", 0.3),
                     shortDescription: 'neues Modell mit Beispiel-Projekt und Beispiel-Ressource erzeugen'
@@ -187,6 +199,14 @@ class View {
             )
 
             // tools
+
+            action(id: 'swapTemplatesAndProjectsAction',
+                    name: "Vorlagen und Projekte tauschen",
+                    //mnemonic: 'p',
+                    closure: { println "swapTemplatesAndProjects not connected to application..." },
+                    //accelerator: shortcut('P'),
+                    shortDescription: 'Projekte erscheinen als Vorlagen. Vorlagen werden bearbeitbar "als Projekte".'
+            )
 
             action(id: 'sortPipelineAction',
                     name: "Staffelung (P) sortieren",
@@ -273,7 +293,7 @@ class View {
                 menuBar(id: 'menuBar') {
 
                     menu(text: 'Dateien', mnemonic: 'D') {
-                        menuItem(newAction)
+                        menuItem(newModelAction)
                         menuItem(openAction)
                         menu(id: "recentMenuItem", "Letzte öffnen", icon: scaleIcon(imageIcon("/icons/recent.png"), 0.5))
                         menuItem(saveAction)
@@ -284,6 +304,7 @@ class View {
 
                     menu(text: 'Werkzeug', mnemonic: 'W') {
                         menuItem(sortPipelineAction)
+                        menuItem(swapTemplatesAndProjectsAction)
                     }
 
                     menu(text: 'Ansicht', mnemonic: 'A') {
@@ -303,6 +324,7 @@ class View {
 
                 label("Projekt suchen: ", foreground: GRAY)
                 textField(id: 'searchTextField', toolTipText: 'Tutorial & Experimente: regex101.com', constraints: 'width 100')
+                label(id: "swapped", foreground: RED)
                 label("    Zeit: ", foreground: GRAY)
                 label("", id: 'timeLabel', foreground: highlightColor)
                 label("    Projekt: ", foreground: GRAY)
@@ -388,6 +410,10 @@ class View {
             bind(target: saveIndicator, targetProperty: 'foreground', source: model, sourceProperty: "dirty", converter: { v ->
                 v ? RED : GRAY
             })
+            bind(target: swapped, targetProperty: 'text', source: model, sourceProperty: "projectsAndTemplatesSwapped", converter: { v ->
+                v ? "VORLAGEN-MODUS" : ""
+            })
+
 
             // sync pipelineView with loadView and projectView (details of witch project?)
             bind(target: gridLoadModel, targetProperty: 'selectedProject', source: gridPipelineModel, sourceProperty: 'selectedProject')

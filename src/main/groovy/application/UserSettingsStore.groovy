@@ -41,7 +41,8 @@ class UserSettingsStore {
         getLastOpenedDataFoldersFile() << "\n" + dir
     }
 
-    List<String> getLastOpenedDataFolders(){
-        List l = getLastOpenedDataFoldersFile().text.trim().split("\n").toList()
+    List<String> getRecentOpenedDataFolders(){
+        def t = getLastOpenedDataFoldersFile().text
+        List l = t?t.trim().split("\n").toList():[]
     }
 }

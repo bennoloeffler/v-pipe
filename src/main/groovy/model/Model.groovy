@@ -10,11 +10,11 @@ import org.pcollections.HashTreePSet
 import org.pcollections.PSet
 import transform.DateShiftTransformer
 import transform.ScenarioTransformer
-import utils.FileSupport
 import utils.RunTimer
 
 import java.time.Duration
 import java.time.temporal.ChronoUnit
+import java.util.stream.Collectors
 
 import static extensions.DateHelperFunctions._getStartOfWeek
 import static extensions.DateHelperFunctions._sToD
@@ -22,6 +22,10 @@ import static model.WeekOrMonth.WEEK
 
 @CompileStatic
 class Model {
+
+    @Bindable
+    boolean projectsAndTemplatesSwapped = false
+
 
     @Bindable
     boolean dirty = false
@@ -98,6 +102,7 @@ class Model {
 
     // the sequence (e.g. if the user moves a project up or down)
     List<String> projectSequence = []
+    List<String> templateSequence = [] //just for swapping templates and projects
 
 
     def fireUpdate() {
@@ -108,8 +113,8 @@ class Model {
     /*
      * Cache for saving templates and templates pipeline
      */
-    String templatesPlainTextCache
-    String templatesPipelineElementsPlainTextCache
+    //String templatesPlainTextCache
+    //String templatesPipelineElementsPlainTextCache
 
 
     Date getDeliveryDate(String project) {
@@ -537,7 +542,7 @@ class Model {
     def checkPipelineTemplatesInTemplates() {
         if (templatePipelineElements) {
             checkOnePipelineToEachProject(templateList, templatePipelineElements, "VORLAGEN")
-            fileErr = { " beim Lesen der Datei ${DataReader.get_PIPELINING_TEMPLATE_FILE_NAME()}\n" }
+            fileErr = { " beim Lesen der Datei ${DataReader.get_TEMPLATE_PIPELINING_FILE_NAME()}\n" }
             templatePipelineElements.each {
                 List<TaskInProject> p = getTemplate(it.project)
                 if (p) {
@@ -611,13 +616,13 @@ class Model {
         projectSequence = []
         templateList = []
         templatePipelineElements = []
-        templatesPlainTextCache = null
-        templatesPipelineElementsPlainTextCache = null
+        //templatesPlainTextCache = null
+        //templatesPipelineElementsPlainTextCache = null
 
         cachedStartOfTasks = null
         cachedEndOfTasks = null
 
-        setDirty(true)
+        setDirty(false)
     }
 
 
@@ -654,7 +659,7 @@ class Model {
             dst.transform()
 
             //
-            // THEN read and create templated projects -> on top of shifts of originals with shift
+            // THEN read and create scenario projects -> on top of shifts of originals with shift
             //
             scenarioProjects = DataReader.readScenario()
             ScenarioTransformer tt = new ScenarioTransformer(this)
@@ -683,12 +688,12 @@ class Model {
             // templates - identical to tasks, but in different file and data structure
             //
             templateList = DataReader.readProjectTemplates()
-            templatesPlainTextCache = FileSupport.getTextOrEmpty(DataReader.get_PROJECT_TEMPLATE_FILE_NAME())
+            //templatesPlainTextCache = FileSupport.getTextOrEmpty(DataReader.get_PROJECT_TEMPLATE_FILE_NAME())
 
             if (templateList && pipelineElements) {
-                if (new File(DataReader.get_PIPELINING_TEMPLATE_FILE_NAME()).exists()) {
+                if (new File(DataReader.get_TEMPLATE_PIPELINING_FILE_NAME()).exists()) {
                     templatePipelineElements = DataReader.readPipeliningTemplates()
-                    templatesPipelineElementsPlainTextCache = FileSupport.getTextOrEmpty(DataReader.get_PIPELINING_TEMPLATE_FILE_NAME())
+                    //templatesPipelineElementsPlainTextCache = FileSupport.getTextOrEmpty(DataReader.get_PIPELINING_TEMPLATE_FILE_NAME())
                     checkPipelineTemplatesInTemplates()
                 } else {
                     throw new VpipeDataException("Wenn die Dateien Integrations-Phasen.txt und\n" +
@@ -706,16 +711,40 @@ class Model {
             //setCurrentDir("  ---   FEHLER BEIM LESEN DER DATEN!   ---")
             throw e
         } finally {
+            setDirty(false)
             fireUpdate()
             t.stop()
         }
-        setDirty(false)
     }
 
     void saveRessources(String yaml) {
         DataReader.capaTextCache = yaml
         jsonSlurp = DataReader.readCapa(true)
         capaAvailable = calcCapa(jsonSlurp)
+        fireUpdate()
+    }
+
+    /**
+     * dont forget: view.gridPipelineModel.setSelectedProject(null)
+     */
+    void renameProject(String oldName, String newName) {
+        def changeTask = { TaskInProject t -> if (t.project == oldName) t.project = newName }
+        taskList.each changeTask
+        templateList.each changeTask
+
+        def replaceName = { String n -> n == oldName ? newName : n }
+        projectSequence.replaceAll replaceName
+        templateSequence.replaceAll replaceName
+
+        def changeTemplElement = { PipelineElement p -> if (p.project == oldName) p.project = newName }
+        pipelineElements.each changeTemplElement
+        templatePipelineElements.each changeTemplElement
+
+        deliveryDates.put(newName, deliveryDates.get(oldName))
+        deliveryDates.remove(oldName)
+
+        // ??? List<List> scenarioProjects = []
+        // ??? Map<String, Integer> projectDayShift = [:]
         fireUpdate()
     }
 
@@ -732,8 +761,72 @@ class Model {
         capaAvailable = calcCapa(jsonSlurp)
 
         templateList.each { if (it.department == oldName) { it.department = newName } }
-        templatesPlainTextCache = templatesPlainTextCache.replace(oldName, newName)
+        //templatesPlainTextCache = templatesPlainTextCache.replace(oldName, newName)
 
         fireUpdate()
+    }
+
+    /**
+     * states of the model:
+     * - loaded = there are Tasks
+     * - not_loaded = there are NO tasks
+     */
+    void newModel() {
+        emptyTheModel()
+        setCurrentDir("./new-model")
+        readAllData()
+        //setCurrentDir(System.getProperty("user.home") + "/v-pipe-data/tmp")
+        setEmptyDir()
+        fireUpdate()
+    }
+
+    void setEmptyDir() {
+        currentDir = "KEIN VERZEICHNIS GEWÄHLT!"
+        DataReader.currentDir = currentDir
+        firePropertyChange('currentDir', "", currentDir)
+    }
+
+    Map<String, Date> swapStoreOfdeliveryDates = [:]
+
+    def swapDeliveryDates() {
+        if (projectsAndTemplatesSwapped){ // move back
+            deliveryDates = swapStoreOfdeliveryDates
+            swapStoreOfdeliveryDates = [:]
+        } else { // save
+            swapStoreOfdeliveryDates = deliveryDates
+            deliveryDates = [:] // clear - in order to let templates "discover" their own
+        }
+    }
+
+    // TODO: Check loading and swapping and saving
+    // - with no templates, no ip
+    // - with with templates, no ip
+    // - with with templates, with ip
+
+    void swapTemplatesAndProjects() {
+
+        createTemplateSequence() // first!
+
+        swapDeliveryDates()
+
+        def swap = taskList
+        taskList = templateList
+        templateList = swap
+
+        swap = pipelineElements
+        pipelineElements = templatePipelineElements
+        templatePipelineElements = swap
+
+        swap = projectSequence
+        projectSequence = templateSequence
+        templateSequence = swap
+
+        setProjectsAndTemplatesSwapped (! projectsAndTemplatesSwapped)
+
+        fireUpdate()
+    }
+
+    List<String> createTemplateSequence() {
+        templateSequence = templateList.stream().map { it.project }.distinct().collect(Collectors.toList())
     }
 }

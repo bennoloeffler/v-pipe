@@ -6,10 +6,10 @@ class DataWriter {
 
     Model model
 
-    String getTasks() {
+    String getTasks(List<TaskInProject> tasks) {
         StringBuffer result = new StringBuffer()
-        for(task in model.taskList) {
-            result.with  {
+        for (task in tasks) {
+            result.with {
                 append(task.project.padRight(20))
                 append('  ')
                 append(task.starting.toString())
@@ -26,9 +26,9 @@ class DataWriter {
         result.toString()
     }
 
-    void writeTasksToFile(){
-        String data = getTasks()
-        def f = new File(DataReader.get_TASK_FILE_NAME())
+    void writeTasksToFile(List<TaskInProject> tasks, String fileName) {
+        String data = getTasks(tasks)
+        def f = new File(fileName)//DataReader.get_TASK_FILE_NAME())
         f.delete()
         f << data
     }
@@ -37,7 +37,7 @@ class DataWriter {
         DataReader.capaTextCache
     }
 
-    void writeCapaToFile(){
+    void writeCapaToFile() {
         String data = getCapa()
         def f = new File(DataReader.get_CAPA_FILE_NAME())
         f.delete()
@@ -56,37 +56,26 @@ class DataWriter {
             DataReader.PROJECT_DELIVERY_DATE_FILE_NAME
     ]
 
-    def backup() {
-
+    static def backup() {
 
         def bDir = FileSupport.backupDirName(DataReader.currentDir)
         assert new File(bDir).mkdirs()
 
         ALL_DATA_FILES.each { fileName ->
-            File from = new File( DataReader.path(fileName))
+            File from = new File(DataReader.path(fileName))
             File to = new File(bDir + '/' + fileName)
-            //def r = from.renameTo(to)
-            //println(to.getCanonicalPath())
-            //to.createNewFile()
-            //Files.move(from.toPath(), to.toPath(), StandardCopyOption.REPLACE_EXISTING)
-            //to << from.text
-            //from.delete()
             from.renameTo(to) // move without exception, if file is missing - but also ignore fails...
         }
     }
 
 
-    def writeSequenceToFile() {
-        def f = new File(DataReader.get_SEQUENCE_FILE_NAME())
+    def writeSequenceToFile(List<String> sequence, String fileName) {
+        def f = new File(fileName)
         f.delete()
 
-        model.projectSequence.each {
+        sequence.each {
             f << "$it\n"
         }
-        /*
-        f.withObjectOutputStream { out ->
-            out.writeObject(model.projectSequence)
-        }*/
     }
 
     def writeDeliveryDatesToFile() {
@@ -96,41 +85,53 @@ class DataWriter {
         model.deliveryDates.each {
             f << "$it.key ${it.value.toString()}\n"
         }
-        /*
-        f.withObjectOutputStream { out ->
-            out.writeObject(model.projectSequence)
-        }*/
     }
 
-    String getPipelining() {
-        StringBuffer result = new StringBuffer(model.maxPipelineSlots.toString()+'\n')
-        model.pipelineElements.each {
+    String getPipelining(List<PipelineElement> elements, boolean isTemplatePipeline = false) {
+        String slots = isTemplatePipeline ? "" : model.maxPipelineSlots.toString() + '\n'
+        StringBuffer result = new StringBuffer(slots)
+        elements.each {
             result << "${it.project.padLeft(20)} ${it.startDate.toString()} ${it.endDate.toString()} ${it.pipelineSlotsNeeded}\n"
         }
         result.toString()
     }
 
-    def writePipliningToFile() {
-        String data = getPipelining()
-        def f = new File(DataReader.get_PIPELINING_FILE_NAME())
+    def writePipliningToFile(List<PipelineElement> elements, String fileName, boolean isTemplatePipeline = false) {
+        String data = getPipelining(elements, isTemplatePipeline)
+        def f = new File(fileName)
         f.delete()
         f << data
     }
 
 
     void saveAll() {
-
+        assert !model.projectsAndTemplatesSwapped
         backup()
 
-        writeTasksToFile()
+        writeTasksToFile(model.taskList, DataReader.get_TASK_FILE_NAME())
+        if (model.templateList) {
+            writeTasksToFile(model.templateList, DataReader.get_PROJECT_TEMPLATE_FILE_NAME())
+        }
+
         writeDeliveryDatesToFile()
-        if(model.capaAvailable) {
+
+        if (model.capaAvailable) {
             writeCapaToFile()
         }
-        writeSequenceToFile()
-        if(model.pipelineElements) {
-            writePipliningToFile()
+        writeSequenceToFile(model.projectSequence, DataReader.get_SEQUENCE_FILE_NAME())
+        if (model.templateSequence) {
+            writeSequenceToFile(model.templateSequence, DataReader.get_TEMPLATE_SEQUENCE_FILE_NAME())
         }
+
+        if (model.pipelineElements) {
+            writePipliningToFile(model.pipelineElements, DataReader.get_PIPELINING_FILE_NAME())
+            if (model.templatePipelineElements) {
+                writePipliningToFile(model.templatePipelineElements, DataReader.get_TEMPLATE_PIPELINING_FILE_NAME(), true)
+            }
+        }
+
+        // TODO: Remove templatesPlainTextCache and unify writing
+        /*
         if(model.templatesPlainTextCache) {
             def f = new File(DataReader.get_PROJECT_TEMPLATE_FILE_NAME())
             f.delete()
@@ -140,7 +141,6 @@ class DataWriter {
             def f = new File(DataReader.get_PIPELINING_TEMPLATE_FILE_NAME())
             f.delete()
             f << model.templatesPipelineElementsPlainTextCache
-        }
-        //model.setThreadSaveDirty(false)
+        }*/
     }
 }

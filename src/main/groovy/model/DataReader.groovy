@@ -6,6 +6,7 @@ import groovy.yaml.YamlBuilder
 import groovy.yaml.YamlSlurper
 import utils.FileSupport
 import utils.RunTimer
+
 /**
  * reading and parsing data
  */
@@ -15,17 +16,18 @@ class DataReader {
 
     static String currentDir = "test" // overwrite this for application!
 
-     static String TASK_FILE_NAME = "Projekt-Start-End-Abt-Kapa.txt"
-     static String PIPELINING_FILE_NAME = "Integrations-Phasen.txt"
-     static String DATESHIFT_FILE_NAME = "Projekt-Verschiebung.txt"
-     static String CAPA_FILE_NAME = "Abteilungs-Kapazitaets-Angebot.txt"
-     static String SCENARIO_FILE_NAME = "Szenario-Kopie-Original-Verschiebung.txt"
-     static String SEQUENCE_FILE_NAME = "Projekt_Sequenz.txt"
-     static String PROJECT_TEMPLATE_FILE_NAME = "Vorlagen-Projekt-Start-End-Abt-Kapa.txt"
-     static String PIPELINE_TEMPLATE_FILE_NAME = "Vorlagen-Integrations-Phasen.txt"
+    static String TASK_FILE_NAME = "Projekt-Start-End-Abt-Kapa.txt"
+    static String PIPELINING_FILE_NAME = "Integrations-Phasen.txt"
+    static String DATESHIFT_FILE_NAME = "Projekt-Verschiebung.txt"
+    static String CAPA_FILE_NAME = "Abteilungs-Kapazitaets-Angebot.txt"
+    static String SCENARIO_FILE_NAME = "Szenario-Kopie-Original-Verschiebung.txt"
+    static String SEQUENCE_FILE_NAME = "Projekt_Sequenz.txt"
+    static String PROJECT_TEMPLATE_FILE_NAME = "Vorlagen-Projekt-Start-End-Abt-Kapa.txt"
+    static String TEMPLATE_PIPELINE_FILE_NAME = "Vorlagen-Integrations-Phasen.txt"
     static String PROJECT_DELIVERY_DATE_FILE_NAME = "Projekt-Liefertermin.txt"
+    static String TEMPLATE_SEQUENCE_FILE_NAME = "Vorlagen-Sequenz.txt"
 
-    static String path(String fileName){
+    static String path(String fileName) {
         currentDir + "/" + fileName
     }
 
@@ -45,8 +47,8 @@ class DataReader {
         path PIPELINING_FILE_NAME
     }
 
-    static String get_PIPELINING_TEMPLATE_FILE_NAME() {
-        path PIPELINE_TEMPLATE_FILE_NAME
+    static String get_TEMPLATE_PIPELINING_FILE_NAME() {
+        path TEMPLATE_PIPELINE_FILE_NAME
     }
 
     static String get_DATESHIFT_FILE_NAME() {
@@ -63,6 +65,10 @@ class DataReader {
 
     static String get_SEQUENCE_FILE_NAME() {
         path SEQUENCE_FILE_NAME
+    }
+
+    static String get_TEMPLATE_SEQUENCE_FILE_NAME() {
+        path TEMPLATE_SEQUENCE_FILE_NAME
     }
 
 
@@ -91,7 +97,7 @@ class DataReader {
     }
 
     static List<TaskInProject> readTasks(String text, boolean templates) {
-        List<List<String>> splitLines =  FileSupport.toSplitAndTrimmedLines(text)
+        List<List<String>> splitLines = FileSupport.toSplitAndTrimmedLines(text)
         return parseTasks(splitLines, templates)
     }
 
@@ -151,8 +157,12 @@ class DataReader {
                 }
             }
         }//t.stop("parsing file ${(templates ? get_PROJECT_TEMPLATE_FILE_NAME(): get_TASK_FILE_NAME())}")
-        if(!templates && !taskList){throw new VpipeDataException("${get_TASK_FILE_NAME()} enthält keine Daten")}
-        if( taskList.size() > 3000 ){println("W A R N U N G:\n${(templates ? get_PROJECT_TEMPLATE_FILE_NAME(): get_TASK_FILE_NAME())} enthält ${taskList.size()} Datensätze. GUI wird seeeehr LANGSAM...")}
+        if (!templates && !taskList) {
+            throw new VpipeDataException("${get_TASK_FILE_NAME()} enthält keine Daten")
+        }
+        if (taskList.size() > 3000) {
+            println("W A R N U N G:\n${(templates ? get_PROJECT_TEMPLATE_FILE_NAME() : get_TASK_FILE_NAME())} enthält ${taskList.size()} Datensätze. GUI wird seeeehr LANGSAM...")
+        }
         return taskList
     }
 
@@ -160,7 +170,7 @@ class DataReader {
         def result = new HashMap<String, Date>()
         try {
             String text = FileSupport.getTextOrEmpty(get_PROJECT_DELIVERY_DATE_FILE_NAME())
-            List<List<String>> splitLines =  FileSupport.toSplitAndTrimmedLines(text)
+            List<List<String>> splitLines = FileSupport.toSplitAndTrimmedLines(text)
             splitLines.each {
                 result.put(it[0], it[1].toDate())
             }
@@ -179,45 +189,46 @@ class DataReader {
         Integer maxPipelineSlots
         List<PipelineElement> elements
     }
+
     static PipelineResult readPipelining() {
         String text = FileSupport.getTextOrEmpty(get_PIPELINING_FILE_NAME())
         return readPipelining(text)
     }
 
     static PipelineResult readPipelining(String text) {
-        List<List<String>> splitLines =  FileSupport.toSplitAndTrimmedLines(text)
+        List<List<String>> splitLines = FileSupport.toSplitAndTrimmedLines(text)
         return parsePipelining(splitLines)
     }
 
     static PipelineResult parsePipelining(List<List<String>> splitLines) {
         int maxPipelineSlots = 0
         List<PipelineElement> pipelineElements = []
-        if(splitLines) {
+        if (splitLines) {
             try {
                 maxPipelineSlots = splitLines[0][0].toInteger()
                 if (maxPipelineSlots == 0) {
                     println("WARNUNG: In ${get_PIPELINING_FILE_NAME()} ist unbegrenzte Kapazität eingestellt (0 = kein Slot = unbegrenzt)...\n Pipelining wird ignoriert!")
                 }
-            } catch(Exception e) {
+            } catch (Exception e) {
                 throw new VpipeDataException("Fehler beim Lesen von ${get_PIPELINING_FILE_NAME()}.\nErste Zeile muss exakt eine Ganzzahl sein: Slots der Pipeline.")
             }
         }
-        if(splitLines.size()>1) {
-            (1..splitLines.size()-1).each {
+        if (splitLines.size() > 1) {
+            (1..splitLines.size() - 1).each {
                 def line = splitLines[it]
-                def errMsg = {"Lesen von Datei ${get_PIPELINING_FILE_NAME()} fehlgeschlagen.\nDatensatz: ${line}"}
-                if(line.size() != 4) {
+                def errMsg = { "Lesen von Datei ${get_PIPELINING_FILE_NAME()} fehlgeschlagen.\nDatensatz: ${line}" }
+                if (line.size() != 4) {
                     throw new VpipeDataException(errMsg() + "\nEs sind keine 4 Elemente.")
                 }
                 try {
                     //def pe = new PipelineOriginalElement(project: line[0], startDate: line[1].toDate(), endDate: line[2].toDate(), pipelineSlotsNeeded: line[3].toInteger() )
                     Date start = line[1].toDate()
                     Date end = line[2].toDate()
-                    if( ! start.before(end)) {
+                    if (!start.before(end)) {
                         throw new VpipeDataException(errMsg() + "\nStart liegt nicht vor Ende.")
                     }
-                    if(line[3].toInteger() > maxPipelineSlots) {
-                        throw new VpipeDataException(errMsg() +"\nerforderliche Pipeline-Slots (${line[3].toInteger()}) größer als Maximum($maxPipelineSlots)")
+                    if (line[3].toInteger() > maxPipelineSlots) {
+                        throw new VpipeDataException(errMsg() + "\nerforderliche Pipeline-Slots (${line[3].toInteger()}) größer als Maximum($maxPipelineSlots)")
                     }
                     def pe = new PipelineElement(
                             project: line[0],
@@ -229,14 +240,14 @@ class DataReader {
                     pipelineElements << pe
                 } catch (VpipeDataException v) {
                     throw v
-                }catch (Exception e) {
+                } catch (Exception e) {
                     throw new VpipeDataException(errMsg() + '\nVermutung:\na) Datum falsch (dd.MM.yyyy). Oder\nb) Pipeline-Bedarf ist keine Zahl', e)
                 }
             }
         }
         List<String> projects = pipelineElements*.project
-        def diff = projects.countBy{it}.grep{it.value > 1}.collect{it}
-        if(diff) {
+        def diff = projects.countBy { it }.grep { it.value > 1 }.collect { it }
+        if (diff) {
             throw new VpipeDataException("Lesen von Datei ${get_PIPELINING_FILE_NAME()} fehlgeschlagen.\nMehrfacheinträge für Projekte: $diff")
         }
         new PipelineResult(maxPipelineSlots: maxPipelineSlots, elements: pipelineElements)
@@ -247,30 +258,30 @@ class DataReader {
      * pipeline templates
      */
     static List<PipelineElement> readPipeliningTemplates() {
-        String text = FileSupport.getTextOrEmpty(get_PIPELINING_TEMPLATE_FILE_NAME())
+        String text = FileSupport.getTextOrEmpty(get_TEMPLATE_PIPELINING_FILE_NAME())
         return readPipeliningTemplates(text)
     }
 
-    static List<PipelineElement>  readPipeliningTemplates(String text) {
-        List<List<String>> splitLines =  FileSupport.toSplitAndTrimmedLines(text)
+    static List<PipelineElement> readPipeliningTemplates(String text) {
+        List<List<String>> splitLines = FileSupport.toSplitAndTrimmedLines(text)
         return parsePipeliningTemplates(splitLines)
     }
 
-    static List<PipelineElement>  parsePipeliningTemplates(List<List<String>> splitLines) {
+    static List<PipelineElement> parsePipeliningTemplates(List<List<String>> splitLines) {
         List<PipelineElement> pipelineElements = []
 
-        if(splitLines.size()>0) {
-            (0..splitLines.size()-1).each {
+        if (splitLines.size() > 0) {
+            (0..splitLines.size() - 1).each {
                 def line = splitLines[it]
-                def errMsg = {"Lesen von Datei ${get_PIPELINING_FILE_NAME()} fehlgeschlagen.\nDatensatz: ${line}"}
-                if(line.size() != 4) {
+                def errMsg = { "Lesen von Datei ${get_PIPELINING_FILE_NAME()} fehlgeschlagen.\nDatensatz: ${line}" }
+                if (line.size() != 4) {
                     throw new VpipeDataException(errMsg() + "\nEs sind keine 4 Elemente.")
                 }
                 try {
                     //def pe = new PipelineOriginalElement(project: line[0], startDate: line[1].toDate(), endDate: line[2].toDate(), pipelineSlotsNeeded: line[3].toInteger() )
                     Date start = line[1].toDate()
                     Date end = line[2].toDate()
-                    if( ! start.before(end)) {
+                    if (!start.before(end)) {
                         throw new VpipeDataException(errMsg() + "\nStart liegt nicht vor Ende.")
                     }
                     /*
@@ -287,14 +298,14 @@ class DataReader {
                     pipelineElements << pe
                 } catch (VpipeDataException v) {
                     throw v
-                }catch (Exception e) {
+                } catch (Exception e) {
                     throw new VpipeDataException(errMsg() + '\nVermutung:\na) Datum falsch (dd.MM.yyyy). Oder\nb) Pipeline-Bedarf ist keine Zahl', e)
                 }
             }
         }
         List<String> projects = pipelineElements*.project
-        def diff = projects.countBy{it}.grep{it.value > 1}.collect{it}
-        if(diff) {
+        def diff = projects.countBy { it }.grep { it.value > 1 }.collect { it }
+        if (diff) {
             throw new VpipeDataException("Lesen von Datei ${get_PIPELINING_FILE_NAME()} fehlgeschlagen.\nMehrfacheinträge für Projekte: $diff")
         }
         pipelineElements
@@ -310,7 +321,7 @@ class DataReader {
     }
 
     static Map<String, Integer> readDateShift(String text) {
-        List<List<String>> splitLines =  FileSupport.toSplitAndTrimmedLines(text)
+        List<List<String>> splitLines = FileSupport.toSplitAndTrimmedLines(text)
         return parseDateShift(splitLines)
     }
 
@@ -319,9 +330,9 @@ class DataReader {
         Map<String, Integer> projectDayShift = [:]
         //List<String[]> lines = FileSupport.getDataLinesSplitTrimmed(DataReader.DATESHIFT_FILE_NAME)
         splitLines.each { line ->
-            def errMsg = {"Parsen von Datei ${get_DATESHIFT_FILE_NAME()} fehlgeschlagen.\nDatensatz: ${line}"}
-            if(line?.size() != 2) {
-                throw new VpipeDataException(errMsg()+"\nJede Zeile braucht zwei Einträge")
+            def errMsg = { "Parsen von Datei ${get_DATESHIFT_FILE_NAME()} fehlgeschlagen.\nDatensatz: ${line}" }
+            if (line?.size() != 2) {
+                throw new VpipeDataException(errMsg() + "\nJede Zeile braucht zwei Einträge")
             }
             try {
                 def project = line[0]
@@ -340,27 +351,29 @@ class DataReader {
     /**
      * @return def jsonSlurp
      */
-    static def  readCapa(boolean fromCapaTextCache = false) {
-        if(fromCapaTextCache) {
+    static def readCapa(boolean fromCapaTextCache = false) {
+        if (fromCapaTextCache) {
             def slurper = new YamlSlurper()
             return slurper.parseText(capaTextCache)
         }
         capaTextCache = null
-        def result =[:]
+        def result = [:]
         File f = new File(get_CAPA_FILE_NAME())
-        if(f.exists()) {
+        if (f.exists()) {
             try {
                 def fileContent = f.text.trim()
-                if(fileContent.startsWith("{")) {
+                if (fileContent.startsWith("{")) {
                     def slurper = new JsonSlurper()
                     result = slurper.parseText(fileContent)
                     def yaml = new YamlBuilder()
                     yaml(result)
                     fileContent = yaml.toString()
-                } else if(fileContent.startsWith("---")) {
+                } else if (fileContent.startsWith("---")) {
                     def slurper = new YamlSlurper()
                     result = slurper.parseText(fileContent)
-                } else {throw new RuntimeException("did not find '---' (yaml) nor '{' at the beginning of file!")}
+                } else {
+                    throw new RuntimeException("did not find '---' (yaml) nor '{' at the beginning of file!")
+                }
                 /*
                 File fy = new File(get_CAPA_FILE_NAME()+".yaml")
                 println("------------------ json file ------------------------")
@@ -396,7 +409,7 @@ class DataReader {
     }
 
     static List<List> readScenario(String text) {
-        List<List<String>> splitLines =  FileSupport.toSplitAndTrimmedLines(text)
+        List<List<String>> splitLines = FileSupport.toSplitAndTrimmedLines(text)
         return parseScenario(splitLines)
     }
 
@@ -405,17 +418,17 @@ class DataReader {
         def line = 0
         def errMsg = ''
         splitLines.each { words ->
-            errMsg = {"Problem in Datei ${get_SCENARIO_FILE_NAME()}\nZeile ${line}: Zerlegt: ${words}\n"}
+            errMsg = { "Problem in Datei ${get_SCENARIO_FILE_NAME()}\nZeile ${line}: Zerlegt: ${words}\n" }
             if (words.size() != 3) {
                 throw new VpipeDataException("${errMsg()}Es müssen 3 Daten-Felder sein")
             }
             def days = 0
             try {
                 days = words[2].toInteger()
-            } catch(Exception e) {
+            } catch (Exception e) {
                 throw new VpipeDataException("${errMsg()}Umwandeln in Ganzahl gescheitert. Das ist keine: ${words[2]}")
             }
-            if(days > 20*365) {
+            if (days > 20 * 365) {
                 throw new VpipeDataException("${errMsg()}Verschiebung in Tagen größer 20 Jahre: ${words[2]}")
             }
             result[line++] = [words[0], words[1], days]
@@ -423,11 +436,11 @@ class DataReader {
         // find double entries
         Set<String> doublettes = []
         result.each { l ->
-            if (result.count{ it[0] == l[0] } > 1) {
+            if (result.count { it[0] == l[0] } > 1) {
                 doublettes << l[0]
             }
         }
-        if(doublettes) {
+        if (doublettes) {
             throw new VpipeDataException("Problem in Datei ${get_SCENARIO_FILE_NAME()}\n Doubletten: $doublettes ")
         }
 
@@ -436,20 +449,19 @@ class DataReader {
     }
 
 
-
-    static List<String>  readSequence() {
+    static List<String> readSequence() {
         String text = FileSupport.getTextOrEmpty(get_SEQUENCE_FILE_NAME())
         return readSequence(text)
     }
 
     static List<String> readSequence(String text) {
-        List<List<String>> splitLines =  FileSupport.toSplitAndTrimmedLines(text)
+        List<List<String>> splitLines = FileSupport.toSplitAndTrimmedLines(text)
         return parseSequence(splitLines)
     }
 
     static List<String> parseSequence(List<List<String>> splitLines) {
         List<String> result = []
-        for(List<String> line in splitLines) {
+        for (List<String> line in splitLines) {
             assert line.size() == 1
             result << line[0]
         }

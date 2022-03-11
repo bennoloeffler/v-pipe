@@ -1,5 +1,6 @@
 package application
 
+import model.DataReader
 import model.Model
 import model.VpipeDataException
 
@@ -7,6 +8,7 @@ import javax.swing.*
 import java.awt.*
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
+
 // HERE is the place for all TODO s (TODO = release, todo = remainder)
 // related with the next release
 // 1. practice clean code. https://issuu.com/softhouse/docs/cleancode_5minutes_120523/16
@@ -140,14 +142,25 @@ class MainGui {
         // start EDT and init model
         //
         view.start {
-            String dirToOpen = "./bsp-daten"
+            String home = System.getProperty("user.home");
+            String dirToOpen = "$home/v-pipe-data"
+            //String dirToOpen = "./bsp-daten"
+            def recent = UserSettingsStore.instance.recentOpenedDataFolders
+            if(recent) {dirToOpen =recent.last()}
+
+            // DEV!
             String currentStartPath = new File(".").absolutePath
-            if (currentStartPath.contains("projects")) {
+            if (currentStartPath.contains(" x projects")) {
                 // if in development mode
-                dirToOpen = "./test2"
+                dirToOpen = "./open-model-dev"
+            }
+
+            boolean vpipeDataExists = isValidModelFolder(dirToOpen)
+
+            if(vpipeDataExists) {
                 controller.openDir(dirToOpen)
             }
-            model.currentDir = dirToOpen
+            model.setDirty(false)
         }
 
 
@@ -179,6 +192,10 @@ class MainGui {
 
         }
 
+    }
+
+    boolean isValidModelFolder(String dirToOpen) {
+        new File(dirToOpen + "/" + DataReader.TASK_FILE_NAME).exists()
     }
 
 }

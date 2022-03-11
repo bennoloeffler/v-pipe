@@ -4,6 +4,17 @@ import spock.lang.Specification
 
 class UserSettingsStoreTest extends Specification {
 
+    def "emptyOpenedDataFolder"() {
+        given:
+        def u = UserSettingsStore.instance
+
+        when:
+        u.deleteAllContent()
+
+        then:
+        u.getRecentOpenedDataFolders().size() == 0
+    }
+
     def "RemoveOpenedDataFolder"() {
         given:
         def u = UserSettingsStore.instance
@@ -16,8 +27,8 @@ class UserSettingsStoreTest extends Specification {
         u.removeOpenedDataFolder("something/even/wilder.txt")
 
         then:
-        u.getLastOpenedDataFolders().size() == 1
-        u.getLastOpenedDataFolders()[0] == "something/wild.txt"
+        u.getRecentOpenedDataFolders().size() == 1
+        u.getRecentOpenedDataFolders()[0] == "something/wild.txt"
     }
 
 
@@ -32,7 +43,7 @@ class UserSettingsStoreTest extends Specification {
         u.addLastOpenedDataFolder("something/even/wilder.txt") // will be written but removed while reading
 
         then:
-        u.getLastOpenedDataFolders().size() == 2
+        u.getRecentOpenedDataFolders().size() == 2
     }
 
 
@@ -49,7 +60,7 @@ class UserSettingsStoreTest extends Specification {
         u.addLastOpenedDataFolder("something/wild.txt")
 
         then:
-        def df = u.getLastOpenedDataFolders()
+        def df = u.getRecentOpenedDataFolders()
         df.size() == 3
         df[0] == "boring"
         df[1] == "something/even/wilder.txt"

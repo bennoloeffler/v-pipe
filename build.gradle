@@ -3,8 +3,8 @@
  */
 
 
+
 import edu.sc.seis.launch4j.tasks.Launch4jLibraryTask
-import org.gradle.internal.os.OperatingSystem
 
 //apply plugin: 'idea'
 //apply plugin: 'groovy'
@@ -114,6 +114,7 @@ if (getOsName() == "linux") {
 //def jrePath = "/Users/benno/Library/Java/JavaVirtualMachines/liberica-1.8.0_322" // macos
 def tempDist = "$buildDir/dist/v-pipe"
 def exampleDir = "$tempDist/bsp-daten"
+def newModelDir = "$tempDist/new-model"
 
 task copyExeLibsJRE {
     //dependsOn createExe, createGui
@@ -140,6 +141,11 @@ task copyExeLibsJRE {
         copy {
             from "bsp-daten"
             into exampleDir
+        }
+
+        copy {
+            from "new-model"
+            into newModelDir
         }
 
 /*
