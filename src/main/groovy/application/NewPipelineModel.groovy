@@ -1,6 +1,8 @@
 package application
 
 import groovy.beans.Bindable
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 import groovyx.gpars.GParsPool
 import model.Model
 import model.PipelineElement
@@ -13,9 +15,10 @@ import utils.RunTimer
 import java.beans.PropertyChangeEvent
 import java.beans.PropertyChangeListener
 
-import static extensions.DateHelperFunctions.*
+import static extensions.DateHelperFunctions._dToS
+import static extensions.DateHelperFunctions._getStartOfWeek
 
-//@CompileStatic
+@CompileStatic
 class NewPipelineModel extends GridModel {
 
     @Bindable String selectedProject
@@ -23,23 +26,19 @@ class NewPipelineModel extends GridModel {
     int nowXRowCache = -1
     Model model
 
+
     def tasksPropertyListener = { PropertyChangeEvent e ->
-        if(e.propertyName=='updateToggle') {
-            //sortProjectNamesWhenChanged() // new task list - probably after opening a new Data-Set
-            //updateProjectNames()
-        }
-        if(e.propertyName=='reloadToggle') {
-            //updateProjectNames()
-        }
         updateGridElements()
         this.setUpdateToggle(!this.getUpdateToggle()) // just to fire an PropertyChange to the view
     }
+
 
     NewPipelineModel(Model model) {
         this.model = model
         model.addPropertyChangeListener(tasksPropertyListener as PropertyChangeListener)
         updateGridElements()
     }
+
 
     void sortProjectNamesToEnd() {
 
@@ -50,38 +49,26 @@ class NewPipelineModel extends GridModel {
         List<String> allProjectNames = model.projectSequence.sort { String p1, String p2 ->
             projectsMap[p2]*.ending.max() <=> projectsMap[p1]*.ending.max()
         }
-
         model.projectSequence = allProjectNames
-
         updateGridElements()
         this.setUpdateToggle(!this.getUpdateToggle()) // just to fire an PropertyChange to the view
-
     }
 
-    //def threadPool = Executors.newFixedThreadPool(4)
 
     /**
      * create "the model" List<List<GridElement>> allProjectGridLines
      * from task-portfolio
      */
+    @CompileStatic(TypeCheckingMode.SKIP)
     private void updateGridElements() {
         allProjectGridLines = []
         RunTimer.getTimerAndStart('NewPipelineModel::updateGridElements').withCloseable {
             if (model.taskList) {
                 Date startOfGrid = _getStartOfWeek(model.getStartOfProjects())
                 Date endOfGrid = _getStartOfWeek(model.getEndOfProjects()) + 7
-
-                /*
-                model.projectSequence.each {
-                    List<TaskInProject> projectTasks = model.getProject(it)
-                    def gridElements = fromProjectTasks(projectTasks, startOfGrid, endOfGrid)
-                    allProjectGridLines << gridElements
-                }*/
-
                 GParsPool.withPool {
                     allProjectGridLines =
                             model.projectSequence.collectParallel { String projectName ->
-                                //println "parallel for: " + projectName
                                 List<TaskInProject> projectTasks = model.getProject(projectName)
                                 fromProjectTasks(projectTasks, startOfGrid, endOfGrid)
                             } as List<List<GridElement>>
@@ -96,21 +83,17 @@ class NewPipelineModel extends GridModel {
      * @return GridElements of one project
      */
     //@Memoized
-    List<GridElement> fromProjectTasks( List<TaskInProject> projectTasks, startOfGrid, endOfGrid) {
+    List<GridElement> fromProjectTasks( List<TaskInProject> projectTasks, Date startOfGrid, Date endOfGrid) {
         def gridElements = []
         try {
             assert projectTasks
-            //Date startOfGrid = _getStartOfWeek(model.getStartOfTasks())
-            //Date endOfGrid = _getStartOfWeek(model.getEndOfTasks()) + 7
             Date startOfTasks = _getStartOfWeek(projectTasks*.starting.min())
             Date endOfTasks = _getStartOfWeek(projectTasks*.ending.max()) + 7
             def deliveryDate = model.getDeliveryDate(projectTasks[0].project)
             def startOfProject = _getStartOfWeek(startOfTasks < deliveryDate ? startOfTasks : deliveryDate)
             def endOfProject = _getStartOfWeek(endOfTasks > deliveryDate ? endOfTasks : deliveryDate)
-
             def fromToDateString = "${_dToS(startOfTasks)} - ${_dToS(endOfTasks)}"
-
-            Date now = new Date() // Date.newInstance()
+            Date now = new Date()
             int row = 0
             for (Date w = startOfGrid; w < endOfGrid; w += 7) {
                 if(w <= now && now < w + 7) {
@@ -192,9 +175,7 @@ class NewPipelineModel extends GridModel {
             pe.startDate += shift
             pe.endDate += shift
         }
-
         model.reCalcCapaAvailableIfNeeded()
-        //model.setUpdateToggle(!model.getUpdateToggle())
         model.fireUpdate()
     }
 
@@ -206,8 +187,6 @@ class NewPipelineModel extends GridModel {
     @Override
     def swap(int y, int withY) {
         model.projectSequence.swap(y, withY)
-        //updateGridElements()
-        //this.setUpdateToggle(!this.getUpdateToggle()) // just to fire an PropertyChange to the view
         model.fireUpdate()
     }
 

@@ -21,7 +21,7 @@ class FileSupport {
     static String getTextOrEmpty(String fileName) {
         String result = ''
         File f = new File(fileName)
-        if( f.exists() ) {
+        if (f.exists()) {
             f.withReader { reader ->
                 result = reader.text
             }
@@ -48,7 +48,6 @@ class FileSupport {
         def text = getTextOrEmpty(fileName)
         toSplitAndTrimmedLines(text)
     }
-
 
 
 /*
@@ -81,7 +80,7 @@ class FileSupport {
         assert fileName[-4] == "."
         assert fileName.length() > 4
 
-        BACKUP_DIR + "/" + fileName[0..-5] + " backup von " + new DateTime().toString("yyyy-MM-dd HH.mm.ss") + fileName[-4..-1]
+        BACKUP_DIR + "/" + fileName[0..-5] + " backup von " + new DateTime().toString("yyyy-MM-dd HH.mm.ss.SSS") + fileName[-4..-1]
     }
 
     /**
@@ -91,12 +90,24 @@ class FileSupport {
      */
     static String backupDirName(String dirName) {
         assert dirName
-        dirName + '/' + BACKUP_DIR + "/" +  new DateTime().toString("yyyy-MM-dd HH.mm.ss")
+        dirName + '/' + BACKUP_DIR + "/" + new DateTime().toString("yyyy-MM-dd HH.mm.ss.SSS")
     }
 
     static def checkBackupDir() {
         def f = new File(FileSupport.BACKUP_DIR)
-        if(!f.exists() && !f.isDirectory()) {f.mkdir()}
+        if (!f.exists() && !f.isDirectory()) {
+            f.mkdirs()
+        }
+    }
+
+    static String getInstantErrorLogFileName() {
+        String home = System.getProperty("user.home");
+        String dirToOpen = "$home/v-pipe-data/crash-logs"
+        def f = new File(dirToOpen)
+        if (!f.exists() && !f.isDirectory()) {
+            f.mkdirs()
+        }
+        dirToOpen + "/" + new DateTime().toString("yyyy-MM-dd HH.mm.ss.SSS") + ".txt"
     }
 
 }

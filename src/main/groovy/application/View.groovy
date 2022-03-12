@@ -64,30 +64,47 @@ class View {
     //
     // adapter models (second layer...)
     //
-    NewPipelineModel gridPipelineModel = new NewPipelineModel(model)
-    GridLoadModel gridLoadModel = new GridLoadModel(model)
-    GridPipelineLoadModel gridPipelineLoadModel = new GridPipelineLoadModel(model)
-    GridModel gridProjectModel = new NewProjectModel(model)
+    NewPipelineModel gridPipelineModel
+    GridLoadModel gridLoadModel
+    GridPipelineLoadModel gridPipelineLoadModel
+    GridModel gridProjectModel
 
-    def pipelineView = new GridPanel(10 * MainGui.scaleX as int, gridPipelineModel)
-    def projectView = new GridPanel(10 * MainGui.scaleX as int, gridProjectModel)
-    def loadView = new NewLoadPanel(10 * MainGui.scaleX as int, gridLoadModel)
-    def pipelineLoadView = new NewLoadPanel(10 * MainGui.scaleX as int, gridPipelineLoadModel)
-    def projectDetails
+    //
+    // views
+    //
+    def pipelineView
+    def projectView
+    def loadView
+    def pipelineLoadView
+
     FileDifferPanel fileDifferPanel
     ProjectTemplates projectTemplates
     ResourceCapacityEditor resourceCapacityEditor
+
+    def projectDetails
 
     View(Model model) {
         this.model = model
         frameIcon = new ImageIcon(getClass().getResource("/icons/vunds_icon_64x64_t.png")).getImage()
         swing = new SwingBuilder()
+
+        gridPipelineModel = new NewPipelineModel(model)
+        gridLoadModel = new GridLoadModel(model)
+        gridPipelineLoadModel = new GridPipelineLoadModel(model)
+        gridProjectModel = new NewProjectModel(model)
+
+        pipelineView = new GridPanel(10 * MainGui.scaleX as int, gridPipelineModel)
+        projectView = new GridPanel(10 * MainGui.scaleX as int, gridProjectModel)
+        loadView = new NewLoadPanel(10 * MainGui.scaleX as int, gridLoadModel)
+        pipelineLoadView = new NewLoadPanel(10 * MainGui.scaleX as int, gridPipelineLoadModel)
+
         fileDifferPanel = new FileDifferPanel(swing)
         projectTemplates = new ProjectTemplates(this)
         resourceCapacityEditor = new ResourceCapacityEditor(swing, model)
-        build()
-        projectDetails = new ProjectDetails(this)
 
+        build()
+
+        projectDetails = new ProjectDetails(this)
 
         pipelineView.name = "pipelineView" // in order to have a specific name in "paintComponent... getRuntimer(...)"
         projectView.name = "projectView"
@@ -106,25 +123,24 @@ class View {
         //recentImageIcon =  scaleIcon(new ImageIcon(url), 0.5 * MainGui.scaleY)
 
 
-
         def saveAs = new URL("https://icons.iconarchive.com/icons/iconsmind/outline/24/Data-icon.png")
-        saveAs =  scaleIcon(new ImageIcon(saveAs), 0.5 * MainGui.scaleY)
+        saveAs = scaleIcon(new ImageIcon(saveAs), 0.5 * MainGui.scaleY)
 
         def saveCont = new URL("https://icons.iconarchive.com/icons/iconsmind/outline/24/Arrow-Refresh-icon.png")
-        saveCont =  scaleIcon(new ImageIcon(saveCont), 0.5 * MainGui.scaleY)
+        saveCont = scaleIcon(new ImageIcon(saveCont), 0.5 * MainGui.scaleY)
 
         def exit = new URL("https://icons.iconarchive.com/icons/icons8/ios7/24/Data-Export-icon.png")
-        exit =  scaleIcon(new ImageIcon(exit), 0.5 * MainGui.scaleY)
+        exit = scaleIcon(new ImageIcon(exit), 0.5 * MainGui.scaleY)
 
 
         def projectViewIcon = new URL("https://icons.iconarchive.com/icons/icons8/windows-8/24/Time-Gantt-Chart-icon.png")
-        projectViewIcon =  scaleIcon(new ImageIcon(projectViewIcon), 0.5 * MainGui.scaleY)
+        projectViewIcon = scaleIcon(new ImageIcon(projectViewIcon), 0.5 * MainGui.scaleY)
 
         def loadViewIcon = new URL("https://icons.iconarchive.com/icons/icons8/ios7/24/Data-Bar-Chart-icon.png")
-        loadViewIcon =  scaleIcon(new ImageIcon(loadViewIcon), 0.5 * MainGui.scaleY)
+        loadViewIcon = scaleIcon(new ImageIcon(loadViewIcon), 0.5 * MainGui.scaleY)
 
         def portfolioViewIcon = new URL("https://icons.iconarchive.com/icons/iconsmind/outline/24/Add-SpaceBeforeParagraph-icon.png")
-        portfolioViewIcon =  scaleIcon(new ImageIcon(portfolioViewIcon), 0.5 * MainGui.scaleY)
+        portfolioViewIcon = scaleIcon(new ImageIcon(portfolioViewIcon), 0.5 * MainGui.scaleY)
 
 
         Color highlightColor = new Color(80, 130, 220, 255)
@@ -136,8 +152,8 @@ class View {
 
         swing.build {
 
-            def i = {String iconPath, double scale = 0.5 ->
-                scaleIcon(imageIcon(resource: iconPath), scale * MainGui.scaleY )
+            def i = { String iconPath, double scale = 0.5 ->
+                scaleIcon(imageIcon(resource: iconPath), scale * MainGui.scaleY)
             }
 
             // https://stackoverflow.com/questions/42833424/java-key-bindings-using-groovy-swing-builder/42834255
@@ -292,7 +308,7 @@ class View {
 
                 menuBar(id: 'menuBar') {
 
-                    menu(text: 'Dateien', mnemonic: 'D') {
+                    menu(text: 'Datei', mnemonic: 'D') {
                         menuItem(newModelAction)
                         menuItem(openAction)
                         menu(id: "recentMenuItem", "Letzte öffnen", icon: scaleIcon(imageIcon("/icons/recent.png"), 0.5))
@@ -320,11 +336,11 @@ class View {
                     }
                 }
 
-                migLayout(layoutConstraints: "fill", columnConstraints: "[][][][][][][][][][][grow]", rowConstraints: "[][grow]")
+                migLayout(layoutConstraints: "fill", columnConstraints: "[][][][][][][][][][][][grow]", rowConstraints: "[][grow]")
 
                 label("Projekt suchen: ", foreground: GRAY)
                 textField(id: 'searchTextField', toolTipText: 'Tutorial & Experimente: regex101.com', constraints: 'width 100')
-                label(id: "swapped", foreground: RED)
+                label(id: "swapped", foreground: RED, toolTipText: "speichern, laden, etc erst nach Beendigung des Vorlagen-Modus möglich.")
                 label("    Zeit: ", foreground: GRAY)
                 label("", id: 'timeLabel', foreground: highlightColor)
                 label("    Projekt: ", foreground: GRAY)
@@ -401,7 +417,7 @@ class View {
                 cp.setToolTipText(v)
                 def l = v.size()
                 if (l > 80) {
-                    def r = v[0..20]+ "  [...]  " + v[l-60..l-1]
+                    def r = v[0..20] + "  [...]  " + v[l - 60..l - 1]
                     return r
                 } else {
                     return v
@@ -411,6 +427,7 @@ class View {
                 v ? RED : GRAY
             })
             bind(target: swapped, targetProperty: 'text', source: model, sourceProperty: "projectsAndTemplatesSwapped", converter: { v ->
+                f.validate() // to layout upmost panel and make "VORLAGEN-MOODUS" visible
                 v ? "VORLAGEN-MODUS" : ""
             })
 
@@ -521,5 +538,17 @@ class View {
             bind(target: newProjectView, targetProperty: 'cursorX', source: pipelineView, sourceProperty: "cursorX")
             bind(target: pipelineView, targetProperty: 'cursorX', source: newProjectView, sourceProperty: "cursorX")
         }
+    }
+
+    def deselectProject() {
+        gridPipelineModel.setSelectedProject(null)
+    }
+
+    String getSelectedProject(){
+        gridPipelineModel.selectedProject
+    }
+
+    def setSelectedProject(String projectName){
+        gridPipelineModel.selectedProject = projectName
     }
 }

@@ -21,7 +21,7 @@ class DataReader {
     static String DATESHIFT_FILE_NAME = "Projekt-Verschiebung.txt"
     static String CAPA_FILE_NAME = "Abteilungs-Kapazitaets-Angebot.txt"
     static String SCENARIO_FILE_NAME = "Szenario-Kopie-Original-Verschiebung.txt"
-    static String SEQUENCE_FILE_NAME = "Projekt_Sequenz.txt"
+    static String SEQUENCE_FILE_NAME = "Projekt-Sequenz.txt"
     static String PROJECT_TEMPLATE_FILE_NAME = "Vorlagen-Projekt-Start-End-Abt-Kapa.txt"
     static String TEMPLATE_PIPELINE_FILE_NAME = "Vorlagen-Integrations-Phasen.txt"
     static String PROJECT_DELIVERY_DATE_FILE_NAME = "Projekt-Liefertermin.txt"

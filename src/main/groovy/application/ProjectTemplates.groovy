@@ -158,13 +158,13 @@ class ProjectTemplates {
 
             // copy pipeline...
             PipelineElement thePipelineCopy = null
-            if(model.pipelineElements) {
+            if(model.pipelineElements || model.templatePipelineElements) {
                 thePipelineCopy = model.copyPipelineFromTemplate(templateName, projectName, projectDate)
                 assert thePipelineCopy
             }
 
             SwingUtilities.invokeLater {
-                if(model.pipelineElements) {
+                if(model.pipelineElements  || model.templatePipelineElements) {
                     model.pipelineElements.add(thePipelineCopy)
                 }
                 model.addProject( theCopy )

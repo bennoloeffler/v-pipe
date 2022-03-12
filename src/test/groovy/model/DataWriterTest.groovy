@@ -1,9 +1,8 @@
 package model
 
 import spock.lang.Specification
-import testdata.TestDataHelper
 
-import static testdata.TestDataHelper.*
+import static testdata.TestDataHelper.t
 
 class DataWriterTest extends Specification {
     void setup() {
@@ -19,7 +18,7 @@ class DataWriterTest extends Specification {
 
         when:
         DataWriter dw = new DataWriter(model: m)
-        def tasksString = dw.getTasks()
+        def tasksString = dw.getTasks(m.taskList)
 
         then:
         tasksString == "p1                    15.01.2020  15.02.2020  IBN                   14.0  \n" // descritption missing...

@@ -1,8 +1,10 @@
 package application
 
+
 import model.DataReader
 import model.Model
 import model.VpipeDataException
+import utils.FileSupport
 
 import javax.swing.*
 import java.awt.*
@@ -44,14 +46,17 @@ class MainGui {
             if (thrown instanceof VpipeDataException) {
                 println "\nD A T E N - F E H L E R :\n" + thrown.getMessage() ?: ''
             } else {
-                println "PROBLEM. Programm ist gecrasht :-(:\n${thrown.getMessage() ?: ''}\n\nSTACKTRACE: (bitte an BEL)\n\n"
-                println thrown
-                thrown.printStackTrace()
-                println ""
+                println "PROBLEM. Programm ist gecrasht :-(:\n ${thrown.getMessage() ?: ''}\n\nSTACKTRACE: (bitte an BEL)\n\n"
+
+                StringWriter sw = new StringWriter()
+                PrintWriter pw = new PrintWriter(sw)
+                thrown.printStackTrace(pw)
+                println sw.toString()
+
+                File f = new File(FileSupport.instantErrorLogFileName)
+                f.text = sw.toString()
+
             }
-            //todo log exceptions to central place with user-name encoded. See CREAM for example
-            //sleep(10000)
-            //System.exit(-1)
         }
     }
 
@@ -69,6 +74,18 @@ class MainGui {
 
         new MainGui().glueAndStart()
     }
+
+    /*
+    PrintStream errStream = new PrintStream(System.err) {
+        @Override
+        void println(String s) {
+            System.err.println(s)
+            //Graphics2D g = getLogArea().getGraphics()
+            //g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            getLogArea().append(s + '\n')
+            getLogArea().setCaretPosition(getLogArea().getDocument().getLength())
+        }
+    }*/
 
 
     PrintStream outStream = new PrintStream(System.out) {
@@ -103,7 +120,9 @@ class MainGui {
         // connect println with JTextArea right/down in app
         //
         System.setOut(outStream)
-        //System.setErr(errStream)
+        //System.setOut(new PrintStream(new CustomOutputStream()));
+        //System.setErr(new PrintStream(new CustomOutputStream()));
+        System.setErr(outStream)
         JTextArea la = getLogArea()
         la.setFont(new Font("Monospaced", Font.PLAIN, (int) (scaleX * 8)))
         println("Programm-Version: $Main.VERSION_STRING")
@@ -150,7 +169,7 @@ class MainGui {
 
             // DEV!
             String currentStartPath = new File(".").absolutePath
-            if (currentStartPath.contains(" x projects")) {
+            if (currentStartPath.contains("projects")) {
                 // if in development mode
                 dirToOpen = "./open-model-dev"
             }
@@ -159,6 +178,8 @@ class MainGui {
 
             if(vpipeDataExists) {
                 controller.openDir(dirToOpen)
+            } else {
+                model.setCurrentDir(home)
             }
             model.setDirty(false)
         }
@@ -194,7 +215,7 @@ class MainGui {
 
     }
 
-    boolean isValidModelFolder(String dirToOpen) {
+    static boolean isValidModelFolder(String dirToOpen) {
         new File(dirToOpen + "/" + DataReader.TASK_FILE_NAME).exists()
     }
 

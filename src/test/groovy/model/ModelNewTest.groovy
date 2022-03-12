@@ -2,9 +2,6 @@ package model
 
 import spock.lang.Specification
 
-import java.beans.PropertyChangeListener
-import java.time.LocalDate
-
 class ModelNewTest extends Specification {
 
     ModelNew model
@@ -61,7 +58,8 @@ class ModelNewTest extends Specification {
         updateCallHappended
     }
 
-    def "test overwright project" () {
+    /*
+    def "test overwrite project" () {
 
         given:
         def p = new Project("theName", new Date(), null, null)
@@ -79,6 +77,6 @@ class ModelNewTest extends Specification {
         model.projects.size() == 1
         model.projects.theName.deliveryDate == new Date() + 1
         updateCallHappended
-    }
+    }*/
 
 }

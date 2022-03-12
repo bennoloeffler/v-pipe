@@ -44,7 +44,7 @@ class ProjectDetails {
 
 
     def buildDataPanel() {
-        def p = view.gridPipelineModel.selectedProject
+        def p = view.selectedProject
         if (p) {
             List<TaskInProject> project = model.getProject(p)
 
@@ -139,7 +139,7 @@ class ProjectDetails {
     }
 
     def deleteLine = { int idx, evt ->
-        def p = view.gridPipelineModel.selectedProject
+        def p = view.selectedProject
         if (p) {
             model.deleteProjectTask(idx, p)
             model.fireUpdate()
@@ -147,7 +147,7 @@ class ProjectDetails {
     }
 
     def copyLine = { idx, evt ->
-        def p = view.gridPipelineModel.selectedProject
+        def p = view.selectedProject
         if (p) {
             model.copyProjectTask(idx, p)
             model.fireUpdate()
@@ -176,10 +176,10 @@ class ProjectDetails {
     }
 
     def deleteSelectedProject = {
-        def p = view.gridPipelineModel.selectedProject
+        def p = view.selectedProject
         if (p) {
             if (confirmDelete(p)) {
-                view.gridPipelineModel.setSelectedProject(null)
+                view.deselectProject()
                 model.deleteProject(p)
             }
         }
@@ -188,7 +188,7 @@ class ProjectDetails {
 
     def saveProjectDetails = {
         if (checkProjectDetails()) {
-            def p = view.gridPipelineModel.selectedProject
+            def p = view.selectedProject
             List<TaskInProject> project = model.getProject(p)
             def idx = 0
             for (task in project) {
@@ -201,9 +201,9 @@ class ProjectDetails {
             }
             model.deliveryDates.put(p, swing.planFinishProject.text.toDate())
 
-            if (view.gridPipelineModel.selectedProject != swing.projectName.text) {
-                model.renameProject(view.gridPipelineModel.selectedProject, swing.projectName.text)
-                view.gridPipelineModel.selectedProject = swing.projectName.text
+            if (view.selectedProject != swing.projectName.text) {
+                model.renameProject(view.selectedProject, swing.projectName.text)
+                view.selectedProject = swing.projectName.text
             }
 
             model.reCalcCapaAvailableIfNeeded()
@@ -222,7 +222,7 @@ class ProjectDetails {
             result = false
         }
         def idx = 0
-        def p = view.gridPipelineModel.selectedProject
+        def p = view.selectedProject
         List<TaskInProject> project = model.getProject(p)
         for (task in project) {
             def startValid = true
@@ -247,7 +247,7 @@ class ProjectDetails {
         } else {
             swing.applyDetails.text = "bitte erst Fehler korrigieren... Dann: Änderungen übernehmen"
         }
-        if (view.gridPipelineModel.selectedProject != swing.projectName.text) {
+        if (view.selectedProject != swing.projectName.text) {
             if (!checkProjectName()) {
                 result = false
             }

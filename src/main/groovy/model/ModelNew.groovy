@@ -1,21 +1,22 @@
 package model
 
 import groovy.beans.Bindable
-import groovy.transform.AutoClone
-import groovy.transform.AutoCloneStyle
 import groovy.transform.Canonical
 import groovy.transform.CompileStatic
-import org.pcollections.*
+import org.pcollections.HashTreePMap
+import org.pcollections.PMap
+import org.pcollections.PVector
+import org.pcollections.TreePVector
 
 @Canonical
-@AutoClone(style=AutoCloneStyle.COPY_CONSTRUCTOR)
+//@AutoClone(style=AutoCloneStyle.COPY_CONSTRUCTOR)
 class TaskOfProject implements StartEndInterval {
     double capacityNeed
     String description
 }
 
 @Canonical
-@AutoClone(style=AutoCloneStyle.COPY_CONSTRUCTOR)
+//@AutoClone(style=AutoCloneStyle.COPY_CONSTRUCTOR)
 class Project {
     String name
     Date deliveryDate

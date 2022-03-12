@@ -11,10 +11,6 @@ import javax.swing.*
 import javax.swing.filechooser.FileFilter
 import java.awt.event.ActionEvent
 
-// TODO: keep users from saving, when model is emtpy or new and you are in a valid directory (e.g. force safe as...)
-// TODO: after startup, disable "save", when dirty: enable (disable/enable the action)
-// TODO: hypothesis: exit kills the current automatic save operation FIX: wait for save to have happened)
-//
 class GlobalController {
 
     Model model
@@ -66,16 +62,21 @@ class GlobalController {
         m.removeAll()
         def allRecentMenuItems = last.collect { String dir ->
             def nameOnly = dir.split("/").last()
-            new JMenuItem(
+            def mi = new JMenuItem(
                     view.swing.action(
                             name: nameOnly,
                             closure: {
                                 if (checkSave(false)) {
+                                    setSaveForValidModel()
                                     openDir(dir)
                                 }
                             },
                             shortDescription: dir
                     ))
+            if(!MainGui.isValidModelFolder(dir)){
+                mi.getAction().setEnabled(false)
+            }
+            mi
         }
         allRecentMenuItems.each { m.add(it) }
     }
@@ -86,11 +87,26 @@ class GlobalController {
     }
 
 
+    def newModelActionPerformed = {
+        if (checkSave(false)) {
+            view.deselectProject()
+            model.newModel()
+            setSaveForEmptyModel()
+            Action a = view.swing.saveAsAction
+            a.setEnabled(true) // BUT: use saveAS...
+            switchAutoSave(false)
+        }
+    }
+
+
     def openActionPerformed = { ActionEvent e ->
         if (checkSave(false)) {
-            switchAutoSave(false)
+            //Action a = view.swing.saveAction
+            //a.setEnabled(true)
             String dir = chooseDir('Datenverzeichnis öffnen', (JComponent) (e.source), "Verzeichnis auswählen & Daten-Dateien von dort lesen", true)
             if (dir) {
+                switchAutoSave(false)
+                setSaveForValidModel()
                 openDir(dir)
             }
         }
@@ -98,7 +114,6 @@ class GlobalController {
 
     def saveActionPerformed = { ActionEvent e ->
         if (model.isDirty() && model.taskList) {
-            swapToNormalStateIfNeeded() // TODO check that!
             DataWriter dw = new DataWriter(model: model)
             dw.saveAll()
             model.setDirty(false)
@@ -111,18 +126,30 @@ class GlobalController {
         Action a = view.swing.saveAction
         def saveAllowed = a.isEnabled() //saving not allowed in general, eg due to empty model or swapped
         if (model.isDirty() && autoSave && saveAllowed) {
+            autosavingInProgress = true
             view.swing.doOutside {
                 def start = System.currentTimeMillis()
                 DataWriter dw = new DataWriter(model: model)
                 dw.saveAll()
                 def end = System.currentTimeMillis()
-                println "gespeichert... ${end - start}ms"
+                println "gespeichert...${end - start} ms"
                 view.swing.doLater {
                     model.setDirty(false)
+                    autosavingInProgress = false
                 }
             }
         }
     }
+
+    boolean autosavingInProgress = false
+
+    def checkAutoSave() {
+        //just wait a little bit in
+        while (autosavingInProgress) {
+            Thread.sleep(100)
+        }
+    }
+
 
     def switchAutoSave(boolean on) {
         JCheckBoxMenuItem i = view.swing.checkBoxMenuContSaving
@@ -137,6 +164,8 @@ class GlobalController {
     }
 
     def exitActionPerformed = { ActionEvent e ->
+        swapToNormalStateIfNeeded()
+        checkAutoSave()
         checkSave(true)
     }
 
@@ -150,14 +179,12 @@ class GlobalController {
     def saveAsActionPerformed = { ActionEvent e ->
         String dir = chooseDir('Datenverzeichnis zum Speichern wählen', (JComponent) (e.source), "Verzeichnis auswählen & Daten-Dateien dort speichern", false)
         if (dir) {
-            swapToNormalStateIfNeeded() // TODO check that!
             model.setCurrentDir(dir)
             DataWriter dw = new DataWriter(model: model)
             dw.saveAll()
             model.setDirty(false)
             addToRecentMenu(dir)
-            Action a = view.swing.saveAction
-            a.setEnabled(true)
+            setSaveForValidModel()
         }
     }
 
@@ -165,19 +192,27 @@ class GlobalController {
         view.gridPipelineModel.sortProjectNamesToEnd()
     }
 
+    def setNewLoadAndSave(boolean how) {
+        Action a = view.swing.saveAction
+        a.setEnabled(how)
+        a = view.swing.saveAsAction
+        a.setEnabled(how)
+        a = view.swing.newModelAction
+        a.setEnabled(how)
+        a = view.swing.openAction
+        a.setEnabled(how)
+        a = view.swing.toggleContinouosSaveAsAction
+        a.setEnabled(how)
+        JMenu m = view.swing.recentMenuItem
+        m.setEnabled(how)
+    }
     def swapTemplatesAndProjectsActionPerformed = {
-        view.gridPipelineModel.setSelectedProject(null)
+        view.deselectProject()
         model.swapTemplatesAndProjects()
         if ( model.projectsAndTemplatesSwapped) {
-            Action a = view.swing.saveAction
-            a.setEnabled(false)
-            a = view.swing.saveAsAction
-            a.setEnabled(false)
+            setNewLoadAndSave(false)
         } else {
-            Action a = view.swing.saveAction
-            a.setEnabled(true)
-            a = view.swing.saveAsAction
-            a.setEnabled(true)
+            setNewLoadAndSave(true)
         }
         model.fireUpdate()
     }
@@ -211,26 +246,17 @@ class GlobalController {
         println(e.getSource())
     }
 
-    def newModelActionPerformed = {
-        if (checkSave(false)) {
-            model.newModel()
-            Action a = view.swing.saveAction
-            a.setEnabled(false) // use saveAS...
-            switchAutoSave(false)
-        }
-    }
-
-
     JFileChooser fc = null
 
-    private String chooseDir(String dialogTitle, JComponent root, String applyButtonText, boolean open) {
+    boolean chooseDirWhileOpen
+    private String chooseDir(String dialogTitle, JComponent root, String applyButtonText,  Boolean open) {
         String result = null
-        def currentOpen = { open }
         if (!fc) {
             fc = new JFileChooser(new File(model.currentDir)) {
 
                 def acceptVPipeDir() {
-                    if (currentOpen()) {
+                    println "innen open =$open  global = ${chooseDirWhileOpen}"
+                    if (chooseDirWhileOpen) {
                         def checkPath1 = getSelectedFile().getAbsolutePath() + "/" + DataReader.TASK_FILE_NAME
                         def rightDirectorySelected = new File(checkPath1).exists()
                         def rightFileSelected = false
@@ -325,7 +351,7 @@ class GlobalController {
     def openDir(String dir) {
         try {
             model.setCurrentDir(dir)
-            view.gridPipelineModel.setSelectedProject(null)
+            view.deselectProject()
             model.readAllData()
             view.pipelineView.setCursorToNow()
             view.loadView.setCursorToNow()
@@ -343,23 +369,40 @@ class GlobalController {
                     vde.message,
                     "DATEN-FEHLER beim Start",
                     JOptionPane.WARNING_MESSAGE)
-            makeGuiEmpty()
+            setEmptyModel()
+            setSaveForEmptyModel()
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null,
                     "Stacktrace speichern. Bitte.\nNochmal in Console starten.\nDann speichern.\nFehler: $e.message",
                     "F I E S E R   FEHLER beim Start  :-(",
                     JOptionPane.ERROR_MESSAGE)
-            makeGuiEmpty()
+            setEmptyModel()
+            setSaveForEmptyModel()
 
             throw e // to produce stacktrace on console...
         }
     }
 
-    def makeGuiEmpty() {
-        model.emptyTheModel()
+    def setSaveForEmptyModel() {
         Action a = view.swing.saveAction
         a.setEnabled(false)
-        model.setEmptyDir()
+        a = view.swing.saveAsAction
+        a.setEnabled(false)
+        a = view.swing.toggleContinouosSaveAsAction
+        a.setEnabled(false)
+    }
+
+    def setEmptyModel() {
+        model.emptyTheModel()
+        model.setVPipeHomeDir()
         model.setUpdateToggle(!model.updateToggle)
+    }
+    def setSaveForValidModel(){
+        Action a = view.swing.saveAction
+        a.setEnabled(true)
+        a = view.swing.saveAsAction
+        a.setEnabled(true)
+        a = view.swing.toggleContinouosSaveAsAction
+        a.setEnabled(true)
     }
 }

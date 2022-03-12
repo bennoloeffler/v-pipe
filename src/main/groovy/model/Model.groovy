@@ -4,6 +4,7 @@ import extensions.DateExtension
 import extensions.StringExtension
 import groovy.beans.Bindable
 import groovy.transform.CompileStatic
+import groovy.transform.Memoized
 import groovy.transform.TypeCheckingMode
 import groovy.yaml.YamlSlurper
 import org.pcollections.HashTreePSet
@@ -26,12 +27,10 @@ class Model {
     @Bindable
     boolean projectsAndTemplatesSwapped = false
 
-
     @Bindable
     boolean dirty = false
 
     PSet<String> set = HashTreePSet.empty();
-
 
     @Bindable
     boolean updateToggle
@@ -40,7 +39,6 @@ class Model {
     String currentDir // = new File(".").getCanonicalPath().toString()
 
     void setCurrentDir(String currentDir) {
-
         DataReader.currentDir = new File(currentDir).getCanonicalPath().toString()
         File path = new File(currentDir)
         if (!(path.exists() && path.isDirectory())) {
@@ -61,7 +59,9 @@ class Model {
     // the corresponding delivery date
     Map<String, Date> deliveryDates = [:]
 
-    // this copies and moves the projects from taskList
+    /**
+     * @see ScenarioTransformer: this copies and moves the projects from taskList
+     */
     List<List> scenarioProjects = []
 
     // maximum number of parallel slots in pipeline
@@ -73,8 +73,8 @@ class Model {
     // those are the pipeline elements for templates
     List<PipelineElement> templatePipelineElements = []
 
-
     /**
+     * @see DateShiftTransformer: just moves projects
      * key: project name
      * value: integer, representing the shift of the project:
      * +7 = all tasks one week to the future.
@@ -88,7 +88,7 @@ class Model {
      * this is needed, because the size of time keys depend on
      * the position of tasks - and that changes when projects are moved
      */
-    def jsonSlurp = ""
+    def capaFileRawYamlSlurp = ""
 
     /**
      * key: department -->
@@ -216,6 +216,7 @@ class Model {
         copy
     }
 
+
     PipelineElement createPipelineForProject(List<TaskInProject> project) {
 
         // exactly ONE element in a newly created project!
@@ -258,6 +259,7 @@ class Model {
         }
     }
 
+
     /**
      * @return List of Strings with all projectNames found in
      */
@@ -294,6 +296,7 @@ class Model {
         result
     }
 
+
     Date getEndOfProjects() {
         Date maxDelDate = deliveryDates.values().max()
         Date end = getEndOfTasks()
@@ -305,13 +308,24 @@ class Model {
      * @return even if data is sparce, deliver continous list of timekey strings. Every week.
      */
     Duration years20 = Duration.of(20 * 365 * 20, ChronoUnit.DAYS)
-    //Duration oneMonth = Duration.of(1, ChronoUnit.MONTHS)
+
+    boolean tooFarAway20Y(Date d){
+        Math.abs(new Date() - d ) > years20.toDays()
+    }
+
 
     List<String> getFullSeriesOfTimeKeys(WeekOrMonth weekOrMonth) {
+        Date s = getStartOfProjects()
+        Date e = getEndOfProjects()
+        getFullSeriesOfTimeKeysInternal(weekOrMonth, s, e)
+    }
+
+
+    @Memoized
+    List<String> getFullSeriesOfTimeKeysInternal(WeekOrMonth weekOrMonth, Date s, Date e) {
         def result = []
         RunTimer.getTimerAndStart('getFullSeriesOfTimeKeys').withCloseable {
-            Date s = getStartOfProjects()
-            Date e = getEndOfProjects()
+
             if (s && e) {
                 if (e - s > years20.toDays()) {
                     throw new VpipeDataException("Dauer von Anfang bis Ende\n" +
@@ -336,21 +350,19 @@ class Model {
     }
 
 
-    long sizeLastAccess = -1
+    long departmentSizeLastAccess = -1
     List<String> allDepartmentsCache = []
 
     List<String> getAllDepartments() {
-        //RunTimer.getTimerAndStart('getAllDepartments').withCloseable {
         if (capaAvailable) {
             capaAvailable.keySet().toList()
         } else {
-            if (taskList.size() != sizeLastAccess) {
+            if (taskList.size() != departmentSizeLastAccess) {
                 allDepartmentsCache = taskList*.department.unique()
-                sizeLastAccess = taskList.size()
+                departmentSizeLastAccess = taskList.size()
             }
             allDepartmentsCache
         }
-        //}
     }
 
 
@@ -377,15 +389,11 @@ class Model {
         RunTimer.getTimerAndStart('reCalcCapaAvailableIfNeeded').withCloseable {
             def currentStart = getStartOfProjects()
             def currentEnd = getEndOfProjects()
-            //println "calc if needed..."
-            //println "current start: ${currentStart.toString()}  cached: ${cachedStartOfTasks?.toString()}"
-            //println "current end: ${currentEnd.toString()}  cached: ${cachedEndOfTasks?.toString()}"
             if (!(currentStart >= cachedStartOfTasks && currentEnd <= cachedEndOfTasks)) {
-                if (jsonSlurp) {
-                    //println "CALC"
-                    capaAvailable = calcCapa(jsonSlurp)
+                if (capaFileRawYamlSlurp) {
+                    capaAvailable = calcCapa(capaFileRawYamlSlurp)
                 }
-            } //else {println ("DONT CALC")}
+            }
             cachedStartOfTasks = currentStart
             cachedEndOfTasks = currentEnd
         }
@@ -397,7 +405,7 @@ class Model {
     Map<String, Map<String, YellowRedLimit>> calcCapa(def jsonSlurp, boolean withFileNameInErrorMessage = true) {
         Map<String, Map<String, YellowRedLimit>> result = [:]
         RunTimer.getTimerAndStart('calcCapa').withCloseable {
-            this.jsonSlurp = jsonSlurp
+            this.capaFileRawYamlSlurp = jsonSlurp
             if (withFileNameInErrorMessage) {
                 fileErr = { "Fehler beim Lesen der Datei ${DataReader.get_CAPA_FILE_NAME()}\n" }
             } else {
@@ -607,7 +615,7 @@ class Model {
         pipelineElements = []
         capaAvailable = [:]
         DataReader.capaTextCache = null
-        jsonSlurp = ''
+        capaFileRawYamlSlurp = ''
         projectSequence = []
         templateList = []
         templatePipelineElements = []
@@ -661,9 +669,9 @@ class Model {
             //
             // capa
             //
-            jsonSlurp = DataReader.readCapa()
-            if (jsonSlurp) {
-                capaAvailable = calcCapa(jsonSlurp)
+            capaFileRawYamlSlurp = DataReader.readCapa()
+            if (capaFileRawYamlSlurp) {
+                capaAvailable = calcCapa(capaFileRawYamlSlurp)
                 if (capaAvailable) {
                     check(taskList)
                 }
@@ -700,8 +708,7 @@ class Model {
 
         } catch (Exception e) {
             emptyTheModel()
-            // TODO: test that
-            setEmptyDir()
+            setVPipeHomeDir()
             throw e
         } finally {
             setDirty(false)
@@ -712,8 +719,8 @@ class Model {
 
     void saveRessources(String yaml) {
         DataReader.capaTextCache = yaml
-        jsonSlurp = DataReader.readCapa(true)
-        capaAvailable = calcCapa(jsonSlurp)
+        capaFileRawYamlSlurp = DataReader.readCapa(true)
+        capaAvailable = calcCapa(capaFileRawYamlSlurp)
         fireUpdate()
     }
 
@@ -742,6 +749,10 @@ class Model {
     }
 
     void renameDepartment(String oldName, String newName) {
+
+        // in order to recalc getAllDepartments(), if no capa is defined
+        departmentSizeLastAccess = -1
+
         taskList.each {
             if (it.department == oldName) {
                 it.department = newName
@@ -750,8 +761,8 @@ class Model {
 
         DataReader.capaTextCache = DataReader.capaTextCache.replace(oldName, newName)
         def slurper = new YamlSlurper()
-        jsonSlurp = slurper.parseText(DataReader.capaTextCache)
-        capaAvailable = calcCapa(jsonSlurp)
+        capaFileRawYamlSlurp = slurper.parseText(DataReader.capaTextCache)
+        capaAvailable = calcCapa(capaFileRawYamlSlurp)
 
         templateList.each { if (it.department == oldName) { it.department = newName } }
 
@@ -767,21 +778,20 @@ class Model {
         emptyTheModel()
         setCurrentDir("./new-model")
         readAllData()
-        //setCurrentDir(System.getProperty("user.home") + "/v-pipe-data/tmp")
-        setEmptyDir()
+        setCurrentDir(System.getProperty("user.home") + "/v-pipe-data/modell-neu")
+        //setVPipeHomeDir()
         fireUpdate()
     }
 
-    void setEmptyDir() {
-        currentDir = "KEIN VERZEICHNIS GEWÄHLT!"
-        DataReader.currentDir = currentDir
-        firePropertyChange('currentDir', "", currentDir)
+    void setVPipeHomeDir() {
+        DataReader.currentDir = System.getProperty("user.home") + "/v-pipe-data"
+        setCurrentDir(DataReader.currentDir)
     }
 
     Map<String, Date> swapStoreOfdeliveryDates = [:]
 
     def swapDeliveryDates() {
-        if (projectsAndTemplatesSwapped){ // move back
+        if (projectsAndTemplatesSwapped) { // move back
             deliveryDates = swapStoreOfdeliveryDates
             swapStoreOfdeliveryDates = [:]
         } else { // save
@@ -790,10 +800,6 @@ class Model {
         }
     }
 
-    // TODO: Check loading and swapping and saving
-    // - with no templates, no ip
-    // - with with templates, no ip
-    // - with with templates, with ip
 
     void swapTemplatesAndProjects() {
 
@@ -813,7 +819,7 @@ class Model {
         projectSequence = templateSequence
         templateSequence = swap
 
-        setProjectsAndTemplatesSwapped (! projectsAndTemplatesSwapped)
+        setProjectsAndTemplatesSwapped(!projectsAndTemplatesSwapped)
 
         reCalcCapaAvailableIfNeeded()
         fireUpdate()

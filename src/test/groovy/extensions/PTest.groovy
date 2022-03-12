@@ -207,7 +207,7 @@ class PTest extends Specification {
         a.get()["a"] == "something else"
         a.get()["e"]["f"] == 4
         a.get()["e"]["g"] == null
-        println "collisions: " + collisions
+        //println "collisions: " + collisions
     }
 
     def "test delete too deep map"() {
@@ -299,7 +299,7 @@ class PTest extends Specification {
         then:
         m.getFamilyTree()["Benno"].size() == 1
         m.getFamilyTree().size() == 4
-        println m.getFamilyTree()
+        //println m.getFamilyTree()
     }
 
     def "test functional"() {

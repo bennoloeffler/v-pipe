@@ -35,8 +35,8 @@ class ResourceCapacityEditor {
             JTextPane t = this.swing.capaTextFile
             def yb = new YamlBuilder()
             String capaYamlText = ""
-            if (this.model.jsonSlurp) {
-                yb(this.model.jsonSlurp)
+            if (this.model.capaFileRawYamlSlurp) {
+                yb(this.model.capaFileRawYamlSlurp)
                 capaYamlText = yb.toString()
                 capaYamlText = capaYamlText.replace("---\n", "")
             }
@@ -237,7 +237,7 @@ Kapa_Abteilungen:
                     //}
 
                     scrollPane(id: 'capaTextFileScrollPane', constraints: "h ${(int) (150 * MainGui.scaleY)}!, w ${(int) (300 * MainGui.scaleY)}!, growx, growy".toString()) {
-                        textPane(id: 'capaTextFile', model.jsonSlurp, font: new Font(Font.MONOSPACED, Font.PLAIN, 12))
+                        textPane(id: 'capaTextFile', model.capaFileRawYamlSlurp, font: new Font(Font.MONOSPACED, Font.PLAIN, 12))
                     }
                     scrollPane(constraints: "w ${(int) (250 * MainGui.scaleY)}!, growy, growx, wrap".toString()) {
                         textArea(id: "errorMessageCapaEdit")

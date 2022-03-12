@@ -181,7 +181,7 @@ class CapaTransformerTest extends GroovyTestCase {
 
     }
 
-    // TODO: move out of test code?
+    //  move out of test code?
     def slurpTextAndCalc(String text) {
         Model m = populatedModel
         //def ct = new CapaTransformer(m)
