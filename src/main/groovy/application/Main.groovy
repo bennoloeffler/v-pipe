@@ -1,16 +1,18 @@
 package application
 
 import core.LoadCalculator
+import groovy.time.TimeDuration
 import model.DataReader
 import model.Model
 import model.VpipeDataException
 import model.WeekOrMonth
 import org.tinylog.Logger as l
-import utils.*
-import groovy.time.TimeDuration
-import transform.DateShiftTransformer
+import utils.FileEvent
+import utils.FileWatcherDeamon
+import utils.StartOnlyOneInstance
 
-import java.awt.Desktop
+import java.awt.*
+import java.util.List
 
 //
 // https://e.printstacktrace.blog/groovy-regular-expressions-the-definitive-guide/
@@ -22,7 +24,7 @@ import java.awt.Desktop
  */
 class  Main {
 
-    static VERSION_STRING ='1.6.0-ipco-pax-edition'
+    static VERSION_STRING ='1.7.0-ip-in-gui'
 
     def singleRunMode = false // instead: Deamon is default
     def multiInstanceMode = false // instead SingleInstance is default
