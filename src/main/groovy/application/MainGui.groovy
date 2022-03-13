@@ -79,29 +79,16 @@ class MainGui {
         new MainGui().glueAndStart()
     }
 
-    /*
-    PrintStream errStream = new PrintStream(System.err) {
-        @Override
-        void println(String s) {
-            System.err.println(s)
-            //Graphics2D g = getLogArea().getGraphics()
-            //g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            getLogArea().append(s + '\n')
-            getLogArea().setCaretPosition(getLogArea().getDocument().getLength())
-        }
-    }*/
-
 
     PrintStream outStream = new PrintStream(System.out) {
         @Override
         void println(String s) {
             out.println(s)
-            //Graphics2D g = getLogArea().getGraphics()
-            //g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             getLogArea().append(s + '\n')
             getLogArea().setCaretPosition(getLogArea().getDocument().getLength())
         }
     }
+
 
     JTextArea getLogArea() {
         view.swing.textAreaLog
@@ -109,7 +96,6 @@ class MainGui {
 
 
     def glueAndStart() {
-
 
         System.setProperty("apple.laf.useScreenMenuBar", "true");
         // todo: add macos gestures for zooming windows:
@@ -119,19 +105,15 @@ class MainGui {
         view = new View(model)
         controller = new GlobalController(model, view)
 
-
         //
         // connect println with JTextArea right/down in app
         //
         System.setOut(outStream)
-        //System.setOut(new PrintStream(new CustomOutputStream()));
-        //System.setErr(new PrintStream(new CustomOutputStream()));
         System.setErr(outStream)
         JTextArea la = getLogArea()
         la.setFont(new Font("Monospaced", Font.PLAIN, (int) (scaleX * 8)))
         println("Programm-Version: $Main.VERSION_STRING")
-        println "Scalierung: x: ${(1000 * scaleX) as int}   y: ${(1000 * scaleY) as int}"
-
+        println "Skalierung: x: ${(1000 * scaleX) as int}   y: ${(1000 * scaleY) as int}"
 
         //
         // connect exit-action to X-symbol on window
@@ -145,21 +127,11 @@ class MainGui {
         }
         ((JFrame) view.swing.frame).addWindowListener(disposeCallback)
 
-
         //
         // configure tooltip manager
         //
         ToolTipManager.sharedInstance().setDismissDelay(600000)
         ToolTipManager.sharedInstance().setInitialDelay(500)
-
-
-
-        //
-        // bind components together, see View
-        //
-        view.swing.build() {
-        }
-
 
         //
         // start EDT and init model

@@ -1,6 +1,7 @@
 package application
 
 import com.formdev.flatlaf.FlatLightLaf
+import groovy.beans.Bindable
 import groovy.swing.SwingBuilder
 import model.Model
 import model.TaskInProject
@@ -60,6 +61,9 @@ class View {
     Dimension screenDimension = Toolkit.getDefaultToolkit().getScreenSize()
     SwingBuilder swing
     Model model
+
+    @Bindable
+    boolean showIntegrationPhase = true // if data is available
 
     //
     // adapter models (second layer...)
@@ -232,7 +236,29 @@ class View {
                     shortDescription: 'Staffelung sortieren dem spätesten End-Termin des letzten Tasks des Projektes'
             )
 
+            action(id: 'insertInPhaseAction',
+                    name: "IPs im Modell erzeugen",
+                    //mnemonic: 'p',
+                    closure: { println "insertInPhaseAction not connected to application..." },
+                    //accelerator: shortcut('P'),
+                    shortDescription: 'falls nicht verfügbar, werden IPs im letzten Drittel des Projektes erzeugt'
+            )
+            action(id: 'removeInPhaseAction',
+                    name: "IPs aus Model entfernen",
+                    //mnemonic: 'p',
+                    closure: { println "removeInPhaseAction not connected to application..." },
+                    //accelerator: shortcut('P'),
+                    shortDescription: 'alle IPs aus dem Modell löschen'
+            )
             // view
+
+            action(id: 'toggleViewInPhaseAction',
+                    name: "IPs sichtbar/unsichtbar",
+                    //mnemonic: 'p',
+                    closure: { println "toggleViewInPhaseAction not connected to application..." },
+                    //accelerator: shortcut('P'),
+                    shortDescription: 'IPs bleiben im Modell. Sichtbar oder unsichtbar.'
+            )
 
             action(id: 'pipelineViewAction',
                     name: "Staffelungs-Ansicht, separat",
@@ -320,10 +346,13 @@ class View {
 
                     menu(text: 'Werkzeug', mnemonic: 'W') {
                         menuItem(sortPipelineAction)
+                        menuItem(insertInPhaseAction)
+                        menuItem(removeInPhaseAction)
                         menuItem(swapTemplatesAndProjectsAction)
                     }
 
                     menu(text: 'Ansicht', mnemonic: 'A') {
+                        menuItem(toggleViewInPhaseAction)
                         menuItem(pipelineViewAction)
                         menuItem(loadViewAction)
                         menuItem(pipelineLoadViewAction)

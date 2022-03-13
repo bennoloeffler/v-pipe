@@ -43,6 +43,7 @@ class GlobalController {
 
 
         // View
+        view.swing.toggleViewInPhaseAction.closure = toggleViewInPhaseActionPerformed
         view.swing.pipelineViewAction.closure = pipelineViewActionPerformed
         view.swing.loadViewAction.closure = loadViewActionPerformed
         view.swing.pipelineLoadViewAction.closure = pipelineLoadViewActionPerformed
@@ -186,6 +187,12 @@ class GlobalController {
             addToRecentMenu(dir)
             setSaveForValidModel()
         }
+    }
+
+
+    def toggleViewInPhaseActionPerformed = {
+        view.setShowIntegrationPhase(!view.showIntegrationPhase)
+        println "anzeigen IPs: " + (view.showIntegrationPhase?"an":"aus")
     }
 
     def sortPipelineActionPerformed = { ActionEvent e ->
