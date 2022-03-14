@@ -25,6 +25,11 @@ class NewProjectModel extends GridModel {
     @Bindable
     String departmentName =""
 
+    @Bindable
+    boolean showIntegrationPhase = true // if data is available
+
+
+
     int nowXRowCache = -1
 
     List<TaskInProject> project = []
@@ -36,6 +41,7 @@ class NewProjectModel extends GridModel {
 
     NewProjectModel(Model model) {
         this.model = model
+        this.addPropertyChangeListener('showIntegrationPhase', updateCallback)
         this.addPropertyChangeListener('projectName', updateCallback)
         model.addPropertyChangeListener('updateToggle', updateCallback)
         updateGridElementsFromDomainModel()
@@ -49,7 +55,7 @@ class NewProjectModel extends GridModel {
             if (projectName) {
                 Date startOfGrid = _getStartOfWeek(model.getStartOfProjects())
                 Date endOfGrid = _getStartOfWeek(model.getEndOfProjects()) + 7
-                if (model.pipelineElements) {
+                if (model.pipelineElements && showIntegrationPhase) {
                     allProjectGridLines << fromPipelineElement(model.getPipelineElement(projectName), startOfGrid, endOfGrid)
                 }
                 project = model.getProject(projectName)
@@ -149,7 +155,7 @@ class NewProjectModel extends GridModel {
     }
 
     def shiftProject(int y, int shift) {
-        if(model.pipelineElements) {
+        if(model.pipelineElements && showIntegrationPhase) {
             if (y == 0) {
                 //Date startP = _getStartOfWeek(project*.starting.min())
                 //Date endProject = _getStartOfWeek(project*.ending.max() + 7)
@@ -210,7 +216,7 @@ class NewProjectModel extends GridModel {
     @Override
     List<String> getLineNames() {
         def r =[]
-        if(model.pipelineElements) {r << 'IP'}
+        if(model.pipelineElements && showIntegrationPhase) {r << 'IP'}
         project.each {r << it.department}
         r
     }
@@ -225,7 +231,7 @@ class NewProjectModel extends GridModel {
         List<String> result = []
         result.add("${lineNames[y]} ${columnNames[x]}" as String)
         def shift = 0
-        if(model.pipelineElements) shift = 1
+        if(model.pipelineElements && showIntegrationPhase) shift = 1
         if(y-shift == -1) {
             result.add("${model.getPipelineElement(projectName).pipelineSlotsNeeded}" as String)
         } else {
@@ -250,7 +256,7 @@ class NewProjectModel extends GridModel {
     }
 
     def shiftSize(int y, int shift) {
-        if(model.pipelineElements) {
+        if(model.pipelineElements && showIntegrationPhase) {
             if (y == 0) {
                 //Date startP = _getStartOfWeek(project*.starting.min())
                 //Date endProject = _getStartOfWeek(project*.ending.max() + 7)

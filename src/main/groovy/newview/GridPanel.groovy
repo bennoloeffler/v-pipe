@@ -34,6 +34,9 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
 
     @Bindable detailsToolTip = true
 
+    @Bindable
+    boolean showIntegrationPhase = true
+
     //int borderWidth
     //int nameWidth
 
@@ -501,6 +504,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
         addPropertyChangeListener('cursorX', cursorXChanged as PropertyChangeListener)
         addPropertyChangeListener('hightlightLinePattern', l)
         addPropertyChangeListener('hScrollBarValueZoomingSync', sbs)
+        addPropertyChangeListener("showIntegrationPhase", l)
 
     }
 
@@ -750,7 +754,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
 
         // element in project color, integration phase color (orange), empty color (white)
         if( e != null) {
-            g.setColor(e.integrationPhase ? Color.orange : (e == e.nullElement ? Color.WHITE : c))
+            g.setColor(e.integrationPhase && showIntegrationPhase ? Color.orange : (e == e.nullElement ? Color.WHITE : c))
 
             // or current mouse location color (overwrites even more)
             if (x == gridMouseX && y == gridMouseY) {

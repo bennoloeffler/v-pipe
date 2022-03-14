@@ -2,6 +2,7 @@ package application
 
 import groovy.swing.SwingBuilder
 import model.Model
+import model.PipelineElement
 import model.TaskInProject
 
 import javax.swing.*
@@ -33,6 +34,7 @@ class ProjectDetails {
         model = view.model // shortcut
         swing = view.swing // shortcut
         view.gridPipelineModel.addPropertyChangeListener("selectedProject", updateProjectDetails)
+        view.addPropertyChangeListener("showIntegrationPhase", updateProjectDetails)
         model.addPropertyChangeListener("updateToggle", updateProjectDetails)
     }
 
@@ -108,6 +110,11 @@ class ProjectDetails {
                         for (task in project) {
                             buildProjectLine(idx++, task.department, task.starting, task.ending, task.capacityNeeded, task.description)
                         }
+                        if(view.showIntegrationPhase && model.pipelineElements) {
+                            label(" Integrations-Phase", constraints: 'growx, span, wrap')
+                            PipelineElement pe = model.getPipelineElement(view.selectedProject)
+                            buildIPLine(pe.startDate, pe.endDate, pe.pipelineSlotsNeeded, "")
+                        }
                     }
                     panel(border: titledBorder('Projektverwaltung'), constraints: 'wrap') {
                         migLayout(layoutConstraints: "fill", columnConstraints: "[][]", rowConstraints: "[][]")
@@ -125,6 +132,19 @@ class ProjectDetails {
         }
     }
 
+    def buildIPLine(def starting, def ending, def capacityNeeded, def description) {
+        swing.build {
+            comboBox(id: "department-IP", items: ["IP"], selectedItem: "IP", enabled: false, constraints: 'growx')
+            //label("IP", toolTipText: "die Integrations-Phase des Projektes")
+            textField(id: "planStart-IP", text: starting.toString(), toolTipText: "alter Wert:  " + starting.toString(), actionPerformed: checkProjectDetails)
+            textField(id: "planFinish-IP", text: ending.toString(), toolTipText: "alter Wert:  " + ending.toString(), actionPerformed: checkProjectDetails)
+            textField(id: "capaNeeded-IP", text: capacityNeeded as String, toolTipText: "alter Wert:  " + (capacityNeeded as String),
+                    actionPerformed: checkProjectDetails,  constraints: 'wrap')
+            //textField(id: "description-$idx", text: description, toolTipText: "alter Wert:  $description", constraints: 'growx', actionPerformed: checkProjectDetails)
+            //button("", icon: cut, constraints: 'growy, growx', actionPerformed: deleteLine.curry(idx))
+            //button("", icon: copy, constraints: "growy, growx, wrap", actionPerformed: copyLine.curry(idx))
+        }
+    }
 
     def buildProjectLine(def idx, def department, def starting, def ending, def capacityNeeded, def description) {
         swing.build {
@@ -206,7 +226,14 @@ class ProjectDetails {
                 view.selectedProject = swing.projectName.text
             }
 
-            model.reCalcCapaAvailableIfNeeded()
+            if(view.showIntegrationPhase && model.pipelineElements) {
+                PipelineElement pe = model.getPipelineElement(view.selectedProject)
+                pe.startDate = swing."planStart-IP".text.toDate()
+                pe.endDate = swing."planFinish-IP".text.toDate()
+                pe.pipelineSlotsNeeded = swing."capaNeeded-IP".text as Integer
+            }
+
+                model.reCalcCapaAvailableIfNeeded()
             model.fireUpdate()
 
             //model.setUpdateToggle(!model.updateToggle)
@@ -241,6 +268,28 @@ class ProjectDetails {
                 }
             }
             idx++
+        }
+        if(view.showIntegrationPhase && model.pipelineElements) {
+            def startValid = true
+            def endValid = true
+            if (!checkTextField(swing."planStart-IP", Date.class)) {
+                result = false; startValid = false
+            }
+            if (!checkTextField(swing."planFinish-IP", Date.class)) {
+                result = false; endValid = false
+            }
+            if (startValid && endValid && !checkStartBeforeEnd(swing."planStart-IP", swing."planFinish-IP")) {
+                result = false
+            }
+            if (!checkTextField(swing."capaNeeded-IP", Integer.class)) {
+                result = false
+            } else {
+                int capaNeeded = Integer.parseInt(swing."capaNeeded-IP".text)
+                if(capaNeeded > model.maxPipelineSlots) {
+                    markError(swing."capaNeeded-IP" as JTextField, "Bedarf ist größer als Maximum der Slots: $model.maxPipelineSlots")
+                    result = false
+                }
+            }
         }
         if (result) {
             swing.applyDetails.text = "Änderungen übernehmen"
@@ -308,7 +357,15 @@ class ProjectDetails {
 
     def checkTextField = { JTextField textField, Class type ->
         def result = true
-        if (type == Double) {
+
+        if (type == Integer) {
+            try {
+                textField.text.toInteger()
+            } catch (Exception e) {
+                markError(textField, "keine Ganzzahl...")
+                result = false
+            }
+        } else if (type == Double) {
             try {
                 textField.text.toDouble()
             } catch (Exception e) {

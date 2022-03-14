@@ -488,6 +488,10 @@ class View {
             bind(target: loadView, targetProperty: 'hScrollBarValueZoomingSync', source: pipelineView, sourceProperty: 'hScrollBarValueZoomingSync')
             bind(target: pipelineLoadView, targetProperty: 'hScrollBarValueZoomingSync', source: pipelineView, sourceProperty: 'hScrollBarValueZoomingSync')
 
+            bind(target: pipelineView, targetProperty: 'showIntegrationPhase', source: this, sourceProperty: 'showIntegrationPhase')
+            //bind(target: projectView, targetProperty: 'showIntegrationPhase', source: this, sourceProperty: 'showIntegrationPhase')
+            bind(target: gridProjectModel, targetProperty: 'showIntegrationPhase', source: this, sourceProperty: 'showIntegrationPhase')
+
         }
         ((JScrollPane) (swing.projectDetailsScrollPane)).verticalScrollBar.setUnitIncrement(10)
 
@@ -522,6 +526,8 @@ class View {
             }
             bind(target: newPipelineView, targetProperty: 'cursorX', source: pipelineView, sourceProperty: "cursorX")
             bind(target: pipelineView, targetProperty: 'cursorX', source: newPipelineView, sourceProperty: "cursorX")
+            bind(target: newPipelineView, targetProperty: 'showIntegrationPhase', source: this, sourceProperty: 'showIntegrationPhase')
+
         }
     }
 
@@ -566,6 +572,7 @@ class View {
             }
             bind(target: newProjectView, targetProperty: 'cursorX', source: pipelineView, sourceProperty: "cursorX")
             bind(target: pipelineView, targetProperty: 'cursorX', source: newProjectView, sourceProperty: "cursorX")
+            bind(target: newProjectView, targetProperty: 'showIntegrationPhase', source: this, sourceProperty: 'showIntegrationPhase')
         }
     }
 

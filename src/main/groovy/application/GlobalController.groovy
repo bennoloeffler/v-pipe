@@ -74,7 +74,7 @@ class GlobalController {
                             },
                             shortDescription: dir
                     ))
-            if(!MainGui.isValidModelFolder(dir)){
+            if (!MainGui.isValidModelFolder(dir)) {
                 mi.getAction().setEnabled(false)
             }
             mi
@@ -171,7 +171,7 @@ class GlobalController {
     }
 
     def swapToNormalStateIfNeeded() {
-        if(model.isProjectsAndTemplatesSwapped()) {
+        if (model.isProjectsAndTemplatesSwapped()) {
             swapTemplatesAndProjectsActionPerformed()
             println "swapped back projects and templates"
         }
@@ -192,7 +192,11 @@ class GlobalController {
 
     def toggleViewInPhaseActionPerformed = {
         view.setShowIntegrationPhase(!view.showIntegrationPhase)
-        println "anzeigen IPs: " + (view.showIntegrationPhase?"an":"aus")
+        showPipelineLoad()
+        println "anzeigen IPs: " + (view.showIntegrationPhase ? "an" : "aus")
+        if (!model.pipelineElements) {
+            println "Es gibt keine Integrations-Phasen... kein Effekt."
+        }
     }
 
     def sortPipelineActionPerformed = { ActionEvent e ->
@@ -216,7 +220,7 @@ class GlobalController {
     def swapTemplatesAndProjectsActionPerformed = {
         view.deselectProject()
         model.swapTemplatesAndProjects()
-        if ( model.projectsAndTemplatesSwapped) {
+        if (model.projectsAndTemplatesSwapped) {
             setNewLoadAndSave(false)
         } else {
             setNewLoadAndSave(true)
@@ -256,7 +260,8 @@ class GlobalController {
     JFileChooser fc = null
 
     boolean chooseDirWhileOpen
-    private String chooseDir(String dialogTitle, JComponent root, String applyButtonText,  Boolean open) {
+
+    private String chooseDir(String dialogTitle, JComponent root, String applyButtonText, Boolean open) {
         String result = null
         if (!fc) {
             fc = new JFileChooser(new File(model.currentDir)) {
@@ -355,6 +360,16 @@ class GlobalController {
         return true
     }
 
+    def showPipelineLoad() {
+        if (model.pipelineElements && view.showIntegrationPhase) {
+            view.swing.spV3.setDividerLocation(((int) (100 * MainGui.scaleY)))
+            view.swing.pipelineLoadViewScrollPane.setVisible(true)
+        } else {
+            view.swing.pipelineLoadViewScrollPane.setVisible(false)
+        }
+        view.swing.frame.validate()
+    }
+
     def openDir(String dir) {
         try {
             model.setCurrentDir(dir)
@@ -362,12 +377,7 @@ class GlobalController {
             model.readAllData()
             view.pipelineView.setCursorToNow()
             view.loadView.setCursorToNow()
-            if (model.pipelineElements) {
-                view.swing.spV3.setDividerLocation(((int) (100 * MainGui.scaleY)))
-                view.swing.pipelineLoadViewScrollPane.setVisible(true)
-            } else {
-                view.swing.pipelineLoadViewScrollPane.setVisible(false)
-            }
+            showPipelineLoad()
             addToRecentMenu(dir)
             model.setDirty(false)
             println "Daten-Verzeichnis: " + dir
@@ -404,7 +414,8 @@ class GlobalController {
         model.setVPipeHomeDir()
         model.setUpdateToggle(!model.updateToggle)
     }
-    def setSaveForValidModel(){
+
+    def setSaveForValidModel() {
         Action a = view.swing.saveAction
         a.setEnabled(true)
         a = view.swing.saveAsAction
