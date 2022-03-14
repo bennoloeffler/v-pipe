@@ -361,13 +361,7 @@ class GlobalController {
     }
 
     def showPipelineLoad() {
-        if (model.pipelineElements && view.showIntegrationPhase) {
-            view.swing.spV3.setDividerLocation(((int) (100 * MainGui.scaleY)))
-            view.swing.pipelineLoadViewScrollPane.setVisible(true)
-        } else {
-            view.swing.pipelineLoadViewScrollPane.setVisible(false)
-        }
-        view.swing.frame.validate()
+        view.showPipelineLoad()
     }
 
     def openDir(String dir) {

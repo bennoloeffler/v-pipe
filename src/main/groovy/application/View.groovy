@@ -4,8 +4,6 @@ import com.formdev.flatlaf.FlatLightLaf
 import groovy.beans.Bindable
 import groovy.swing.SwingBuilder
 import model.Model
-import model.TaskInProject
-import model.WeekOrMonth
 import net.miginfocom.swing.MigLayout
 import newview.FileDifferPanel
 import newview.GridModel
@@ -13,27 +11,16 @@ import newview.GridPanel
 import newview.NewLoadPanel
 import newview.ResourceCapacityEditor
 
-import javax.swing.BoxLayout
-import javax.swing.Icon
 import javax.swing.ImageIcon
-import javax.swing.JCheckBoxMenuItem
-import javax.swing.JComponent
 import javax.swing.JFrame
 import javax.swing.JLabel
-import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JSplitPane
 import javax.swing.JTabbedPane
-import javax.swing.JTextArea
-import javax.swing.JTextField
 import javax.swing.UIManager
-import java.awt.BorderLayout
 import java.awt.Color
-import java.awt.Component
 import java.awt.Dimension
-import java.awt.Font
 import java.awt.Image
-import java.awt.TextField
 import java.awt.Toolkit
 
 import static application.ProjectDetails.*
@@ -84,6 +71,7 @@ class View {
     FileDifferPanel fileDifferPanel
     ProjectTemplates projectTemplates
     ResourceCapacityEditor resourceCapacityEditor
+    PipelineEditor pipelineEditor
 
     def projectDetails
 
@@ -105,6 +93,7 @@ class View {
         fileDifferPanel = new FileDifferPanel(swing)
         projectTemplates = new ProjectTemplates(this)
         resourceCapacityEditor = new ResourceCapacityEditor(swing, model)
+        pipelineEditor = new PipelineEditor(model: model, view: this, swing: swing)
 
         build()
 
@@ -419,23 +408,27 @@ class View {
                         tabbedPane(id: 'tabs', tabLayoutPolicy: JTabbedPane.SCROLL_TAB_LAYOUT) {
 
                             scrollPane(id: 'projectDetailsScrollPane',
-                                    name: 'Projekt-Details',
+                                    name: 'Details',
                                     verticalScrollBarPolicy: JScrollPane.VERTICAL_SCROLLBAR_ALWAYS) {
-                                //projectDetails.noDataPanel()
                             }
 
-                            scrollPane(name: 'Projekt-Vorlagen') {
-                                projectTemplates.buildDataPanel()
+                            scrollPane(name: 'Ressourcen') {
+                                resourceCapacityEditor.buildPanel()
                             }
-                            scrollPane(name: 'Info') {
+
+                            scrollPane(name: 'Vorlagen') {
+                                projectTemplates.buildPanel()
+                            }
+
+                            scrollPane(name: 'Pipeline') {
+                                pipelineEditor.buildPanel()
+                            }
+
+                            scrollPane(name: 'Log') {
                                 textArea(id: 'textAreaLog', editable: false, focusable: false)
                             }
 
                             fileDifferPanel.buildPanel()
-
-                            scrollPane(name: 'Ressosurcen & Kapa') {
-                                resourceCapacityEditor.buildPanel()
-                            }
 
                         }
                     }
@@ -580,11 +573,21 @@ class View {
         gridPipelineModel.setSelectedProject(null)
     }
 
-    String getSelectedProject(){
+    String getSelectedProject() {
         gridPipelineModel.selectedProject
     }
 
-    def setSelectedProject(String projectName){
+    def setSelectedProject(String projectName) {
         gridPipelineModel.selectedProject = projectName
+    }
+
+    def showPipelineLoad() {
+        if (model.pipelineElements && showIntegrationPhase) {
+            swing.spV3.setDividerLocation(((int) (100 * MainGui.scaleY)))
+            swing.pipelineLoadViewScrollPane.setVisible(true)
+        } else {
+            swing.pipelineLoadViewScrollPane.setVisible(false)
+        }
+        swing.frame.validate()
     }
 }

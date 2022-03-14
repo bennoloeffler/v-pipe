@@ -173,7 +173,7 @@ class ProjectTemplates {
         }
     }
 
-    def buildDataPanel() {
+    def buildPanel() {
         def t = model.allTemplates
         //if(t) {
 

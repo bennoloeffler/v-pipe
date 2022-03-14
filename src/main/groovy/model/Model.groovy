@@ -828,4 +828,40 @@ class Model {
     List<String> createTemplateSequence() {
         templateSequence = templateList.stream().map { it.project }.distinct().collect(Collectors.toList())
     }
+
+    void removePipeline() {
+        assert (pipelineElements || templatePipelineElements), "pipline need to be there in templates or tasks"
+        pipelineElements =[]
+        templatePipelineElements =[]
+        maxPipelineSlots = 0
+        fireUpdate()
+    }
+
+    void createPipeline() {
+        assert !(pipelineElements || templatePipelineElements), "no pipline at all..."
+
+        maxPipelineSlots = 2
+
+        projectSequence.each {project ->
+            def tasks = getProject(project)
+            Date start = tasks*.starting.min()
+            Date end = tasks*.ending.max()
+            int lenIP = (int)((end - start) / 3)
+            lenIP = lenIP == 0 ? 1 : lenIP
+            start = end - lenIP
+            pipelineElements << new PipelineElement(project: project, startDate: start, endDate: end, pipelineSlotsNeeded: 1)
+        }
+        templateSequence.each {project ->
+            def tasks = getTemplate(project)
+            Date start = tasks*.starting.min()
+            Date end = tasks*.ending.max()
+            int lenIP = (int)((end - start) / 3)
+            lenIP = lenIP == 0 ? 1 : lenIP
+            start = end - lenIP
+            templatePipelineElements << new PipelineElement(project: project, startDate: start, endDate: end, pipelineSlotsNeeded: 1)
+        }
+
+        fireUpdate()
+
+    }
 }

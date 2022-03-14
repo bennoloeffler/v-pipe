@@ -18,16 +18,20 @@ import java.awt.event.WindowEvent
 
 // RELEASE 2.0 do all in Gui (MIK edition) with video starting from help
 // ok 1.6 new Model, new Project, rename Project, templates and pipelines in GUI --> YOU DONT NEED THE FILES.
-// 1.7 ip in gui.  idea: showIP - and IPs are created ALWAYS. But they are stored only, when the are shown.
+// ok 1.7-ip-in-gui.  idea: showIP - and IPs are created ALWAYS. But they are stored only, when the are shown.
 //                      as soon as IPs "there in files", they are shown. showIP = true
 //                      as soon as IPs "are missing in files", showIP=false. They are created, when acivated: 1/3rd of project at the end
 //                      as soon as they are there, they can be hidden - but they are saved (with hidden flag)
-// 1.8 TODO: Detail-Fenster sortierten, Namen kürzen, Detail-Pipeline-View: Slots setzen. Pipeline löschen, Pipeline erzeugen.
-// 2.1 months in Gui
+// ok 1.8-beta-all-gui Detail-Fenster sortierten, Namen kürzen, Detail-Pipeline-View: Slots setzen. Pipeline löschen, Pipeline erzeugen.
+// 1.9 months in Gui ??
+// 2.0 all-analysis-in-gui
 // 2.2 watch files (inside v-pipe in a text area, so that scenarios and shifts can be realized)
 // 3.0 Operational: create “rueckmeldung” in folder -> verbleibend
 
 class MainGui {
+
+    static VERSION_STRING ='1.8.0-beta-all-gui'
+
     Model model
     View view
     GlobalController controller
@@ -113,7 +117,7 @@ class MainGui {
         System.setErr(outStream)
         JTextArea la = getLogArea()
         la.setFont(new Font("Monospaced", Font.PLAIN, (int) (scaleX * 8)))
-        println("Programm-Version: $Main.VERSION_STRING")
+        println("Programm-Version: $VERSION_STRING")
         println "Skalierung: x: ${(1000 * scaleX) as int}   y: ${(1000 * scaleY) as int}"
 
         //

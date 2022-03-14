@@ -24,7 +24,6 @@ import java.util.List
  */
 class  Main {
 
-    static VERSION_STRING ='1.7.0-ip-in-gui'
 
     def singleRunMode = false // instead: Deamon is default
     def multiInstanceMode = false // instead SingleInstance is default
@@ -33,7 +32,7 @@ class  Main {
 
 
     static void main(String[] args) {
-        l.info "v-pipe  (release: $VERSION_STRING)"
+        l.info "v-pipe  (release: $MainGui.VERSION_STRING)"
         def m = new Main()
         m.parseArgs(args)
         m.checkStartAndHelp()
