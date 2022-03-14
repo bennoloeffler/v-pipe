@@ -18,10 +18,11 @@ import java.awt.event.WindowEvent
 
 // RELEASE 2.0 do all in Gui (MIK edition) with video starting from help
 // ok 1.6 new Model, new Project, rename Project, templates and pipelines in GUI --> YOU DONT NEED THE FILES.
-// 1.7 ip in gui. TODO: idea: showIP - and IPs are created ALWAYS. But they are stored only, when the are shown.
+// 1.7 ip in gui.  idea: showIP - and IPs are created ALWAYS. But they are stored only, when the are shown.
 //                      as soon as IPs "there in files", they are shown. showIP = true
 //                      as soon as IPs "are missing in files", showIP=false. They are created, when acivated: 1/3rd of project at the end
 //                      as soon as they are there, they can be hidden - but they are saved (with hidden flag)
+// 1.8 TODO: Detail-Fenster sortierten, Namen kürzen, Detail-Pipeline-View: Slots setzen. Pipeline löschen, Pipeline erzeugen.
 // 2.1 months in Gui
 // 2.2 watch files (inside v-pipe in a text area, so that scenarios and shifts can be realized)
 // 3.0 Operational: create “rueckmeldung” in folder -> verbleibend
