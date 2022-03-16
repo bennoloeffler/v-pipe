@@ -118,6 +118,7 @@ def newModelDir = "$tempDist/new-model"
 
 task copyExeLibsJRE {
     //dependsOn createExe, createGui
+    dependsOn test
     dependsOn createAllExecutables
     
     description "copies jre, exe and lib to $tempDist"

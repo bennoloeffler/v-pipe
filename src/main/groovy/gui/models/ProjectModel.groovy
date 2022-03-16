@@ -1,19 +1,20 @@
-package application
+package gui.models
 
 import groovy.beans.Bindable
 import groovy.transform.CompileStatic
+import gui.models.GridElement
+import gui.models.GridModel
 import model.Model
 import model.PipelineElement
 import model.TaskInProject
 import model.WeekOrMonth
-import newview.GridElement
-import newview.GridModel
 import utils.RunTimer
 
-import static extensions.DateHelperFunctions.*
+import static extensions.DateHelperFunctions._dToS
+import static extensions.DateHelperFunctions._getStartOfWeek
 
 @CompileStatic
-class NewProjectModel extends GridModel {
+class ProjectModel extends GridModel {
 
     final Model model
 
@@ -39,7 +40,7 @@ class NewProjectModel extends GridModel {
         setUpdateToggle(!getUpdateToggle())
     }
 
-    NewProjectModel(Model model) {
+    ProjectModel(Model model) {
         this.model = model
         this.addPropertyChangeListener('showIntegrationPhase', updateCallback)
         this.addPropertyChangeListener('projectName', updateCallback)

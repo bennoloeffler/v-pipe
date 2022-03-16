@@ -1,15 +1,18 @@
-package application
+package gui.models
 
-
+import core.MovingAverage
+import groovy.transform.CompileStatic
 import model.Model
 import model.WeekOrMonth
-import newview.AbstractGridLoadModel
-import newview.GridLoadElement
 import utils.RunTimer
 
-import static extensions.DateHelperFunctions._getStartOfWeek
+import java.beans.PropertyChangeListener
 
-class GridPipelineLoadModel extends AbstractGridLoadModel {
+import static extensions.DateHelperFunctions._getStartOfWeek
+import static extensions.StringExtension.toDateFromYearWeek
+
+@CompileStatic
+class GridLoadPipelineModel extends AbstractGridLoadModel {
 
     Model model
 
@@ -21,15 +24,15 @@ class GridPipelineLoadModel extends AbstractGridLoadModel {
 
     Map<String, GridLoadElement> gridElements = [:]
 
-    def updateCallback = {
+    PropertyChangeListener updateCallback = {
         updateAllFromModelData()
     }
 
 
-    GridPipelineLoadModel(Model model, WeekOrMonth weekOrMonth = WeekOrMonth.WEEK) {
+    GridLoadPipelineModel(Model model, WeekOrMonth weekOrMonth = WeekOrMonth.WEEK) {
         this.model = model
         this.weekOrMonth = weekOrMonth
-        model.addPropertyChangeListener('updateToggle', updateCallback)
+        model.addPropertyChangeListener('updateToggle', updateCallback )
         updateAllFromModelData()
     }
 
@@ -50,7 +53,7 @@ class GridPipelineLoadModel extends AbstractGridLoadModel {
                 model.getFullSeriesOfTimeKeys(weekOrMonth).each { String timeStr ->
                     model.pipelineElements.each { element ->
 
-                        Date start = timeStr.toDateFromYearWeek()
+                        Date start = toDateFromYearWeek(timeStr)
                         Date end = start + 7
                         long overlap = element.getDaysOverlap(start, end)
                         double capaNeeded = ((double) overlap / 7) * element.pipelineSlotsNeeded

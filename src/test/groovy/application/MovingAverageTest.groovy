@@ -1,5 +1,7 @@
 package application
 
+import core.MovingAverage
+
 
 class MovingAverageTest extends GroovyTestCase {
 

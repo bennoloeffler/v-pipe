@@ -1,9 +1,12 @@
-package newview
+package gui.panels
 
 import groovy.beans.Bindable
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import groovyx.gpars.GParsPool
+import gui.models.GridElement
+import gui.models.GridModel
+import gui.panels.PanelBasics
 import utils.RunTimer
 
 import javax.swing.*

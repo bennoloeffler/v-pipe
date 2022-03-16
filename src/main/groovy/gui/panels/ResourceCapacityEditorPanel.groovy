@@ -1,9 +1,10 @@
-package newview
+package gui.panels
 
-import application.MainGui
+
 import groovy.swing.SwingBuilder
 import groovy.yaml.YamlBuilder
 import groovy.yaml.YamlSlurper
+import gui.View
 import model.Model
 
 import javax.swing.*
@@ -13,13 +14,13 @@ import java.awt.event.KeyListener
 import java.util.List
 
 
-class ResourceCapacityEditor {
+class ResourceCapacityEditorPanel {
 
     SwingBuilder swing
     Model model
     Color fg = UIManager.getLookAndFeelDefaults().get("TextField.foreground") as Color
 
-    ResourceCapacityEditor(SwingBuilder swing, Model model) {
+    ResourceCapacityEditorPanel(SwingBuilder swing, Model model) {
         this.swing = swing
         this.model = model
         model.addPropertyChangeListener {
@@ -236,10 +237,10 @@ Kapa_Abteilungen:
                     //list(id: 'resourcesList', constraints: "grow")
                     //}
 
-                    scrollPane(id: 'capaTextFileScrollPane', constraints: "h ${(int) (150 * MainGui.scaleY)}!, w ${(int) (300 * MainGui.scaleY)}!, growx, growy".toString()) {
+                    scrollPane(id: 'capaTextFileScrollPane', constraints: "h ${(int) (150 * View.scaleY)}!, w ${(int) (300 * View.scaleY)}!, growx, growy".toString()) {
                         textPane(id: 'capaTextFile', model.capaFileRawYamlSlurp, font: new Font(Font.MONOSPACED, Font.PLAIN, 12))
                     }
-                    scrollPane(constraints: "w ${(int) (250 * MainGui.scaleY)}!, growy, growx, wrap".toString()) {
+                    scrollPane(constraints: "w ${(int) (250 * View.scaleY)}!, growy, growx, wrap".toString()) {
                         textArea(id: "errorMessageCapaEdit")
                     }
                     button(id: "yamlSaveButton", "speichern", actionPerformed: saveRessources, constraints: "span, grow, wrap")

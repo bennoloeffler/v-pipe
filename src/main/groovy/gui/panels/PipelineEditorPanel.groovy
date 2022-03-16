@@ -1,5 +1,6 @@
-package application
+package gui.panels
 
+import gui.View
 import groovy.swing.SwingBuilder
 import model.Model
 
@@ -9,7 +10,7 @@ import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
 import java.beans.PropertyChangeListener
 
-class PipelineEditor {
+class PipelineEditorPanel {
 
     Model model
     View view

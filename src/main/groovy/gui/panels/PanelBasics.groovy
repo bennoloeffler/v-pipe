@@ -1,19 +1,13 @@
-package newview
+package gui.panels
 
-import groovy.beans.Bindable
+
 import groovy.transform.CompileStatic
 
-import javax.swing.ImageIcon
-import javax.swing.JComponent
-import javax.swing.JScrollPane
-import javax.swing.ToolTipManager
-import java.awt.Color
-import java.awt.Graphics2D
-import java.awt.Image
-import java.awt.Point
-import java.awt.RenderingHints
+import javax.swing.*
+import java.awt.*
 import java.awt.event.MouseEvent
 import java.awt.geom.AffineTransform
+import java.util.List
 
 @CompileStatic
 trait PanelBasics {

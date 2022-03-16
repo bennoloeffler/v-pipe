@@ -193,7 +193,7 @@ class CapaTransformerTest extends GroovyTestCase {
             m.capaAvailable = m.calcCapa(result)
             //}
             if(m.capaAvailable) {
-                m.check()
+                m.check(m.taskList)
             }
             return m.capaAvailable
 
@@ -242,7 +242,7 @@ class CapaTransformerTest extends GroovyTestCase {
             def capa = slurpTextAndCalc(text)
             println(capa)
         }
-        assert msg.contains("Für folgende Abteilungen ist keine Kapa definiert: [d1, d2]")
+        assert msg.contains("Kapa definiert: [d1, d2]")
 
     }
 }

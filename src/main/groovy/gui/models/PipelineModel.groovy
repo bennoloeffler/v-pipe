@@ -1,15 +1,15 @@
-package application
+package gui.models
 
 import groovy.beans.Bindable
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import groovyx.gpars.GParsPool
+import gui.models.GridElement
+import gui.models.GridModel
 import model.Model
 import model.PipelineElement
 import model.TaskInProject
 import model.WeekOrMonth
-import newview.GridElement
-import newview.GridModel
 import utils.RunTimer
 
 import java.beans.PropertyChangeEvent
@@ -19,7 +19,7 @@ import static extensions.DateHelperFunctions._dToS
 import static extensions.DateHelperFunctions._getStartOfWeek
 
 @CompileStatic
-class NewPipelineModel extends GridModel {
+class PipelineModel extends GridModel {
 
     @Bindable String selectedProject
     List<List<GridElement>> allProjectGridLines
@@ -33,7 +33,7 @@ class NewPipelineModel extends GridModel {
     }
 
 
-    NewPipelineModel(Model model) {
+    PipelineModel(Model model) {
         this.model = model
         model.addPropertyChangeListener(tasksPropertyListener as PropertyChangeListener)
         updateGridElements()

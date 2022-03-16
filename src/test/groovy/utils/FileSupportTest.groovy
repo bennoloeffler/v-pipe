@@ -62,7 +62,7 @@ class FileSupportTest extends GroovyTestCase {
         def r = FileSupport.backupFileName(fn)
         r = r[7..-1]
 
-        assert r.length()==fn.length()+ 31
+        assert r.length()==fn.length()+ 35
         assert r[0..9] == fn[0..9] // first 10
         assert r[-4..-1] == fn[-4..-1] // last 4
 

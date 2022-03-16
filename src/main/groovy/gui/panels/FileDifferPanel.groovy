@@ -1,30 +1,9 @@
-package newview
-
-
+package gui.panels
 
 import groovy.swing.SwingBuilder
-import model.Model
-import model.TaskInProject
-import utils.DiffMatchPatch
 
-import javax.swing.Icon
-import javax.swing.ImageIcon
-import javax.swing.JButton
-import javax.swing.JComboBox
-import javax.swing.JComponent
-import javax.swing.JFileChooser
-import javax.swing.JTextField
-import javax.swing.JTextPane
-import javax.swing.UIManager
-import javax.swing.text.html.HTMLEditorKit
-import java.awt.Color
-import java.awt.Desktop
-import java.awt.Image
-import java.awt.event.KeyEvent
-
-import static java.awt.Color.RED
-import static utils.DiffMatchPatch.*
-import static utils.DiffMatchPatch.get as get
+import javax.swing.*
+import java.awt.*
 
 class FileDifferPanel {
 

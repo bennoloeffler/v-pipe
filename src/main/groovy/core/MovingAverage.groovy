@@ -1,7 +1,4 @@
-package application
-
-import groovy.transform.CompileStatic
-
+package core
 /**
  * based on a series of doubles, calc a moving average.
  * default: use 5 values to calc average.

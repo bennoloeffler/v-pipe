@@ -1,6 +1,4 @@
-package newview
-
-
+package gui.models
 /**
  * base model for grid - this one is for manual testing
  */

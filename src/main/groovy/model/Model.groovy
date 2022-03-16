@@ -529,10 +529,10 @@ class Model {
                     Date startOfProject = _getStartOfWeek(p*.starting.min())
                     Date endOfProject = _getStartOfWeek(p*.ending.max()) + 7
                     if (startOfPipeline < startOfProject) {
-                        println("WARNUNG ${fileErr()}Projekt: $it.project... Integrations-Phase außerhalb des Projektes")
+                        println("WARNUNG ${fileErr()}Projekt: $it.project -> Integrations-Phase außerhalb des Projektes")
                     }
                     if (endOfPipeline > endOfProject) {
-                        println("WARNUNG ${fileErr()}Projekt: $it.project... Integrations-Phase außerhalb des Projektes")
+                        println("WARNUNG ${fileErr()}Projekt: $it.project -> Integrations-Phase außerhalb des Projektes")
                     }
                 } else {
                     throw new VpipeDataException("Fehler ${fileErr()}Projekt: $it.project existiert nicht in Projekt-Daten")
@@ -554,10 +554,10 @@ class Model {
                     Date startOfProject = _getStartOfWeek(p*.starting.min())
                     Date endOfProject = _getStartOfWeek(p*.ending.max()) + 7
                     if (startOfPipeline < startOfProject) {
-                        println("WARNUNG ${fileErr()}Projekt: $it.project... Integrations-Phase außerhalb des Projektes")
+                        println("WARNUNG ${fileErr()}Projekt: $it.project -> Integrations-Phase außerhalb des Projektes")
                     }
                     if (endOfPipeline > endOfProject) {
-                        println("WARNUNG ${fileErr()}Projekt: $it.project... Integrations-Phase außerhalb des Projektes")
+                        println("WARNUNG ${fileErr()}Projekt: $it.project -> Integrations-Phase außerhalb des Projektes")
                     }
                 } else {
                     throw new VpipeDataException("Fehler ${fileErr()}Projekt: $it.project existiert nicht in Template-Daten")

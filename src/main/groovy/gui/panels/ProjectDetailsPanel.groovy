@@ -1,5 +1,7 @@
-package application
+package gui.panels
 
+
+import gui.View
 import groovy.swing.SwingBuilder
 import model.Model
 import model.PipelineElement
@@ -11,7 +13,7 @@ import java.util.List
 
 import static java.awt.Color.RED
 
-class ProjectDetails {
+class ProjectDetailsPanel {
 
     View view
     Model model
@@ -27,9 +29,9 @@ class ProjectDetails {
         new ImageIcon(newImg)
     }
 
-    ProjectDetails(View view) {
-        cut = scaleIcon(new ImageIcon(getClass().getResource("/icons/cut.png")), 0.03 * MainGui.scaleY)
-        copy = scaleIcon(new ImageIcon(getClass().getResource("/icons/copy.png")), 0.03 * MainGui.scaleY)
+    ProjectDetailsPanel(View view) {
+        cut = scaleIcon(new ImageIcon(getClass().getResource("/icons/cut.png")), 0.03 * View.scaleY)
+        copy = scaleIcon(new ImageIcon(getClass().getResource("/icons/copy.png")), 0.03 * View.scaleY)
         this.view = view
         model = view.model // shortcut
         swing = view.swing // shortcut

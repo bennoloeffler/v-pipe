@@ -1,5 +1,7 @@
 package model
 
+import modelNew.ModelNew
+import modelNew.Project
 import spock.lang.Specification
 
 class ModelNewTest extends Specification {

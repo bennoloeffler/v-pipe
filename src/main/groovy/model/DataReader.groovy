@@ -27,6 +27,11 @@ class DataReader {
     static String PROJECT_DELIVERY_DATE_FILE_NAME = "Projekt-Liefertermin.txt"
     static String TEMPLATE_SEQUENCE_FILE_NAME = "Vorlagen-Sequenz.txt"
 
+
+    static boolean isValidModelFolder(String dirToOpen) {
+        new File(dirToOpen + "/" + DataReader.TASK_FILE_NAME).exists()
+    }
+
     static String path(String fileName) {
         currentDir + "/" + fileName
     }

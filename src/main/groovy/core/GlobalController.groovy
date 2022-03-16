@@ -1,15 +1,20 @@
-package application
+package core
 
-import model.DataReader
+import application.Main
+import gui.View
 import model.DataWriter
 import model.Model
 import model.VpipeDataException
 import utils.RunTimer
 import utils.SystemInfo
+import utils.UserSettingsStore
 
 import javax.swing.*
 import javax.swing.filechooser.FileFilter
 import java.awt.event.ActionEvent
+
+import static model.DataReader.getTASK_FILE_NAME
+import static model.DataReader.isValidModelFolder
 
 class GlobalController {
 
@@ -74,7 +79,7 @@ class GlobalController {
                             },
                             shortDescription: dir
                     ))
-            if (!MainGui.isValidModelFolder(dir)) {
+            if (!isValidModelFolder(dir)) {
                 mi.getAction().setEnabled(false)
             }
             mi
@@ -267,13 +272,12 @@ class GlobalController {
             fc = new JFileChooser(new File(model.currentDir)) {
 
                 def acceptVPipeDir() {
-                    println "innen open =$open  global = ${chooseDirWhileOpen}"
                     if (chooseDirWhileOpen) {
-                        def checkPath1 = getSelectedFile().getAbsolutePath() + "/" + DataReader.TASK_FILE_NAME
+                        def checkPath1 = getSelectedFile().getAbsolutePath() + "/" + TASK_FILE_NAME
                         def rightDirectorySelected = new File(checkPath1).exists()
                         def rightFileSelected = false
                         if (getSelectedFile().isFile()) {
-                            def checkPath2 = getSelectedFile().parentFile.getAbsolutePath() + "/" + DataReader.TASK_FILE_NAME
+                            def checkPath2 = getSelectedFile().parentFile.getAbsolutePath() + "/" + TASK_FILE_NAME
                             rightFileSelected = new File(checkPath2).exists()
                         }
                         return rightDirectorySelected || rightFileSelected
@@ -293,8 +297,8 @@ class GlobalController {
                 @Override
                 boolean accept(File f) {
 
-                    def checkPath = f.getAbsolutePath() + "/" + DataReader.TASK_FILE_NAME
-                    def checkNeigbour = f.parentFile.getAbsolutePath() + "/" + DataReader.TASK_FILE_NAME
+                    def checkPath = f.getAbsolutePath() + "/" + TASK_FILE_NAME
+                    def checkNeigbour = f.parentFile.getAbsolutePath() + "/" + TASK_FILE_NAME
                     def pathExists = new File(checkPath).exists()
                     def neighbourExists = new File(checkNeigbour).exists()
                     return pathExists || neighbourExists || f.isDirectory()
@@ -317,7 +321,7 @@ class GlobalController {
 
                 @Override
                 String getDescription() {
-                    return "$DataReader.TASK_FILE_NAME available?"
+                    return "$TASK_FILE_NAME available?"
                 }
             })
         }

@@ -1,15 +1,17 @@
 package application
 
-
-import model.DataReader
+import core.GlobalController
+import gui.View
 import model.Model
 import model.VpipeDataException
 import utils.FileSupport
+import utils.UserSettingsStore
 
 import javax.swing.*
-import java.awt.*
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
+
+import static model.DataReader.isValidModelFolder
 
 // HERE is the place for all TODO s (TODO = release, todo = remainder)
 // related with the next release
@@ -23,21 +25,38 @@ import java.awt.event.WindowEvent
 //                      as soon as IPs "are missing in files", showIP=false. They are created, when acivated: 1/3rd of project at the end
 //                      as soon as they are there, they can be hidden - but they are saved (with hidden flag)
 // ok 1.8-beta-all-gui Detail-Fenster sortierten, Namen kürzen, Detail-Pipeline-View: Slots setzen. Pipeline löschen, Pipeline erzeugen.
-// 1.9 months in Gui ??
+// 1.9-tidy-code TODO:  month load (probably: make a monthly capa available, too)
+//                      win and macos batch and jre in package
+//                      packages sorted (application, view, view-model, ...
+//                      empty yaml files (Feiertage, Profile, Kapa_Profile),
+//                      yaml in (almost) all examples,
+//
+//                      Gui save As
+//
 // 2.0 all-analysis-in-gui
 // 2.2 watch files (inside v-pipe in a text area, so that scenarios and shifts can be realized)
 // 3.0 Operational: create “rueckmeldung” in folder -> verbleibend
 
 class MainGui {
 
-    static VERSION_STRING ='1.8.0-beta-all-gui'
+    static VERSION_STRING ='1.9.0-tidy-code'
 
     Model model
     View view
     GlobalController controller
 
-    static def scaleX = 1.0;
-    static def scaleY = 1.0;
+
+    static void main(String[] args) {
+        //
+        // AWT event dispatch thread: get the exceptions...
+        //
+        Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler())
+        System.setProperty("sun.awt.exception.handler",
+                ExceptionHandler.class.getName())
+
+        new MainGui().glueAndStart()
+    }
+
 
     static class ExceptionHandler implements Thread.UncaughtExceptionHandler {
 
@@ -55,48 +74,33 @@ class MainGui {
             if (thrown instanceof VpipeDataException) {
                 println "\nD A T E N - F E H L E R :\n" + thrown.getMessage() ?: ''
             } else {
-                println "PROBLEM. Programm ist gecrasht :-(:\n ${thrown.getMessage() ?: ''}\n\nSTACKTRACE: (bitte an BEL)\n\n"
+                File f = new File(FileSupport.instantErrorLogFileName)
+                println "\n\nABSTURZ!   " +
+                        "Fehler:\n${thrown.getMessage() ?: ''}\n" +
+                        "Thread-Name: $tname\n" +
+                        "Log-File: ${f.getAbsolutePath()}"
 
                 StringWriter sw = new StringWriter()
                 PrintWriter pw = new PrintWriter(sw)
                 thrown.printStackTrace(pw)
                 println sw.toString()
-
-                File f = new File(FileSupport.instantErrorLogFileName)
                 f.text = sw.toString()
-
             }
         }
     }
 
-    static void main(String[] args) {
-        //
-        // AWT event dispatch thread: get the exceptions...
-        //
-        Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler())
-        System.setProperty("sun.awt.exception.handler",
-                ExceptionHandler.class.getName())
 
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        scaleX = screenSize.getWidth() / 1000.0 // 1000 as virt size => xSize = 1000 * scaleX
-        scaleY = screenSize.getHeight() / 1000.0
-
-        new MainGui().glueAndStart()
-    }
-
-
+    //
+    // connect println with JTextArea right/down in app
+    //
     PrintStream outStream = new PrintStream(System.out) {
         @Override
         void println(String s) {
             out.println(s)
-            getLogArea().append(s + '\n')
-            getLogArea().setCaretPosition(getLogArea().getDocument().getLength())
+            def doc = view.getLogArea().getStyledDocument()
+            doc.insertString(doc.length, s + '\n', null)
+            view.getLogArea().setCaretPosition(doc.length)
         }
-    }
-
-
-    JTextArea getLogArea() {
-        view.swing.textAreaLog
     }
 
 
@@ -115,10 +119,9 @@ class MainGui {
         //
         System.setOut(outStream)
         System.setErr(outStream)
-        JTextArea la = getLogArea()
-        la.setFont(new Font("Monospaced", Font.PLAIN, (int) (scaleX * 8)))
+
         println("Programm-Version: $VERSION_STRING")
-        println "Skalierung: x: ${(1000 * scaleX) as int}   y: ${(1000 * scaleY) as int}"
+        println "Auflösung in Pixel: x: ${(1000 * View.scaleX) as int}   y: ${(1000 * View.scaleY) as int}"
 
         //
         // connect exit-action to X-symbol on window
@@ -131,12 +134,6 @@ class MainGui {
             }
         }
         ((JFrame) view.swing.frame).addWindowListener(disposeCallback)
-
-        //
-        // configure tooltip manager
-        //
-        ToolTipManager.sharedInstance().setDismissDelay(600000)
-        ToolTipManager.sharedInstance().setInitialDelay(500)
 
         //
         // start EDT and init model
@@ -164,40 +161,5 @@ class MainGui {
             }
             model.setDirty(false)
         }
-
-
-        SwingUtilities.invokeLater {
-            // increase fonts in java 1.8
-            /*
-            JMenuBar menuBar = view.swing.menuBar
-            Font f = new FontUIResource(menuBar.getFont().getFontName(), menuBar.getFont().getStyle(), 25)
-            UIManager.put("Menu.font", f)
-            UIManager.put("MenuItem.font", f)
-            UIManager.put("Label.font", f)
-            UIManager.put("TextArea.font", f)
-            UIManager.put("Button.font", f)
-            */
-
-/*
-            int szIncr = 10; // Value to increase the size by
-            UIDefaults uidef = UIManager.getLookAndFeelDefaults();
-            for (Map.Entry<Object,Object> e : uidef.entrySet()) {
-                Object val = e.getValue();
-                if (val != null && val instanceof FontUIResource) {
-                    FontUIResource fui = (FontUIResource)val;
-                    uidef.put(e.getKey(), new FontUIResource(fui.getName(), fui.getStyle(), fui.getSize()+szIncr));
-                }
-            }
-            */
-            JFrame frame = view.swing.frame
-            SwingUtilities.updateComponentTreeUI(frame)
-
-        }
-
     }
-
-    static boolean isValidModelFolder(String dirToOpen) {
-        new File(dirToOpen + "/" + DataReader.TASK_FILE_NAME).exists()
-    }
-
 }

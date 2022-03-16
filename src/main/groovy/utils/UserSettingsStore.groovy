@@ -1,4 +1,4 @@
-package application
+package utils
 
 @Singleton
 class UserSettingsStore {

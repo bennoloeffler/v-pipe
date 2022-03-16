@@ -1,15 +1,13 @@
 package model
 
-import extensions.DateHelperFunctions
-import groovy.time.TimeCategory
 import groovy.transform.CompileStatic
 import groovy.transform.EqualsAndHashCode
-import groovy.transform.Immutable
 import groovy.transform.TupleConstructor
-import org.joda.time.*
+import org.joda.time.Interval
 import utils.RunTimer
 
 import static extensions.DateHelperFunctions.*
+import static extensions.StringExtension.toDate
 
 /**
  * Represents one entry of a dataset that models a multi-project situation.
@@ -20,6 +18,7 @@ import static extensions.DateHelperFunctions.*
 //@Immutable
 @TupleConstructor
 @EqualsAndHashCode
+@CompileStatic
 class TaskInProject {
 
     Date startingLastTime
@@ -76,7 +75,6 @@ class TaskInProject {
      * @param intervalEnd
      * @return overlap of the interval with this task in days
      */
-    //@CompileStatic
     long getDaysOverlap(Date intervalStart, Date intervalEnd) {
         assert starting < ending
         assert intervalStart < intervalEnd
@@ -98,7 +96,7 @@ class TaskInProject {
      * @return overlap of the interval with this task in days
      */
     long getDaysOverlap(String intervalStart, String intervalEnd) {
-        getDaysOverlap(intervalStart.toDate(), intervalEnd.toDate())
+        getDaysOverlap(toDate(intervalStart), toDate(intervalEnd))
     }
 
     /**
@@ -115,7 +113,6 @@ class TaskInProject {
      * @param intervalEnd
      * @return the capacity, the task is spending in the interval
      */
-    //@CompileStatic
     double getCapaNeeded(Date intervalStart, Date intervalEnd) {
         getDaysOverlap(intervalStart, intervalEnd) * getCapaPerDay()
     }
@@ -135,7 +132,6 @@ class TaskInProject {
      * @param weeks = true means weeks, false means split in months
      * @return map of [ W01:13.7, W04:4] for weeks (or [M1:17, M3,19.5] for months)
      */
-    //@CompileStatic
     Map<String, Double> cache
     WeekOrMonth weekOrMonthLastTime
     Map<String, Double> getCapaDemandSplitIn(WeekOrMonth weekOrMonth) {
@@ -147,14 +143,14 @@ class TaskInProject {
                 //t.stop()
                 return cache
             } else {
-                def resultMap = [:]
+                Map<String, Double> resultMap = [:]
                 if (capacityNeeded == 0) {
                     //t.stop()
                     return resultMap as Map<String, Double>
                 }
                 if (weekOrMonth == WeekOrMonth.WEEK) {
                     Date week = _getStartOfWeek(starting)
-//starting.getStartOfWeek() // not possible because of static comp
+                    //starting.getStartOfWeek() // not possible because of static comp
                     while (week < ending) {
                         double capNeededInThatWeek = getCapaNeeded(week, week + 7)
                         def key = _getWeekYearStr(week)//week.getWeekYearStr() // not possible because of static comp
@@ -189,7 +185,7 @@ class TaskInProject {
                 capacityNeededLastTime = capacityNeeded
                 weekOrMonthLastTime = weekOrMonth
                 //t.stop()
-                return resultMap as Map<String, Double>
+                return resultMap
             }
         }
     }

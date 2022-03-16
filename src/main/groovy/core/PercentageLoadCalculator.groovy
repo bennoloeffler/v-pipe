@@ -1,5 +1,6 @@
 package core
 
+import groovy.transform.CompileStatic
 import groovy.transform.Memoized
 import model.YellowRedLimit
 
@@ -11,6 +12,7 @@ import model.YellowRedLimit
  * Returns CapaNeedDetails.nullElement, when there is nothing to return.
  * Or returns the detailed Numbers RELATIVE to the YellowRedLimit.RED
  */
+@CompileStatic
 class PercentageLoadCalculator {
 
     AbsoluteLoadCalculator absoluteLoadCalculator = new AbsoluteLoadCalculator()
@@ -20,7 +22,7 @@ class PercentageLoadCalculator {
 
 
     PercentageLoadCalculator() {
-        this(new AbsoluteLoadCalculator(),[:])
+        this(new AbsoluteLoadCalculator(), [:] as Map<String, Map<String, YellowRedLimit>>)
     }
 
     PercentageLoadCalculator(AbsoluteLoadCalculator absoluteLoadCalculator,
@@ -65,7 +67,7 @@ class PercentageLoadCalculator {
 
                 // if there is not yet a department key and map: create
                 if (!result[department]) {
-                    result[department] = [:]
+                    result[department] = [:] as Map<String, CapaNeedDetails>
                 }
 
                 CapaNeedDetails absDetails = absoluteLoadCalculator.getCapaNeeded(department, timeKey)

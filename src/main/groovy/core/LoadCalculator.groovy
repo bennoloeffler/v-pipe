@@ -150,11 +150,12 @@ class LoadCalculator {
 
                 // if there is not yet a department key and map: create
                 if (!load[it.department]) {
-                    load[it.department] = [:]
+                    load.putAt(it.department, [:])
                 }
                 if(load[it.department][key]) { // if department and week-key are available
                     //Map<String, Double> departmentLoad = load[it.department]
-                    load[it.department][key]+=value // add
+                    def oldVal = load[it.department][key]
+                    load[it.department][key] = oldVal + value // add
                 } else {
                     load[it.department][key]=value // otherwise create
                 }
@@ -181,11 +182,12 @@ class LoadCalculator {
 
                 // if there is not yet a department key and map: create
                 if (!load[it.department]) {
-                    load[it.department] = [:]
+                    load.putAt(it.department,[:])
                 }
                 if(load[it.department][key]) { // if department and week-key are available
+                    def oldVal = load[it.department][key]
                     //Double val = load[it.department][key]
-                    load[it.department][key]+=value // add
+                    load[it.department][key] = oldVal + value // add
                 } else {
                     load[it.department][key]=value // otherwise create
                 }

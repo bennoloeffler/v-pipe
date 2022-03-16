@@ -1,6 +1,7 @@
 package model
 
 import groovy.transform.Canonical
+import modelNew.StartEndInterval
 
 class StartEndIntervalTest extends GroovyTestCase {
 

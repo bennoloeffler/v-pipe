@@ -112,7 +112,7 @@ class ProjectDataToLoadCalculatorTest extends GroovyTestCase {
 
 
         def f = new File(DataReader.get_TASK_FILE_NAME())
-        f.delete()
+        f.getParentFile().mkdirs()
         f.createNewFile()
         f << "p1 6.1.2020 12.1.2020 d1 20\n"
         f << "p1 13.1.2020 19.1.2020 d1 20"

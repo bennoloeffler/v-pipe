@@ -1,6 +1,7 @@
 package application
 
 import spock.lang.Specification
+import utils.UserSettingsStore
 
 class UserSettingsStoreTest extends Specification {
 

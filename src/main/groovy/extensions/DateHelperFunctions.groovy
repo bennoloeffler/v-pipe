@@ -1,5 +1,6 @@
 package extensions
 
+import groovy.transform.CompileStatic
 import groovy.transform.Memoized
 import org.joda.time.DateTime
 
@@ -8,6 +9,7 @@ import org.joda.time.DateTime
  * For good accessibility, they are added to Date and String.
  * See DateExtension StringExtension.
  */
+@CompileStatic
 class DateHelperFunctions {
 
     static Calendar cal = Calendar.getInstance()

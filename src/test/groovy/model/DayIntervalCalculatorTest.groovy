@@ -1,6 +1,8 @@
 package model
 
 import groovy.transform.Canonical
+import modelNew.DayIntervalCalculator
+import modelNew.StartEndInterval
 
 class DayIntervalCalculatorTest extends GroovyTestCase {
 

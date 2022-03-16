@@ -1,13 +1,13 @@
 package model
 
-
+import groovy.transform.CompileStatic
 import org.joda.time.Interval
 
 /**
  * Those elements read from file eg. The "original planning".
  */
-//@Immutable
-//@ToString
+
+@CompileStatic
 class PipelineElement {
 
     String project

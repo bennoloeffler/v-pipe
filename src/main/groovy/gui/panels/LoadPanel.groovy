@@ -1,16 +1,15 @@
-package newview
+package gui.panels
 
 import groovy.beans.Bindable
 import groovy.transform.CompileStatic
 import groovy.transform.Memoized
 import groovy.transform.TypeCheckingMode
+import gui.models.AbstractGridLoadModel
+import gui.models.GridLoadElement
 import utils.RunTimer
 
 import javax.swing.JPanel
-import javax.swing.JToolTip
-import javax.swing.SwingUtilities
 import javax.swing.ToolTipManager
-import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.Font
@@ -18,7 +17,6 @@ import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.Point
 import java.awt.Rectangle
-import java.awt.Stroke
 import java.awt.event.FocusEvent
 import java.awt.event.FocusListener
 import java.awt.event.KeyEvent
@@ -38,7 +36,7 @@ enum ShowAverageValue {
     no, yes
 }
 @CompileStatic
-class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, FocusListener, PanelBasics {
+class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, FocusListener, PanelBasics {
 
     //Color nowBarShadowColor = new Color(50, 50, 50, 30)
 
@@ -76,7 +74,7 @@ class NewLoadPanel  extends JPanel implements MouseListener, MouseMotionListener
         //println "scrollBarChange: $e.newValue"
     }
 
-    NewLoadPanel(int gridWidth, AbstractGridLoadModel model) {
+    LoadPanel(int gridWidth, AbstractGridLoadModel model) {
         //setDoubleBuffered(false)
         setFocusable(true)
         this.model = model

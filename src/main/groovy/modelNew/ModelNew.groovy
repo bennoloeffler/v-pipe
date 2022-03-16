@@ -1,4 +1,4 @@
-package model
+package modelNew
 
 import groovy.beans.Bindable
 import groovy.transform.Canonical

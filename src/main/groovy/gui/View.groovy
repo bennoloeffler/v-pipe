@@ -1,15 +1,24 @@
-package application
+package gui
+
 
 import com.formdev.flatlaf.FlatLightLaf
 import groovy.beans.Bindable
 import groovy.swing.SwingBuilder
+import gui.models.GridLoadProjectsModel
+import gui.models.GridLoadPipelineModel
+import gui.models.PipelineModel
+import gui.models.ProjectModel
+import gui.panels.PipelineEditorPanel
+import gui.panels.ProjectDetailsPanel
+import gui.panels.ProjectTemplatesPanel
 import model.Model
+import model.WeekOrMonth
 import net.miginfocom.swing.MigLayout
-import newview.FileDifferPanel
-import newview.GridModel
-import newview.GridPanel
-import newview.NewLoadPanel
-import newview.ResourceCapacityEditor
+import gui.panels.FileDifferPanel
+import gui.models.GridModel
+import gui.panels.GridPanel
+import gui.panels.LoadPanel
+import gui.panels.ResourceCapacityEditorPanel
 
 import javax.swing.ImageIcon
 import javax.swing.JFrame
@@ -17,13 +26,16 @@ import javax.swing.JLabel
 import javax.swing.JScrollPane
 import javax.swing.JSplitPane
 import javax.swing.JTabbedPane
+import javax.swing.JTextPane
+import javax.swing.ToolTipManager
 import javax.swing.UIManager
 import java.awt.Color
 import java.awt.Dimension
+import java.awt.Font
 import java.awt.Image
 import java.awt.Toolkit
 
-import static application.ProjectDetails.*
+import static gui.panels.ProjectDetailsPanel.*
 import static java.awt.Color.*
 
 /**
@@ -44,6 +56,9 @@ import static java.awt.Color.*
  */
 class View {
 
+    static def scaleX = 1.0
+    static def scaleY = 1.0
+
     Image frameIcon
     Dimension screenDimension = Toolkit.getDefaultToolkit().getScreenSize()
     SwingBuilder swing
@@ -55,9 +70,10 @@ class View {
     //
     // adapter models (second layer...)
     //
-    NewPipelineModel gridPipelineModel
-    GridLoadModel gridLoadModel
-    GridPipelineLoadModel gridPipelineLoadModel
+    PipelineModel gridPipelineModel
+    GridLoadProjectsModel gridLoadModel
+    GridLoadProjectsModel gridLoadMonthModel
+    GridLoadPipelineModel gridPipelineLoadModel
     GridModel gridProjectModel
 
     //
@@ -69,35 +85,45 @@ class View {
     def pipelineLoadView
 
     FileDifferPanel fileDifferPanel
-    ProjectTemplates projectTemplates
-    ResourceCapacityEditor resourceCapacityEditor
-    PipelineEditor pipelineEditor
+    ProjectTemplatesPanel projectTemplates
+    ResourceCapacityEditorPanel resourceCapacityEditor
+    PipelineEditorPanel pipelineEditor
 
     def projectDetails
 
     View(Model model) {
+
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        scaleX = screenSize.getWidth() / 1000.0 // 1000 as virt size => xSize = 1000 * scaleX
+        scaleY = screenSize.getHeight() / 1000.0
+
+        def ttm = ToolTipManager.sharedInstance()
+        ttm.setDismissDelay(600000)
+        ttm.setInitialDelay(500)
+
         this.model = model
         frameIcon = new ImageIcon(getClass().getResource("/icons/vunds_icon_64x64_t.png")).getImage()
         swing = new SwingBuilder()
 
-        gridPipelineModel = new NewPipelineModel(model)
-        gridLoadModel = new GridLoadModel(model)
-        gridPipelineLoadModel = new GridPipelineLoadModel(model)
-        gridProjectModel = new NewProjectModel(model)
+        gridPipelineModel = new PipelineModel(model)
+        gridLoadModel = new GridLoadProjectsModel(model)
+        gridLoadMonthModel = new GridLoadProjectsModel(model, WeekOrMonth.MONTH)
+        gridPipelineLoadModel = new GridLoadPipelineModel(model)
+        gridProjectModel = new ProjectModel(model)
 
-        pipelineView = new GridPanel(10 * MainGui.scaleX as int, gridPipelineModel)
-        projectView = new GridPanel(10 * MainGui.scaleX as int, gridProjectModel)
-        loadView = new NewLoadPanel(10 * MainGui.scaleX as int, gridLoadModel)
-        pipelineLoadView = new NewLoadPanel(10 * MainGui.scaleX as int, gridPipelineLoadModel)
+        pipelineView = new GridPanel(10 * scaleX as int, gridPipelineModel)
+        projectView = new GridPanel(10 * scaleX as int, gridProjectModel)
+        loadView = new LoadPanel(10 * scaleX as int, gridLoadModel)
+        pipelineLoadView = new LoadPanel(10 * scaleX as int, gridPipelineLoadModel)
 
         fileDifferPanel = new FileDifferPanel(swing)
-        projectTemplates = new ProjectTemplates(this)
-        resourceCapacityEditor = new ResourceCapacityEditor(swing, model)
-        pipelineEditor = new PipelineEditor(model: model, view: this, swing: swing)
+        projectTemplates = new ProjectTemplatesPanel(this)
+        resourceCapacityEditor = new ResourceCapacityEditorPanel(swing, model)
+        pipelineEditor = new PipelineEditorPanel(model: model, view: this, swing: swing)
 
         build()
 
-        projectDetails = new ProjectDetails(this)
+        projectDetails = new ProjectDetailsPanel(this)
 
         pipelineView.name = "pipelineView" // in order to have a specific name in "paintComponent... getRuntimer(...)"
         projectView.name = "projectView"
@@ -117,23 +143,23 @@ class View {
 
 
         def saveAs = new URL("https://icons.iconarchive.com/icons/iconsmind/outline/24/Data-icon.png")
-        saveAs = scaleIcon(new ImageIcon(saveAs), 0.5 * MainGui.scaleY)
+        saveAs = scaleIcon(new ImageIcon(saveAs), 0.5 * scaleY)
 
         def saveCont = new URL("https://icons.iconarchive.com/icons/iconsmind/outline/24/Arrow-Refresh-icon.png")
-        saveCont = scaleIcon(new ImageIcon(saveCont), 0.5 * MainGui.scaleY)
+        saveCont = scaleIcon(new ImageIcon(saveCont), 0.5 * scaleY)
 
         def exit = new URL("https://icons.iconarchive.com/icons/icons8/ios7/24/Data-Export-icon.png")
-        exit = scaleIcon(new ImageIcon(exit), 0.5 * MainGui.scaleY)
+        exit = scaleIcon(new ImageIcon(exit), 0.5 * scaleY)
 
 
         def projectViewIcon = new URL("https://icons.iconarchive.com/icons/icons8/windows-8/24/Time-Gantt-Chart-icon.png")
-        projectViewIcon = scaleIcon(new ImageIcon(projectViewIcon), 0.5 * MainGui.scaleY)
+        projectViewIcon = scaleIcon(new ImageIcon(projectViewIcon), 0.5 * scaleY)
 
         def loadViewIcon = new URL("https://icons.iconarchive.com/icons/icons8/ios7/24/Data-Bar-Chart-icon.png")
-        loadViewIcon = scaleIcon(new ImageIcon(loadViewIcon), 0.5 * MainGui.scaleY)
+        loadViewIcon = scaleIcon(new ImageIcon(loadViewIcon), 0.5 * scaleY)
 
         def portfolioViewIcon = new URL("https://icons.iconarchive.com/icons/iconsmind/outline/24/Add-SpaceBeforeParagraph-icon.png")
-        portfolioViewIcon = scaleIcon(new ImageIcon(portfolioViewIcon), 0.5 * MainGui.scaleY)
+        portfolioViewIcon = scaleIcon(new ImageIcon(portfolioViewIcon), 0.5 * scaleY)
 
 
         Color highlightColor = new Color(80, 130, 220, 255)
@@ -146,7 +172,7 @@ class View {
         swing.build {
 
             def i = { String iconPath, double scale = 0.5 ->
-                scaleIcon(imageIcon(resource: iconPath), scale * MainGui.scaleY)
+                scaleIcon(imageIcon(resource: iconPath), scale * scaleY)
             }
 
             // https://stackoverflow.com/questions/42833424/java-key-bindings-using-groovy-swing-builder/42834255
@@ -284,14 +310,13 @@ class View {
                     shortDescription: 'Projekt-Ansicht in gesondertem Fenster öffnen. Gerne mehrere. Multi-Monitor. Multi-View...'
             )
 
-            /*
             action(id: 'monthViewAction',
                     name: "Monats-Belastung, separat",
                     //mnemonic: 'p',
-                    closure: { println "monthlyViewAction not connected to application..." },
+                    closure: { openMonthlyLoadWindow() },
                     //accelerator: shortcut('P'),
                     shortDescription: 'Monats-Ansicht in gesondertem Fenster öffnen.'
-            )*/
+            )
 
             // help
 
@@ -346,6 +371,7 @@ class View {
                         menuItem(loadViewAction)
                         menuItem(pipelineLoadViewAction)
                         menuItem(projectViewAction)
+                        menuItem(monthViewAction)
                     }
 
                     menu(text: 'Hilfe', mnemonic: 'H') {
@@ -370,12 +396,12 @@ class View {
                 label(id: 'currentPath', constraints: 'wrap')
 
                 // left | right
-                splitPane(id: 'spH', orientation: JSplitPane.HORIZONTAL_SPLIT, continuousLayout: true, dividerLocation: (int) (500 * MainGui.scaleX), constraints: 'grow, span') {
+                splitPane(id: 'spH', orientation: JSplitPane.HORIZONTAL_SPLIT, continuousLayout: true, dividerLocation: (int) (500 * scaleX), constraints: 'grow, span') {
 
                     // pipeline
                     // --------
                     //  IP + Load
-                    splitPane(id: 'spV1', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: (int) (300 * MainGui.scaleY)) {
+                    splitPane(id: 'spV1', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: (int) (300 * scaleY)) {
 
                         scrollPane(horizontalScrollBarPolicy: JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS) {
                             widget(pipelineView)
@@ -384,7 +410,7 @@ class View {
                         // IP
                         // ----
                         // Load
-                        splitPane(id: 'spV3', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: (int) (100 * MainGui.scaleY)) {
+                        splitPane(id: 'spV3', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: (int) (100 * scaleY)) {
 
                             scrollPane(id: 'pipelineLoadViewScrollPane', horizontalScrollBarPolicy: JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS) {
                                 widget(pipelineLoadView)
@@ -399,7 +425,7 @@ class View {
                     // Project
                     // -------
                     // Details
-                    splitPane(id: 'spV2', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: (int) (300 * MainGui.scaleY)) {
+                    splitPane(id: 'spV2', orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: (int) (300 * scaleY)) {
 
                         scrollPane() {
                             widget(projectView)
@@ -425,7 +451,7 @@ class View {
                             }
 
                             scrollPane(name: 'Log') {
-                                textArea(id: 'textAreaLog', editable: false, focusable: false)
+                                textPane(id: 'textAreaLog', editable: true, focusable: true, font: new Font("Monospaced", Font.PLAIN, (int) (scaleX * 8)))
                             }
 
                             fileDifferPanel.buildPanel()
@@ -508,7 +534,7 @@ class View {
     int i = 0
 
     def openPipelineWindow() {
-        def newPipelineView = new GridPanel(10 * MainGui.scaleX as int, gridPipelineModel)
+        def newPipelineView = new GridPanel(10 * scaleX as int, gridPipelineModel)
         swing.edt {
 
             frame(id: "framePipeline+${i++}", iconImage: frameIcon,
@@ -525,7 +551,21 @@ class View {
     }
 
     def openLoadWindow() {
-        def newLoadView = new NewLoadPanel(10 * MainGui.scaleX as int, gridLoadModel)
+        def newLoadView = new LoadPanel(10 * scaleX as int, gridLoadModel)
+        swing.edt {
+            frame(id: "frameLoad+${i++}", iconImage: frameIcon,
+                    title: "v-pipe: Abt.-Belastung", locationRelativeTo: null, show: true, pack: true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
+                scrollPane() {
+                    widget(newLoadView)
+                }
+            }
+            bind(target: newLoadView, targetProperty: 'cursorX', source: pipelineView, sourceProperty: "cursorX")
+            bind(target: pipelineView, targetProperty: 'cursorX', source: newLoadView, sourceProperty: "cursorX")
+        }
+    }
+
+    def openMonthlyLoadWindow() {
+        def newLoadView = new LoadPanel(10 * scaleX as int, gridLoadMonthModel)
         swing.edt {
             frame(id: "frameLoad+${i++}", iconImage: frameIcon,
                     title: "v-pipe: Abt.-Belastung", locationRelativeTo: null, show: true, pack: true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
@@ -540,7 +580,7 @@ class View {
 
 
     def openPipelineLoadWindow() {
-        def newLoadView = new NewLoadPanel(10 * MainGui.scaleX as int, gridPipelineLoadModel)
+        def newLoadView = new LoadPanel(10 * scaleX as int, gridPipelineLoadModel)
         swing.edt {
             frame(id: "framePipelineLoad+${i++}", iconImage: frameIcon,
                     title: "v-pipe: IP-Belastung", locationRelativeTo: null, show: true, pack: true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
@@ -555,7 +595,7 @@ class View {
 
 
     def openProjectWindow() {
-        def newProjectView = new GridPanel(10 * MainGui.scaleX as int, gridProjectModel)
+        def newProjectView = new GridPanel(10 * scaleX as int, gridProjectModel)
         swing.edt {
             frame(id: "frameProjectLoad+${i++}", iconImage: frameIcon,
                     title: "v-pipe: Projekt", locationRelativeTo: null, show: true, pack: true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
@@ -583,11 +623,15 @@ class View {
 
     def showPipelineLoad() {
         if (model.pipelineElements && showIntegrationPhase) {
-            swing.spV3.setDividerLocation(((int) (100 * MainGui.scaleY)))
+            swing.spV3.setDividerLocation(((int) (100 * scaleY)))
             swing.pipelineLoadViewScrollPane.setVisible(true)
         } else {
             swing.pipelineLoadViewScrollPane.setVisible(false)
         }
         swing.frame.validate()
+    }
+
+    JTextPane getLogArea() {
+        swing.textAreaLog
     }
 }

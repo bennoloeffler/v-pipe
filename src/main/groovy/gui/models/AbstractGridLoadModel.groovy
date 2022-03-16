@@ -1,19 +1,23 @@
-package newview
+package gui.models
 
 import core.ProjectCapaNeedDetails
 
 import groovy.beans.Bindable
+import groovy.transform.CompileStatic
+import groovy.transform.ToString
 import groovy.transform.TupleConstructor
 
 /**
  * One Element in the grid
  */
 @TupleConstructor
+@CompileStatic
+@ToString(includeNames = true)
 class GridLoadElement {
 
     String department // department
     String timeString
-    double load // as absulute value
+    Double load // as absulute value
     double loadProject // as absulute value
     double yellow = -1 // as absulute value
     double red = -1 // as absulute value
@@ -25,7 +29,7 @@ class GridLoadElement {
     static GridLoadElement nullElement = new GridLoadElement(
             department:'',
             timeString:'',
-            load: 0.0,
+            load: 0.0d,
             yellow: -1,
             red: -1,
             projectDetails: [],

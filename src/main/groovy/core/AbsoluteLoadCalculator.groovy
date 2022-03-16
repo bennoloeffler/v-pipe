@@ -1,5 +1,6 @@
 package core
 
+
 import groovy.transform.CompileStatic
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.Memoized
@@ -8,6 +9,7 @@ import model.TaskInProject
 import model.WeekOrMonth
 import utils.RunTimer
 
+@CompileStatic
 @ToString
 @EqualsAndHashCode
 class ProjectCapaNeedDetails {
@@ -15,11 +17,12 @@ class ProjectCapaNeedDetails {
     Double projectCapaNeed
 }
 
+@CompileStatic
 @ToString
 @EqualsAndHashCode
 class CapaNeedDetails {
 
-    BigDecimal totalCapaNeed
+    Double totalCapaNeed
     List<ProjectCapaNeedDetails> projects
     //List<String> projects
 
@@ -35,6 +38,7 @@ class CapaNeedDetails {
  * Returns CapaNeedDetails.nullElement, when there is nothing to return.
  */
 
+@CompileStatic
 class AbsoluteLoadCalculator {
 
     WeekOrMonth weekOrMonth = WeekOrMonth.WEEK
@@ -80,6 +84,7 @@ class AbsoluteLoadCalculator {
     }
 
 
+    //@CompileDynamic
     void calculate() {
         Map<String, Map<String, CapaNeedDetails>> result = [:]
         RunTimer.getTimerAndStart('AbsoluteLoadCalculator::calculate').withCloseable {
@@ -92,7 +97,7 @@ class AbsoluteLoadCalculator {
 
                     // if there is not yet a department key and map: create
                     if (!result[department]) {
-                        result[department] = [:]
+                        result[department] = [:] as Map<String, CapaNeedDetails>
                     }
 
                     if (result[department][timeKey]) {

@@ -1,5 +1,6 @@
-package application
+package gui.panels
 
+import gui.View
 import groovy.swing.SwingBuilder
 import model.Model
 import model.PipelineElement
@@ -9,13 +10,13 @@ import java.awt.*
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 
-class ProjectTemplates {
+class ProjectTemplatesPanel {
     View view
     Model model
     SwingBuilder swing
 
 
-    ProjectTemplates(View view) {
+    ProjectTemplatesPanel(View view) {
         this.view = view
         model = view.model // shortcut
         swing = view.swing // shortcut

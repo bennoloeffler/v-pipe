@@ -1,4 +1,4 @@
-package newview
+package gui.models
 
 import groovy.beans.Bindable
 import groovy.transform.TupleConstructor

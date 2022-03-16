@@ -1,24 +1,28 @@
-package application
+package gui.models
 
 import core.AbsoluteLoadCalculator
 import core.CapaNeedDetails
+import core.MovingAverage
 import groovy.beans.Bindable
+import groovy.time.TimeCategory
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import model.Model
 import model.WeekOrMonth
-import newview.AbstractGridLoadModel
-import newview.GridLoadElement
 import utils.RunTimer
 
-
 import java.beans.PropertyChangeEvent
+import java.beans.PropertyChangeListener
 
+import static extensions.DateHelperFunctions._getStartOfMonth
 import static extensions.DateHelperFunctions._getStartOfWeek
 
 // Performance IDEA
 // 1 GridLoadModelSparce with x and y and shiftX (korrekt x and y when saving (and drawing), set ShiftX to 0 when loading)
 // 2 GridLoadModelSparce --> iterate (and draw) only those, that are there
 // 3 make creating model simple by calculating x and y ONCE while start and when changing a project or task
-class GridLoadModel extends AbstractGridLoadModel {
+@CompileStatic
+class GridLoadProjectsModel extends AbstractGridLoadModel {
 
     Model model
 
@@ -33,16 +37,16 @@ class GridLoadModel extends AbstractGridLoadModel {
 
     AbsoluteLoadCalculator absoluteLoadCalculator
 
-    def updateCallback = {
+    PropertyChangeListener updateCallback = {
         updateAllFromModelData()
     }
 
-    def updateCallbackCurrentProject = { PropertyChangeEvent e ->
+    PropertyChangeListener updateCallbackCurrentProject = { PropertyChangeEvent e ->
         //println("updateCallbackCurrentProject: $e.oldValue -> $e.newValue")
         updateAllFromModelData()
     }
 
-    GridLoadModel(Model model, WeekOrMonth weekOrMonth = WeekOrMonth.WEEK) {
+    GridLoadProjectsModel(Model model, WeekOrMonth weekOrMonth = WeekOrMonth.WEEK) {
         this.model = model
         this.weekOrMonth = weekOrMonth
         model.addPropertyChangeListener('updateToggle', updateCallback)
@@ -52,7 +56,7 @@ class GridLoadModel extends AbstractGridLoadModel {
 
     void updateAllFromModelData() {
         RunTimer.getTimerAndStart('GridLoadModel::updateAllFromModelData').withCloseable {
-            absoluteLoadCalculator = new AbsoluteLoadCalculator(model.taskList)
+            absoluteLoadCalculator = new AbsoluteLoadCalculator(model.taskList, weekOrMonth)
             calcGridElements()
             calcAverageValues()
             calcRowX()
@@ -66,7 +70,7 @@ class GridLoadModel extends AbstractGridLoadModel {
         RunTimer.getTimerAndStart('GridLoadModel::calcGridElements').withCloseable {
             gridElements = [:]
             model.getAllDepartments().each { String department ->
-                gridElements[department] = [:]
+                gridElements[department] = [:] as Map<String, GridLoadElement>
                 model.getFullSeriesOfTimeKeys(weekOrMonth).each { String timeStr ->
                     Double yellowAbs = -1
                     Double redAbs = -1
@@ -109,12 +113,24 @@ class GridLoadModel extends AbstractGridLoadModel {
         }
     }
 
+    @CompileDynamic
     private void calcRowX() {
         RunTimer.getTimerAndStart('GridLoadModel::calcRowX').withCloseable {
 
             nowXRowCache = -1
-            Date startOfGrid = _getStartOfWeek(model.getStartOfProjects())
-            Date endOfGrid = _getStartOfWeek(model.getEndOfProjects()) + 7
+
+            Date startOfGrid
+            Date endOfGrid
+            if (weekOrMonth == WeekOrMonth.WEEK) {
+                startOfGrid = _getStartOfWeek(model.getStartOfProjects())
+                endOfGrid = _getStartOfWeek(model.getEndOfProjects()) + 7
+
+            } else {
+                startOfGrid = _getStartOfMonth(model.getStartOfProjects())
+                use(TimeCategory) {
+                    endOfGrid = _getStartOfMonth(model.getEndOfProjects()) + 1.month
+                }
+            }
 
             Date now = new Date() // Date.newInstance()
             int row = 0
@@ -154,11 +170,12 @@ class GridLoadModel extends AbstractGridLoadModel {
         //println "$y: $d"
         //println gridElements[d].entrySet()
         def maxLoad = absoluteLoadCalculator.getMax(d)
-        def maxRed = gridElements[d].entrySet()*.value.max { it.red }
-        if(maxRed) {
+        def maxRed = gridElements[d].entrySet().collect { it.value }.max { it.red }
+        if (maxRed) {
             Math.max(maxLoad, maxRed.red)
-        }
-        else { 1.0} // if there is no load at all...
+        } else {
+            1.0
+        } // if there is no load at all...
     }
 
     @Override
@@ -174,7 +191,7 @@ class GridLoadModel extends AbstractGridLoadModel {
 
     void calcAverageValues() {
         model.getAllDepartments().each { String department ->
-            def ma = { gridElements[department]*.getValue().load } as MovingAverage
+            def ma = { gridElements[department].values()*.load } as MovingAverage
             ma.howMany = 5
             def maList = ma.getAverageValues()
             def i = 0
