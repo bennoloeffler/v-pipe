@@ -149,8 +149,8 @@ class GridDemoModel extends GridModel {
     }
 
     @Override
-    List<String> getDetailsForTooltip(int x, int y) {
-        ["dummy", "0"]
+    Map<String, String> getDetailsForTooltip(int x, int y) {
+        ['dummy': "0"]
     }
 
     @Override

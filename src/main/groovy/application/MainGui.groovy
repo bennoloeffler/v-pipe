@@ -38,9 +38,9 @@ import static model.DataReader.isValidModelFolder
 //                      yaml in (almost) all examples,
 //
 //
-//
-// 2.0 all-analysis-in-gui
-// 2.2 watch files (inside v-pipe in a text area, so that scenarios and shifts can be realized)
+// 2.0 Durchsatz in EUR dd
+// 3.0 ccpm-planning (krit Pfad in Projekten, most penetrating chain,
+// 3.2 watch files (inside v-pipe in a text area, so that scenarios and shifts can be realized)
 // 3.0 Operational: create “rueckmeldung” in folder -> verbleibend
 
 class MainGui {

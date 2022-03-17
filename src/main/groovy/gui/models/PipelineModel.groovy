@@ -211,14 +211,14 @@ class PipelineModel extends GridModel {
     }
 
     @Override
-    List<String> getDetailsForTooltip(int x, int y) {
-        def result = []
-        result << "${lineNames[y]} ${columnNames[x]}"
+    Map<String, String> getDetailsForTooltip(int x, int y) {
+        Map<String, String> result = [:]
+        result['line-row-idx'] = "${lineNames[y]} ${columnNames[x]}" as String
         def load = model.getProject(lineNames[y])
                 .stream()
                 .map({it.capacityNeeded})
                 .reduce({a, b -> a + b }).get()
-        result << "$load"
+        result['capa'] = "$load" as String
         result
     }
 

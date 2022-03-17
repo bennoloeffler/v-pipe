@@ -21,15 +21,13 @@ class ProjectModel extends GridModel {
     List<List<GridElement>> allProjectGridLines
 
     @Bindable
-    String projectName =""
+    String projectName = ""
 
     @Bindable
-    String departmentName =""
+    String departmentName = ""
 
     @Bindable
     boolean showIntegrationPhase = true // if data is available
-
-
 
     int nowXRowCache = -1
 
@@ -74,14 +72,14 @@ class ProjectModel extends GridModel {
      * @return GridElements of one project
      */
     List<GridElement> fromTask(TaskInProject projectTask, Date startOfGrid, Date endOfGrid) {
-        nowXRowCache = - 1
+        nowXRowCache = -1
         assert projectTask
         def gridElements = []
         def deliveryDate = model.getDeliveryDate(projectTask.project)
         Date startOfTask = _getStartOfWeek(projectTask.starting)
         Date endOfTask = _getStartOfWeek(projectTask.ending) + 7
-        Date startOfProject = _getStartOfWeek(deliveryDate < projectTask.starting  ? deliveryDate : projectTask.starting)
-        Date endOfProject = _getStartOfWeek(deliveryDate > projectTask.ending ? deliveryDate : projectTask.ending ) + 7
+        Date startOfProject = _getStartOfWeek(deliveryDate < projectTask.starting ? deliveryDate : projectTask.starting)
+        Date endOfProject = _getStartOfWeek(deliveryDate > projectTask.ending ? deliveryDate : projectTask.ending) + 7
 
 
         def fromToDateString = "${_dToS(startOfTask)} - ${_dToS(endOfTask)}"
@@ -89,11 +87,11 @@ class ProjectModel extends GridModel {
         Date now = new Date()
         int row = 0
         for (Date w = startOfGrid; w < endOfGrid; w += 7) {
-            if(w <= now && now < w + 7) {
+            if (w <= now && now < w + 7) {
                 nowXRowCache = row
             }
-            row ++
-            boolean isDeliveryDate = deliveryDate >= w && deliveryDate < w+7
+            row++
+            boolean isDeliveryDate = deliveryDate >= w && deliveryDate < w + 7
 
             if (w >= startOfTask && w < endOfTask) {
                 gridElements << new GridElement(projectTask.project, projectTask.department, fromToDateString, false, isDeliveryDate)
@@ -156,7 +154,7 @@ class ProjectModel extends GridModel {
     }
 
     def shiftProject(int y, int shift) {
-        if(model.pipelineElements && showIntegrationPhase) {
+        if (model.pipelineElements && showIntegrationPhase) {
             if (y == 0) {
                 //Date startP = _getStartOfWeek(project*.starting.min())
                 //Date endProject = _getStartOfWeek(project*.ending.max() + 7)
@@ -216,9 +214,11 @@ class ProjectModel extends GridModel {
 
     @Override
     List<String> getLineNames() {
-        def r =[]
-        if(model.pipelineElements && showIntegrationPhase) {r << 'IP'}
-        project.each {r << it.department}
+        def r = []
+        if (model.pipelineElements && showIntegrationPhase) {
+            r << 'IP'
+        }
+        project.each { r << it.department }
         r
     }
 
@@ -228,18 +228,23 @@ class ProjectModel extends GridModel {
     }
 
     @Override
-    List<String> getDetailsForTooltip(int x, int y) {
-        List<String> result = []
-        result.add("${lineNames[y]} ${columnNames[x]}" as String)
+    Map<String, String> getDetailsForTooltip(int x, int y) {
+        Map<String, String> result = [:]
+        result['line-row-idx'] = "${lineNames[y]} ${columnNames[x]}" as String
         def shift = 0
-        if(model.pipelineElements && showIntegrationPhase) shift = 1
-        if(y-shift == -1) {
-            result.add("${model.getPipelineElement(projectName).pipelineSlotsNeeded}" as String)
+        if (model.pipelineElements && showIntegrationPhase) shift = 1
+        if (y - shift == -1) {
+            result['capa'] = "${model.getPipelineElement(projectName).pipelineSlotsNeeded}" as String
+            //result['s'] = "${model.getPipelineElement(projectName).startDate}" as String
+            //result['e'] = "${model.getPipelineElement(projectName).endDate}" as String
+            result['task-info'] = "Integrations-Phase"
         } else {
             def d = project[y - shift].description
-            d = (d == null || d == "")?"keine Task-Info":d
-            result.add("${project[y - shift].capacityNeeded}" as String)
-            result.add("$d" as String)
+            //d = (d == null || d == "") ? "keine Task-Info" : d
+            result.put("capa", "${project[y - shift].capacityNeeded}" as String)
+            if (d) {
+                result['task-info'] = "$d" as String
+            }
         }
         result
     }
@@ -257,13 +262,13 @@ class ProjectModel extends GridModel {
     }
 
     def shiftSize(int y, int shift) {
-        if(model.pipelineElements && showIntegrationPhase) {
+        if (model.pipelineElements && showIntegrationPhase) {
             if (y == 0) {
                 //Date startP = _getStartOfWeek(project*.starting.min())
                 //Date endProject = _getStartOfWeek(project*.ending.max() + 7)
                 Date potPipStartDate = model.getPipelineElement(projectName).startDate + shift
                 Date potPipEndDate = model.getPipelineElement(projectName).endDate - shift
-                if(potPipStartDate >= potPipEndDate) {
+                if (potPipStartDate >= potPipEndDate) {
                     potPipStartDate = model.getPipelineElement(projectName).startDate
                     potPipEndDate = model.getPipelineElement(projectName).endDate
                 }
@@ -273,14 +278,14 @@ class ProjectModel extends GridModel {
                 //}
             } else {
                 TaskInProject projectTask = project[y - 1]
-                if(projectTask.ending + shift > projectTask.starting - shift) {
+                if (projectTask.ending + shift > projectTask.starting - shift) {
                     projectTask.ending += shift
                     projectTask.starting -= shift
                 }
             }
         } else {
             TaskInProject projectTask = project[y]
-            if(projectTask.ending + shift > projectTask.starting - shift) {
+            if (projectTask.ending + shift > projectTask.starting - shift) {
                 projectTask.ending += shift
                 projectTask.starting -= shift
             }

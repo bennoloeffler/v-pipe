@@ -165,10 +165,10 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
                                 p  { color: black; font-family: courier; font-size: 120%; } </style> </head>
                                 
                                 <body>
-                                    <h1>${details[0]}</h1>
+                                    <h1>${details['line-row-idx']}</h1>
                                     <p>
-                                        Kapa-Bedarf: ${details[1]}<br/>
-                                        ${(details.size()>2)?(details[2]+"<br/>"):"INTEGRATIONS-PHASE...<br/>"}
+                                        Kapa-Bedarf: ${details['capa']}<br/>
+                                        ${details['task-info']? details['task-info']+"<br/>":""}
                                         ${element ? element.timeString : ""} <br/>
                                     </p>
                                 </body>

@@ -93,7 +93,7 @@ abstract class GridModel {
      * @param y
      * @return headline, load - line by line
      */
-    abstract List<String> getDetailsForTooltip(int x, int y)
+    abstract Map<String, String> getDetailsForTooltip(int x, int y)
 
     abstract makeSmaller(int i)
     abstract makeBigger(int i)
