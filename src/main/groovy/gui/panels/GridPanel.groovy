@@ -35,7 +35,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
 
     @Bindable int gridWidth
 
-    @Bindable detailsToolTip = true
+    @Bindable detailsToolTip = false
 
     @Bindable
     boolean showIntegrationPhase = true
@@ -161,15 +161,15 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
             def details = model.getDetailsForTooltip(gridX, gridY)
 
             html  =      """<html><head><style>
-                                h1 { color: #808080; font-family: verdana; font-size: 120%; }
-                                p  { color: black; font-family: courier; font-size: 120%; } </style> </head>
+                                h1 { color: #8ac5f8; font-family: verdana; font-size: 100%; }
+                                p  { color: black; font-family: courier; font-size: 100%; } </style> </head>
                                 
                                 <body>
                                     <h1>${details['line-row-idx']}</h1>
                                     <p>
                                         Kapa-Bedarf: ${details['capa']}<br/>
                                         ${details['task-info']? details['task-info']+"<br/>":""}
-                                        ${element ? element.timeString : ""} <br/>
+                                        ${element ? "KWs: $element.timeString" : ""} <br/>
                                     </p>
                                 </body>
                              </html>                                

@@ -665,20 +665,31 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
             // <br/>$element.fromToDateString
             String details = ""
             if(detailsToolTip == ToolTipDetails.details) {
-                details = "Details: <br/> ${(element.projectDetails.sort { -it.projectCapaNeed }.collect { it.projectCapaNeed.round(1) + " : " + it.originalTask.toString() + "<br/>" } as List<String>).join('')}"
+                List<String> data = element.projectDetails.sort {-it.projectCapaNeed }
+                        .collect {
+                            def start = ""
+                            if (element.yellow > 0) {
+                                start = ((double) (it.projectCapaNeed / element.yellow) * 100).round(1) + '% = '
+                            }
+                            start + it.projectCapaNeed.round(1) + " : " + it.originalTask.toString() + "<br/>"
+                        } as List<String>
+
+
+                //details = "Details: <br/> ${(element.projectDetails.sort { -it.projectCapaNeed }.collect { it.projectCapaNeed.round(1) + " : " + it.originalTask.toString() + "<br/>" } as List<String>).join('')}"
+                details = data?"Details: <br/> " + data.join(''):""
             }
             //html =  "Gesamtbelastung: $element.load\nGelb: $element.percentageYellow, Rot: $element.percentageYellow)\nGewähltes Projekt:$element.loadProject"
             html  =      """<html><head><style>
-                                h1 { color: #808080; font-family: verdana; font-size: 120%; }
-                                p  { color: black; font-family: courier; font-size: 120%; } </style> </head>
+                                h1 { color: #8ac5f8; font-family: verdana; font-size: 100%; }
+                                p  { color: black; font-family: courier; font-size: 100%; } </style> </head>
                                 
                                 <body>
-                                    <h1>${percentTotal>=0?percentTotal.round(1)+ '% = ':''}${element.load.round(1)}</h1><h1>$department $timeStr</h1>
+                                    <h1>$department $timeStr</h1>
                                     <p>
-                                        Gesamtbelastung: ${element.load.round(1)}<br/>
+                                        Gesamtbelastung: ${percentTotal>=0?percentTotal.round(1)+ '% = ':''}${element.load.round(1)}<br/>
                                         Grenze gelb: $yellow, rot: $red<br/>
                                         $percentStr
-                                        Gewähltes Projekt: ${element.loadProject.round(1)}<br/>
+                                        Gewähltes Projekt: ${element.yellow>0?((double)(element.loadProject / element.yellow)*100).round(1) + '% = ':''} ${element.loadProject.round(1)} <br/>
                                         $details
                                     </p>
                                 </body>

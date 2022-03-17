@@ -66,6 +66,7 @@ class GridLoadPipelineModel extends AbstractGridLoadModel {
                         if (gridElements[timeStr]) {
                             gridElements[timeStr].load += capaNeeded
                         } else {
+                            // TODO: pipeline detail load would be no problem?
                             gridElements[timeStr] = new GridLoadElement('', timeStr, capaNeeded, 0, model.maxPipelineSlots, model.maxPipelineSlots, [])
                         }
                         //}

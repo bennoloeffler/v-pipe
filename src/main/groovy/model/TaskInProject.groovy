@@ -65,7 +65,7 @@ class TaskInProject {
      */
     @Override
     String toString() {
-        "Task:( $project ${starting.toString()} ${ending.toString()} $department $capacityNeeded $description)"
+        "Task:( $project ${_dToS(starting)} ${_dToS(ending)} $department $capacityNeeded $description)"
     }
 
     /**

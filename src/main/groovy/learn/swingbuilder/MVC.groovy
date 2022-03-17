@@ -1,5 +1,6 @@
 package learn.swingbuilder
 
+
 import com.formdev.flatlaf.FlatLightLaf
 import groovy.beans.Bindable
 import groovy.swing.SwingBuilder
@@ -11,7 +12,6 @@ import java.awt.BorderLayout as BL
 import java.awt.event.ActionEvent
 import java.beans.PropertyChangeEvent
 import java.beans.PropertyChangeListener
-
 // MVC & SwingBuilder
 // See: Console.groovy, ConsoleActions.groovy, ConsoleView.groovy
 // Old Doc: https://web.archive.org/web/20140702234351/http://groovy.codehaus.org/GUI+Programming+with+Groovy

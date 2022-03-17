@@ -17,10 +17,10 @@ class GridLoadElement {
 
     String department // department
     String timeString
-    Double load // as absulute value
-    double loadProject // as absulute value
-    double yellow = -1 // as absulute value
-    double red = -1 // as absulute value
+    Double load // as absolute value
+    double loadProject // as absolute value
+    double yellow = -1 // as absolute value
+    double red = -1 // as absolute value
     List<ProjectCapaNeedDetails> projectDetails
 
     // all moving averages
