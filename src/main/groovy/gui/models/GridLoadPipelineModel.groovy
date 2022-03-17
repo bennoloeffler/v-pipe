@@ -1,6 +1,8 @@
 package gui.models
 
 import core.MovingAverage
+import groovy.time.TimeCategory
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import model.Model
 import model.WeekOrMonth
@@ -8,8 +10,10 @@ import utils.RunTimer
 
 import java.beans.PropertyChangeListener
 
+import static extensions.DateHelperFunctions._getStartOfMonth
 import static extensions.DateHelperFunctions._getStartOfWeek
 import static extensions.StringExtension.toDateFromYearWeek
+import static model.WeekOrMonth.*
 
 @CompileStatic
 class GridLoadPipelineModel extends AbstractGridLoadModel {
@@ -20,7 +24,7 @@ class GridLoadPipelineModel extends AbstractGridLoadModel {
 
     int nowXRowCache = -1
 
-    WeekOrMonth weekOrMonth = WeekOrMonth.WEEK
+    WeekOrMonth weekOrMonth = WEEK
 
     Map<String, GridLoadElement> gridElements = [:]
 
@@ -29,7 +33,7 @@ class GridLoadPipelineModel extends AbstractGridLoadModel {
     }
 
 
-    GridLoadPipelineModel(Model model, WeekOrMonth weekOrMonth = WeekOrMonth.WEEK) {
+    GridLoadPipelineModel(Model model, WeekOrMonth weekOrMonth = WEEK) {
         this.model = model
         this.weekOrMonth = weekOrMonth
         model.addPropertyChangeListener('updateToggle', updateCallback )
@@ -72,19 +76,35 @@ class GridLoadPipelineModel extends AbstractGridLoadModel {
         }
     }
 
+    @CompileDynamic
     private void calcRowX() {
         RunTimer.getTimerAndStart('GridPipelineLoadModel::calcRowX').withCloseable {
             nowXRowCache = -1
-            Date startOfGrid = _getStartOfWeek(model.getStartOfProjects())
-            Date endOfGrid = _getStartOfWeek(model.getEndOfProjects()) + 7
-
-            Date now = new Date() // Date.newInstance()
-            int row = 0
-            for (Date w = startOfGrid; w < endOfGrid; w += 7) {
-                if (w <= now && now < w + 7) {
-                    nowXRowCache = row
+            if(weekOrMonth == WEEK) {
+                Date startOfGrid = _getStartOfWeek(model.getStartOfProjects())
+                Date endOfGrid = _getStartOfWeek(model.getEndOfProjects()) + 7
+                Date now = new Date() // Date.newInstance()
+                int row = 0
+                for (Date w = startOfGrid; w < endOfGrid; w += 7) {
+                    if (w <= now && now < w + 7) {
+                        nowXRowCache = row
+                    }
+                    row++
                 }
-                row++
+            } else {
+                Date startOfGrid = _getStartOfMonth(model.getStartOfProjects())
+                use(TimeCategory) {
+                    Date endOfGrid = _getStartOfMonth(model.getEndOfProjects()) + 1.month
+                    Date now = new Date() // Date.newInstance()
+                    int row = 0
+                    for (Date w = startOfGrid; w < endOfGrid; w += 1.month) {
+                        if (w <= now && now < w + 1.month) {
+                            nowXRowCache = row
+                        }
+                        row++
+                    }
+                }
+
             }
         }
     }

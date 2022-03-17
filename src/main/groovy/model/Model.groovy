@@ -3,6 +3,7 @@ package model
 import extensions.DateExtension
 import extensions.StringExtension
 import groovy.beans.Bindable
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.transform.Memoized
 import groovy.transform.TypeCheckingMode
@@ -17,8 +18,7 @@ import java.time.Duration
 import java.time.temporal.ChronoUnit
 import java.util.stream.Collectors
 
-import static extensions.DateHelperFunctions._getStartOfWeek
-import static extensions.DateHelperFunctions._sToD
+import static extensions.DateHelperFunctions.*
 import static model.WeekOrMonth.WEEK
 
 @CompileStatic
@@ -293,6 +293,9 @@ class Model {
         Date minDelDate = deliveryDates.values().min()
         Date start = getStartOfTasks()
         def result = (minDelDate && minDelDate < start) ? minDelDate : start
+        if (result) {
+            //result = result - 5 * 7
+        }
         result
     }
 
@@ -300,7 +303,11 @@ class Model {
     Date getEndOfProjects() {
         Date maxDelDate = deliveryDates.values().max()
         Date end = getEndOfTasks()
-        maxDelDate && maxDelDate > end ? maxDelDate : end
+        def result = maxDelDate && maxDelDate > end ? maxDelDate : end
+        if (result) {
+            //result = result + 5 * 7
+        }
+        result
     }
 
 
@@ -309,19 +316,21 @@ class Model {
      */
     Duration years20 = Duration.of(20 * 365 * 20, ChronoUnit.DAYS)
 
-    boolean tooFarAway20Y(Date d){
-        Math.abs(new Date() - d ) > years20.toDays()
+    boolean tooFarAway20Y(Date d) {
+        Math.abs(new Date() - d) > years20.toDays()
     }
 
 
     List<String> getFullSeriesOfTimeKeys(WeekOrMonth weekOrMonth) {
         Date s = getStartOfProjects()
         Date e = getEndOfProjects()
+
         getFullSeriesOfTimeKeysInternal(weekOrMonth, s, e)
     }
 
 
     @Memoized
+    @CompileDynamic
     List<String> getFullSeriesOfTimeKeysInternal(WeekOrMonth weekOrMonth, Date s, Date e) {
         def result = []
         RunTimer.getTimerAndStart('getFullSeriesOfTimeKeys').withCloseable {
@@ -338,11 +347,14 @@ class Model {
                         s = DateExtension.convertToDate(DateExtension.convertToLocalDate(s).plusDays(7))
                     }
                 } else {
-                    s = DateExtension.getStartOfMonth(s)
-                    while (s < e) {
-                        result << DateExtension.getMonthYearStr(s)
-                        s = DateExtension.convertToDate(DateExtension.convertToLocalDate(s).plusMonths(1))
-                    }
+                    //use (TimeCategory) {
+                        s = DateExtension.getStartOfMonth(s)
+                        while (s < e ) {
+                            result << DateExtension.getMonthYearStr(s)
+                            s = DateExtension.convertToDate(DateExtension.convertToLocalDate(s).plusMonths(1))
+                            //result << DateExtension.getMonthYearStr(s)
+                        }
+                    //}
                 }
             }
         }
@@ -389,23 +401,105 @@ class Model {
         RunTimer.getTimerAndStart('reCalcCapaAvailableIfNeeded').withCloseable {
             def currentStart = getStartOfProjects()
             def currentEnd = getEndOfProjects()
-            if (!(currentStart >= cachedStartOfTasks && currentEnd <= cachedEndOfTasks)) {
-                if (capaFileRawYamlSlurp) {
-                    capaAvailable = calcCapa(capaFileRawYamlSlurp)
-                }
+            if (!(currentStart >= cachedStartOfTasks && currentEnd <= cachedEndOfTasks) && capaFileRawYamlSlurp) {
+                capaAvailable = calcCapa(capaFileRawYamlSlurp)
+                calcAndInsertMonthlyCapaAvailable(capaAvailable)
             }
             cachedStartOfTasks = currentStart
             cachedEndOfTasks = currentEnd
         }
     }
 
+
+    void calcAndInsertMonthlyCapaAvailable(Map<String, Map<String, YellowRedLimit>> capaAvailable) {
+
+        // ALGORITHM of available capa
+
+        // WEEKS
+        //
+        // Feiertage:
+        // data: companyHolidays = coHoDayPerc[week] = calced on basis of public holidays (each reduces the week capacity by 1/5, so dont take Sa So)
+        // Kapa_Profil:
+        // data: companyWeekProfile coWeProf[week] = percentage to reduce the capa (e.g. for sesonal holiday time)
+        // calc: companyWeekPercentage coWePerc[week] =  coHoDayPerc * coWeProf (of that week)
+        //
+        // Kapa_Abteilungen, Key: Resourcen-name (zB IBN)
+        // Kapa:
+        // data: ressourceCapa(yellow, red) = resCapa
+        // Kapa_Profil:
+        // data: resourceWeekCapa(y, r) = resWeekCapa starting from that week another base value
+        // data: ressourceWeekProfile resWeProf[week] --> totally overwrites coWePerc
+        //
+        // calc realResWeekCapa = current resWeekCapa or ResCapa   *   exists?(resWeProf) or resWeProf or 100%
+
+        // MONTHS
+        // init all structure with zero? --> no. weeks are not sparse
+        // for each resource, for each week:
+        //   split the red and yellow numbers according to Mo - Fr that belong to which month
+        //   and put it to the map of resource and according months
+
+        def timeKeysWeek = getFullSeriesOfTimeKeys(WEEK)
+        def departments = getAllDepartments()
+        departments.each { dep ->
+            timeKeysWeek.each { week ->
+                Map<String, YellowRedLimit> monthPartsToAdd = getMonthParts(capaAvailable[dep][week], dep, week)
+                monthPartsToAdd.each { monthPart ->
+                    String month = monthPart.key
+                    YellowRedLimit yellowRedLimit = capaAvailable[dep][month]
+                    double oldYellow = 0
+                    double oldRed = 0
+                    if (yellowRedLimit) {
+                        oldRed = yellowRedLimit.red
+                        oldYellow = yellowRedLimit.yellow
+                    }
+                    capaAvailable[dep][month] =
+                            new YellowRedLimit(yellow: oldYellow + monthPart.value.yellow,
+                                    red: oldRed + monthPart.value.red)
+                }
+
+            }
+        }
+        /*
+        //check if all months are there
+        def timeKeysMonth = getFullSeriesOfTimeKeys(MONTH)
+        departments.each {dep ->
+            timeKeysMonth.each {month ->
+                if(! capaAvailable[dep][month]){
+                    //println "missing: " + dep + " " + month
+                    capaAvailable[dep][month] = new YellowRedLimit(1,2) //kind of bugfix... to avoid infinity
+                }
+            }
+        }
+         */
+    }
+
+    static Map<String, YellowRedLimit> getMonthParts(YellowRedLimit yellowRedLimit, String dep, String week) {
+        // start from the beginning of week and count to end (5) or until month changes.
+        int countFirstMonth = 0
+        Date startOfWeek = _getStartOfWeek(_wToD(week))
+        Date endOfWeek = startOfWeek + 5
+        Map<String, Double> months = [:] as Map<String, Double>
+        for (day in startOfWeek..endOfWeek) {
+            String month = _getMonthYearStr(day)
+            months[month] = months[month] ? months[month] + 0.2d : 0.2d
+        }
+        Map<String, YellowRedLimit> result = [:]
+        months.each {
+            String month = it.key
+            double percentage = months[month]
+            result[month] = new YellowRedLimit(percentage * yellowRedLimit.yellow, percentage * yellowRedLimit.red)
+        }
+        result
+    }
+
+
     Closure<GString> fileErr = { "" as GString }
 
     @CompileStatic(TypeCheckingMode.SKIP)
-    Map<String, Map<String, YellowRedLimit>> calcCapa(def jsonSlurp, boolean withFileNameInErrorMessage = true) {
+    Map<String, Map<String, YellowRedLimit>> calcCapa(def yamlSlurp, boolean withFileNameInErrorMessage = true) {
         Map<String, Map<String, YellowRedLimit>> result = [:]
         RunTimer.getTimerAndStart('calcCapa').withCloseable {
-            this.capaFileRawYamlSlurp = jsonSlurp
+            this.capaFileRawYamlSlurp = yamlSlurp
             if (withFileNameInErrorMessage) {
                 fileErr = { "Fehler beim Lesen der Datei ${DataReader.get_CAPA_FILE_NAME()}\n" }
             } else {
@@ -415,35 +509,32 @@ class Model {
             //println ("calcCapa von ${timeKeys[0]} to ${timeKeys[timeKeys.size()-1]}")
 
             // get the public holiday of that week and create a percentage based on 5 days (5-h)/5 (ph)
-            if (!jsonSlurp.Kapa_Gesamt) {
+            if (!yamlSlurp.Kapa_Gesamt) {
                 throw new VpipeDataException("${fileErr()}Eintrag 'Kapa_Gesamt' fehlt.")
             }
-            if (!jsonSlurp.Kapa_Gesamt.Feiertage) {
+            if (!yamlSlurp.Kapa_Gesamt.Feiertage) {
                 throw new VpipeDataException("${fileErr()}Eintrag 'Feiertage' in 'Kapa_Gesamt' fehlt.")
             }
-            List publicHolidays = jsonSlurp.Kapa_Gesamt.Feiertage
+            List publicHolidays = yamlSlurp.Kapa_Gesamt.Feiertage
 
             // get the company percentage profile from holidayPercentProfile (ch)
-            if (!jsonSlurp.Kapa_Gesamt.Kapa_Profil) {
+            if (!yamlSlurp.Kapa_Gesamt.Kapa_Profil) {
                 throw new VpipeDataException("${fileErr()}Eintrag 'Kapa_Profil' in 'Kapa_Gesamt' fehlt.")
             }
-            Map percentProfile = jsonSlurp.Kapa_Gesamt.Kapa_Profil
+            Map percentProfile = yamlSlurp.Kapa_Gesamt.Kapa_Profil
             percentProfile.keySet().each {
                 checkWeekPattern(it)
             }
 
-            // create a map of year-week-strings with a percentage based  cp = ch * ph
+            // create a map of year-week-strings with a percentage based
+            // percentOverall = profilePercentLeft * pubHolPercentLeft
             Map<String, Double> overallPercentageProfile = [:]
             for (week in timeKeys) {
                 Double percentagePubHol = percentageLeftAfterPublicHoliday(week, publicHolidays)
                 Double percentageProfile = (Double) (percentProfile[week] == null ? 1.0 : (Double) (percentProfile[week] / 100))
                 overallPercentageProfile[week] = percentagePubHol * percentageProfile
             }
-            //println (overallPercentageProfile)
-
-            // every department
-            //println(jsonSlurp.Kapa_Abteilungen)
-            Map departments = jsonSlurp.Kapa_Abteilungen
+            Map departments = yamlSlurp.Kapa_Abteilungen
             if (!departments) {
                 throw new VpipeDataException("${fileErr()}Kein Abschnitt 'Kapa_Abteilungen' definiert")
             }
@@ -506,11 +597,12 @@ class Model {
                 result[(String) (dep.key)] = capaMap
             }
         }
+        //calcAndInsertMonthlyCapaAvailable(result)
         result
     }
 
 
-    def checkWeekPattern(String week) {
+    static def checkWeekPattern(String week) {
         def weekPattern = /\d\d\d\d-W\d\d/
         if (!(week =~ weekPattern)) {
             throw new VpipeDataException("Wochen-Bezeichner falsch: $week\nSieht z. B. so aus: 2020-W02")
@@ -566,7 +658,7 @@ class Model {
         }
     }
 
-    def checkOnePipelineToEachProject(List<TaskInProject> projects, List<PipelineElement> pipelineElements, String templateOrData) {
+    static def checkOnePipelineToEachProject(List<TaskInProject> projects, List<PipelineElement> pipelineElements, String templateOrData) {
 
         Set<String> pipProjects = pipelineElements*.project.unique().toSet()
         Set<String> projProjects = projects*.project.unique().toSet()
@@ -588,9 +680,9 @@ class Model {
         if (remain) throw new VpipeDataException("${fileErr()}Für folgende Abteilungen (Projekte oder Vorlagen) ist keine Kapa definiert: $remain")
     }
 
-    Double percentageLeftAfterPublicHoliday(String week, List listOfPubHoliday) {
+    static Double percentageLeftAfterPublicHoliday(String week, List listOfPubHoliday) {
         Double p = 1.0d
-        Date startOfWeek = StringExtension.toDateFromYearWeek(week)
+        Date startOfWeek = StringExtension.toDateFromYearWeek(week) // TODO check if this is Monday
         Date endOfWeek = DateExtension.convertToDate(DateExtension.convertToLocalDate(startOfWeek).plusDays(5))
         // exclude Sa and Su
         for (String day in listOfPubHoliday) {
@@ -674,6 +766,7 @@ class Model {
                 capaAvailable = calcCapa(capaFileRawYamlSlurp)
                 if (capaAvailable) {
                     check(taskList)
+                    calcAndInsertMonthlyCapaAvailable(capaAvailable)
                 }
             }
 
@@ -721,6 +814,7 @@ class Model {
         DataReader.capaTextCache = yaml
         capaFileRawYamlSlurp = DataReader.readCapa(true)
         capaAvailable = calcCapa(capaFileRawYamlSlurp)
+        calcAndInsertMonthlyCapaAvailable(capaAvailable)
         fireUpdate()
     }
 
@@ -763,7 +857,7 @@ class Model {
         def slurper = new YamlSlurper()
         capaFileRawYamlSlurp = slurper.parseText(DataReader.capaTextCache)
         capaAvailable = calcCapa(capaFileRawYamlSlurp)
-
+        calcAndInsertMonthlyCapaAvailable(capaAvailable)
         templateList.each { if (it.department == oldName) { it.department = newName } }
 
         fireUpdate()
@@ -831,8 +925,8 @@ class Model {
 
     void removePipeline() {
         assert (pipelineElements || templatePipelineElements), "pipline need to be there in templates or tasks"
-        pipelineElements =[]
-        templatePipelineElements =[]
+        pipelineElements = []
+        templatePipelineElements = []
         maxPipelineSlots = 0
         fireUpdate()
     }
@@ -842,20 +936,20 @@ class Model {
 
         maxPipelineSlots = 2
 
-        projectSequence.each {project ->
+        projectSequence.each { project ->
             def tasks = getProject(project)
             Date start = tasks*.starting.min()
             Date end = tasks*.ending.max()
-            int lenIP = (int)((end - start) / 3)
+            int lenIP = (int) ((end - start) / 3)
             lenIP = lenIP == 0 ? 1 : lenIP
             start = end - lenIP
             pipelineElements << new PipelineElement(project: project, startDate: start, endDate: end, pipelineSlotsNeeded: 1)
         }
-        templateSequence.each {project ->
+        templateSequence.each { project ->
             def tasks = getTemplate(project)
             Date start = tasks*.starting.min()
             Date end = tasks*.ending.max()
-            int lenIP = (int)((end - start) / 3)
+            int lenIP = (int) ((end - start) / 3)
             lenIP = lenIP == 0 ? 1 : lenIP
             start = end - lenIP
             templatePipelineElements << new PipelineElement(project: project, startDate: start, endDate: end, pipelineSlotsNeeded: 1)
@@ -864,4 +958,6 @@ class Model {
         fireUpdate()
 
     }
+
+
 }

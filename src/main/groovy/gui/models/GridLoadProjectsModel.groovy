@@ -87,6 +87,7 @@ class GridLoadProjectsModel extends AbstractGridLoadModel {
 
 
                     if (model.capaAvailable.size()) {
+                        //println department + "   " + timeStr
                         assert model.capaAvailable[department][timeStr]
                         yellowAbs = model.capaAvailable[department][timeStr].yellow
                         redAbs = model.capaAvailable[department][timeStr].red
@@ -118,27 +119,31 @@ class GridLoadProjectsModel extends AbstractGridLoadModel {
         RunTimer.getTimerAndStart('GridLoadModel::calcRowX').withCloseable {
 
             nowXRowCache = -1
-
-            Date startOfGrid
-            Date endOfGrid
-            if (weekOrMonth == WeekOrMonth.WEEK) {
-                startOfGrid = _getStartOfWeek(model.getStartOfProjects())
-                endOfGrid = _getStartOfWeek(model.getEndOfProjects()) + 7
-
-            } else {
-                startOfGrid = _getStartOfMonth(model.getStartOfProjects())
-                use(TimeCategory) {
+            use(TimeCategory) {
+                def add = 0.day
+                Date startOfGrid
+                Date endOfGrid
+                if (weekOrMonth == WeekOrMonth.WEEK) {
+                    startOfGrid = _getStartOfWeek(model.getStartOfProjects())
+                    endOfGrid = _getStartOfWeek(model.getEndOfProjects()) + 7
+                    add = 7.day
+                } else {
+                    startOfGrid = _getStartOfMonth(model.getStartOfProjects())
                     endOfGrid = _getStartOfMonth(model.getEndOfProjects()) + 1.month
+                    add = 1.month
                 }
-            }
 
-            Date now = new Date() // Date.newInstance()
-            int row = 0
-            for (Date w = startOfGrid; w < endOfGrid; w += 7) {
-                if (w <= now && now < w + 7) {
-                    nowXRowCache = row
+                Date now = new Date() // Date.newInstance()
+                int row = 0
+                for (Date w = startOfGrid; w < endOfGrid; w += add) {
+                    if (w <= now && now < w + add) {
+                        nowXRowCache = row
+                    }
+                    row++
                 }
-                row++
+                //if (weekOrMonth == WeekOrMonth.MONTH) {
+                //    nowXRowCache = -1
+                //}
             }
         }
     }

@@ -46,9 +46,9 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
     //int gridHeigth
     //int nameWidth
 
-    @Bindable ToolTipDetails detailsToolTip = ToolTipDetails.some
+    @Bindable ToolTipDetails detailsToolTip = ToolTipDetails.no
 
-    ShowAverageValue showAverageValue = ShowAverageValue.yes
+    ShowAverageValue showAverageValue = ShowAverageValue.no
 
     @Bindable hScrollBarValueZoomingSync
 

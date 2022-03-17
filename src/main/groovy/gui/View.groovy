@@ -566,6 +566,8 @@ class View {
 
     def openMonthlyLoadWindow() {
         def newLoadView = new LoadPanel(10 * scaleX as int, gridLoadMonthModel)
+        newLoadView.setCursorToNow()
+
         swing.edt {
             frame(id: "frameLoad+${i++}", iconImage: frameIcon,
                     title: "v-pipe: Abt.-Belastung", locationRelativeTo: null, show: true, pack: true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
@@ -573,8 +575,8 @@ class View {
                     widget(newLoadView)
                 }
             }
-            bind(target: newLoadView, targetProperty: 'cursorX', source: pipelineView, sourceProperty: "cursorX")
-            bind(target: pipelineView, targetProperty: 'cursorX', source: newLoadView, sourceProperty: "cursorX")
+            //bind(target: newLoadView, targetProperty: 'cursorX', source: pipelineView, sourceProperty: "cursorX")
+            //bind(target: pipelineView, targetProperty: 'cursorX', source: newLoadView, sourceProperty: "cursorX")
         }
     }
 
