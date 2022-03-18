@@ -351,7 +351,7 @@ class View {
                     menu(text: 'Datei', mnemonic: 'D') {
                         menuItem(newModelAction)
                         menuItem(openAction)
-                        menu(id: "recentMenuItem", "Letzte öffnen", icon: scaleIcon(imageIcon("/icons/recent.png"), 0.6))
+                        menu(id: "recentMenuItem", "Letzte öffnen", icon: scaleIcon(imageIcon("/icons/recent.png"), 0.2))
                         menuItem(saveAction)
                         menuItem(saveAsAction)
                         checkBoxMenuItem(id: "checkBoxMenuContSaving", toggleContinouosSaveAsAction)
