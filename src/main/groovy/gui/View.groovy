@@ -568,7 +568,6 @@ class View {
         def newLoadView = new LoadPanel(10 * scaleX as int, gridLoadMonthModel)
 
         newLoadView.setCursorToNow()
-            newLoadView.gridWidth *= 4
 
 
         swing.edt {

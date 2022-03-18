@@ -664,8 +664,8 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
 
                 //details = "Details: <br/> ${(element.projectDetails.sort { -it.projectCapaNeed }.collect { it.projectCapaNeed.round(1) + " : " + it.originalTask.toString() + "<br/>" } as List<String>).join('')}"
                 details = data?"Details: <br/> " + data.join(''):""
-                choosenProject = element.loadProject>=0?"Gewähltes Projekt: ${element.yellow>0?((double)(element.loadProject / element.yellow)*100).round(1) + '% = ':''} ${element.loadProject.round(1)} <br/>":""
             }
+            choosenProject = element.loadProject>=0?"Gewähltes Projekt: ${element.yellow>0?((double)(element.loadProject / element.yellow)*100).round(1) + '% = ':''} ${element.loadProject.round(1)} <br/>":""
             //html =  "Gesamtbelastung: $element.load\nGelb: $element.percentageYellow, Rot: $element.percentageYellow)\nGewähltes Projekt:$element.loadProject"
             html  =      """<html><head><style>
                                 h1 { color: #8ac5f8; font-family: verdana; font-size: 100%; }
