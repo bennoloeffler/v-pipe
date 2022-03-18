@@ -238,7 +238,7 @@ Kapa_Abteilungen:
                     //}
 
                     scrollPane(id: 'capaTextFileScrollPane', constraints: "h ${(int) (150 * View.scaleY)}!, w ${(int) (300 * View.scaleY)}!, growx, growy".toString()) {
-                        textPane(id: 'capaTextFile', model.capaFileRawYamlSlurp, font: new Font(Font.MONOSPACED, Font.PLAIN, 12))
+                        textPane(id: 'capaTextFile', model.capaFileRawYamlSlurp, font: new Font(Font.MONOSPACED, Font.PLAIN, (int)(12 * View.scaleY)))
                     }
                     scrollPane(constraints: "w ${(int) (250 * View.scaleY)}!, growy, growx, wrap".toString()) {
                         textArea(id: "errorMessageCapaEdit")
