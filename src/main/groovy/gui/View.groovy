@@ -39,20 +39,20 @@ import static gui.panels.ProjectDetailsPanel.*
 import static java.awt.Color.*
 
 /**
- * @see https://docs.oracle.com/javase/tutorial/uiswing/components/
+ *  https://docs.oracle.com/javase/tutorial/uiswing/components/
  *
  * MVC with swing. BELs interpretation:
  * Model knows nothing - its observed and firing changes to an interface
  * View knows Model - but only to "bind". Holds swings actions. Holds the adaper-models (like JTableModel).
  * Controller knows Model and View. It connedts swings actions to real code that works on model.
- * @see GINA p.247 http://index-of.es/Java/Groovy%20in%20Action.pdf
- * @see OLD docu SwingBuilder https://web.archive.org/web/20140702234352/http://groovy.codehaus.org/Swing+Builder
- * @see SLIDES https://de.slideshare.net/aalmiray/javaone-ts5098-groovy-swingbuilder?qid=58967b6f-7007-4c0a-9dc2-148194f618c8&v=&b=&from_search=2
- * @see OLD article 1 https://uberconf.com/blog/andres_almiray/2009/11/building_rich_swing_applications_with_groovy__part_i
- * @see OLD article 2 https://uberconf.com/blog/andres_almiray/2009/11/building_rich_swing_applications_with_groovy__part_iI
- * @see OLD article 3 https://uberconf.com/blog/andres_almiray/2009/12/building_rich_swing_applications_with_groovy__part_iii
- * @see OLD article 4 https://uberconf.com/blog/andres_almiray/2009/12/building_rich_swing_applications_with_groovy__part_iv
- * @see Beispiel deutsch: https://docplayer.org/9822371-Programmieren-lernen-mit-groovy-graphische-oberflaechen-guis-graphical-user-interfaces.html
+ *  GINA p.247 http://index-of.es/Java/Groovy%20in%20Action.pdf
+ *  OLD docu SwingBuilder https://web.archive.org/web/20140702234352/http://groovy.codehaus.org/Swing+Builder
+ *  SLIDES https://de.slideshare.net/aalmiray/javaone-ts5098-groovy-swingbuilder?qid=58967b6f-7007-4c0a-9dc2-148194f618c8&v=&b=&from_search=2
+ *  OLD article 1 https://uberconf.com/blog/andres_almiray/2009/11/building_rich_swing_applications_with_groovy__part_i
+ *  OLD article 2 https://uberconf.com/blog/andres_almiray/2009/11/building_rich_swing_applications_with_groovy__part_iI
+ *  OLD article 3 https://uberconf.com/blog/andres_almiray/2009/12/building_rich_swing_applications_with_groovy__part_iii
+ *  OLD article 4 https://uberconf.com/blog/andres_almiray/2009/12/building_rich_swing_applications_with_groovy__part_iv
+ *  Beispiel deutsch: https://docplayer.org/9822371-Programmieren-lernen-mit-groovy-graphische-oberflaechen-guis-graphical-user-interfaces.html
  */
 class View {
 
