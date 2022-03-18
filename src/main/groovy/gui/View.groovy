@@ -142,24 +142,24 @@ class View {
         //recentImageIcon =  scaleIcon(new ImageIcon(url), 0.5 * MainGui.scaleY)
 
 
-        def saveAs = new URL("https://icons.iconarchive.com/icons/iconsmind/outline/24/Data-icon.png")
-        saveAs = scaleIcon(new ImageIcon(saveAs), 0.5 * scaleY)
+        //def saveAs = new URL("https://icons.iconarchive.com/icons/iconsmind/outline/24/Data-icon.png")
+        //saveAs = scaleIcon(new ImageIcon(saveAs), 0.5 * scaleY)
 
-        def saveCont = new URL("https://icons.iconarchive.com/icons/iconsmind/outline/24/Arrow-Refresh-icon.png")
-        saveCont = scaleIcon(new ImageIcon(saveCont), 0.5 * scaleY)
+        //def saveCont = new URL("https://icons.iconarchive.com/icons/iconsmind/outline/24/Arrow-Refresh-icon.png")
+        //saveCont = scaleIcon(new ImageIcon(saveCont), 0.5 * scaleY)
 
-        def exit = new URL("https://icons.iconarchive.com/icons/icons8/ios7/24/Data-Export-icon.png")
-        exit = scaleIcon(new ImageIcon(exit), 0.5 * scaleY)
+        //def exit = new URL("https://icons.iconarchive.com/icons/icons8/ios7/24/Data-Export-icon.png")
+        //exit = scaleIcon(new ImageIcon(exit), 0.5 * scaleY)
 
 
-        def projectViewIcon = new URL("https://icons.iconarchive.com/icons/icons8/windows-8/24/Time-Gantt-Chart-icon.png")
-        projectViewIcon = scaleIcon(new ImageIcon(projectViewIcon), 0.5 * scaleY)
+        //def projectViewIcon = new URL("https://icons.iconarchive.com/icons/icons8/windows-8/24/Time-Gantt-Chart-icon.png")
+        //projectViewIcon = scaleIcon(new ImageIcon(projectViewIcon), 0.5 * scaleY)
 
-        def loadViewIcon = new URL("https://icons.iconarchive.com/icons/icons8/ios7/24/Data-Bar-Chart-icon.png")
-        loadViewIcon = scaleIcon(new ImageIcon(loadViewIcon), 0.5 * scaleY)
+        //def loadViewIcon = new URL("https://icons.iconarchive.com/icons/icons8/ios7/24/Data-Bar-Chart-icon.png")
+        //loadViewIcon = scaleIcon(new ImageIcon(loadViewIcon), 0.5 * scaleY)
 
-        def portfolioViewIcon = new URL("https://icons.iconarchive.com/icons/iconsmind/outline/24/Add-SpaceBeforeParagraph-icon.png")
-        portfolioViewIcon = scaleIcon(new ImageIcon(portfolioViewIcon), 0.5 * scaleY)
+        //def portfolioViewIcon = new URL("https://icons.iconarchive.com/icons/iconsmind/outline/24/Add-SpaceBeforeParagraph-icon.png")
+        //portfolioViewIcon = scaleIcon(new ImageIcon(portfolioViewIcon), 0.5 * scaleY)
 
 
         Color highlightColor = new Color(80, 130, 220, 255)
@@ -351,7 +351,7 @@ class View {
                     menu(text: 'Datei', mnemonic: 'D') {
                         menuItem(newModelAction)
                         menuItem(openAction)
-                        menu(id: "recentMenuItem", "Letzte öffnen", icon: scaleIcon(imageIcon("/icons/recent.png"), 0.5))
+                        menu(id: "recentMenuItem", "Letzte öffnen", icon: scaleIcon(imageIcon("/icons/recent.png"), 0.6))
                         menuItem(saveAction)
                         menuItem(saveAsAction)
                         checkBoxMenuItem(id: "checkBoxMenuContSaving", toggleContinouosSaveAsAction)
@@ -566,7 +566,10 @@ class View {
 
     def openMonthlyLoadWindow() {
         def newLoadView = new LoadPanel(10 * scaleX as int, gridLoadMonthModel)
+
         newLoadView.setCursorToNow()
+            newLoadView.gridWidth *= 4
+
 
         swing.edt {
             frame(id: "frameLoad+${i++}", iconImage: frameIcon,

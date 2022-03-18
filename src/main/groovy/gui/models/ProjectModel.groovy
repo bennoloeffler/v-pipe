@@ -185,10 +185,6 @@ class ProjectModel extends GridModel {
 
 
     @Override
-    def toggleIntegrationPhase(int x, int y) {
-    }
-
-    @Override
     def swap(int y, int withY) {
         /*
         def shift = 0

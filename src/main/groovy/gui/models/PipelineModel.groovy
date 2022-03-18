@@ -180,9 +180,11 @@ class PipelineModel extends GridModel {
     }
 
     @Override
+    /*
     def toggleIntegrationPhase(int x, int y) {
         allProjectGridLines[y][x].integrationPhase = ! allProjectGridLines[y][x].integrationPhase
     }
+     */
 
     @Override
     def swap(int y, int withY) {

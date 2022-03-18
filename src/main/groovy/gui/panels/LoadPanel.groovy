@@ -90,18 +90,8 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
         addMouseListener(this)
         addKeyListener(this)
         addFocusListener(this)
-        /*
-        SwingUtilities.invokeLater {
-            setCursorToNow()
-        }*/
     }
 
-    /*
-    void setModel(AbstractGridLoadModel model) {
-        assert false
-        this.model = model
-        setCursorToNow()
-    }*/
 
     //
     // Focus Listener
@@ -255,8 +245,6 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
         if(KeyEvent.VK_LEFT == keyCode)  {cursorX > 0              ? setCursorX(cursorX-1) :0 ; scrollToCursorX()}
         if(KeyEvent.VK_RIGHT == keyCode) {cursorX < model.sizeX-1  ? setCursorX(cursorX+1) :0 ; scrollToCursorX()}
 
-
-        //scrollToCursorX()
         invalidateAndRepaint(this)
 
     }
@@ -284,7 +272,7 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
      * @return gridY - based on mouse pos
      */
     int getGridYFromMouseY(int mouseY) {
-        int gridY = ((mouseY - borderWidth) / gridHeigth) as int
+        int gridY = (int)((mouseY - borderWidth) / gridHeigth)
         gridY
     }
 
@@ -292,7 +280,7 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
      * @return gridX - based on mouse pos
      */
     int getGridXFromMouseX(int mouseX) {
-        int gridX = ((mouseX - borderWidth- nameWidth) / gridWidth) as int
+        int gridX = (int)((mouseX - borderWidth- nameWidth) / gridWidth)
         gridX
     }
 
@@ -307,9 +295,7 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
 
 
     Rectangle r = new Rectangle()
-    /**
-     * @param g1d
-     */
+
     @Override
     @CompileStatic
     protected void paintComponent(Graphics g1d) {
@@ -664,6 +650,7 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
             def percentStr = percentTotal >=0 ? "$percentTotal% (von gelb)  (rot bei: $percentRed%)<br/>": ""
             // <br/>$element.fromToDateString
             String details = ""
+            String choosenProject =""
             if(detailsToolTip == ToolTipDetails.details) {
                 List<String> data = element.projectDetails.sort {-it.projectCapaNeed }
                         .collect {
@@ -677,6 +664,7 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
 
                 //details = "Details: <br/> ${(element.projectDetails.sort { -it.projectCapaNeed }.collect { it.projectCapaNeed.round(1) + " : " + it.originalTask.toString() + "<br/>" } as List<String>).join('')}"
                 details = data?"Details: <br/> " + data.join(''):""
+                choosenProject = element.loadProject>=0?"Gewähltes Projekt: ${element.yellow>0?((double)(element.loadProject / element.yellow)*100).round(1) + '% = ':''} ${element.loadProject.round(1)} <br/>":""
             }
             //html =  "Gesamtbelastung: $element.load\nGelb: $element.percentageYellow, Rot: $element.percentageYellow)\nGewähltes Projekt:$element.loadProject"
             html  =      """<html><head><style>
@@ -689,7 +677,7 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
                                         Gesamtbelastung: ${percentTotal>=0?percentTotal.round(1)+ '% = ':''}${element.load.round(1)}<br/>
                                         Grenze gelb: $yellow, rot: $red<br/>
                                         $percentStr
-                                        Gewähltes Projekt: ${element.yellow>0?((double)(element.loadProject / element.yellow)*100).round(1) + '% = ':''} ${element.loadProject.round(1)} <br/>
+                                        $choosenProject
                                         $details
                                     </p>
                                 </body>

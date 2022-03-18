@@ -84,6 +84,9 @@ class GridLoadProjectsModel extends AbstractGridLoadModel {
                             projectLoad += it.projectCapaNeed
                         }
                     }
+                    if(!selectedProject){
+                        projectLoad = -1
+                    }
 
 
                     if (model.capaAvailable.size()) {

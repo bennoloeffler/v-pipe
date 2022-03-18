@@ -4,18 +4,16 @@ import groovy.beans.Bindable
 import groovy.transform.TupleConstructor
 
 /**
- * One Element in the grid
+ * one element in the grid
  */
 @TupleConstructor
 class GridElement {
-    String project // project
-    String department // department
+    String project
+    String department
     String timeString
-    //String fromToDateString
-    boolean integrationPhase // integration?
+    boolean integrationPhase
     boolean deliveryDate = false
 
-    //static GridElement nullElement = new GridElement(project:'', department:'', timeString:'', fromToDateString:'', integrationPhase: false)
     static GridElement nullElement = new GridElement(project:'', department:'', timeString:'', integrationPhase: false)
 
     boolean asBoolean() {
@@ -53,7 +51,6 @@ abstract class GridModel {
      */
     abstract def moveLeft(int y)
 
-
     /**
      * move the complete line in line y to the right
      * @param y line
@@ -61,16 +58,7 @@ abstract class GridModel {
     abstract def moveRight(int y)
 
     /**
-     * switch the state of an GridElement: i on or off
-     * @param x
-     * @param y
-     */
-    abstract def toggleIntegrationPhase(int x, int y)
-
-    /**
      * swap two lines
-     * @param x
-     * @param y
      */
     abstract def swap(int y, int withY)
 
@@ -81,21 +69,14 @@ abstract class GridModel {
      */
     abstract int getNowX()
 
-    /**
-     * @return as it says
-     */
     abstract List<String> getLineNames()
 
     abstract List<String> getColumnNames()
 
-    /**
-     * @param x
-     * @param y
-     * @return headline, load - line by line
-     */
     abstract Map<String, String> getDetailsForTooltip(int x, int y)
 
     abstract makeSmaller(int i)
+
     abstract makeBigger(int i)
 }
 

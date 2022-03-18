@@ -104,6 +104,7 @@ class GridDemoModel extends GridModel {
     }
 
     @Override
+    /*
     def toggleIntegrationPhase(int x, int y) {
         assert y < data.size()
         assert x < data[y].size()
@@ -117,7 +118,7 @@ class GridDemoModel extends GridModel {
             }
         }
         //e != GridElement.nullElement ? e.integrationPhase = !e.integrationPhase : ''
-    }
+    }*/
 
     @Override
     def swap(int y, int withY) {

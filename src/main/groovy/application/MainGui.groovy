@@ -28,6 +28,7 @@ import static model.DataReader.isValidModelFolder
 // 1.9-tidy-code TODO:  Month Load
 //                      Tooltips off - and bugfree
 //                      month-load? 4-times-broader?
+//                      icons for menu as local files
 //
 //                      ...
 //                      tooltip - mindestens die "date.toString" funzt nicht mehr @CompileStatic
