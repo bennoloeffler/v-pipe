@@ -197,7 +197,6 @@ class View {
                     shortDescription: 'Verzeichnis mit Daten-Datein öffnen - alle Dateien darin'
             )
 
-
             action(id: 'saveAction',
                     name: "speichern",
                     mnemonic: 's',
@@ -206,7 +205,6 @@ class View {
                     accelerator: shortcut('S'),
                     shortDescription: 'alle Daten ins aktuelle Daten-Verzeichnis sichern'
             )
-
 
             action(id: 'saveAsAction',
                     name: "speichern als...",
@@ -351,7 +349,7 @@ class View {
                     menu(text: 'Datei', mnemonic: 'D') {
                         menuItem(newModelAction)
                         menuItem(openAction)
-                        menu(id: "recentMenuItem", "Letzte öffnen", icon: scaleIcon(imageIcon("/icons/recent.png"), 0.2))
+                        menu(id: "recentMenuItem", "Letzte öffnen", icon: i("/icons/recent.png"))
                         menuItem(saveAction)
                         menuItem(saveAsAction)
                         checkBoxMenuItem(id: "checkBoxMenuContSaving", toggleContinouosSaveAsAction)
