@@ -93,7 +93,7 @@ class View {
 
     View(Model model) {
 
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize()
         scaleX = screenSize.getWidth() / 1000.0 // 1000 as virt size => xSize = 1000 * scaleX
         scaleY = screenSize.getHeight() / 1000.0
 

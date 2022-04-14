@@ -64,7 +64,6 @@ class GridLoadProjectsModel extends AbstractGridLoadModel {
         setUpdateToggle(!getUpdateToggle())
     }
 
-
     void calcGridElements() {
         def oldElements = gridElements
         RunTimer.getTimerAndStart('GridLoadModel::calcGridElements').withCloseable {
@@ -76,18 +75,15 @@ class GridLoadProjectsModel extends AbstractGridLoadModel {
                     Double redAbs = -1
                     CapaNeedDetails capaNeedDetailsAbsolut = absoluteLoadCalculator.getCapaNeeded(department, timeStr)
 
-                    //Double maxAbsolute = absoluteLoadCalculator.getMax(department)
-
                     Double projectLoad = 0
                     capaNeedDetailsAbsolut.projects.each {
                         if (it.originalTask.project == selectedProject) {
                             projectLoad += it.projectCapaNeed
                         }
                     }
-                    if(!selectedProject){
+                    if (!selectedProject) {
                         projectLoad = -1
                     }
-
 
                     if (model.capaAvailable.size()) {
                         //println department + "   " + timeStr
@@ -98,6 +94,7 @@ class GridLoadProjectsModel extends AbstractGridLoadModel {
                         //projectLoad /= maxAbsolute
                         //capaNeedDetailsAbsolut.totalCapaNeed /= maxAbsolute
                     }
+
                     def avail = oldElements[department]?.get(timeStr)
                     if (avail) {
                         avail.department = department
@@ -130,13 +127,13 @@ class GridLoadProjectsModel extends AbstractGridLoadModel {
                     startOfGrid = _getStartOfWeek(model.getStartOfProjects())
                     endOfGrid = _getStartOfWeek(model.getEndOfProjects()) + 7
                     add = 7.day
-                } else {
+                } else { // problably never used
                     startOfGrid = _getStartOfMonth(model.getStartOfProjects())
                     endOfGrid = _getStartOfMonth(model.getEndOfProjects()) + 1.month
                     add = 1.month
                 }
 
-                Date now = new Date() // Date.newInstance()
+                Date now = new Date()
                 int row = 0
                 for (Date w = startOfGrid; w < endOfGrid; w += add) {
                     if (w <= now && now < w + add) {
@@ -144,9 +141,6 @@ class GridLoadProjectsModel extends AbstractGridLoadModel {
                     }
                     row++
                 }
-                //if (weekOrMonth == WeekOrMonth.MONTH) {
-                //    nowXRowCache = -1
-                //}
             }
         }
     }
@@ -175,10 +169,10 @@ class GridLoadProjectsModel extends AbstractGridLoadModel {
     double getMaxValAndRed(int y) {
 
         def d = model.getAllDepartments()[y]
-        //println "$y: $d"
-        //println gridElements[d].entrySet()
         def maxLoad = absoluteLoadCalculator.getMax(d)
-        def maxRed = gridElements[d].entrySet().collect { it.value }.max { it.red }
+        def maxRed = gridElements[d].entrySet()
+                .collect { it.value }
+                .max { it.red }
         if (maxRed) {
             Math.max(maxLoad, maxRed.red)
         } else {

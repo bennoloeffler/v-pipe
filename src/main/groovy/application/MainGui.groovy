@@ -25,16 +25,11 @@ import static model.DataReader.isValidModelFolder
 //                      as soon as IPs "are missing in files", showIP=false. They are created, when acivated: 1/3rd of project at the end
 //                      as soon as they are there, they can be hidden - but they are saved (with hidden flag)
 // ok 1.8-beta-all-gui Detail-Fenster sortierten, Namen kürzen, Detail-Pipeline-View: Slots setzen. Pipeline löschen, Pipeline erzeugen.
-// 1.9-tidy-code TODO:  Month Load
+// 1.9-tidy-code        Month Load
 //                      Tooltips off - and bugfree
-//                      month-load? 4-times-broader?
-//                      icons for menu as local files
-//
-//                      ...
-//                      tooltip - mindestens die "date.toString" funzt nicht mehr @CompileStatic
-//
+//                      TODO:
 //                      win and macos batch and jre in package
-//
+//                      comments and history for Projects: Date, Project, comment
 //                      empty yaml files (Feiertage, Profile, Kapa_Profile),
 //                      yaml in (almost) all examples,
 //

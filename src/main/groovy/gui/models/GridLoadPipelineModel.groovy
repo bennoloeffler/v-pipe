@@ -36,7 +36,7 @@ class GridLoadPipelineModel extends AbstractGridLoadModel {
     GridLoadPipelineModel(Model model, WeekOrMonth weekOrMonth = WEEK) {
         this.model = model
         this.weekOrMonth = weekOrMonth
-        model.addPropertyChangeListener('updateToggle', updateCallback )
+        model.addPropertyChangeListener('updateToggle', updateCallback)
         updateAllFromModelData()
     }
 
@@ -51,27 +51,21 @@ class GridLoadPipelineModel extends AbstractGridLoadModel {
 
 
     void calcGridElements() {
-        RunTimer.getTimerAndStart('GridPipelineLoadModel::calcGridElements').withCloseable {
-            gridElements = [:]
-            if (model.pipelineElements) {
-                model.getFullSeriesOfTimeKeys(weekOrMonth).each { String timeStr ->
-                    model.pipelineElements.each { element ->
-
-                        Date start = toDateFromYearWeek(timeStr)
-                        Date end = start + 7
-                        long overlap = element.getDaysOverlap(start, end)
-                        double capaNeeded = ((double) overlap / 7) * element.pipelineSlotsNeeded
-                        //println("$overlap $capaNeeded $timeStr --> $element")
-                        //if(capaNeeded > 0) {
-                        if (gridElements[timeStr]) {
-                            gridElements[timeStr].load += capaNeeded
-                        } else {
-                            gridElements[timeStr] = new GridLoadElement('', timeStr, capaNeeded, -1, model.maxPipelineSlots, model.maxPipelineSlots, [])
-                        }
-                        //}
+        gridElements = [:]
+        if (model.pipelineElements) {
+            model.getFullSeriesOfTimeKeys(weekOrMonth).each { String timeStr ->
+                model.pipelineElements.each { element ->
+                    Date start = toDateFromYearWeek(timeStr)
+                    Date end = start + 7
+                    long overlap = element.getDaysOverlap(start, end)
+                    double capaNeeded = ((double) overlap / 7) * element.pipelineSlotsNeeded
+                    if (gridElements[timeStr]) {
+                        gridElements[timeStr].load += capaNeeded
+                    } else {
+                        gridElements[timeStr] = new GridLoadElement('', timeStr, capaNeeded, -1, model.maxPipelineSlots, model.maxPipelineSlots, [])
                     }
-                    maxVal = Math.max(gridElements[timeStr]?.load ?: 0, maxVal)
                 }
+                maxVal = Math.max(gridElements[timeStr]?.load ?: 0, maxVal)
             }
         }
     }
@@ -80,7 +74,7 @@ class GridLoadPipelineModel extends AbstractGridLoadModel {
     private void calcRowX() {
         RunTimer.getTimerAndStart('GridPipelineLoadModel::calcRowX').withCloseable {
             nowXRowCache = -1
-            if(weekOrMonth == WEEK) {
+            if (weekOrMonth == WEEK) {
                 Date startOfGrid = _getStartOfWeek(model.getStartOfProjects())
                 Date endOfGrid = _getStartOfWeek(model.getEndOfProjects()) + 7
                 Date now = new Date() // Date.newInstance()
