@@ -52,12 +52,6 @@ class ProjectDetailsPanel {
         if (p) {
             List<TaskInProject> project = model.getProject(p)
 
-            /*
-            swing.actions({
-
-            })
-             */
-
             swing.build {
 
                 action(id: 'applyProjectDetails',
@@ -125,6 +119,12 @@ class ProjectDetailsPanel {
                         //button("Projekt aus Vorlage", enabled: true, constraints: '')
                         //checkBox("Vorlage (wird nicht als Last gerechnet)", enabled: false, constraints: 'wrap')
 
+                    }
+                    panel(border: titledBorder('Anmerkungen'), constraints: 'span, growx, wrap') {
+                        migLayout(layoutConstraints: "fill", columnConstraints: "[]", rowConstraints: "[][]")
+                        scrollPane(name: 'Log', constraints: 'span, growx') {
+                            textPane(text:  model.projectComments[p], id: 'projectComment', editable: true, focusable: true, font: new Font("Monospaced", Font.PLAIN, (int) (View.scaleX * 8)))
+                        }
                     }
 
                 }
@@ -223,10 +223,7 @@ class ProjectDetailsPanel {
             }
             model.deliveryDates.put(p, swing.planFinishProject.text.toDate())
 
-            if (view.selectedProject != swing.projectName.text) {
-                model.renameProject(view.selectedProject, swing.projectName.text)
-                view.selectedProject = swing.projectName.text
-            }
+            model.saveComment(p, swing.projectComment.text)
 
             if(view.showIntegrationPhase && model.pipelineElements) {
                 PipelineElement pe = model.getPipelineElement(view.selectedProject)
@@ -235,10 +232,13 @@ class ProjectDetailsPanel {
                 pe.pipelineSlotsNeeded = swing."capaNeeded-IP".text as Integer
             }
 
-                model.reCalcCapaAvailableIfNeeded()
-            model.fireUpdate()
+            if (view.selectedProject != swing.projectName.text) {
+                model.renameProject(view.selectedProject, swing.projectName.text)
+                view.selectedProject = swing.projectName.text
+            }
 
-            //model.setUpdateToggle(!model.updateToggle)
+            model.reCalcCapaAvailableIfNeeded()
+            model.fireUpdate()
         } else {
             println "NOT SAVING project details - found errors..."
         }

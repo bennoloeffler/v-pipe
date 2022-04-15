@@ -13,7 +13,7 @@ import javax.swing.*
 import javax.swing.filechooser.FileFilter
 import java.awt.event.ActionEvent
 
-import static model.DataReader.getTASK_FILE_NAME
+import static model.DataReader.TASK_FILE_NAME
 import static model.DataReader.isValidModelFolder
 
 class GlobalController {

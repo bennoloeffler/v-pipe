@@ -25,6 +25,7 @@ class DataReader {
     static String PROJECT_TEMPLATE_FILE_NAME = "Vorlagen-Projekt-Start-End-Abt-Kapa.txt"
     static String TEMPLATE_PIPELINE_FILE_NAME = "Vorlagen-Integrations-Phasen.txt"
     static String PROJECT_DELIVERY_DATE_FILE_NAME = "Projekt-Liefertermin.txt"
+    static String PROJECT_COMMENTS_FILE_NAME = "Projekt-Kommentare.txt"
     static String TEMPLATE_SEQUENCE_FILE_NAME = "Vorlagen-Sequenz.txt"
 
 
@@ -74,6 +75,10 @@ class DataReader {
 
     static String get_TEMPLATE_SEQUENCE_FILE_NAME() {
         path TEMPLATE_SEQUENCE_FILE_NAME
+    }
+
+    static String get_PROJECT_COMMENTS_FILE_NAME() {
+        path PROJECT_COMMENTS_FILE_NAME
     }
 
 
@@ -182,6 +187,20 @@ class DataReader {
         } catch (Exception e) {
             throw new VpipeDataException(get_PROJECT_DELIVERY_DATE_FILE_NAME() + "\nVermutlich Fehler beim parsen von \nDatum (--> 22.4.2020)\n Grund: ${e.getMessage()}")
 
+        }
+        result
+    }
+
+    static Map<String, String> readComments() {
+        Map<String, String> result = [:]
+        File f = new File(get_PROJECT_COMMENTS_FILE_NAME())
+        if (f.exists()) {
+            try {
+                def data = new YamlSlurper().parse(f)
+                result = data as Map<String, String>
+            } catch (Exception e) {
+                throw new VpipeDataException(get_PROJECT_COMMENTS_FILE_NAME() + "\nFehler beim parsen. Grund: ${e.getMessage()}")
+            }
         }
         result
     }

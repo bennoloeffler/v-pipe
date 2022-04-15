@@ -59,6 +59,8 @@ class Model {
     // the corresponding delivery date
     Map<String, Date> deliveryDates = [:]
 
+    Map<String, String> projectComments = [:]
+
     /**
      * @see ScenarioTransformer: this copies and moves the projects from taskList
      */
@@ -348,12 +350,12 @@ class Model {
                     }
                 } else {
                     //use (TimeCategory) {
-                        s = DateExtension.getStartOfMonth(s)
-                        while (s < e ) {
-                            result << DateExtension.getMonthYearStr(s)
-                            s = DateExtension.convertToDate(DateExtension.convertToLocalDate(s).plusMonths(1))
-                            //result << DateExtension.getMonthYearStr(s)
-                        }
+                    s = DateExtension.getStartOfMonth(s)
+                    while (s < e) {
+                        result << DateExtension.getMonthYearStr(s)
+                        s = DateExtension.convertToDate(DateExtension.convertToLocalDate(s).plusMonths(1))
+                        //result << DateExtension.getMonthYearStr(s)
+                    }
                     //}
                 }
             }
@@ -509,21 +511,27 @@ class Model {
             //println ("calcCapa von ${timeKeys[0]} to ${timeKeys[timeKeys.size()-1]}")
 
             // get the public holiday of that week and create a percentage based on 5 days (5-h)/5 (ph)
-            if (!yamlSlurp.Kapa_Gesamt) {
-                throw new VpipeDataException("${fileErr()}Eintrag 'Kapa_Gesamt' fehlt.")
+            //if (!yamlSlurp.Kapa_Gesamt) {
+            //    throw new VpipeDataException("${fileErr()}Eintrag 'Kapa_Gesamt' fehlt.")
+            //}
+            //if (!yamlSlurp.Kapa_Gesamt.Feiertage) {
+            //    throw new VpipeDataException("${fileErr()}Eintrag 'Feiertage' in 'Kapa_Gesamt' fehlt.")
+            //}
+            List publicHolidays = []
+            if (yamlSlurp.Kapa_Gesamt?.Feiertage) {
+                publicHolidays = yamlSlurp.Kapa_Gesamt.Feiertage
             }
-            if (!yamlSlurp.Kapa_Gesamt.Feiertage) {
-                throw new VpipeDataException("${fileErr()}Eintrag 'Feiertage' in 'Kapa_Gesamt' fehlt.")
-            }
-            List publicHolidays = yamlSlurp.Kapa_Gesamt.Feiertage
-
             // get the company percentage profile from holidayPercentProfile (ch)
-            if (!yamlSlurp.Kapa_Gesamt.Kapa_Profil) {
-                throw new VpipeDataException("${fileErr()}Eintrag 'Kapa_Profil' in 'Kapa_Gesamt' fehlt.")
-            }
-            Map percentProfile = yamlSlurp.Kapa_Gesamt.Kapa_Profil
-            percentProfile.keySet().each {
-                checkWeekPattern(it)
+            //if (!yamlSlurp.Kapa_Gesamt.Kapa_Profil) {
+            //    throw new VpipeDataException("${fileErr()}Eintrag 'Kapa_Profil' in 'Kapa_Gesamt' fehlt.")
+            //}
+
+            Map percentProfile = [:]
+            if (yamlSlurp.Kapa_Gesamt?.Kapa_Profil) {
+                percentProfile = yamlSlurp.Kapa_Gesamt.Kapa_Profil
+                percentProfile.keySet().each {
+                    checkWeekPattern(it)
+                }
             }
 
             // create a map of year-week-strings with a percentage based
@@ -711,6 +719,7 @@ class Model {
         projectSequence = []
         templateList = []
         templatePipelineElements = []
+        projectComments = [:]
 
         cachedStartOfTasks = null
         cachedEndOfTasks = null
@@ -798,6 +807,9 @@ class Model {
                             " Vorlagen für die Integrationsphasen.")
                 }
             }
+
+        projectComments = DataReader.readComments()
+
 
         } catch (Exception e) {
             emptyTheModel()
@@ -960,4 +972,12 @@ class Model {
     }
 
 
+    def void saveComment(String projectName, String comment) {
+        if (comment) {
+            projectComments[projectName] = comment
+        } else {
+            projectComments.remove(projectName)
+        }
+        fireUpdate()
+    }
 }

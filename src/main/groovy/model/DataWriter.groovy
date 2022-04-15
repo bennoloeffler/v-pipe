@@ -1,5 +1,6 @@
 package model
 
+import org.yaml.snakeyaml.Yaml
 import utils.FileSupport
 
 class DataWriter {
@@ -53,7 +54,9 @@ class DataWriter {
             DataReader.SEQUENCE_FILE_NAME,
             DataReader.PROJECT_TEMPLATE_FILE_NAME,
             DataReader.PROJECT_TEMPLATE_FILE_NAME,
-            DataReader.PROJECT_DELIVERY_DATE_FILE_NAME
+            DataReader.PROJECT_DELIVERY_DATE_FILE_NAME,
+            DataReader.PROJECT_COMMENTS_FILE_NAME
+
     ]
 
     static def backup() {
@@ -130,5 +133,17 @@ class DataWriter {
             }
         }
 
+        writeCommentsToFile(model.projectComments, DataReader.get_PROJECT_COMMENTS_FILE_NAME())
+
+    }
+
+    static void writeCommentsToFile(LinkedHashMap<String, String> comments, String fileName) {
+        if (comments) {
+            Yaml yaml = new Yaml()
+            String data = yaml.dump(comments)
+            def f = new File(fileName)
+            f.delete()
+            f << data
+        }
     }
 }

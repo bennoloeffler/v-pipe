@@ -27,21 +27,19 @@ import static model.DataReader.isValidModelFolder
 // ok 1.8-beta-all-gui Detail-Fenster sortierten, Namen kürzen, Detail-Pipeline-View: Slots setzen. Pipeline löschen, Pipeline erzeugen.
 // 1.9-tidy-code        Month Load
 //                      Tooltips off - and bugfree
-//                      TODO:
 //                      win and macos batch and jre in package
 //                      comments and history for Projects: Date, Project, comment
 //                      empty yaml files (Feiertage, Profile, Kapa_Profile),
-//                      yaml in (almost) all examples,
 //
-//
-// 2.0 Durchsatz in EUR dd
-// 3.0 ccpm-planning (krit Pfad in Projekten, most penetrating chain,
-// 3.2 watch files (inside v-pipe in a text area, so that scenarios and shifts can be realized)
-// 3.0 Operational: create “rueckmeldung” in folder -> verbleibend
+// 2.0 all-in-gui
+// 3.0 Durchsatz in EUR dd
+// 4.0 ccpm-planning (krit Pfad in Projekten, most penetrating chain,
+// 4.2 watch files (inside v-pipe in a text area, so that scenarios and shifts can be realized)
+// 2.1 Operational: create “rueckmeldung” in folder -> verbleibend
 
 class MainGui {
 
-    static VERSION_STRING ='1.9.0-tidy-code'
+    static VERSION_STRING ='2.0.0-all-in-gui'
 
     Model model
     View view
