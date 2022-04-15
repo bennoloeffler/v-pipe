@@ -12,7 +12,7 @@ import org.joda.time.DateTime
 @CompileStatic
 class DateHelperFunctions {
 
-    static Calendar cal = Calendar.getInstance()
+    static Calendar cal = Calendar.getInstance(Locale.GERMANY)
 
     /**
      * Monday of the week of d

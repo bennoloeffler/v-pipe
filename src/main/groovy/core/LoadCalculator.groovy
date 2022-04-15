@@ -263,7 +263,7 @@ class LoadCalculator {
             loads << dep
             allTimeKeys.each { String timeKey ->
                 if (loadMap[timeKey]) {
-                    def commaNumber = String.format("%.1f", loadMap[timeKey])
+                    def commaNumber = String.format(Locale.GERMAN,"%.1f", loadMap[timeKey])
 
                     loads << "\t" +  commaNumber
                 } else {

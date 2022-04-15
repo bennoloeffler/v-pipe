@@ -15,19 +15,19 @@ class HelperFunctionsTest extends GroovyTestCase {
     void testGetWeekYearStr() {
 
         assertWeek("28.12.2019", '2019-W52')
-        assertWeek("29.12.2019", '2019-W52')
+        assertWeek("29.12.2019", '2019-W52') // DIFFERENT IN US AND DE Locale!
         assertWeek("30.12.2019", '2020-W01') // first week in last year...
         assertWeek("31.12.2019", '2020-W01')
         assertWeek("1.1.2020", '2020-W01')
         assertWeek("2.1.2020", '2020-W01')
         assertWeek("3.1.2020", '2020-W01')
         assertWeek("4.1.2020", '2020-W01')
-        assertWeek("5.1.2020", '2020-W01')
+        assertWeek("5.1.2020", '2020-W01') // DIFFERENT IN US AND DE Locale!
         assertWeek("6.1.2020", '2020-W02') // second week...
         assertWeek("7.1.2020", '2020-W02')
 
         // some other years
-        assertWeek("31.12.2017", '2017-W52')
+        assertWeek("31.12.2017", '2017-W52') // DIFFERENT IN US AND DE Locale!
         assertWeek("1.1.2018", '2018-W01')
 
         assertWeek("31.12.2018", '2019-W01')
@@ -36,8 +36,9 @@ class HelperFunctionsTest extends GroovyTestCase {
         assertWeek("31.12.2019", '2020-W01')
         assertWeek("1.1.2020", '2020-W01')
 
-        assertWeek("31.12.2020", '2020-W53')
-        assertWeek("1.1.2021", '2020-W53')
+        assertWeek("31.12.2020", '2020-W53') // DIFFERENT IN US AND DE Locale!
+        assertWeek("1.1.2021", '2020-W53') // DIFFERENT IN US AND DE Locale!
+
 
         assertWeek("31.12.2021", '2021-W52')
         assertWeek("1.1.2022", '2021-W52')
@@ -50,6 +51,7 @@ class HelperFunctionsTest extends GroovyTestCase {
 
         assertWeek("31.12.2024", '2025-W01')
         assertWeek("1.1.2025", '2025-W01')
+
     }
 
     void testGetMonthYearStr() {

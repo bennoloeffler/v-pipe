@@ -16,7 +16,6 @@ import static model.DataReader.isValidModelFolder
 // HERE is the place for all TODO s (TODO = release, todo = remainder)
 // related with the next release
 // TODO practice clean code. https://issuu.com/softhouse/docs/cleancode_5minutes_120523/16
-//      make tests functional again and part of the createDistribution task
 
 // RELEASE 2.0 do all in Gui (MIK edition) with video starting from help
 // ok 1.6 new Model, new Project, rename Project, templates and pipelines in GUI --> YOU DONT NEED THE FILES.

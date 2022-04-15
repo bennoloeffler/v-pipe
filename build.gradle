@@ -91,8 +91,10 @@ def getOsName() {
 
 if (getOsName() == "linux") {
     // Consider Linux.
-    println "NO JRE YET for Linux"
-    Thread.sleep(10000)
+    //println "NO JRE YET for Linux"
+    //Thread.sleep(10000)
+    jrePath ="/home/benno/.jdks/corretto-1.8.0_322" // Linux
+    println "jre for linux: " + jrePath
 } else if (getOsName() == "windows") {
     // Consider Windows.
     jrePath = "C:\\Program Files\\Java\\jre1.8.0_172" // WIN11
@@ -202,6 +204,11 @@ task copyExeLibsJRE {
 
         copy {
             from "v-pipe-macos.sh.command"
+            into tempDist
+        }
+
+        copy {
+            from "v-pipe-linux.sh"
             into tempDist
         }
 
