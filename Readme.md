@@ -316,7 +316,7 @@ gleichzeitig gearbeitet werden soll.
 
 2022-??? `2.0.0-delta-data-import`
 - have a directory scanned for delta-data in order to update the model.
-
+- copy a project (not from template - just plain copy)
 
 ### Release History
 

@@ -31,10 +31,12 @@ import static model.DataReader.isValidModelFolder
 //                      empty yaml files (Feiertage, Profile, Kapa_Profile),
 //
 // 2.0 all-in-gui
+// TODO: 2.1
+//  Operational: create “rueckmeldung” in folder -> verbleibend
+//  Copy Project
 // 3.0 Durchsatz in EUR dd
 // 4.0 ccpm-planning (krit Pfad in Projekten, most penetrating chain,
 // 4.2 watch files (inside v-pipe in a text area, so that scenarios and shifts can be realized)
-// 2.1 Operational: create “rueckmeldung” in folder -> verbleibend
 
 class MainGui {
 
