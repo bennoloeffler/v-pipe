@@ -72,7 +72,15 @@ class ProjectDetailsPanel {
                         //smallIcon: imageIcon(resource: "icons/folder_r1.png"),
                         shortDescription: 'dieses Projekt löschen'
                 )
-
+                action(id: 'copyProject',
+                        name: "Projekt kopieren",
+                        //mnemonic: 'r',
+                        closure: copySelectedProject,
+                        //accelerator: shortcut('R'), //, KeyEvent.ALT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK),
+                        focus: JComponent.WHEN_IN_FOCUSED_WINDOW,
+                        //smallIcon: imageIcon(resource: "icons/folder_r1.png"),
+                        shortDescription: 'dieses Projekt kopieren'
+                )
                 panel() {
                     migLayout(layoutConstraints: "", columnConstraints: "[][]", rowConstraints: "[][]")
 
@@ -115,7 +123,7 @@ class ProjectDetailsPanel {
                     panel(border: titledBorder('Projektverwaltung'), constraints: 'wrap') {
                         migLayout(layoutConstraints: "fill", columnConstraints: "[][]", rowConstraints: "[][]")
                         button("Projekt löschen", enabled: true, action: deleteProject)
-                        //button("Projekt duplizieren", enabled: true)
+                        button("Projekt duplizieren", enabled: true, action: copyProject)
                         //button("Projekt aus Vorlage", enabled: true, constraints: '')
                         //checkBox("Vorlage (wird nicht als Last gerechnet)", enabled: false, constraints: 'wrap')
 
@@ -205,7 +213,16 @@ class ProjectDetailsPanel {
                 model.deleteProject(p)
             }
         }
+    }
 
+    def copySelectedProject = {
+        def p = view.selectedProject
+        if (p) {
+            //if (confirmDelete(p)) {
+                String newProjectName = model.copyProject(p)
+                view.selectedProject = newProjectName
+            //}
+        }
     }
 
     def saveProjectDetails = {

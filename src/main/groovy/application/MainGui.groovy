@@ -32,7 +32,11 @@ import static model.DataReader.isValidModelFolder
 //
 // 2.0 all-in-gui
 // TODO: 2.1
-//  Operational: create “rueckmeldung” in folder -> verbleibend
+//  Operational:
+//   aktualisierte Projekte einzeln einlesen: read-new-data/Diff-Project-001.txt (lesen in aufsteigender Nummer)
+//   Menu-eintrag
+//   find files and sort them
+//   each: read tasks, delete projects old, put tasks in model
 //  Copy Project
 // 3.0 Durchsatz in EUR dd
 // 4.0 ccpm-planning (krit Pfad in Projekten, most penetrating chain,

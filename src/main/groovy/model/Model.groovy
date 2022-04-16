@@ -978,6 +978,39 @@ class Model {
         } else {
             projectComments.remove(projectName)
         }
-        fireUpdate()
+        //fireUpdate()
+    }
+
+    String copyProject(String project) {
+        def tasks = getProject(project)
+        def deliveryDate = deliveryDates[project]
+        def pipelineElement = getPipelineElement(project)
+
+        // find a free name
+        String newName = project + "-Kopie"
+        while(getProject(newName)) {
+            newName += "-Kopie"
+        }
+
+        //liefertermin
+        if(deliveryDate) {
+            deliveryDates[newName] = deliveryDate
+        }
+
+        //ip
+        if (pipelineElement){
+            PipelineElement newPE = pipelineElement.clone()
+            newPE.project = newName
+            pipelineElements << newPE
+        }
+
+        // kommentar ???
+
+        // tasks
+        def clonedTasks = deepClone(tasks)
+        clonedTasks*.project = newName
+        addProject(clonedTasks)
+
+        newName
     }
 }
