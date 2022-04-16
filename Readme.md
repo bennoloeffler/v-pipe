@@ -43,6 +43,7 @@ Option: *Zugriff auf Datei-URLs zulassen* aktivieren
 - `v-pipe.exe` (der Starter - Doppelklick und los geht's.)
 - `v-pipe-gui.exe` (WIN-Starter: visuelle Darstellung - Doppelklick und los.)  
 - `v-pipe-macos.sh.command` (MACOS-Starter - Doppelklick)
+- `v-pipe-linux.sh` (Linux-Starter - Doppelklick)
 - `lib` (ein paar Java-Bibliotheken. Finger weg ;-))  
 - `jre` (eine Java-Laufzeit-Umgebung. Nicht anfassen...)
 - `bsp-daten` (alle Daten-Dateien als funktionierende Beispiele)
@@ -310,15 +311,33 @@ gleichzeitig gearbeitet werden soll.
 - ask for save only if changed - see "dirty-state"
 
 ### BUGS to fix
-- start on macos directly in from dropbox (on Caros mac)
 
 ### Next Release
-1.6.0
+
+2022-??? `2.0.0-delta-data-import`
+- have a directory scanned for delta-data in order to update the model.
+
+
+### Release History
+
+2022-04-16 `2.0.0-all-in-gui`
+- linux, windows and mac
+- month load
+- project comments/history
+
+2022-03-16 `1.9.0-tidy-code`
+- moved and renamed many classes / packages for more clarity
+
+2022-03-14 `1.8.0-beta-all-gui`
+- everything can be changed in gui 
+
+2022-03-12 `1.7.0-ip-in-gui`
+- pipeline (integration phases) can be created / deleted / hidden
+
+2022-03-12 `1.6.0-ipco-pax-edition`
 - can only open valid data folders
 - simplified creation of capacity model
 - can create new model from GUI
-
-### Release History
 
 2022-02-27 `1.5.0-average-load`
 - show load average (5 weeks moving average) by pressing 'a'
@@ -452,9 +471,8 @@ Das ist nur vernünftig in verschiedenen Verzeichnissen!
 
 wären nützlich - Nützlichkeit in absteigender Reihenfolge:  
 
-- Automatisches Pipelining
+- Automatisches Pipelining (entweder an der Pipeline oder an einer Abteilung)
 - Monte-Carlo Simulation für "wenns gut läuft / wenns schlecht läuft"
-- Kommentare in Datenfiles erlauben. Solche: //
 
 ## Feedback
 an: benno.loeffler AT gmx.de
