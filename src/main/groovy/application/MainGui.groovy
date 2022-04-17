@@ -31,7 +31,7 @@ import static model.DataReader.isValidModelFolder
 //                      empty yaml files (Feiertage, Profile, Kapa_Profile),
 //
 // 2.0 all-in-gui
-// TODO: 2.1
+// 2.1 copy-and-update
 //  Operational:
 //   aktualisierte Projekte einzeln einlesen: read-new-data/Diff-Project-001.txt (lesen in aufsteigender Nummer)
 //   Menu-eintrag
@@ -44,7 +44,7 @@ import static model.DataReader.isValidModelFolder
 
 class MainGui {
 
-    static VERSION_STRING ='2.0.0-all-in-gui'
+    static VERSION_STRING ='2.1.0-copy-and-update'
 
     Model model
     View view

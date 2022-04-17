@@ -263,6 +263,15 @@ class View {
                     //accelerator: shortcut('P'),
                     shortDescription: 'alle IPs aus dem Modell löschen'
             )
+
+            action(id: 'readProjectUpdatesAction',
+                    name: "Aktualisierung für Projekte einlesen",
+                    //mnemonic: 'p',
+                    closure: { println "readProjectUpdatesAction not connected to application..." },
+                    //accelerator: shortcut('P'),
+                    shortDescription: 'Update-Files im Verzeichnis project-updates verarbeiten'
+            )
+
             // view
 
             action(id: 'toggleViewInPhaseAction',
@@ -361,6 +370,7 @@ class View {
                         menuItem(insertInPhaseAction)
                         menuItem(removeInPhaseAction)
                         menuItem(swapTemplatesAndProjectsAction)
+                        menuItem(readProjectUpdatesAction)
                     }
 
                     menu(text: 'Ansicht', mnemonic: 'A') {

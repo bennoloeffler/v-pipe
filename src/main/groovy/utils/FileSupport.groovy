@@ -8,9 +8,14 @@ class FileSupport {
     final static String SEPARATOR_SC = /\s*[;,]+\s*/ // can read data with whitespace
     static String SEPARATOR = SEPARATOR_ALL
     static String BACKUP_DIR = "backup"
+    static String UPDATE_DIR = "read-updates-from-here"
+    static String UPDATE_DONE_DIR = "read-updates-from-here/done"
 
+    // TODO: is that needed?
     static {
-        checkBackupDir()
+        checkDirAndCreate(BACKUP_DIR)
+        checkDirAndCreate(UPDATE_DIR)
+        checkDirAndCreate(UPDATE_DONE_DIR)
     }
 
 /**
@@ -93,8 +98,8 @@ class FileSupport {
         dirName + '/' + BACKUP_DIR + "/" + new DateTime().toString("yyyy-MM-dd HH.mm.ss.SSS")
     }
 
-    static def checkBackupDir() {
-        def f = new File(FileSupport.BACKUP_DIR)
+    static def checkDirAndCreate(String where) {
+        def f = new File(where)
         if (!f.exists() && !f.isDirectory()) {
             f.mkdirs()
         }

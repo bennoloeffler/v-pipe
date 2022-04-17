@@ -4,6 +4,7 @@ import groovy.json.JsonSlurper
 import groovy.time.TimeCategory
 import groovy.yaml.YamlBuilder
 import groovy.yaml.YamlSlurper
+import org.joda.time.DateTime
 import utils.FileSupport
 import utils.RunTimer
 
@@ -28,6 +29,12 @@ class DataReader {
     static String PROJECT_COMMENTS_FILE_NAME = "Projekt-Kommentare.txt"
     static String TEMPLATE_SEQUENCE_FILE_NAME = "Vorlagen-Sequenz.txt"
 
+    // those may be used to update the current model
+    static List<String> ALL_UPDATE_DATA_FILES = [
+            DataReader.TASK_FILE_NAME,
+            DataReader.PIPELINING_FILE_NAME,
+            DataReader.PROJECT_DELIVERY_DATE_FILE_NAME
+    ]
 
     static boolean isValidModelFolder(String dirToOpen) {
         new File(dirToOpen + "/" + DataReader.TASK_FILE_NAME).exists()
@@ -35,6 +42,29 @@ class DataReader {
 
     static String path(String fileName) {
         currentDir + "/" + fileName
+    }
+
+    static boolean isDataInUpdateFolder() {
+       new File( get_UPDATE_TASK_FILE_NAME()).exists()
+    }
+
+    static String updateDir() {
+        currentDir + "/" + FileSupport.UPDATE_DIR
+    }
+
+    static String updateDoneDir() {
+        currentDir + "/" + FileSupport.UPDATE_DONE_DIR
+    }
+
+    static String updatePath(String fileName) {
+        updateDir() + "/Update-" + fileName
+    }
+    static String updateDonePath(String fileName) {
+        updateDoneDir() +
+                "/Update-" +
+                fileName[0.. -5] + // name
+                "-" + new DateTime().toString("yyyy-MM-dd HH.mm.ss.SSS") + // date + timestamp
+                fileName[-4..-1] // .txt
     }
 
     static String get_PROJECT_TEMPLATE_FILE_NAME() {
@@ -47,6 +77,10 @@ class DataReader {
 
     static String get_TASK_FILE_NAME() {
         path TASK_FILE_NAME
+    }
+
+    static String get_UPDATE_TASK_FILE_NAME() {
+        updatePath TASK_FILE_NAME
     }
 
     static String get_PIPELINING_FILE_NAME() {
@@ -203,6 +237,20 @@ class DataReader {
             }
         }
         result
+    }
+
+    static void dropUpdateFilesToDoneFolder() {
+        def doneDir = new File(updateDoneDir())
+        doneDir.mkdirs()
+        if(doneDir.exists() && doneDir.isDirectory()) {
+            ALL_UPDATE_DATA_FILES.each { fileName ->
+                File from = new File(updatePath(fileName))
+                File to = new File(updateDonePath(fileName))
+                from.renameTo(to) // move without exception, if file is missing - but also ignore fails...
+            }
+        } else {
+            throw new RuntimeException("could not create folder: " + doneDir.getAbsolutePath())
+        }
     }
 
 

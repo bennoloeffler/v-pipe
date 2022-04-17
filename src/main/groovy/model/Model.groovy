@@ -12,6 +12,7 @@ import org.pcollections.HashTreePSet
 import org.pcollections.PSet
 import transform.DateShiftTransformer
 import transform.ScenarioTransformer
+import utils.FileSupport
 import utils.RunTimer
 
 import java.time.Duration
@@ -808,7 +809,7 @@ class Model {
                 }
             }
 
-        projectComments = DataReader.readComments()
+            projectComments = DataReader.readComments()
 
 
         } catch (Exception e) {
@@ -988,17 +989,17 @@ class Model {
 
         // find a free name
         String newName = project + "-Kopie"
-        while(getProject(newName)) {
+        while (getProject(newName)) {
             newName += "-Kopie"
         }
 
         //liefertermin
-        if(deliveryDate) {
+        if (deliveryDate) {
             deliveryDates[newName] = deliveryDate
         }
 
         //ip
-        if (pipelineElement){
+        if (pipelineElement) {
             PipelineElement newPE = pipelineElement.clone()
             newPE.project = newName
             pipelineElements << newPE
@@ -1012,5 +1013,48 @@ class Model {
         addProject(clonedTasks)
 
         newName
+    }
+
+    def readUpdatesFromUpdateFolder() {
+
+        def existingProjects = _getAllProjects()
+
+        // parse tasks and find the projects, that will be affected
+        def readFromFile = DataReader.get_UPDATE_TASK_FILE_NAME()
+        String text = FileSupport.getTextOrEmpty(readFromFile)
+
+        def tasks = []
+        def projects = []
+        def err = null
+        try {
+            tasks = DataReader.readTasks(text, false)
+            projects = (tasks*.project).unique()
+        } catch (Exception e) {
+            err = e.getMessage()
+        }
+
+        projects.each { p ->
+            taskList.removeIf {
+                it.project == p
+            }
+        }
+
+        taskList.addAll tasks
+
+        // delivery date AND integration phase STAY AS THEY ARE
+
+        if (! err) DataReader.dropUpdateFilesToDoneFolder()
+
+        // in order to tell the user, which will be affected
+        def updatedProjects = existingProjects.intersect(projects)
+        def newProjects = projects - updatedProjects
+        projectSequence.addAll(newProjects)
+
+        newProjects.each { p ->
+            pipelineElements << createPipelineForProject(getProject(p))
+        }
+
+        fireUpdate()
+        [updated: updatedProjects, new: newProjects, err: err]
     }
 }

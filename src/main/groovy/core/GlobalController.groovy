@@ -2,6 +2,7 @@ package core
 
 import application.Main
 import gui.View
+import model.DataReader
 import model.DataWriter
 import model.Model
 import model.VpipeDataException
@@ -45,6 +46,7 @@ class GlobalController {
         // Tool
         view.swing.sortPipelineAction.closure = sortPipelineActionPerformed
         view.swing.swapTemplatesAndProjectsAction.closure = swapTemplatesAndProjectsActionPerformed
+        view.swing.readProjectUpdatesAction.closure = readProjectUpdatesActionPerformed
 
 
         // View
@@ -222,6 +224,7 @@ class GlobalController {
         JMenu m = view.swing.recentMenuItem
         m.setEnabled(how)
     }
+
     def swapTemplatesAndProjectsActionPerformed = {
         view.deselectProject()
         model.swapTemplatesAndProjects()
@@ -232,6 +235,27 @@ class GlobalController {
         }
         model.fireUpdate()
     }
+
+    def readProjectUpdatesActionPerformed = {
+        view.deselectProject()
+        if (DataReader.isDataInUpdateFolder()) {
+            def updates = model.readUpdatesFromUpdateFolder()
+            def updatedStr = "\nneue Projekte:\n" +
+                    (updates.new ? updates.new.join("\n") : "keine") +
+                    "\n\naktualisierte Projekte:\n" +
+                    (updates.updated ? updates.updated.join("\n") : "keine")
+            if (updates.err) {
+                // this is a stupid workaround: the error message contains the wrong filename
+                if(updates.err.contains("enthält keine Daten")) updates.err = "Datei enthält keine Daten.\n"
+                JOptionPane.showMessageDialog(null, "Datei:\n" + DataReader.get_UPDATE_TASK_FILE_NAME() +"\n" + updates.err, "Fehler beim lesen des Update!", JOptionPane.ERROR_MESSAGE)
+            } else {
+                JOptionPane.showMessageDialog(null, updatedStr, "Update!", JOptionPane.INFORMATION_MESSAGE)
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Im Verzeichnis zum Update der Projektdaten liegen keine Daten:\n" + DataReader.updateDir(), "Keine Daten!", JOptionPane.INFORMATION_MESSAGE)
+        }
+    }
+
 
     def pipelineViewActionPerformed = { ActionEvent e ->
         view.openPipelineWindow()
