@@ -269,7 +269,7 @@ class View {
                     //mnemonic: 'p',
                     closure: { println "readProjectUpdatesAction not connected to application..." },
                     //accelerator: shortcut('P'),
-                    shortDescription: 'Update-Files im Verzeichnis project-updates verarbeiten'
+                    shortDescription: "Update-Files im Verzeichnis 'read-updates-from-here' verarbeiten"
             )
 
             // view

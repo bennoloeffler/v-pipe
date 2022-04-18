@@ -298,27 +298,24 @@ gleichzeitig gearbeitet werden soll.
 
 ## Realease
 
-### Planned Features
+### Planned Features, Ideas
 
 - settings file für user: aktuelles Verzeichnis, details, offene Fenster, Window-Size, Splitter, ...
 - Finanz-Zahlen und damit Durchsatz-Kennzahlen
 - Daten-Bereinigungs-Modus in GUI
-- Monats-weise Darstellung auch in GUI
 - adapter elegantly import project data
 - backlog of department for X weeks (in order to simulate "additional work")
-- copy from project (in three tabs (template, new, copy))
-- monthly view (in addition to weekly) (every week is an average of the last)
-- ask for save only if changed - see "dirty-state"
 
 ### BUGS to fix
 
 ### Next Release
-
-2022-??? `2.0.0-delta-data-import`
-- have a directory scanned for delta-data in order to update the model.
-- copy a project (not from template - just plain copy)
+not yet planned
 
 ### Release History
+
+2022-04-17 `2.1.0-copy-and-update`
+- have a directory scanned for delta-data in order to update the model.
+- copy a project (not from template - just plain copy)
 
 2022-04-16 `2.0.0-all-in-gui`
 - linux, windows and mac

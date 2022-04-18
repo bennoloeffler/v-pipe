@@ -38,6 +38,11 @@ import static model.DataReader.isValidModelFolder
 //   find files and sort them
 //   each: read tasks, delete projects old, put tasks in model
 //  Copy Project
+// TODO
+//  - bat file for win start
+//  - three different jre for windows/linux/macos into ONE distro
+//  - deployment from every computer for linux, macos and windows
+
 // 3.0 Durchsatz in EUR dd
 // 4.0 ccpm-planning (krit Pfad in Projekten, most penetrating chain,
 // 4.2 watch files (inside v-pipe in a text area, so that scenarios and shifts can be realized)
