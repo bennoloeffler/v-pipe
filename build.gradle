@@ -25,6 +25,9 @@ repositories {
     }
 }
 
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
 
 dependencies {
     implementation 'joda-time:joda-time:2.10.13'
@@ -209,6 +212,11 @@ task copyExeLibsJRE {
 
         copy {
             from "v-pipe-linux.sh"
+            into tempDist
+        }
+
+        copy {
+            from "v-pipe-win.bat"
             into tempDist
         }
 
