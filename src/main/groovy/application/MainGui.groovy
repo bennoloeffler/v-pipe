@@ -49,7 +49,7 @@ import static model.DataReader.isValidModelFolder
 
 class MainGui {
 
-    static VERSION_STRING ='2.1.0-copy-and-update'
+    static VERSION_STRING ='2.1.1-bugfix-elements'
 
     Model model
     View view

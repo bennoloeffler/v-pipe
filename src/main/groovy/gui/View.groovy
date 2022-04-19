@@ -249,6 +249,7 @@ class View {
                     shortDescription: 'Staffelung sortieren dem spätesten End-Termin des letzten Tasks des Projektes'
             )
 
+            /*
             action(id: 'insertInPhaseAction',
                     name: "IPs im Modell erzeugen",
                     //mnemonic: 'p',
@@ -256,6 +257,7 @@ class View {
                     //accelerator: shortcut('P'),
                     shortDescription: 'falls nicht verfügbar, werden IPs im letzten Drittel des Projektes erzeugt'
             )
+
             action(id: 'removeInPhaseAction',
                     name: "IPs aus Model entfernen",
                     //mnemonic: 'p',
@@ -263,6 +265,7 @@ class View {
                     //accelerator: shortcut('P'),
                     shortDescription: 'alle IPs aus dem Modell löschen'
             )
+             */
 
             action(id: 'readProjectUpdatesAction',
                     name: "Aktualisierung für Projekte einlesen",
@@ -367,8 +370,8 @@ class View {
 
                     menu(text: 'Werkzeug', mnemonic: 'W') {
                         menuItem(sortPipelineAction)
-                        menuItem(insertInPhaseAction)
-                        menuItem(removeInPhaseAction)
+                        //menuItem(insertInPhaseAction)
+                        //menuItem(removeInPhaseAction)
                         menuItem(swapTemplatesAndProjectsAction)
                         menuItem(readProjectUpdatesAction)
                     }

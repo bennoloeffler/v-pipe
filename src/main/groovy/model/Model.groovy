@@ -1050,8 +1050,10 @@ class Model {
         def newProjects = projects - updatedProjects
         projectSequence.addAll(newProjects)
 
-        newProjects.each { p ->
-            pipelineElements << createPipelineForProject(getProject(p))
+        if (pipelineElements) {
+            newProjects.each { p ->
+                pipelineElements << createPipelineForProject(getProject(p))
+            }
         }
 
         fireUpdate()

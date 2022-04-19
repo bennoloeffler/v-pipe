@@ -95,7 +95,12 @@ class FileSupport {
      */
     static String backupDirName(String dirName) {
         assert dirName
-        dirName + '/' + BACKUP_DIR + "/" + new DateTime().toString("yyyy-MM-dd HH.mm.ss.SSS")
+        def result = dirName + '/' + BACKUP_DIR + "/" + new DateTime().toString("yyyy-MM-dd_HH.mm.ss.SSS")
+        if (Commons.getOsName() == "windows") {
+            result = result.replace("/", "\\")
+            println "backupdir corrected: " + result
+        }
+        result
     }
 
     static def checkDirAndCreate(String where) {
@@ -112,7 +117,7 @@ class FileSupport {
         if (!f.exists() && !f.isDirectory()) {
             f.mkdirs()
         }
-        dirToOpen + "/" + new DateTime().toString("yyyy-MM-dd HH.mm.ss.SSS") + ".txt"
+        dirToOpen + "/" + new DateTime().toString("yyyy-MM-dd_HH.mm.ss.SSS") + ".txt"
     }
 
 }

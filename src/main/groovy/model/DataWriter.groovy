@@ -62,12 +62,24 @@ class DataWriter {
     static def backup() {
 
         def bDir = FileSupport.backupDirName(DataReader.currentDir)
-        assert new File(bDir).mkdirs()
-
-        ALL_DATA_FILES.each { fileName ->
-            File from = new File(DataReader.path(fileName))
-            File to = new File(bDir + '/' + fileName)
-            from.renameTo(to) // move without exception, if file is missing - but also ignore fails...
+        println "try to create backup folder: " + bDir
+        def sm = SecurityManager.newInstance()
+        sm.checkRead(bDir)
+        sm.checkWrite(bDir)
+        //assert new File(bDir).mkdirs() // this fails on
+        def bFile = new File(bDir)
+        //def succ = bFile.mkdirs() // TODO: Does mkdir make it any better?
+        def succ = bFile.mkdir() // TODO: CHECK WHY ONEDRIVE does not work on win box of Frank
+        println "creation worked?" + succ
+        if(bFile.exists()) {
+            ALL_DATA_FILES.each { fileName ->
+                File from = new File(DataReader.path(fileName))
+                File to = new File(bDir + '/' + fileName)
+                from.renameTo(to) // move without exception, if file is missing - but also ignore fails...
+            }
+        } else {
+            //throw new RuntimeException("creation of backup folder failed: " + bDir)
+            println "ATTENTION: no backup saved! cant create backup folder..."
         }
     }
 
