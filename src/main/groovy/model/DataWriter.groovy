@@ -63,14 +63,20 @@ class DataWriter {
 
         def bDir = FileSupport.backupDirName(DataReader.currentDir)
         println "try to create backup folder: " + bDir
-        def sm = SecurityManager.newInstance()
-        sm.checkRead(bDir)
-        sm.checkWrite(bDir)
+
+        SecurityManager sm = System.getSecurityManager()
+        try {
+            sm.checkRead(bDir)
+            sm.checkWrite(bDir)
+        } catch (Exception e) {
+            println "Security Exception trying to check read / write backup file: "
+            println e.getMessage()
+        }
         //assert new File(bDir).mkdirs() // this fails on
         def bFile = new File(bDir)
         //def succ = bFile.mkdirs() // TODO: Does mkdir make it any better?
         def succ = bFile.mkdir() // TODO: CHECK WHY ONEDRIVE does not work on win box of Frank
-        println "creation worked?" + succ
+        println "mkdir(s) creation worked?" + succ
         if(bFile.exists()) {
             ALL_DATA_FILES.each { fileName ->
                 File from = new File(DataReader.path(fileName))
