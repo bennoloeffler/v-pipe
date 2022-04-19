@@ -65,18 +65,25 @@ class DataWriter {
         println "try to create backup folder: " + bDir
 
         SecurityManager sm = System.getSecurityManager()
-        try {
-            sm.checkRead(bDir)
-            sm.checkWrite(bDir)
-        } catch (Exception e) {
-            println "Security Exception trying to check read / write backup file: "
-            println e.getMessage()
+        if(sm) {
+            try {
+                sm.checkRead(bDir)
+                println "SecurityManager: read allowed: " + bDir
+                sm.checkWrite(bDir)
+                println "SecurityManager: write allowed: " + bDir
+            } catch (Exception e) {
+                println "Security Exception trying to check read / write backup file: "
+                println e.getMessage()
+            }
+        } else {
+            println "there is no SecurityManager"
         }
-        //assert new File(bDir).mkdirs() // this fails on
+        //assert new File(bDir).mkdirs() // this fails on ONEDRIVE on win box of Frank
         def bFile = new File(bDir)
+        bFile.is
         //def succ = bFile.mkdirs() // TODO: Does mkdir make it any better?
-        def succ = bFile.mkdir() // TODO: CHECK WHY ONEDRIVE does not work on win box of Frank
-        println "mkdir(s) creation worked?" + succ
+        def succ = bFile.mkdirs() // TODO: CHECK WHY ONEDRIVE does not work on win box of Frank
+        println "mkdir(s) creation worked? " + succ
         if(bFile.exists()) {
             ALL_DATA_FILES.each { fileName ->
                 File from = new File(DataReader.path(fileName))
