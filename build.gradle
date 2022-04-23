@@ -30,6 +30,7 @@ tasks.withType(JavaCompile) {
 }
 
 dependencies {
+    implementation 'org.apache.ivy:ivy:2.4.0' // for plugins apache excel adapter
     implementation 'joda-time:joda-time:2.10.13'
     implementation 'org.codehaus.groovy:groovy-all:3.0.8'
     implementation group: 'org.codehaus.groovy', name: 'groovy-dateutil', version: '3.0.8'

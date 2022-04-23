@@ -56,6 +56,8 @@ class Model {
 
     // all project tasks data
     List<TaskInProject> taskList = []
+    List<TaskInProject> taskListOriginal = []
+
 
     // the corresponding delivery date
     Map<String, Date> deliveryDates = [:]
@@ -1016,6 +1018,7 @@ class Model {
     }
 
     def readUpdatesFromUpdateFolder() {
+
 
         def existingProjects = _getAllProjects()
 

@@ -80,8 +80,6 @@ class DataWriter {
         }
         //assert new File(bDir).mkdirs() // this fails on ONEDRIVE on win box of Frank
         def bFile = new File(bDir)
-        bFile.is
-        //def succ = bFile.mkdirs() // TODO: Does mkdir make it any better?
         def succ = bFile.mkdirs() // TODO: CHECK WHY ONEDRIVE does not work on win box of Frank
         println "mkdir(s) creation worked? " + succ
         if(bFile.exists()) {
@@ -91,8 +89,8 @@ class DataWriter {
                 from.renameTo(to) // move without exception, if file is missing - but also ignore fails...
             }
         } else {
-            //throw new RuntimeException("creation of backup folder failed: " + bDir)
-            println "ATTENTION: no backup saved! cant create backup folder..."
+            throw new RuntimeException("creation of backup folder failed: " + bDir)
+            //println "ATTENTION: no backup saved! cant create backup folder..."
         }
     }
 

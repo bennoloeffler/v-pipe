@@ -238,6 +238,11 @@ class GlobalController {
 
     def readProjectUpdatesActionPerformed = {
         view.deselectProject()
+
+        // Start plugin to transform data to input format
+        GroovyShell shell = new GroovyShell()
+        shell.evaluate(new File(DataReader.get_UPDATE_PLUGIN_FILE_NAME()))
+
         if (DataReader.isDataInUpdateFolder()) {
             def updates = model.readUpdatesFromUpdateFolder()
             def updatedStr = "\nneue Projekte:\n" +

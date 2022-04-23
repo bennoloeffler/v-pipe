@@ -116,6 +116,11 @@ class DataReader {
     }
 
 
+    static String get_UPDATE_PLUGIN_FILE_NAME() {
+        updateDir() + "/plugin/import.groovy"
+    }
+
+
     /**
      * read templates
      * @return
@@ -252,6 +257,7 @@ class DataReader {
             throw new RuntimeException("could not create folder: " + doneDir.getAbsolutePath())
         }
     }
+
 
 
     /**
