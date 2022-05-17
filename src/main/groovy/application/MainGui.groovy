@@ -38,18 +38,22 @@ import static model.DataReader.isValidModelFolder
 //   find files and sort them
 //   each: read tasks, delete projects old, put tasks in model
 //  Copy Project
-// TODO
+//
+// TODO 2.2
+//  _ read updates in documentation
+//  - Plugin to read Excel while reading updates
+//  - SWITCH to "correction mode" when error during opening occurs. OPEN FILES IN EDITOR!
 //  - bat file for win start
 //  - three different jre for windows/linux/macos into ONE distro
 //  - deployment from every computer for linux, macos and windows
-
+// 2.3 shadow tasks (tasks that are not saved - but shown as shadow of the original)
 // 3.0 Durchsatz in EUR dd
 // 4.0 ccpm-planning (krit Pfad in Projekten, most penetrating chain,
 // 4.2 watch files (inside v-pipe in a text area, so that scenarios and shifts can be realized)
 
 class MainGui {
 
-    static VERSION_STRING ='2.1.1-bugfix-elements'
+    static VERSION_STRING ='2.2.0-plugin-win-osx-linux'
 
     Model model
     View view

@@ -18,9 +18,15 @@ class DateExtension {
     static Date getStartOfWeek(Date d) {
         return DateHelperFunctions._getStartOfWeek(d)
     }
+    static LocalDate getStartOfWeek(LocalDate d) {
+        return DateHelperFunctions.getStartOfWeek(d)
+    }
 
     static Date getStartOfMonth(Date d) {
         return DateHelperFunctions._getStartOfMonth(d)
+    }
+    static LocalDate getStartOfMonth(LocalDate d) {
+        return DateHelperFunctions.getStartOfMonth(d)
     }
 
     /**
@@ -30,6 +36,14 @@ class DateExtension {
      */
     static String getWeekYearStr(Date d) {
         return DateHelperFunctions._getWeekYearStr(d)
+    }
+
+    static String getWeekYearStr(LocalDate d) {
+        return DateHelperFunctions._getWeekYearStr(d)
+    }
+
+    static String getMonthYearStr(LocalDate d) {
+        return DateHelperFunctions._getMonthYearStr(d)
     }
 
     static String getMonthYearStr(Date d) {

@@ -10,8 +10,7 @@ import utils.RunTimer
 
 import java.beans.PropertyChangeListener
 
-import static extensions.DateHelperFunctions._getStartOfMonth
-import static extensions.DateHelperFunctions._getStartOfWeek
+import static extensions.DateHelperFunctions.*
 import static extensions.StringExtension.toDateFromYearWeek
 import static model.WeekOrMonth.*
 

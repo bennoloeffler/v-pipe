@@ -21,6 +21,7 @@ import java.util.stream.Collectors
 
 import static extensions.DateHelperFunctions.*
 import static model.WeekOrMonth.WEEK
+import static model.Weekifyer.weekify
 
 @CompileStatic
 class Model {
@@ -35,6 +36,9 @@ class Model {
 
     @Bindable
     boolean updateToggle
+
+    @Bindable
+    List<TaskInProject> projectChanged
 
     @Bindable
     String currentDir // = new File(".").getCanonicalPath().toString()
@@ -145,6 +149,11 @@ class Model {
         assert (tasks && tasks.size() > 0)
         projectSequence.add(0, tasks[0].project)
         taskList.addAll(tasks)
+
+        // TODO: fire projectChanged
+        firePropertyChange("projectChanged", null, tasks)
+
+        // TODO: remove this - because capaAvailable does not change because of this
         reCalcCapaAvailableIfNeeded()
         fireUpdate()
     }
@@ -159,6 +168,9 @@ class Model {
             }
             TaskInProject t = r[idx]
             taskList.remove(t)
+            //firePropertyChange("projectChanged", clone, taskList)
+            // TODO check usage of deleteProjectTask - where comes the fireUpdate?
+            firePropertyChange("projectChanged", "deletedTask", t)
         }
     }
 
@@ -172,6 +184,8 @@ class Model {
         TaskInProject t = r[idx]
         TaskInProject copy = new TaskInProject(t.project, t.starting, t.ending, t.department, t.capacityNeeded, t.description)
         taskList.add(copy)
+        // TODO check usage of copyProjectTask - where comes the fireUpdate?
+        firePropertyChange("projectChanged", "addedTask", copy)
     }
 
 
@@ -743,6 +757,7 @@ class Model {
             // ordinary tasks
             //
             taskList = DataReader.readTasks()
+            weekify(taskList)
 
             deliveryDates = DataReader.readPromisedDeliveryDates()
 
@@ -1041,7 +1056,7 @@ class Model {
                 it.project == p
             }
         }
-
+        weekify(tasks)
         taskList.addAll tasks
 
         // delivery date AND integration phase STAY AS THEY ARE

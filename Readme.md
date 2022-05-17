@@ -11,28 +11,20 @@ Quickstart- Video? [Hier Klicken...](https://loom.com/share/folder/098a2ada42f64
 ## Start direkt in der V&S-Dropbox
 Auf der Dropbox liegt eine lauffähige Installation.
 1. Den Produkt-Ordner "01_CCPM" synchronisieren.
-2. Doppelklick auf:
-   VundS/A_Leistungsteams/A_02_Leistungserstellung/A_0205_Produkte/
-   01_CCPM/06_V-Pipe/start-v-pipe-macos
-
+2. dort gibt es drei Ordner: `v-pipe-win v-pipe-macos v-pipe-linux`
+3. OSX: Doppelklick auf:
+   `VundS/A_Leistungsteams/A_02_Leistungserstellung/A_0205_Produkte/
+   01_CCPM/06_V-Pipe/v-pipe-macos.sh.command`
+4. WIN: Doppelclick in Release-Ordner auf `v-pipe-win.bat`
+5. LINUX Doppelclick in Release-Ordner auf: `v-pipe-linux.sh`
 ## Lokale Installation
 Die Distribution ist ein `v-pipe-major.minor.bugfix-ReleaseName.zip`.    
-Beispiel: v-pipe-1.4.4.zip  
-Dieses Zip-File entpacken - ideal in das Verzeichnis:  
-`c:\v-pipe`. Aber auch gerne auf einen Memory-Stick. Tut auch.  
-In Win10 braucht man dazu keinen "Zipper".    
-1. Zip-File v-pipe-x.y.z-release.zip 'irgendwo' ablegen.  
-2. Im Explorer (WIN+E) das v-pipe.zip 'anklicken'.
-Einfach im Explorer einmal draufklicken.  
-3. Inhalte des zip-files werden wie ein File-System angezeigt.  
-4. Oberes Verzeichnis (`v-pipe`) per Copy&Paste mit CTRL-C 'kopieren'  
-und nach C: einfügen. Also im Explorer auf C: klicken und per CTRL-V entpacken.  
-Fertig.
-5. Das klappt auch für ein Programm-Update.  
-eigene Daten-Dateien werden nicht überschrieben.  
-Backup schadet trotzdem nicht.
+Beispiel: ordner v-pipe-win/v-pipe-1.4.4  
+Diesen Ordner kopieren - ideal in das Verzeichnis:  
+`c:\v-pipe-1.4.4`. Aber auch gerne auf einen Memory-Stick oder ins eigene Home.  
+Oder nach `Programme` (als admin). Tut auch.  
 
-In C:\v-pipe liegen dann die Verzeichnisse und Dateien:
+In C:\v-pipe-x.y.z liegen dann die Verzeichnisse und Dateien:
 
 - `Readme.md` (diese Betriebsanleitung als Markdown - falls offline)  
 Markdown-Plugin für Chrome installieren? Dort:  
@@ -40,13 +32,14 @@ Markdown-Plugin für Chrome installieren? Dort:
 in den Einstellungen des Plugins unter  
 Einstellungen/Erweiterungen/MarkdownPreviewPlus:  
 Option: *Zugriff auf Datei-URLs zulassen* aktivieren 
-- `v-pipe.exe` (der Starter - Doppelklick und los geht's.)
-- `v-pipe-gui.exe` (WIN-Starter: visuelle Darstellung - Doppelklick und los.)  
+- ALTLAST (nicht mehr nutzen) `v-pipe.exe` (der Starter - Doppelklick und los geht's.)
+- ALTLAST (nicht mehr nutzen) `v-pipe-gui.exe` (WIN-Starter: visuelle Darstellung - Doppelklick und los.)  
 - `v-pipe-macos.sh.command` (MACOS-Starter - Doppelklick)
 - `v-pipe-linux.sh` (Linux-Starter - Doppelklick)
+- `v-pipe-win.bat` (Windows-Starter - Doppelclick)
 - `lib` (ein paar Java-Bibliotheken. Finger weg ;-))  
 - `jre` (eine Java-Laufzeit-Umgebung. Nicht anfassen...)
-- `bsp-daten` (alle Daten-Dateien als funktionierende Beispiele)
+- `bsp-daten` (Unterordner sind gefüllt mit Daten-Dateien als funktionierende Beispiele)
     - Grunddaten
         - `Projekt-Start-End-Abt-Kapa.txt` (ERFORDERLICH: Alle Tasks)
         - `Abteilungs-Kapazitaets-Angebot.txt` (OPTIONAL: Kapa Abteilungen)
@@ -64,6 +57,7 @@ Option: *Zugriff auf Datei-URLs zulassen* aktivieren
 ## Anwendung
 
 ### Start von v-pipe, wenn die Daten bereinigt werden müssen...  
+
 
 Einfach Doppelklick auf `v-pipe.exe`. Das startet den  
 Deamon-Mode: v-pipe lauert jetzt auf Veränderungen  

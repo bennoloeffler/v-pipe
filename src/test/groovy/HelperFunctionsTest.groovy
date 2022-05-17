@@ -4,12 +4,16 @@ class HelperFunctionsTest extends GroovyTestCase {
 
     def static assertWeek(String dateddmmyyyy, String yyyy_wxx) {
         def sw = dateddmmyyyy.toDate().getWeekYearStr()
+        def swl = dateddmmyyyy.toLocalDate().getWeekYearStr()
         assert sw == yyyy_wxx
+        assert swl == yyyy_wxx
     }
 
     def static assertMonth(String dateddmmyyyy, String yyyy_mxx) {
         def sw = dateddmmyyyy.toDate().getMonthYearStr()
+        def swl = dateddmmyyyy.toLocalDate().getMonthYearStr()
         assert sw == yyyy_mxx
+        assert swl == yyyy_mxx
     }
 
     void testGetWeekYearStr() {
@@ -81,9 +85,11 @@ class HelperFunctionsTest extends GroovyTestCase {
 
     void testGetStartOfWeek () {
         assert "20.4.2020".toDate() == "25.4.2020".toDate().getStartOfWeek()
+        assert "20.4.2020".toLocalDate() == "25.4.2020".toLocalDate().getStartOfWeek()
     }
 
     void testGetStartOfMonth () {
         assert "1.4.2020".toDate() == "25.4.2020".toDate().getStartOfMonth()
+        assert "1.4.2020".toLocalDate() == "25.4.2020".toLocalDate().getStartOfMonth()
     }
 }

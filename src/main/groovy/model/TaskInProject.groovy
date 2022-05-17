@@ -26,8 +26,13 @@ class TaskInProject {
     double capacityNeededLastTime
 
     String project
+
     Date starting
+    int startingWeek
+
     Date ending
+    int endingWeek
+
     String department
     double capacityNeeded
     String description

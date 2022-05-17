@@ -14,8 +14,7 @@ import utils.RunTimer
 import java.beans.PropertyChangeEvent
 import java.beans.PropertyChangeListener
 
-import static extensions.DateHelperFunctions._getStartOfMonth
-import static extensions.DateHelperFunctions._getStartOfWeek
+import static extensions.DateHelperFunctions.*
 
 // Performance IDEA
 // 1 GridLoadModelSparce with x and y and shiftX (korrekt x and y when saving (and drawing), set ShiftX to 0 when loading)

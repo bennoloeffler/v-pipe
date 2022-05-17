@@ -4,6 +4,11 @@ import groovy.transform.CompileStatic
 import groovy.transform.Memoized
 import org.joda.time.DateTime
 
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.temporal.TemporalField
+import java.time.temporal.WeekFields
+
 /**
  * Implementation of helper functions.
  * For good accessibility, they are added to Date and String.
@@ -13,6 +18,13 @@ import org.joda.time.DateTime
 class DateHelperFunctions {
 
     static Calendar cal = Calendar.getInstance(Locale.GERMANY)
+    static TemporalField woy = WeekFields.of(Locale.GERMANY).weekOfWeekBasedYear();
+
+
+    @Memoized
+    static LocalDate getStartOfWeek(LocalDate d) {
+        d.with(DayOfWeek.MONDAY)
+    }
 
     /**
      * Monday of the week of d
@@ -26,6 +38,12 @@ class DateHelperFunctions {
         startOfWeek.toDate()
     }
 
+
+    @Memoized
+    static LocalDate getStartOfMonth(LocalDate d) {
+        d.withDayOfMonth(1)
+    }
+
     /**
      *
      * @param d
@@ -36,6 +54,29 @@ class DateHelperFunctions {
         def dt = new DateTime(d)
         def startOfMonth = dt.withDayOfMonth(1)
         startOfMonth.toDate()
+    }
+
+    @Memoized
+    static String _getWeekYearStr(LocalDate d) {
+        int year = d.getYear()
+
+        int month = d.getMonthValue() -1
+        int week = d.get(woy);
+
+        // correct the last days in december
+        // those days belong already to the first week of the next year
+        // or sometimes vice verca
+
+        if (month == 11 && week == 1) {
+            year++
+        }
+        if (month == 0 && week == 52) {
+            year--
+        }
+        if (month == 0 && week == 53) {
+            year--
+        }
+        "$year-W${week < 10 ? "0" : ""}$week"
     }
 
     /**
@@ -52,10 +93,30 @@ class DateHelperFunctions {
         // correct the last days in december
         // those days belong already to the first week of the next year
         // or sometimes vice verca
-        if(month==11 && week==1) {year++}
-        if(month==0 && week==52) {year--}
-        if(month==0 && week==53) {year--}
-        "$year-W${week<10?"0":""}$week"
+        if (month == 11 && week == 1) {
+            year++
+        }
+        if (month == 0 && week == 52) {
+            year--
+        }
+        if (month == 0 && week == 53) {
+            year--
+        }
+        "$year-W${week < 10 ? "0" : ""}$week"
+    }
+
+
+
+
+    @Memoized
+    static int _getCalWeek(Date d) {
+        cal.setTime(d)
+        cal.get(Calendar.WEEK_OF_YEAR)
+    }
+
+    @Memoized
+    static int _getCalWeek(LocalDate d) {
+        d.get(woy);
     }
 
     /**
@@ -68,7 +129,14 @@ class DateHelperFunctions {
         cal.setTime(d)
         int year = cal.get(Calendar.YEAR)
         int month = cal.get(Calendar.MONTH) + 1
-        "$year-M${month<10?"0":""}$month"
+        "$year-M${month < 10 ? "0" : ""}$month"
+    }
+
+    @Memoized
+    static String _getMonthYearStr(LocalDate d) {
+        int year = d.getYear()
+        int month = d.getMonthValue()
+        "$year-M${month < 10 ? "0" : ""}$month"
     }
 
     /**
@@ -91,6 +159,11 @@ class DateHelperFunctions {
         Date.parse("dd.MM.yyyy", s)
     }
 
+    @Memoized
+    static LocalDate _sToLD(String s) {
+        assert s != null
+        LocalDate.parse(s, "d.M.yyyy")
+    }
 
     /**
      * @param s "yyyy-Www" 2020-W01
@@ -107,8 +180,8 @@ class DateHelperFunctions {
         cal.set(Calendar.WEEK_OF_YEAR, week)
 
         _getStartOfWeek(cal.getTime())
-
     }
+
 }
 
 

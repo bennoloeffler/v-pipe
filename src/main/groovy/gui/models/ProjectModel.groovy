@@ -1,9 +1,8 @@
 package gui.models
 
+
 import groovy.beans.Bindable
 import groovy.transform.CompileStatic
-import gui.models.GridElement
-import gui.models.GridModel
 import model.Model
 import model.PipelineElement
 import model.TaskInProject
@@ -12,6 +11,7 @@ import utils.RunTimer
 
 import static extensions.DateHelperFunctions._dToS
 import static extensions.DateHelperFunctions._getStartOfWeek
+
 
 @CompileStatic
 class ProjectModel extends GridModel {

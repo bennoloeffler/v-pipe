@@ -3,34 +3,57 @@ package gui.models
 import groovy.beans.Bindable
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
-import groovyx.gpars.GParsPool
 import model.Model
 import model.PipelineElement
 import model.TaskInProject
 import model.WeekOrMonth
-import utils.RunTimer
 
 import java.beans.PropertyChangeEvent
 import java.beans.PropertyChangeListener
 
-import static extensions.DateHelperFunctions.*
-
 @CompileStatic
-class PipelineModel extends GridModel {
+class PipelineModelAbsoluteWeeks extends GridModel {
+
+    // TODO: THE WEEK MODEL:
+    //       week    0 starts with first day: 4.1.2010
+    //       week 1565 ends   with last  day: 1.1.2040
+    // TODO: there need to be a "weekOffset" in the view, that needs to be handled  by the view
+
+    int getFirstIdxWithData(){0}
+    int getLastIdxWithData(){1565}
+
+
+    List<GridElement> recalcGridElementsForProject(String projectName) {
+        []
+    }
+
 
     @Bindable String selectedProject
-    List<List<GridElement>> allProjectGridLines
+
+
+    // TODO: change to "map projectName List<GridElement>" in order to change single elements
+    Map<String, List<GridElement>> allProjectGridLines
+
+    // TODO: this is a lookup to the current absolute week (not even a lookup, but initialized and cached)
+    // Weekifyer.dateAbsWeekMap[new Date()]
     int nowXRowCache = -1
+
     Model model
 
 
+    // TODO: we need to notify "projectChanged" -->
+    //       then only ONE project line needs to be adapted AND in LOAD PANEL, load could be reduced and added again...
     def tasksPropertyListener = { PropertyChangeEvent e ->
-        updateGridElements()
+        if (e.propertyName == "projectChanged") {
+          // TODO oldValue = the old original, newValue = the new one as clone
+        } else {
+            updateGridElements()
+        }
         this.setUpdateToggle(!this.getUpdateToggle()) // just to fire an PropertyChange to the view
     }
 
 
-    PipelineModel(Model model) {
+    PipelineModelAbsoluteWeeks(Model model) {
         this.model = model
         model.addPropertyChangeListener(tasksPropertyListener as PropertyChangeListener)
         updateGridElements()
@@ -59,6 +82,7 @@ class PipelineModel extends GridModel {
     @CompileStatic(TypeCheckingMode.SKIP)
     private void updateGridElements() {
         allProjectGridLines = []
+        /*
         RunTimer.getTimerAndStart('NewPipelineModel::updateGridElements').withCloseable {
             if (model.taskList) {
                 Date startOfGrid = _getStartOfWeek(model.getStartOfProjects())
@@ -72,6 +96,8 @@ class PipelineModel extends GridModel {
                 }
             }
         }
+
+         */
     }
 
 
@@ -82,6 +108,7 @@ class PipelineModel extends GridModel {
     //@Memoized
     List<GridElement> fromProjectTasks( List<TaskInProject> projectTasks, Date startOfGrid, Date endOfGrid) {
         def gridElements = []
+        /*
         try {
             assert projectTasks
             Date startOfTasks = _getStartOfWeek(projectTasks*.starting.min())
@@ -135,6 +162,8 @@ class PipelineModel extends GridModel {
         }
         //String line = gridElements.collect {GridElement e -> (" - " + (e == GridElement.nullElement ? "X" : "P") +(e.isIntegrationPhase() ? "I" : "") + (e.isDeliveryDate() ? "D" : "") ) }.join("")
         //println line
+
+         */
         return gridElements
     }
 
@@ -175,13 +204,6 @@ class PipelineModel extends GridModel {
         model.reCalcCapaAvailableIfNeeded()
         model.fireUpdate()
     }
-
-    @Override
-    /*
-    def toggleIntegrationPhase(int x, int y) {
-        allProjectGridLines[y][x].integrationPhase = ! allProjectGridLines[y][x].integrationPhase
-    }
-     */
 
     @Override
     def swap(int y, int withY) {
