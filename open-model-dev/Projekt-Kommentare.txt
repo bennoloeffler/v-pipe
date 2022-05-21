@@ -1,3 +1,0 @@
-Neu-Ulm-Anlage: "ABC\r\ndie Katze \r\nliegt im Schnee\r\n"
-p1: "p1 sowieso\r\nzwiete zeile ist die letzte"
-pro2: auch
