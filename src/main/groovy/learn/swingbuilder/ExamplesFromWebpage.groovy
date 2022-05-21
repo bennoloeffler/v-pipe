@@ -1,5 +1,6 @@
 package learn.swingbuilder
 
+import com.formdev.flatlaf.FlatLightLaf
 import groovy.beans.Bindable
 import groovy.swing.SwingBuilder
 
@@ -183,6 +184,8 @@ class ExamplesFromWebpage {
 
 
     static void main(String[] args) {
+        FlatLightLaf.install()
+
         try {
             doIt_01()
             doIt_02()

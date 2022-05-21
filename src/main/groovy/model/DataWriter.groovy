@@ -1,8 +1,11 @@
 package model
 
+import extensions.DateHelperFunctions
+import groovy.transform.CompileStatic
 import org.yaml.snakeyaml.Yaml
 import utils.FileSupport
 
+@CompileStatic
 class DataWriter {
 
     Model model
@@ -13,9 +16,9 @@ class DataWriter {
             result.with {
                 append(task.project.padRight(20))
                 append('  ')
-                append(task.starting.toString())
+                append(DateHelperFunctions._dToS(task.starting))
                 append('  ')
-                append(task.ending.toString())
+                append(DateHelperFunctions._dToS(task.ending))
                 append('  ')
                 append(task.department.padRight(20))
                 append(task.capacityNeeded.toString().padLeft(6))
@@ -80,6 +83,8 @@ class DataWriter {
         }
         //assert new File(bDir).mkdirs() // this fails on ONEDRIVE on win box of Frank
         def bFile = new File(bDir)
+        //bFile.is
+        //def succ = bFile.mkdirs() // TODO: Does mkdir make it any better?
         def succ = bFile.mkdirs() // TODO: CHECK WHY ONEDRIVE does not work on win box of Frank
         println "mkdir(s) creation worked? " + succ
         if(bFile.exists()) {
@@ -160,7 +165,7 @@ class DataWriter {
 
     }
 
-    static void writeCommentsToFile(LinkedHashMap<String, String> comments, String fileName) {
+    static void writeCommentsToFile(Map<String, String> comments, String fileName) {
         if (comments) {
             Yaml yaml = new Yaml()
             String data = yaml.dump(comments)

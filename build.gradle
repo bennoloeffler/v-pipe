@@ -16,6 +16,8 @@ plugins {
     id 'idea'
     id 'groovy'
     id 'edu.sc.seis.launch4j' version '2.4.6'
+    id 'com.github.johnrengelman.shadow' version '4.0.4'
+
 }
 
 repositories {
@@ -102,7 +104,8 @@ if (getOsName() == "linux") {
     println "jre for linux: " + jrePath
 } else if (getOsName() == "windows") {
     // Consider Windows.
-    jrePath = "C:\\Program Files\\Java\\jre1.8.0_172" // WIN11
+    //jrePath = "C:\\Program Files\\Java\\jre1.8.0_172" // WIN11
+    jrePath = "C:\\Program Files\\Java\\jdk-11.0.12"// WIN11
     println "jre for WIN: " + jrePath
 } else if (getOsName() == "macos") {
     // Consider OS X.
@@ -241,6 +244,25 @@ task createDistribution(type: Zip) {
     group "v-pipe"
     dependsOn copyExeLibsJRE
     from "$buildDir/dist"
+}
+
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'application.MainGui'
+        //attributes 'Main-Class': 'learn.swingbuilder.ExamplesFromWebpage'
+
+    }
+}
+
+// EXPERIMENTAL
+task buildNativeImage(type: Exec) {
+    workingDir "$projectDir/build/dist/v-pipe/lib"
+    if (getOsName() == "windows") {
+        commandLine '%comspec% /k "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Auxiliary\\Build\\vcvarsx86_amd64.bat"', '/c', '..\\..\\..\\..\\buildNativeImage.bat'
+    } else {
+        //commandLine 'sh', '-c', 'buildNativeImage.sh'
+    }
 }
 
 
