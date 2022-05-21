@@ -96,9 +96,9 @@ def getOsName() {
 
 if (getOsName() == "linux") {
     // Consider Linux.
-    //println "NO JRE YET for Linux"
-    //Thread.sleep(10000)
-    jrePath ="/home/benno/.jdks/corretto-1.8.0_322" // Linux
+    //jrePath ="/home/benno/.jdks/corretto-1.8.0_322" // Linux
+    jrePath ="/home/benno/.sdkman/candidates/java/11.0.12-open"
+
     println "jre for linux: " + jrePath
 } else if (getOsName() == "windows") {
     // Consider Windows.
