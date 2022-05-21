@@ -9,11 +9,9 @@ import model.WeekOrMonth
 import org.tinylog.Logger as l
 import utils.FileEvent
 import utils.FileWatcherDeamon
-import utils.StartOnlyOneInstance
 
 import java.awt.*
 import java.util.List
-
 //
 // https://e.printstacktrace.blog/groovy-regular-expressions-the-definitive-guide/
 //
@@ -52,7 +50,7 @@ class  Main {
         //
         // only one instance - typically...
         //
-        if( ! multiInstanceMode ) { StartOnlyOneInstance.checkStart() }
+        //if( ! multiInstanceMode ) { StartOnlyOneInstance.checkStart() }
 
         //
         // Browser with quickstart-hints
@@ -113,7 +111,7 @@ class  Main {
                     DataReader.DATESHIFT_FILE_NAME,
                     DataReader.PIPELINING_FILE_NAME,
                     DataReader.CAPA_FILE_NAME,
-                    DataReader.TEMPLATE_FILE_NAME, ]
+                    DataReader.PROJECT_TEMPLATE_FILE_NAME, ]
         d
     }
 

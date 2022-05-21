@@ -1,42 +1,20 @@
 package gui
 
-
 import com.formdev.flatlaf.FlatLightLaf
 import groovy.beans.Bindable
 import groovy.swing.SwingBuilder
-import gui.models.GridLoadProjectsModel
-import gui.models.GridLoadPipelineModel
-import gui.models.PipelineModel
-import gui.models.ProjectModel
-import gui.panels.PipelineEditorPanel
-import gui.panels.ProjectDetailsPanel
-import gui.panels.ProjectTemplatesPanel
+import gui.models.*
+import gui.panels.*
 import model.Model
 import model.WeekOrMonth
 import net.miginfocom.swing.MigLayout
-import gui.panels.FileDifferPanel
-import gui.models.GridModel
-import gui.panels.GridPanel
-import gui.panels.LoadPanel
-import gui.panels.ResourceCapacityEditorPanel
 
-import javax.swing.ImageIcon
-import javax.swing.JFrame
-import javax.swing.JLabel
-import javax.swing.JScrollPane
-import javax.swing.JSplitPane
-import javax.swing.JTabbedPane
-import javax.swing.JTextPane
-import javax.swing.ToolTipManager
-import javax.swing.UIManager
-import java.awt.Color
-import java.awt.Dimension
-import java.awt.Font
-import java.awt.Image
-import java.awt.Toolkit
+import javax.swing.*
+import java.awt.*
 
-import static gui.panels.ProjectDetailsPanel.*
-import static java.awt.Color.*
+import static gui.panels.ProjectDetailsPanel.scaleIcon
+import static java.awt.Color.GRAY
+import static java.awt.Color.RED
 
 /**
  *  https://docs.oracle.com/javase/tutorial/uiswing/components/
@@ -347,9 +325,9 @@ class View {
             )
 
 
-            def f = frame(id: 'frame',
+            JFrame f = frame(id: 'frame',
                     size: [(int) (screenDimension.width), (int) (screenDimension.height - 50)],
-                    location: [0, 0],
+                    location: [0,0],
                     iconImage: frameIcon,
                     title: 'v-pipe:  +/- = Zoom  |  Pfeile = Cursor bewegen  |  Shift+Pfeile = Projekt bewegen  |  d = Details an/aus  |  n = now  |  Strg+Pfeile = Tasks vergr./verkl.  |  m = Mittelwert',
                     locationRelativeTo: null,

@@ -2,13 +2,15 @@
  * User guide available at https://docs.gradle.org/4.0/userguide/tutorial_groovy_projects.html
  */
 
-
+/*
+ * fat jar: does not work.
+ * so _instead_: create dist with Launch4J
+ * and delete the exe files finally.
+ */
 
 import edu.sc.seis.launch4j.tasks.Launch4jLibraryTask
 
-//apply plugin: 'idea'
-//apply plugin: 'groovy'
-//apply plugin: 'edu.sc.seis.launch4j'
+
 
 
 
@@ -16,7 +18,7 @@ plugins {
     id 'idea'
     id 'groovy'
     id 'edu.sc.seis.launch4j' version '2.4.6'
-    id 'com.github.johnrengelman.shadow' version '4.0.4'
+    //id 'com.github.johnrengelman.shadow' version '4.0.4'
 
 }
 
@@ -52,7 +54,6 @@ dependencies {
     testCompile 'junit:junit:4.13.2'
     //testCompile ('org.junit.jupiter:junit-jupiter:5.6.0')
 
-    //testCompile "org.spockframework:spock-core:1.3-groovy-2.5"
     testCompile group: 'org.spockframework', name: 'spock-core', version: '2.0-groovy-3.0'
 }
 
@@ -72,6 +73,7 @@ task createGui(type: Launch4jLibraryTask) {
 
 }
 
+
 /**
  * set that to local copy
  */
@@ -80,7 +82,7 @@ def jrePath ="NOT SET YET"
 
 println "native os.name = " + System.getProperty("os.name").toLowerCase()
 
-def getOsName() {
+static def getOsName() {
     String osName = System.getProperty("os.name").toLowerCase();
     if (osName.contains("linux")) {
         return ("linux");
@@ -100,7 +102,6 @@ if (getOsName() == "linux") {
     // Consider Linux.
     //jrePath ="/home/benno/.jdks/corretto-1.8.0_322" // Linux
     jrePath ="/home/benno/.sdkman/candidates/java/11.0.12-open"
-
     println "jre for linux: " + jrePath
 } else if (getOsName() == "windows") {
     // Consider Windows.
@@ -111,14 +112,11 @@ if (getOsName() == "linux") {
     // Consider OS X.
     //jrePath = "/Users/benno/Library/Java/JavaVirtualMachines/liberica-1.8.0_322" // macos
     jrePath = "/Users/benno/.sdkman/candidates/java/11.0.15-librca" // macos
-
-
     println "jre for macos: " + jrePath
 } else {
     // Unknown OS.
-    println "*********  Unknown OS  *********"
+    println "ERROR... *********  Unknown OS  *********"
     Thread.sleep(10000)
-
 }
 
 
@@ -130,10 +128,10 @@ def exampleDir = "$tempDist/bsp-daten"
 def newModelDir = "$tempDist/new-model"
 
 task copyExeLibsJRE {
-    //dependsOn createExe, createGui
+    dependsOn createExe, createGui
     dependsOn test
-    dependsOn createAllExecutables
-    
+    //dependsOn shadowJar
+
     description "copies jre, exe and lib to $tempDist"
     group "v-pipe"
 
@@ -235,16 +233,28 @@ task copyExeLibsJRE {
             from jrePath
             into "$tempDist/$jre"
         }
+
+        delete "build/dist/v-pipe/v-pipe.exe"
+        delete "build/dist/v-pipe/v-pipe-gui.exe"
+
+        /*
+        // tried with FAT JAR... (shadowJar)
+        copy {
+            from "build/libs/v-pipe.jar"
+            into "$tempDist/lib/"
+        }*/
+
         //}
     }
 }
 
+/*
 task createDistribution(type: Zip) {
     description 'creates the v-pipe zip distribution'
     group "v-pipe"
     dependsOn copyExeLibsJRE
     from "$buildDir/dist"
-}
+}*/
 
 
 jar {

@@ -17,23 +17,17 @@ Auf der Dropbox liegt eine lauffähige Installation.
    01_CCPM/06_V-Pipe/v-pipe-macos.sh.command`
 4. WIN: Doppelclick in Release-Ordner auf `v-pipe-win.bat`
 5. LINUX Doppelclick in Release-Ordner auf: `v-pipe-linux.sh`
+
 ## Lokale Installation
-Die Distribution ist ein `v-pipe-major.minor.bugfix-ReleaseName.zip`.    
-Beispiel: ordner v-pipe-win/v-pipe-1.4.4  
-Diesen Ordner kopieren - ideal in das Verzeichnis:  
+Die Distribution ist ein Ordner mit dem Namen: `v-pipe-major.minor.bugfix-ReleaseName`.    
+Beispiel: v-pipe-win/v-pipe-1.4.4  
+Diesen Ordner kopieren - z. B. in das lokale Verzeichnis:  
 `c:\v-pipe-1.4.4`. Aber auch gerne auf einen Memory-Stick oder ins eigene Home.  
 Oder nach `Programme` (als admin). Tut auch.  
 
-In C:\v-pipe-x.y.z liegen dann die Verzeichnisse und Dateien:
+Dort (also z.B. in C:\v-pipe-x.y.z) liegen dann die Verzeichnisse und Dateien:
 
 - `Readme.md` (diese Betriebsanleitung als Markdown - falls offline)  
-Markdown-Plugin für Chrome installieren? Dort:  
-[MarkdownPreviewPlus](https://t.ly/xB5M)  
-in den Einstellungen des Plugins unter  
-Einstellungen/Erweiterungen/MarkdownPreviewPlus:  
-Option: *Zugriff auf Datei-URLs zulassen* aktivieren 
-- ALTLAST (nicht mehr nutzen) `v-pipe.exe` (der Starter - Doppelklick und los geht's.)
-- ALTLAST (nicht mehr nutzen) `v-pipe-gui.exe` (WIN-Starter: visuelle Darstellung - Doppelklick und los.)  
 - `v-pipe-macos.sh.command` (MACOS-Starter - Doppelklick)
 - `v-pipe-linux.sh` (Linux-Starter - Doppelklick)
 - `v-pipe-win.bat` (Windows-Starter - Doppelclick)
@@ -50,14 +44,14 @@ Option: *Zugriff auf Datei-URLs zulassen* aktivieren
           ERFORDERLICH, wenn: Vorlagen-Projekt-Start-End-Abt-Kapa.txt UND Integrations-Phasen.txt 
     - Szenarien        
         - `Projekt-Verschiebung.txt` (OPTIONAL: Projekte schieben)
-        - `Szenario-Kopie-Original-Verschiebung.txt` (OPTIONAL: Projekte kopieren+schieben)  
- 
-
-
+        - `Szenario-Kopie-Original-Verschiebung.txt` (OPTIONAL: Projekte kopieren+schieben)
+- ALTLAST (nicht mehr nutzen) 
+  - `v-pipe.exe` (der Daten-Cleaner-Starter - Doppelklick und los geht's.)
+  - `v-pipe-gui.exe` (WIN-Starter: visuelle Darstellung - Doppelklick und los.)
+  
 ## Anwendung
 
 ### Start von v-pipe, wenn die Daten bereinigt werden müssen...  
-
 
 Einfach Doppelklick auf `v-pipe.exe`. Das startet den  
 Deamon-Mode: v-pipe lauert jetzt auf Veränderungen  
