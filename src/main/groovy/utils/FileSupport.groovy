@@ -98,7 +98,7 @@ class FileSupport {
         def result = dirName + '/' + BACKUP_DIR + "/" + new DateTime().toString("yyyy-MM-dd_HH.mm.ss.SSS")
         if (Commons.getOsName() == "windows") {
             result = result.replace("/", "\\")
-            println "backupdir corrected: " + result
+            println "backup-dir: " + result
         }
         result
     }

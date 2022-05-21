@@ -1,4 +1,4 @@
-           vorlage-1 17.02.2020 23.02.2020 1
-              VORL-2 05.03.2020 21.03.2020 2
-              VORL-3 01.04.2020 24.04.2020 2
-        VORL-Montage 17.01.2020 29.02.2020 2
+           vorlage-1 Mon Feb 17 00:00:00 CET 2020 Sun Feb 23 00:00:00 CET 2020 1
+              VORL-2 Thu Mar 05 00:00:00 CET 2020 Sat Mar 21 00:00:00 CET 2020 2
+              VORL-3 Wed Apr 01 00:00:00 CEST 2020 Fri Apr 24 00:00:00 CEST 2020 2
+        VORL-Montage Fri Jan 17 00:00:00 CET 2020 Sat Feb 29 00:00:00 CET 2020 2

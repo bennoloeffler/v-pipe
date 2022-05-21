@@ -40,6 +40,7 @@ import static model.DataReader.isValidModelFolder
 //  Copy Project
 //
 // TODO 2.2
+//  - fix bug with "saving wrong date format"
 //  - commit update commit from all: surfux, belmac and pux
 //  - build osx, win, linux with java11 jre
 //  - describe "read updates" in documentation

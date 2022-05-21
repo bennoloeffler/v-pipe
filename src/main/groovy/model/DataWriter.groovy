@@ -1,24 +1,25 @@
 package model
 
-import extensions.DateHelperFunctions
 import groovy.transform.CompileStatic
 import org.yaml.snakeyaml.Yaml
 import utils.FileSupport
+
+import static extensions.DateHelperFunctions.*
 
 @CompileStatic
 class DataWriter {
 
     Model model
 
-    String getTasks(List<TaskInProject> tasks) {
+    static String getTasks(List<TaskInProject> tasks) {
         StringBuffer result = new StringBuffer()
         for (task in tasks) {
             result.with {
                 append(task.project.padRight(20))
                 append('  ')
-                append(DateHelperFunctions._dToS(task.starting))
+                append(_dToS(task.starting))
                 append('  ')
-                append(DateHelperFunctions._dToS(task.ending))
+                append(_dToS(task.ending))
                 append('  ')
                 append(task.department.padRight(20))
                 append(task.capacityNeeded.toString().padLeft(6))
@@ -30,18 +31,18 @@ class DataWriter {
         result.toString()
     }
 
-    void writeTasksToFile(List<TaskInProject> tasks, String fileName) {
+    static void writeTasksToFile(List<TaskInProject> tasks, String fileName) {
         String data = getTasks(tasks)
         def f = new File(fileName)//DataReader.get_TASK_FILE_NAME())
         f.delete()
         f << data
     }
 
-    String getCapa() {
+    static String getCapa() {
         DataReader.capaTextCache
     }
 
-    void writeCapaToFile() {
+    static void writeCapaToFile() {
         String data = getCapa()
         def f = new File(DataReader.get_CAPA_FILE_NAME())
         f.delete()
@@ -100,7 +101,7 @@ class DataWriter {
     }
 
 
-    def writeSequenceToFile(List<String> sequence, String fileName) {
+    static def writeSequenceToFile(List<String> sequence, String fileName) {
         def f = new File(fileName)
         f.delete()
 
@@ -114,7 +115,7 @@ class DataWriter {
         f.delete()
 
         model.deliveryDates.each {
-            f << "$it.key ${it.value.toString()}\n"
+            f << "$it.key ${_dToS(it.value)}\n"
         }
     }
 
@@ -122,7 +123,7 @@ class DataWriter {
         String slots = isTemplatePipeline ? "" : model.maxPipelineSlots.toString() + '\n'
         StringBuffer result = new StringBuffer(slots)
         elements.each {
-            result << "${it.project.padLeft(20)} ${it.startDate.toString()} ${it.endDate.toString()} ${it.pipelineSlotsNeeded}\n"
+            result << "${it.project.padLeft(20)} ${_dToS(it.startDate)} ${_dToS(it.endDate)} ${it.pipelineSlotsNeeded}\n"
         }
         result.toString()
     }
