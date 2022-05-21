@@ -106,7 +106,10 @@ if (getOsName() == "linux") {
     println "jre for WIN: " + jrePath
 } else if (getOsName() == "macos") {
     // Consider OS X.
-    jrePath = "/Users/benno/Library/Java/JavaVirtualMachines/liberica-1.8.0_322" // macos
+    //jrePath = "/Users/benno/Library/Java/JavaVirtualMachines/liberica-1.8.0_322" // macos
+    jrePath = "/Users/benno/.sdkman/candidates/java/11.0.15-librca" // macos
+
+
     println "jre for macos: " + jrePath
 } else {
     // Unknown OS.

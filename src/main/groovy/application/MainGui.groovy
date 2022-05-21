@@ -40,8 +40,10 @@ import static model.DataReader.isValidModelFolder
 //  Copy Project
 //
 // TODO 2.2
-//  _ read updates in documentation
-//  - Plugin to read Excel while reading updates
+//  - commit update commit from all: surfux, belmac and pux
+//  - build osx, win, linux with java11 jre
+//  - describe "read updates" in documentation
+//  - describe in doc "Plugin to read Excel while reading updates"
 //  - SWITCH to "correction mode" when error during opening occurs. OPEN FILES IN EDITOR!
 //  - bat file for win start
 //  - three different jre for windows/linux/macos into ONE distro
