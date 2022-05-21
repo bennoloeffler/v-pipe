@@ -241,8 +241,18 @@ class GlobalController {
 
         // Start plugin to transform data to input format
         GroovyShell shell = new GroovyShell()
-        shell.evaluate(new File(DataReader.get_UPDATE_PLUGIN_FILE_NAME()))
 
+        File plugin = new File(DataReader.get_UPDATE_PLUGIN_FILE_NAME())
+        try {
+            if (plugin.exists()) {
+                shell.evaluate(plugin)
+            } else {
+                println "kein plugin file für den Daten-Import gefunden. Wird übersprungen...\n $plugin"
+            }
+        } catch(Exception e) {
+            println "**** ERROR IN PLUGIN **** \n $e.message"
+            JOptionPane.showMessageDialog(null, "Datei:\n" + plugin +"\n" + e.message, "Fehler im Import-Plugin!", JOptionPane.ERROR_MESSAGE)
+        }
         if (DataReader.isDataInUpdateFolder()) {
             def updates = model.readUpdatesFromUpdateFolder()
             def updatedStr = "\nneue Projekte:\n" +

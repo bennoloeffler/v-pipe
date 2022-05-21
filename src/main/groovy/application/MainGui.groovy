@@ -40,14 +40,14 @@ import static model.DataReader.isValidModelFolder
 //  Copy Project
 //
 // TODO 2.2
-//  - fix bug with "saving wrong date format"
-//  - commit update commit from all: surfux, belmac and pux
-//  - build osx, win, linux with java11 jre
+//  ok - fix bug with "saving wrong date format"
+//  ok - commit update commit from all: surfux, belmac and pux
+//  ok - build osx, win, linux with java11 jre
 //  - describe "read updates" in documentation
 //  - describe in doc "Plugin to read Excel while reading updates"
 //  - SWITCH to "correction mode" when error during opening occurs. OPEN FILES IN EDITOR!
-//  - bat file for win start
-//  - three different jre for windows/linux/macos into ONE distro
+//  ok - bat file for win start
+//  NO - three different jre for windows/linux/macos into ONE distro
 //  - deployment from every computer for linux, macos and windows
 // 2.3 shadow tasks (tasks that are not saved - but shown as shadow of the original)
 // 3.0 Durchsatz in EUR dd
