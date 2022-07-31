@@ -4,7 +4,7 @@ import groovy.transform.CompileStatic
 import org.yaml.snakeyaml.Yaml
 import utils.FileSupport
 
-import static extensions.DateHelperFunctions.*
+import static extensions.DateHelperFunctions._dToS
 
 @CompileStatic
 class DataWriter {
@@ -49,25 +49,22 @@ class DataWriter {
         f << data
     }
 
-    static List<String> ALL_DATA_FILES = [
-            DataReader.TASK_FILE_NAME,
-            DataReader.PIPELINING_FILE_NAME,
-            DataReader.DATESHIFT_FILE_NAME,
-            DataReader.CAPA_FILE_NAME,
-            DataReader.SCENARIO_FILE_NAME,
-            DataReader.SEQUENCE_FILE_NAME,
-            DataReader.PROJECT_TEMPLATE_FILE_NAME,
-            DataReader.PROJECT_TEMPLATE_FILE_NAME,
-            DataReader.PROJECT_DELIVERY_DATE_FILE_NAME,
-            DataReader.PROJECT_COMMENTS_FILE_NAME
-
-    ]
+    static List<String> ALL_DATA_FILES = [DataReader.TASK_FILE_NAME,
+                                          DataReader.PIPELINING_FILE_NAME,
+                                          DataReader.DATESHIFT_FILE_NAME,
+                                          DataReader.CAPA_FILE_NAME,
+                                          DataReader.SCENARIO_FILE_NAME,
+                                          DataReader.SEQUENCE_FILE_NAME,
+                                          DataReader.PROJECT_TEMPLATE_FILE_NAME,
+                                          DataReader.PROJECT_TEMPLATE_FILE_NAME,
+                                          DataReader.PROJECT_DELIVERY_DATE_FILE_NAME,
+                                          DataReader.PROJECT_COMMENTS_FILE_NAME]
 
     static def backup() {
-
         def bDir = FileSupport.backupDirName(DataReader.currentDir)
-        println "try to create backup folder: " + bDir
 
+        //println "try to create backup folder: " + bDir
+        /* try to debug onedrive writing problems...
         SecurityManager sm = System.getSecurityManager()
         if(sm) {
             try {
@@ -82,13 +79,13 @@ class DataWriter {
         } else {
             println "there is no SecurityManager"
         }
+        */
         //assert new File(bDir).mkdirs() // this fails on ONEDRIVE on win box of Frank
+
+        println "Backup-Verzeichnis: " + bDir
         def bFile = new File(bDir)
-        //bFile.is
-        //def succ = bFile.mkdirs() // TODO: Does mkdir make it any better?
-        def succ = bFile.mkdirs() // TODO: CHECK WHY ONEDRIVE does not work on win box of Frank
-        println "mkdir(s) creation worked? " + succ
-        if(bFile.exists()) {
+        bFile.mkdirs() // CHECK WHY ONEDRIVE does not work on win box of Frank
+        if (bFile.exists()) {
             ALL_DATA_FILES.each { fileName ->
                 File from = new File(DataReader.path(fileName))
                 File to = new File(bDir + '/' + fileName)
@@ -96,7 +93,6 @@ class DataWriter {
             }
         } else {
             throw new RuntimeException("creation of backup folder failed: " + bDir)
-            //println "ATTENTION: no backup saved! cant create backup folder..."
         }
     }
 

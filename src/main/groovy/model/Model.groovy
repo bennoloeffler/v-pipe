@@ -235,7 +235,7 @@ class Model {
     }
 
 
-    PipelineElement createPipelineForProject(List<TaskInProject> project) {
+    static PipelineElement createPipelineForProject(List<TaskInProject> project) {
 
         // exactly ONE element in a newly created project!
         assert project
@@ -329,32 +329,37 @@ class Model {
     }
 
 
+
+    static Duration years20 = Duration.of(20 * 365, ChronoUnit.DAYS)
+
+    @CompileDynamic
+    static boolean isMoreThan20Y(Date d1, Date d2) {
+        Math.abs(d2 - d1) > years20.toDays()
+    }
+
+    @CompileDynamic
+    static boolean isMoreThan20Y(Date d) {
+        isMoreThan20Y(new Date(),d)
+    }
+
     /**
      * @return even if data is sparce, deliver continous list of timekey strings. Every week.
      */
-    Duration years20 = Duration.of(20 * 365 * 20, ChronoUnit.DAYS)
-
-    boolean tooFarAway20Y(Date d) {
-        Math.abs(new Date() - d) > years20.toDays()
-    }
-
-
     List<String> getFullSeriesOfTimeKeys(WeekOrMonth weekOrMonth) {
         Date s = getStartOfProjects()
         Date e = getEndOfProjects()
-
         getFullSeriesOfTimeKeysInternal(weekOrMonth, s, e)
     }
 
 
     @Memoized
     @CompileDynamic
-    List<String> getFullSeriesOfTimeKeysInternal(WeekOrMonth weekOrMonth, Date s, Date e) {
+    static List<String> getFullSeriesOfTimeKeysInternal(WeekOrMonth weekOrMonth, Date s, Date e) {
         def result = []
         RunTimer.getTimerAndStart('getFullSeriesOfTimeKeys').withCloseable {
 
             if (s && e) {
-                if (e - s > years20.toDays()) {
+                if (isMoreThan20Y(e, s)) {
                     throw new VpipeDataException("Dauer von Anfang bis Ende\n" +
                             "der Tasks zu lange ( > 20 Jahre ): ${s.toString()} bis ${e.toString()}")
                 }
@@ -493,7 +498,7 @@ class Model {
 
     static Map<String, YellowRedLimit> getMonthParts(YellowRedLimit yellowRedLimit, String dep, String week) {
         // start from the beginning of week and count to end (5) or until month changes.
-        int countFirstMonth = 0
+        //int countFirstMonth = 0
         Date startOfWeek = _getStartOfWeek(_wToD(week))
         Date endOfWeek = startOfWeek + 5
         Map<String, Double> months = [:] as Map<String, Double>
@@ -521,7 +526,7 @@ class Model {
             if (withFileNameInErrorMessage) {
                 fileErr = { "Fehler beim Lesen der Datei ${DataReader.get_CAPA_FILE_NAME()}\n" }
             } else {
-                fileErr = { "" }
+                fileErr = { "" } as Closure<GString>
             }
             def timeKeys = getFullSeriesOfTimeKeys(WEEK)
             //println ("calcCapa von ${timeKeys[0]} to ${timeKeys[timeKeys.size()-1]}")
@@ -546,7 +551,7 @@ class Model {
             if (yamlSlurp.Kapa_Gesamt?.Kapa_Profil) {
                 percentProfile = yamlSlurp.Kapa_Gesamt.Kapa_Profil
                 percentProfile.keySet().each {
-                    checkWeekPattern(it)
+                    checkWeekPattern(it as String)
                 }
             }
 
@@ -989,7 +994,7 @@ class Model {
     }
 
 
-    def void saveComment(String projectName, String comment) {
+    void saveComment(String projectName, String comment) {
         if (comment) {
             projectComments[projectName] = comment
         } else {

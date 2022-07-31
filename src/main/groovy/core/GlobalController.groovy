@@ -273,8 +273,19 @@ class GlobalController {
 
     static JDialog d
     ModelReaderMessagePanel modelReaderMessagePanel
+    boolean reactiveAutoSave
 
     def correctProjectFilesActionPerformed = {
+        if (model.isDirty()) {
+            JOptionPane.showMessageDialog(null, "Speichern sie ihre Änderungen\nvor der Aktivierung des 'Daten-Datei-Lese-Modus'.", "Fehler: Änderungen sind nicht gespeichert!", JOptionPane.ERROR_MESSAGE)
+            return
+        }
+
+        reactiveAutoSave = false
+        if (autoSave) {
+            reactiveAutoSave = true
+            switchAutoSave(false)
+        }
         if (!d) {
             modelReaderMessagePanel = new ModelReaderMessagePanel(swing: view.swing)
             JFrame f = view.swing.frame
@@ -283,7 +294,12 @@ class GlobalController {
             JPanel p = modelReaderMessagePanel.buildPanel()
             d.add(p)
             d.addWindowListener(new WindowAdapter() {
-                void windowClosing(WindowEvent e) { modelReaderMessagePanel.stopReading() }
+                void windowClosing(WindowEvent e) {
+                    modelReaderMessagePanel.stopReading()
+                    if (reactiveAutoSave) {
+                        switchAutoSave(true)
+                    }
+                }
             })
         }
         modelReaderMessagePanel.startReading()
@@ -326,14 +342,12 @@ class GlobalController {
     boolean chooseDirWhileOpen
 
     private String chooseDir(String dialogTitle, JComponent root, String applyButtonText, Boolean open) {
-
+        chooseDirWhileOpen = open // to avoid the open get bound in the closure
         String result = null
         if (!fc) {
             fc = new JFileChooser(new File(model.currentDir)) {
 
                 def acceptVPipeDir() {
-                    println "open: " + open
-                    println "chooseDirWhileOpen: " + chooseDirWhileOpen
                     if (chooseDirWhileOpen) {
                         def checkPath1 = getSelectedFile().getAbsolutePath() + "/" + TASK_FILE_NAME
                         def rightDirectorySelected = new File(checkPath1).exists()
@@ -383,7 +397,7 @@ class GlobalController {
 
                 @Override
                 String getDescription() {
-                    return "$TASK_FILE_NAME available?"
+                    return "Datei $TASK_FILE_NAME muss im Verzeichnis liegen..."
                 }
             })
         }

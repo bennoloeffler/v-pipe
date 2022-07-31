@@ -105,7 +105,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
             minMaxGridCheck()
             updateOthersFromGridWidth(gridWidth, this)
             def newPreferredSize = getPreferredSize()
-            def ratio = newPreferredSize.width / oldPreferredSize.width
+            //def ratio = newPreferredSize.width / oldPreferredSize.width
             //println("ratio: $ratio")
 
             adjustLocationAndMouseAfterZooming(mouseX, mouseY, oldPreferredSize.width, newPreferredSize.width)
@@ -357,17 +357,17 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
      * @param keyCode e.g. KeyEvent.VK_RIGHT
      * @return pressed the keyCode together with SHIFT
      */
-    private boolean keyAndShiftPressed(KeyEvent e, keyCode) {
+    static boolean keyAndShiftPressed(KeyEvent e, keyCode) {
         (keyCode == e.getKeyCode()) && (e.getModifiersEx() & KeyEvent.SHIFT_DOWN_MASK) > 0
     }
 
-    private boolean keyAndCtrlPressed(KeyEvent e, keyCode) {
+    static boolean keyAndCtrlPressed(KeyEvent e, keyCode) {
         (keyCode == e.getKeyCode()) && (e.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK) > 0
     }
 
     def minMaxGridCheck() {
         if(gridWidth > 100){setGridWidth(100)}
-        if(gridWidth < 10){setGridWidth(10)}
+        if(gridWidth < 10){setGridWidth(10)} // make 6 work...
     }
 
 
@@ -545,7 +545,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
 
     //@CompileDynamic
 
-    protected void paintComponent(Graphics g1d) {
+    def paintComponent(Graphics g1d) {
         super.paintComponent(g1d)
         //println(this.name)
         RunTimer.getTimerAndStart("${this.name} GridPanel::paintComponent ").withCloseable {
@@ -647,14 +647,13 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
                     int gridY = borderWidth + y * gridWidth
                     try {
                         if (hightlightLinePattern && projectName =~ hightlightLinePattern) {
-
                             g.setColor(cursorColor) //new Color(150,255,255,100))
                             g.fillRoundRect(borderWidth, (int) (gridY + gridWidth / 2) - 2, nameWidth + borderWidth + gridWidth * model.sizeX, 4, round, round)
                         } else {
                             g.setColor(Color.WHITE)
                         }
                     } catch (Exception e) {
-                        //println "problem with regex: " + hightlightLinePattern
+                        println "problem with regex: " + hightlightLinePattern + "\n" + e
                     }
                     g.fillRoundRect(borderWidth, gridY, nameWidth - 4, gridWidth - 4, round, round)
 
@@ -718,6 +717,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
                     x++
                 }
             }
+            return // just to suppress warning...
         }
     }
 

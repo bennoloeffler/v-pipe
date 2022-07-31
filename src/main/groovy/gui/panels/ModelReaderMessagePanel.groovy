@@ -35,12 +35,14 @@ class ModelReaderMessagePanel {
     }
 
     def openFolder = {
-        Desktop.getDesktop().open(new File(MainGui.instance.controller.model.currentDir));
+        Desktop.getDesktop().open(new File(MainGui.instance.controller.model.currentDir))
     }
 
     def startReading = {
         // if model is dirty - ask to save first.
+        assert (!MainGui.instance.controller.model.isDirty())
         // if auto-save-mode ask to switch off first.
+        assert (!MainGui.instance.controller.autoSave)
         //startButton.enabled = false
         //stopButton.enabled = true
         System.setOut(readerOutStream)
@@ -72,7 +74,7 @@ class ModelReaderMessagePanel {
 
     JPanel buildPanel() {
         swing.build {
-            def p = panel(id: 'modelReaderMessagePanel', name: 'Einlese-Fehler', focusable: true) {
+            panel(id: 'modelReaderMessagePanel', name: 'Einlese-Fehler', focusable: true) {
                 migLayout(layoutConstraints: "fill", columnConstraints: "[][]", rowConstraints: "[][grow]")
                 //startButton = button("lesen starten", id: "startReading", actionPerformed: startReading, constraints: 'split 3, ')
                 //label(id: 'fileA', "noch nichts gewählt", constraints: 'wrap, growx')
