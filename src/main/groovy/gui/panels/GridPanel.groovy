@@ -545,7 +545,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
 
     //@CompileDynamic
 
-    def paintComponent(Graphics g1d) {
+    void paintComponent(Graphics g1d) {
         super.paintComponent(g1d)
         //println(this.name)
         RunTimer.getTimerAndStart("${this.name} GridPanel::paintComponent ").withCloseable {
@@ -717,7 +717,6 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
                     x++
                 }
             }
-            return // just to suppress warning...
         }
     }
 
