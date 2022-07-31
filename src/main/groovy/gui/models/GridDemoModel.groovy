@@ -2,6 +2,7 @@ package gui.models
 /**
  * base model for grid - this one is for manual testing
  */
+@SuppressWarnings('unused')
 class GridDemoModel extends GridModel {
 
     List<List<String>> data =
@@ -52,7 +53,7 @@ class GridDemoModel extends GridModel {
 
 
     /**
-     * @return heigth or Y size of the grid
+     * @return height or Y size of the grid
      */
     int getSizeY() { data.size() }
 

@@ -36,7 +36,7 @@ abstract class GridModel {
     abstract GridElement getElement(int x, int y)
 
     /**
-     * @return heigth or Y size of the grid
+     * @return height or Y size of the grid
      */
     abstract int getSizeY()
 

@@ -78,8 +78,8 @@ class ProjectModel extends GridModel {
         def deliveryDate = model.getDeliveryDate(projectTask.project)
         Date startOfTask = _getStartOfWeek(projectTask.starting)
         Date endOfTask = _getStartOfWeek(projectTask.ending) + 7
-        Date startOfProject = _getStartOfWeek(deliveryDate < projectTask.starting ? deliveryDate : projectTask.starting)
-        Date endOfProject = _getStartOfWeek(deliveryDate > projectTask.ending ? deliveryDate : projectTask.ending) + 7
+        //Date startOfProject = _getStartOfWeek(deliveryDate < projectTask.starting ? deliveryDate : projectTask.starting)
+        //Date endOfProject = _getStartOfWeek(deliveryDate > projectTask.ending ? deliveryDate : projectTask.ending) + 7
 
 
         def fromToDateString = "${_dToS(startOfTask)} - ${_dToS(endOfTask)}"
@@ -108,7 +108,7 @@ class ProjectModel extends GridModel {
         return gridElements
     }
 
-    List<GridElement> fromPipelineElement(PipelineElement element, Date startOfGrid, Date endOfGrid) {
+    static List<GridElement> fromPipelineElement(PipelineElement element, Date startOfGrid, Date endOfGrid) {
         assert element
         def gridElements = []
 

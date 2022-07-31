@@ -17,8 +17,8 @@ import java.beans.PropertyChangeListener
 import static extensions.DateHelperFunctions.*
 
 // Performance IDEA
-// 1 GridLoadModelSparce with x and y and shiftX (korrekt x and y when saving (and drawing), set ShiftX to 0 when loading)
-// 2 GridLoadModelSparce --> iterate (and draw) only those, that are there
+// 1 GridLoadModelSparse with x and y and shiftX (korrekt x and y when saving (and drawing), set ShiftX to 0 when loading)
+// 2 GridLoadModelSparse --> iterate (and draw) only those, that are there
 // 3 make creating model simple by calculating x and y ONCE while start and when changing a project or task
 @CompileStatic
 class GridLoadProjectsModel extends AbstractGridLoadModel {
@@ -119,14 +119,14 @@ class GridLoadProjectsModel extends AbstractGridLoadModel {
 
             nowXRowCache = -1
             use(TimeCategory) {
-                def add = 0.day
+                def add
                 Date startOfGrid
                 Date endOfGrid
                 if (weekOrMonth == WeekOrMonth.WEEK) {
                     startOfGrid = _getStartOfWeek(model.getStartOfProjects())
                     endOfGrid = _getStartOfWeek(model.getEndOfProjects()) + 7
                     add = 7.day
-                } else { // problably never used
+                } else { //  never used ?
                     startOfGrid = _getStartOfMonth(model.getStartOfProjects())
                     endOfGrid = _getStartOfMonth(model.getEndOfProjects()) + 1.month
                     add = 1.month
