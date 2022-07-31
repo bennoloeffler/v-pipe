@@ -2,6 +2,7 @@ package core
 
 import application.Main
 import gui.View
+import gui.panels.ModelReaderMessagePanel
 import model.DataReader
 import model.DataWriter
 import model.Model
@@ -13,6 +14,8 @@ import utils.UserSettingsStore
 import javax.swing.*
 import javax.swing.filechooser.FileFilter
 import java.awt.event.ActionEvent
+import java.awt.event.WindowAdapter
+import java.awt.event.WindowEvent
 
 import static model.DataReader.TASK_FILE_NAME
 import static model.DataReader.isValidModelFolder
@@ -26,10 +29,9 @@ class GlobalController {
         this.model = model
         this.view = view
         addLastDirsToRecentMenu()
-        Timer timer = new Timer(10000, saveTimerAction);
+        Timer timer = new Timer(10000, saveTimerAction)
         timer.setRepeats(true)
-        timer.start();
-
+        timer.start()
 
         //
         // glue view and controller together
@@ -40,14 +42,14 @@ class GlobalController {
         view.swing.openAction.closure = openActionPerformed
         view.swing.saveAction.closure = saveActionPerformed
         view.swing.saveAsAction.closure = saveAsActionPerformed
-        view.swing.toggleContinouosSaveAsAction.closure = toggleContinouosSaveAsActionPerformed
+        view.swing.toggleContinouosSaveAsAction.closure = toggleContinuosSaveAsActionPerformed
         view.swing.exitAction.closure = exitActionPerformed
 
         // Tool
         view.swing.sortPipelineAction.closure = sortPipelineActionPerformed
         view.swing.swapTemplatesAndProjectsAction.closure = swapTemplatesAndProjectsActionPerformed
         view.swing.readProjectUpdatesAction.closure = readProjectUpdatesActionPerformed
-
+        view.swing.correctProjectFilesAction.closure = correctProjectFilesActionPerformed
 
         // View
         view.swing.toggleViewInPhaseAction.closure = toggleViewInPhaseActionPerformed
@@ -59,8 +61,6 @@ class GlobalController {
         // Help
         view.swing.helpAction.closure = helpActionPerformed
         view.swing.printPerformanceAction.closure = printPerformanceActionPerformed
-
-
     }
 
     def addLastDirsToRecentMenu() {
@@ -134,7 +134,7 @@ class GlobalController {
         Action a = view.swing.saveAction
         def saveAllowed = a.isEnabled() //saving not allowed in general, eg due to empty model or swapped
         if (model.isDirty() && autoSave && saveAllowed) {
-            autosavingInProgress = true
+            autoSavingInProgress = true
             view.swing.doOutside {
                 def start = System.currentTimeMillis()
                 DataWriter dw = new DataWriter(model: model)
@@ -143,17 +143,17 @@ class GlobalController {
                 println "gespeichert...${end - start} ms"
                 view.swing.doLater {
                     model.setDirty(false)
-                    autosavingInProgress = false
+                    autoSavingInProgress = false
                 }
             }
         }
     }
 
-    boolean autosavingInProgress = false
+    boolean autoSavingInProgress = false
 
     def checkAutoSave() {
         //just wait a little bit in
-        while (autosavingInProgress) {
+        while (autoSavingInProgress) {
             Thread.sleep(100)
         }
     }
@@ -162,10 +162,10 @@ class GlobalController {
     def switchAutoSave(boolean on) {
         JCheckBoxMenuItem i = view.swing.checkBoxMenuContSaving
         i.setSelected(on)
-        toggleContinouosSaveAsActionPerformed(null)
+        toggleContinuosSaveAsActionPerformed(null)
     }
 
-    def toggleContinouosSaveAsActionPerformed = { ActionEvent e ->
+    def toggleContinuosSaveAsActionPerformed = { ActionEvent e ->
         JCheckBoxMenuItem i = view.swing.checkBoxMenuContSaving
         autoSave = i.isSelected()
         println "Auto-Speichern: " + (autoSave ? "an" : "aus")
@@ -249,9 +249,9 @@ class GlobalController {
             } else {
                 println "kein plugin file für den Daten-Import gefunden. Wird übersprungen...\n $plugin"
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             println "**** ERROR IN PLUGIN **** \n $e.message"
-            JOptionPane.showMessageDialog(null, "Datei:\n" + plugin +"\n" + e.message, "Fehler im Import-Plugin!", JOptionPane.ERROR_MESSAGE)
+            JOptionPane.showMessageDialog(null, "Datei:\n" + plugin + "\n" + e.message, "Fehler im Import-Plugin!", JOptionPane.ERROR_MESSAGE)
         }
         if (DataReader.isDataInUpdateFolder()) {
             def updates = model.readUpdatesFromUpdateFolder()
@@ -261,14 +261,33 @@ class GlobalController {
                     (updates.updated ? updates.updated.join("\n") : "keine")
             if (updates.err) {
                 // this is a stupid workaround: the error message contains the wrong filename
-                if(updates.err.contains("enthält keine Daten")) updates.err = "Datei enthält keine Daten.\n"
-                JOptionPane.showMessageDialog(null, "Datei:\n" + DataReader.get_UPDATE_TASK_FILE_NAME() +"\n" + updates.err, "Fehler beim lesen des Update!", JOptionPane.ERROR_MESSAGE)
+                if (updates.err.contains("enthält keine Daten")) updates.err = "Datei enthält keine Daten.\n"
+                JOptionPane.showMessageDialog(null, "Datei:\n" + DataReader.get_UPDATE_TASK_FILE_NAME() + "\n" + updates.err, "Fehler beim lesen des Update!", JOptionPane.ERROR_MESSAGE)
             } else {
                 JOptionPane.showMessageDialog(null, updatedStr, "Update!", JOptionPane.INFORMATION_MESSAGE)
             }
         } else {
             JOptionPane.showMessageDialog(null, "Im Verzeichnis zum Update der Projektdaten liegen keine Daten:\n" + DataReader.updateDir(), "Keine Daten!", JOptionPane.INFORMATION_MESSAGE)
         }
+    }
+
+    static JDialog d
+    ModelReaderMessagePanel modelReaderMessagePanel
+
+    def correctProjectFilesActionPerformed = {
+        if (!d) {
+            modelReaderMessagePanel = new ModelReaderMessagePanel(swing: view.swing)
+            JFrame f = view.swing.frame
+            d = new JDialog(f, "Datendateien kontinuierlich einlesen...", true)
+            d.setSize((int) (f.getSize().width / 2), (int) (f.getSize().height / 2))
+            JPanel p = modelReaderMessagePanel.buildPanel()
+            d.add(p)
+            d.addWindowListener(new WindowAdapter() {
+                void windowClosing(WindowEvent e) { modelReaderMessagePanel.stopReading() }
+            })
+        }
+        modelReaderMessagePanel.startReading()
+        d.setVisible(true)
     }
 
 
@@ -297,20 +316,24 @@ class GlobalController {
         println(RunTimer.getResultTable())
     }
 
+    /*
     def compareActionPerformed = { ActionEvent e ->
         println(e.getSource())
-    }
+    }*/
 
     JFileChooser fc = null
 
     boolean chooseDirWhileOpen
 
     private String chooseDir(String dialogTitle, JComponent root, String applyButtonText, Boolean open) {
+
         String result = null
         if (!fc) {
             fc = new JFileChooser(new File(model.currentDir)) {
 
                 def acceptVPipeDir() {
+                    println "open: " + open
+                    println "chooseDirWhileOpen: " + chooseDirWhileOpen
                     if (chooseDirWhileOpen) {
                         def checkPath1 = getSelectedFile().getAbsolutePath() + "/" + TASK_FILE_NAME
                         def rightDirectorySelected = new File(checkPath1).exists()
@@ -337,9 +360,9 @@ class GlobalController {
                 boolean accept(File f) {
 
                     def checkPath = f.getAbsolutePath() + "/" + TASK_FILE_NAME
-                    def checkNeigbour = f.parentFile.getAbsolutePath() + "/" + TASK_FILE_NAME
+                    def checkNeighbour = f.parentFile.getAbsolutePath() + "/" + TASK_FILE_NAME
                     def pathExists = new File(checkPath).exists()
-                    def neighbourExists = new File(checkNeigbour).exists()
+                    def neighbourExists = new File(checkNeighbour).exists()
                     return pathExists || neighbourExists || f.isDirectory()
                     /*
                     // DOES NOT WORK???
@@ -423,8 +446,8 @@ class GlobalController {
                     vde.message,
                     "DATEN-FEHLER beim Start",
                     JOptionPane.WARNING_MESSAGE)
-            setEmptyModel()
             setSaveForEmptyModel()
+            correctProjectFilesActionPerformed()
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null,
                     "Stacktrace speichern. Bitte.\nNochmal in Console starten.\nDann speichern.\nFehler: $e.message",

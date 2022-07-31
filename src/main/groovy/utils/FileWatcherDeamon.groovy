@@ -144,7 +144,7 @@ class FileWatcherDeamon {
                     }
 
                 }
-                sleep(200)
+                sleep(50)
                 //reset is invoked to put the key back to ready state
                 boolean valid = key.reset()
                 //If the key is invalid, just exit.

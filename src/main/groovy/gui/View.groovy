@@ -253,6 +253,16 @@ class View {
                     shortDescription: "Update-Files im Verzeichnis 'read-updates-from-here' verarbeiten"
             )
 
+
+            action(id: 'correctProjectFilesAction',
+                    name: "Datendateien lesen und korrigieren",
+                    //mnemonic: 'p',
+                    closure: { println "correctProjectFilesAction not connected to application..." },
+                    //accelerator: shortcut('P'),
+                    shortDescription: "alle Datendateien bei Veränderung lesen und ggf. Fehlermeldungen anzeigen"
+            )
+
+
             // view
 
             action(id: 'toggleViewInPhaseAction',
@@ -352,6 +362,8 @@ class View {
                         //menuItem(removeInPhaseAction)
                         menuItem(swapTemplatesAndProjectsAction)
                         menuItem(readProjectUpdatesAction)
+                        menuItem(correctProjectFilesAction)
+
                     }
 
                     menu(text: 'Ansicht', mnemonic: 'A') {
@@ -439,7 +451,7 @@ class View {
                                 pipelineEditor.buildPanel()
                             }
 
-                            scrollPane(name: 'Log') {
+                            scrollPane(id: 'log', name: 'Log') {
                                 textPane(id: 'textAreaLog', editable: true, focusable: true, font: new Font("Monospaced", Font.PLAIN, (int) (scaleX * 8)))
                             }
 
@@ -604,6 +616,12 @@ class View {
 
     def deselectProject() {
         gridPipelineModel.setSelectedProject(null)
+    }
+
+    def showLog() {
+        JTabbedPane tp = swing.tabs
+        JScrollPane log = swing.log
+        tp.setSelectedComponent(log)
     }
 
     String getSelectedProject() {

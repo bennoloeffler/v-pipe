@@ -8,8 +8,6 @@ import groovy.transform.CompileStatic
 import groovy.transform.Memoized
 import groovy.transform.TypeCheckingMode
 import groovy.yaml.YamlSlurper
-import org.pcollections.HashTreePSet
-import org.pcollections.PSet
 import transform.DateShiftTransformer
 import transform.ScenarioTransformer
 import utils.FileSupport
@@ -32,7 +30,7 @@ class Model {
     @Bindable
     boolean dirty = false
 
-    PSet<String> set = HashTreePSet.empty();
+    //PSet<String> set = HashTreePSet.empty();
 
     @Bindable
     boolean updateToggle
@@ -44,6 +42,7 @@ class Model {
     String currentDir // = new File(".").getCanonicalPath().toString()
 
     void setCurrentDir(String currentDir) {
+        //println "setCurrentDir: " + currentDir
         DataReader.currentDir = new File(currentDir).getCanonicalPath().toString()
         File path = new File(currentDir)
         if (!(path.exists() && path.isDirectory())) {
@@ -60,7 +59,7 @@ class Model {
 
     // all project tasks data
     List<TaskInProject> taskList = []
-    List<TaskInProject> taskListOriginal = []
+    //List<TaskInProject> taskListOriginal = []
 
 
     // the corresponding delivery date
@@ -831,7 +830,7 @@ class Model {
 
         } catch (Exception e) {
             emptyTheModel()
-            setVPipeHomeDir()
+            //setVPipeHomeDir() removed here with implemenation of FileErrorChecker
             throw e
         } finally {
             setDirty(false)
