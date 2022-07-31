@@ -18,14 +18,14 @@ import static model.DataReader.isValidModelFolder
 // TODO practice clean code. https://issuu.com/softhouse/docs/cleancode_5minutes_120523/16
 
 // RELEASE 2.0 do all in Gui (MIK edition) with video starting from help
-// ok 1.6 new Model, new Project, rename Project, templates and pipelines in GUI --> YOU DONT NEED THE FILES.
+// ok 1.6 new Model, new Project, rename Project, templates and pipelines in GUI --> YOU DON'T NEED THE FILES.
 // ok 1.7-ip-in-gui.  idea: showIP - and IPs are created ALWAYS. But they are stored only, when the are shown.
 //                      as soon as IPs "there in files", they are shown. showIP = true
-//                      as soon as IPs "are missing in files", showIP=false. They are created, when acivated: 1/3rd of project at the end
+//                      as soon as IPs "are missing in files", showIP=false. They are created, when activated: 1/3rd of project at the end
 //                      as soon as they are there, they can be hidden - but they are saved (with hidden flag)
 // ok 1.8-beta-all-gui Detail-Fenster sortierten, Namen kürzen, Detail-Pipeline-View: Slots setzen. Pipeline löschen, Pipeline erzeugen.
 // 1.9-tidy-code        Month Load
-//                      Tooltips off - and bugfree
+//                      Tooltips off - and bug free
 //                      win and macos batch and jre in package
 //                      comments and history for Projects: Date, Project, comment
 //                      empty yaml files (Feiertage, Profile, Kapa_Profile),
@@ -45,13 +45,15 @@ import static model.DataReader.isValidModelFolder
 //  ok - build osx, win, linux with java11 jre
 //  - describe "read updates" in documentation
 //  - describe in doc "Plugin to read Excel while reading updates"
-//  - SWITCH to "correction mode" when error during opening occurs. OPEN FILES IN EDITOR!
+//  ok - SWITCH to "correction mode" when error during opening occurs. OPEN FILES IN EDITOR!
 //  ok - bat file for win start
 //  NO - three different jre for windows/linux/macos into ONE distro
-//  - deployment from every computer for linux, macos and windows
+//  ok - deployment from every computer for linux, macos and windows
+//
+// TODO 2.3 shadow
 // 2.3 shadow tasks (tasks that are not saved - but shown as shadow of the original)
 // 3.0 Durchsatz in EUR dd
-// 4.0 ccpm-planning (krit Pfad in Projekten, most penetrating chain,
+// 4.0 CCPM-planning (kritischer Pfad in Projekten, most penetrating chain,
 // 4.2 watch files (inside v-pipe in a text area, so that scenarios and shifts can be realized)
 
 class MainGui {
@@ -61,22 +63,22 @@ class MainGui {
     Model model
     View view
     GlobalController controller
+    static MainGui instance
 
 
     static void main(String[] args) {
-        //
-        // AWT event dispatch thread: get the exceptions...
-        //
+        // AWT event dispatch thread: get the exceptions.
         Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler())
         System.setProperty("sun.awt.exception.handler",
                 ExceptionHandler.class.getName())
-
-        new MainGui().glueAndStart()
+        instance = new MainGui()
+        instance.glueAndStart()
     }
 
 
     static class ExceptionHandler implements Thread.UncaughtExceptionHandler {
 
+        @SuppressWarnings('unused')
         void handle(Throwable thrown) {
             // for EDT exceptions
             handleException(Thread.currentThread().getName(), thrown)
@@ -87,14 +89,15 @@ class MainGui {
             handleException(thread.getName(), thrown)
         }
 
-        void handleException(String tname, Throwable thrown) {
+        @SuppressWarnings('GrMethodMayBeStatic')
+        void handleException(String threadName, Throwable thrown) {
             if (thrown instanceof VpipeDataException) {
                 println "\nD A T E N - F E H L E R :\n" + thrown.getMessage() ?: ''
             } else {
                 File f = new File(FileSupport.instantErrorLogFileName)
                 println "\n\nABSTURZ!   " +
                         "Fehler:\n${thrown.getMessage() ?: ''}\n" +
-                        "Thread-Name: $tname\n" +
+                        "Thread-Name: $threadName\n" +
                         "Log-File: ${f.getAbsolutePath()}"
 
                 StringWriter sw = new StringWriter()
@@ -123,7 +126,7 @@ class MainGui {
 
     def glueAndStart() {
 
-        System.setProperty("apple.laf.useScreenMenuBar", "true");
+        System.setProperty("apple.laf.useScreenMenuBar", "true")
         // todo: add macos gestures for zooming windows:
         // https://stackoverflow.com/questions/48535595/what-replaces-gestureutilities-in-java-9
 
@@ -138,7 +141,7 @@ class MainGui {
         System.setErr(outStream)
 
         println("Programm-Version: $VERSION_STRING")
-        println "Auflösung in Pixel: x: ${(1000 * View.scaleX) as int}   y: ${(1000 * View.scaleY) as int}"
+        //println "Auflösung in Pixel: x: ${(1000 * View.scaleX) as int}   y: ${(1000 * View.scaleY) as int}"
 
         //
         // connect exit-action to X-symbol on window
@@ -156,18 +159,19 @@ class MainGui {
         // start EDT and init model
         //
         view.start {
-            String home = System.getProperty("user.home");
+            String home = System.getProperty("user.home")
             String dirToOpen = "$home/v-pipe-data"
             //String dirToOpen = "./bsp-daten"
             def recent = UserSettingsStore.instance.recentOpenedDataFolders
             if(recent) {dirToOpen =recent.last()}
 
             // DEV!
+            /*
             String currentStartPath = new File(".").absolutePath
             if (currentStartPath.contains("projects")) {
                 // if in development mode
                 dirToOpen = "./open-model-dev"
-            }
+            }*/
 
             boolean vpipeDataExists = isValidModelFolder(dirToOpen)
 
