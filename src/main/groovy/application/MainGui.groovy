@@ -71,7 +71,10 @@ class MainGui {
 
 
     static void main(String[] args) {
-        //ExamplesFromWebpage.main()
+        // ExamplesFromWebpage.main()
+        // flatlaf: goto lib and start flatlaf-demo-2.4.jar
+        // for sourcecode see: https://www.formdev.com/flatlaf
+
         // AWT event dispatch thread: get the exceptions.
         Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler())
         System.setProperty("sun.awt.exception.handler",
