@@ -39,9 +39,10 @@ trait PanelBasics {
     }
 
 
+    /*
     int scrollMouseToMouse(JComponent c, Point mouse) {
         getScrollPane(c)?.getVerticalScrollBar()?.getValue()
-    }
+    }*/
 
 
     /**
@@ -75,18 +76,18 @@ trait PanelBasics {
         ToolTipManager.sharedInstance().mouseMoved(e)//phantom)
     }
 
-    /*
+
     void mouseDragged(MouseEvent e) {
         //int x = e.getY()
         //int y = e.getX()
-
+        /*
         println("drag: x=$x y=$y")
         int gX = getGridXFromMouseX(x)
         int gY = getGridYFromMouseY(y)
         int swapX = getGridXFromMouseX(startDragX)
         int swapY = getGridYFromMouseY(startDragY)
-
-    }*/
+        */
+    }
 
 
 

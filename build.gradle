@@ -261,7 +261,7 @@ jar {
 
 // EXPERIMENTAL
 task buildNativeImage(type: Exec) {
-    workingDir "$projectDir/build/dist/v-pipe/lib"
+    workingDir "$projectDir/build/dist/v-pipe/lib" //wrong!!!
     if (getOsName() == "windows") {
         commandLine '%comspec% /k "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Auxiliary\\Build\\vcvarsx86_amd64.bat"', '/c', '..\\..\\..\\..\\buildNativeImage.bat'
     } else {

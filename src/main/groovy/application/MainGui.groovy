@@ -8,7 +8,7 @@ import utils.FileSupport
 import utils.UserSettingsStore
 
 import javax.swing.*
-import java.awt.Desktop
+import java.awt.*
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 
@@ -71,6 +71,7 @@ class MainGui {
 
 
     static void main(String[] args) {
+        //ExamplesFromWebpage.main()
         // AWT event dispatch thread: get the exceptions.
         Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler())
         System.setProperty("sun.awt.exception.handler",
@@ -191,8 +192,8 @@ class MainGui {
 
     static void checkFirstStartAndHelp() {
         def fs = new File("ersterStart.md")
-        println fs.getAbsolutePath()
         if(fs.exists()) {
+            println fs.getAbsolutePath()
             openBrowserWithHelp()
             fs.delete()
         }
