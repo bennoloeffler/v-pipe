@@ -1,6 +1,6 @@
 package core
 
-import application.Main
+import application.MainGui
 import gui.View
 import gui.panels.ModelReaderMessagePanel
 import model.DataReader
@@ -324,7 +324,7 @@ class GlobalController {
     }
 
     def helpActionPerformed = { ActionEvent e ->
-        Main.openBrowserWithHelp()
+        MainGui.openBrowserWithHelp()
     }
 
     def printPerformanceActionPerformed = { ActionEvent e ->

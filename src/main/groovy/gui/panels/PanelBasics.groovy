@@ -61,6 +61,7 @@ trait PanelBasics {
         //mouseX = e.getX()
         //mouseY = e.getY()
         //println "$e.x $e.y in $c.name"
+        /*
         MouseEvent phantom = new MouseEvent(
                 c,
                 MouseEvent.MOUSE_MOVED,
@@ -70,28 +71,29 @@ trait PanelBasics {
                 e.getY(),
                 0,
                 false)
-
+         */
         ToolTipManager.sharedInstance().mouseMoved(e)//phantom)
     }
 
-
+    /*
     void mouseDragged(MouseEvent e) {
-        int x = e.getY()
-        int y = e.getX()
-        /*
+        //int x = e.getY()
+        //int y = e.getX()
+
         println("drag: x=$x y=$y")
         int gX = getGridXFromMouseX(x)
         int gY = getGridYFromMouseY(y)
         int swapX = getGridXFromMouseX(startDragX)
         int swapY = getGridYFromMouseY(startDragY)
-        */
-    }
+
+    }*/
+
 
 
     JScrollPane getScrollPane(JComponent c) {
         try {
             c.getParent().getParent() as JScrollPane
-        }catch(Exception e) {
+        }catch(Exception ignore) {
             null // no scrollPane...
         }
     }
@@ -119,7 +121,7 @@ trait PanelBasics {
     List<Color> colors = createColorList()
 
     static List<Color> createColorList() {
-        def cl = []
+        List<Color> cl = []
         10.times {
             0.step 11, 1,  {
                 float h1 = (float)((float)it/10.0f)

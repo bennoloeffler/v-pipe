@@ -74,7 +74,7 @@ class ProjectModel extends GridModel {
     List<GridElement> fromTask(TaskInProject projectTask, Date startOfGrid, Date endOfGrid) {
         nowXRowCache = -1
         assert projectTask
-        def gridElements = []
+        List<GridElement> gridElements = []
         def deliveryDate = model.getDeliveryDate(projectTask.project)
         Date startOfTask = _getStartOfWeek(projectTask.starting)
         Date endOfTask = _getStartOfWeek(projectTask.ending) + 7
@@ -110,7 +110,7 @@ class ProjectModel extends GridModel {
 
     static List<GridElement> fromPipelineElement(PipelineElement element, Date startOfGrid, Date endOfGrid) {
         assert element
-        def gridElements = []
+        List<GridElement> gridElements = []
 
         Date startOfTask = _getStartOfWeek(element.startDate)
         Date endOfTask = _getStartOfWeek(element.endDate) + 7
@@ -210,7 +210,7 @@ class ProjectModel extends GridModel {
 
     @Override
     List<String> getLineNames() {
-        def r = []
+        List<String> r = []
         if (model.pipelineElements && showIntegrationPhase) {
             r << 'IP'
         }

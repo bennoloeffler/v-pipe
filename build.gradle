@@ -10,10 +10,6 @@
 
 import edu.sc.seis.launch4j.tasks.Launch4jLibraryTask
 
-
-
-
-
 plugins {
     id 'idea'
     id 'groovy'
@@ -36,10 +32,9 @@ tasks.withType(JavaCompile) {
 dependencies {
     implementation 'org.apache.ivy:ivy:2.5.0' // for plugins apache excel adapter
     implementation 'joda-time:joda-time:2.10.14'
-    implementation 'org.codehaus.groovy:groovy-all:3.0.10'
+    implementation 'org.codehaus.groovy:groovy-all:3.0.11'
     implementation group: 'org.codehaus.groovy', name: 'groovy-dateutil', version: '3.0.8'
     implementation group: 'org.codehaus.groovy', name: 'groovy-yaml', version: '3.0.8'
-    //implementation "org.codehaus.groovy:groovy-all:2.5.7"
     implementation 'org.tinylog:tinylog-impl:2.4.1'
     implementation 'org.tinylog:tinylog-api:2.4.1'
     implementation name: 'flatlaf-0.37'
@@ -49,18 +44,14 @@ dependencies {
     implementation group: 'org.yaml', name: 'snakeyaml', version: '1.23'
 
 
-    //implementation 'net.java.balloontip:balloontip:1.2.4.1'
-
     testCompile 'junit:junit:4.13.2'
-    //testCompile ('org.junit.jupiter:junit-jupiter:5.6.0')
-
     testCompile group: 'org.spockframework', name: 'spock-core', version: '2.0-groovy-3.0'
 }
 
 
 
 launch4j {
-    mainClassName = 'application.Main'
+    mainClassName = 'application.GuiMain'
     headerType='console'
     bundledJrePath='jre'
 }
@@ -69,8 +60,6 @@ launch4j {
 task createGui(type: Launch4jLibraryTask) {
     outfile = 'v-pipe-gui.exe'
     mainClassName = 'application.MainGui'
-    //jvmOptions =['-Dsun.java2d.uiScale=1.5'] // does only work with java9 properly
-
 }
 
 
@@ -83,19 +72,19 @@ def jrePath ="NOT SET YET"
 println "native os.name = " + System.getProperty("os.name").toLowerCase()
 
 static def getOsName() {
-    String osName = System.getProperty("os.name").toLowerCase();
+    String osName = System.getProperty("os.name").toLowerCase()
     if (osName.contains("linux")) {
-        return ("linux");
+        return ("linux")
     } else if (osName.contains("mac os x") || osName.contains("darwin") || osName.contains("osx")) {
-        return ("macos");
+        return ("macos")
     } else if (osName.contains("windows")) {
-        return ("windows");
+        return ("windows")
     } else if (osName.contains("sunos") || osName.contains("solaris")) {
-        return ("solaris");
+        return ("solaris")
     } else if (osName.contains("freebsd")) {
-        return ("freebsd");
+        return ("freebsd")
     }
-    return ("unix");
+    return ("unix")
 }
 
 if (getOsName() == "linux") {
@@ -123,7 +112,9 @@ if (getOsName() == "linux") {
 //def jrePath = "C:\\Program Files\\Java\\jre1.8.0_172" // WIN11
 //def jrePath = "C:\\Program Files\\Java\\jre-9.0.4" // does not scale so fine in the Grid-Panel...
 //def jrePath = "/Users/benno/Library/Java/JavaVirtualMachines/liberica-1.8.0_322" // macos
-def tempDist = "$buildDir/dist/v-pipe"
+def version = rootProject.file('version.txt').text.trim()
+println "VERSION: " + version
+def tempDist = "$buildDir/dist/v-pipe-" + version
 def exampleDir = "$tempDist/bsp-daten"
 def newModelDir = "$tempDist/new-model"
 
@@ -136,6 +127,7 @@ task copyExeLibsJRE {
     group "v-pipe"
 
     doFirst {
+
         delete tempDist
         mkdir tempDist
 
@@ -181,6 +173,10 @@ task copyExeLibsJRE {
             into exampleDir
         }
 */
+        copy {
+            from "version.txt"
+            into tempDist
+        }
         copy {
             from "Readme.md"
             into tempDist
@@ -234,8 +230,8 @@ task copyExeLibsJRE {
             into "$tempDist/$jre"
         }
 
-        delete "build/dist/v-pipe/v-pipe.exe"
-        delete "build/dist/v-pipe/v-pipe-gui.exe"
+        delete "$tempDist/v-pipe.exe"
+        delete "$tempDist/v-pipe-gui.exe"
 
         /*
         // tried with FAT JAR... (shadowJar)
@@ -260,8 +256,6 @@ task createDistribution(type: Zip) {
 jar {
     manifest {
         attributes 'Main-Class': 'application.MainGui'
-        //attributes 'Main-Class': 'learn.swingbuilder.ExamplesFromWebpage'
-
     }
 }
 

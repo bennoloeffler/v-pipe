@@ -56,7 +56,7 @@ class RunTimer implements Closeable{
                       "calls    "     :'l',
                       "time (m:s:ms) " :'l'
         ]
-        def data = []
+        List<List> data = []
 
         data[0] = [100.0, 'TOTAL', '-', readableShortTime(total)]
         def line = 1
@@ -138,7 +138,7 @@ class RunTimer implements Closeable{
                 sleep(100)
                 throw new RuntimeException("fuck...")
             }
-        } catch(Exception e) {}
+        } catch(Exception ignore) {}
 
         printTimerResults()
     }

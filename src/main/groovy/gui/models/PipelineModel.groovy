@@ -56,6 +56,7 @@ class PipelineModel extends GridModel {
      * create "the model" List<List<GridElement>> allProjectGridLines
      * from task-portfolio
      */
+    @SuppressWarnings('GroovyMissingReturnStatement')
     @CompileStatic(TypeCheckingMode.SKIP)
     private void updateGridElements() {
         allProjectGridLines = []
@@ -81,7 +82,7 @@ class PipelineModel extends GridModel {
      */
     //@Memoized
     List<GridElement> fromProjectTasks( List<TaskInProject> projectTasks, Date startOfGrid, Date endOfGrid) {
-        def gridElements = []
+        List<GridElement> gridElements = []
         try {
             assert projectTasks
             Date startOfTasks = _getStartOfWeek(projectTasks*.starting.min())

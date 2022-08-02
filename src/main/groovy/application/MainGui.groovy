@@ -8,6 +8,7 @@ import utils.FileSupport
 import utils.UserSettingsStore
 
 import javax.swing.*
+import java.awt.Desktop
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 
@@ -39,26 +40,29 @@ import static model.DataReader.isValidModelFolder
 //   each: read tasks, delete projects old, put tasks in model
 //  Copy Project
 //
-// TODO 2.2
+// TODO 2.2.0-win-osx-linux-err-checker-excel
 //  ok - fix bug with "saving wrong date format"
 //  ok - commit update commit from all: surfux, belmac and pux
 //  ok - build osx, win, linux with java11 jre
+//  - make updates based on IDs in comments of tasks: Project-Name and comment may be the "ID"
 //  - describe "read updates" in documentation
 //  - describe in doc "Plugin to read Excel while reading updates"
+//  ok remove all starters, e.g. v-pipe.exe in distribution
 //  ok - SWITCH to "correction mode" when error during opening occurs. OPEN FILES IN EDITOR!
 //  ok - bat file for win start
 //  NO - three different jre for windows/linux/macos into ONE distro
 //  ok - deployment from every computer for linux, macos and windows
 //
 // TODO 2.3 shadow
-// 2.3 shadow tasks (tasks that are not saved - but shown as shadow of the original)
+// - shadow tasks (tasks that are not saved - but shown as shadow of the original)
+// - export results (weekly, monthly, Details) to excel or csv
 // 3.0 Durchsatz in EUR dd
 // 4.0 CCPM-planning (kritischer Pfad in Projekten, most penetrating chain,
 // 4.2 watch files (inside v-pipe in a text area, so that scenarios and shifts can be realized)
 
 class MainGui {
 
-    static VERSION_STRING ='2.2.0-plugin-win-osx-linux'
+    static VERSION_STRING = new File('version.txt').text
 
     Model model
     View view
@@ -71,6 +75,7 @@ class MainGui {
         Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler())
         System.setProperty("sun.awt.exception.handler",
                 ExceptionHandler.class.getName())
+        checkFirstStartAndHelp()
         instance = new MainGui()
         instance.glueAndStart()
     }
@@ -181,6 +186,25 @@ class MainGui {
                 model.setCurrentDir(home)
             }
             model.setDirty(false)
+        }
+    }
+
+    static void checkFirstStartAndHelp() {
+        def fs = new File("ersterStart.md")
+        println fs.getAbsolutePath()
+        if(fs.exists()) {
+            openBrowserWithHelp()
+            fs.delete()
+        }
+    }
+
+    static void openBrowserWithHelp() {
+        if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+            //String path = new File("Referenz.html").absolutePath.replace('\\', ('/'))
+            //path.replace(' ', '%20')
+            //path = java.net.URLEncoder.encode(path, "UTF-8")
+            //Desktop.getDesktop().browse(new URI("file:/$path"))
+            Desktop.getDesktop().browse(new URI("https://github.com/bennoloeffler/v-pipe/blob/master/Readme.md"))
         }
     }
 }

@@ -196,9 +196,9 @@ class Model {
     }
 
     static List<TaskInProject> deepClone(List<TaskInProject> originals) {
-        def result = []
+        List<TaskInProject> result = []
         for (o in originals) {
-            result.add(o.clone())
+            result.add((TaskInProject)(o.clone()))
         }
         result
     }
