@@ -34,7 +34,7 @@ class ModelReaderMessagePanel {
         }
     }
 
-    def openFolder = {
+    static def openFolder = {
         Desktop.getDesktop().open(new File(MainGui.instance.controller.model.currentDir))
     }
 

@@ -44,7 +44,6 @@ import static model.DataReader.isValidModelFolder
 //  ok - fix bug with "saving wrong date format"
 //  ok - commit update commit from all: surfux, belmac and pux
 //  ok - build osx, win, linux with java11 jre
-//  - make updates based on IDs in comments of tasks: Project-Name and comment may be the "ID"
 //  - describe "read updates" in documentation
 //  - describe in doc "Plugin to read Excel while reading updates"
 //  ok remove all starters, e.g. v-pipe.exe in distribution
@@ -52,10 +51,14 @@ import static model.DataReader.isValidModelFolder
 //  ok - bat file for win start
 //  NO - three different jre for windows/linux/macos into ONE distro
 //  ok - deployment from every computer for linux, macos and windows
+//  - make updates based on IDs in comments of tasks: Project-Name and comment may be the "ID"
 //
-// TODO 2.3 shadow
+// TODO 2.3 shadow-export-id
 // - shadow tasks (tasks that are not saved - but shown as shadow of the original)
 // - export results (weekly, monthly, Details) to excel or csv
+// - mark tasks with "zero capa" in a different color
+// - have a setting: delete tasks with zero capa need during import
+
 // 3.0 Durchsatz in EUR dd
 // 4.0 CCPM-planning (kritischer Pfad in Projekten, most penetrating chain,
 // 4.2 watch files (inside v-pipe in a text area, so that scenarios and shifts can be realized)

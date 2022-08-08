@@ -58,6 +58,17 @@ class TaskInProject {
         return new TaskInProject(project, starting, ending, department, capacityNeeded, description)
     }
 
+    void copyFrom (TaskInProject other) {
+        project = other.project
+        starting = other.starting
+        startingWeek = other.startingWeek
+        ending = other.ending
+        endingWeek = other.endingWeek
+        department = other.department
+        capacityNeeded = other.capacityNeeded
+        description = other.description
+    }
+
     TaskInProject cloneFromTemplate(String otherProject, int dayShift) {
         def tip = new TaskInProject(otherProject, starting + dayShift, ending+dayShift, department, capacityNeeded, description)
         tip.fromTemplate = this
@@ -129,6 +140,10 @@ class TaskInProject {
                 starting == startingLastTime &&
                 ending == endingLastTime &&
                 capacityNeeded == capacityNeededLastTime)
+    }
+
+    boolean sameID (TaskInProject other) {
+        project == other.project && description == other.description
     }
 
     /**

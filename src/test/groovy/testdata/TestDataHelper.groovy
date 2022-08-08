@@ -48,14 +48,14 @@ class TestDataHelper {
      * @param cap
      * @return new model.TaskInProject
      */
-    static TaskInProject t(String pro, String sta, String end, String dep, Double cap) {
+    static TaskInProject t(String pro, String sta, String end, String dep, Double cap, String description = '') {
         new TaskInProject(
                  pro,
                 sta.toDate(),
                 end.toDate(),
                 dep,
                 cap,
-                '',
+                description
         )
     }
 

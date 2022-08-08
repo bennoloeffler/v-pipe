@@ -198,7 +198,7 @@ class Model {
     static List<TaskInProject> deepClone(List<TaskInProject> originals) {
         List<TaskInProject> result = []
         for (o in originals) {
-            result.add((TaskInProject)(o.clone()))
+            result.add((TaskInProject) (o.clone()))
         }
         result
     }
@@ -309,25 +309,22 @@ class Model {
 
     Date getStartOfProjects() {
         Date minDelDate = deliveryDates.values().min()
+        Date minIPDate = pipelineElements*.startDate.min()
         Date start = getStartOfTasks()
         def result = (minDelDate && minDelDate < start) ? minDelDate : start
-        if (result) {
-            //result = result - 5 * 7
-        }
+        result = (minIPDate && minIPDate < result) ? minIPDate : result
         result
     }
 
 
     Date getEndOfProjects() {
         Date maxDelDate = deliveryDates.values().max()
+        Date maxIPDate = pipelineElements*.endDate.min()
         Date end = getEndOfTasks()
         def result = maxDelDate && maxDelDate > end ? maxDelDate : end
-        if (result) {
-            //result = result + 5 * 7
-        }
+        result = (maxIPDate && maxIPDate > result) ? maxIPDate : result
         result
     }
-
 
 
     static Duration years20 = Duration.of(20 * 365, ChronoUnit.DAYS)
@@ -339,7 +336,7 @@ class Model {
 
     @CompileDynamic
     static boolean isMoreThan20Y(Date d) {
-        isMoreThan20Y(new Date(),d)
+        isMoreThan20Y(new Date(), d)
     }
 
     /**
@@ -402,9 +399,11 @@ class Model {
 
 
     void deleteProject(String projectToDelete) {
+
         taskList.removeIf {
             it.project == projectToDelete
         }
+
         if (pipelineElements) {
             pipelineElements.removeIf {
                 it.project == projectToDelete
@@ -412,6 +411,8 @@ class Model {
         }
 
         projectSequence.remove(projectToDelete)
+        deliveryDates.remove(projectToDelete)
+        projectComments.remove(projectToDelete)
 
         fireUpdate()
     }
@@ -1036,49 +1037,216 @@ class Model {
         newName
     }
 
-    def readUpdatesFromUpdateFolder() {
-
-
-        def existingProjects = _getAllProjects()
-
-        // parse tasks and find the projects, that will be affected
-        def readFromFile = DataReader.get_UPDATE_TASK_FILE_NAME()
-        String text = FileSupport.getTextOrEmpty(readFromFile)
-
-        def tasks = []
-        def projects = []
-        def err = null
-        try {
-            tasks = DataReader.readTasks(text, false)
-            projects = (tasks*.project).unique()
-        } catch (Exception e) {
-            err = e.getMessage()
-        }
-
+    void removeProjects(List<TaskInProject> tasks) {
+        def projects = (tasks*.project).unique()
         projects.each { p ->
             taskList.removeIf {
                 it.project == p
             }
         }
-        weekify(tasks)
-        taskList.addAll tasks
+    }
 
-        // delivery date AND integration phase STAY AS THEY ARE
+    Map readUpdatesFromIDs(List<TaskInProject> changedTasks) {
+        def changedProjects = (changedTasks*.project).unique()
+        def existingProjects = _getAllProjects()
+        changedTasks.forEach { overwriteOrCreate(it)}
+        deleteAllWithoutID()
+        def existingProjectsAfter = _getAllProjects()
+        def deletedProjects = existingProjects - existingProjectsAfter
+        def newProjects = existingProjectsAfter - existingProjects
+        def updatedProjects = changedProjects - deletedProjects - newProjects
+        addNewProjects(newProjects)
+        deletedProjects.each{p -> cleanUpProjectAfterUpdate(p)}
+        return [deleted: deletedProjects, new: newProjects, updated: updatedProjects, err: null]
+    }
 
-        if (! err) DataReader.dropUpdateFilesToDoneFolder()
+    Map readUpdatesFromCompleteProjects(List<TaskInProject> changedTasks) {
+        // tell the user, which projects are new or updated
+        def changedProjects = (changedTasks*.project).unique()
+        def existingProjects = _getAllProjects()
+        def updatedProjects = existingProjects.intersect(changedProjects)
+        def newProjects = changedProjects - updatedProjects
 
-        // in order to tell the user, which will be affected
-        def updatedProjects = existingProjects.intersect(projects)
-        def newProjects = projects - updatedProjects
+        removeProjects(changedTasks)
+        taskList.addAll changedTasks
+
+        addNewProjects(newProjects)
+
+        return [deleted: [], new: newProjects, changed: changedProjects, err: null]
+    }
+
+    def addNewProjects(List<String> newProjects) {
         projectSequence.addAll(newProjects)
-
         if (pipelineElements) {
             newProjects.each { p ->
-                pipelineElements << createPipelineForProject(getProject(p))
+                pipelineElements << createPipelineForProject(getProject(p as String))
+            }
+        }
+    }
+
+    void cleanUpProjectAfterUpdate(String projectToCleanUp) {
+
+        if (pipelineElements) {
+            pipelineElements.removeIf {
+                it.project == projectToCleanUp
             }
         }
 
-        fireUpdate()
-        [updated: updatedProjects, new: newProjects, err: err]
+        projectSequence.remove(projectToCleanUp)
+        deliveryDates.remove(projectToCleanUp)
+        projectComments.remove(projectToCleanUp)
+    }
+
+    enum UpdateStrategy {
+        NO_IDs_REPLACE_PROJECTS,
+        ALL_IDs_UPDATE_TASKS,
+        ERROR
+    }
+
+    /**
+     * return list with keys new: deleted: updated: and err:
+     * While err: is a string, the others are Lists of Strings which represent
+     * names of projects...
+     */
+    @CompileDynamic
+    Map readUpdatesFromTasks(List<TaskInProject> tasks) {
+
+        // strategy - which?
+        def updateStrategy = UpdateStrategy.ERROR
+        def tasksWithoutID = checkForTasksWithoutIDs(tasks)
+        def doubleIDs = checkForDoubleIDs(tasks)
+        if (tasksWithoutID.size() == 0 && doubleIDs.size() == 0) {
+            updateStrategy = UpdateStrategy.ALL_IDs_UPDATE_TASKS
+        } else if (tasksWithoutID.size() == tasks.size()) {
+            updateStrategy = UpdateStrategy.NO_IDs_REPLACE_PROJECTS
+        }
+
+        Map result =[:]
+        weekify(tasks)
+        switch (updateStrategy) {
+            case UpdateStrategy.ALL_IDs_UPDATE_TASKS:
+                result = readUpdatesFromIDs(tasks)
+                break
+            case UpdateStrategy.NO_IDs_REPLACE_PROJECTS:
+                result = readUpdatesFromCompleteProjects(tasks)
+                break
+            case UpdateStrategy.ERROR:
+                def err = "Fehler während Update:"
+                if (tasksWithoutID) {
+                    err = err +
+                            "Einige Tasks haben keine ID:-Kennzeichnung\n" +
+                            tasksWithoutID + "\n"
+                }
+                if (doubleIDs) {
+                    err = err +
+                            "Einige ID:-Kennzeichnungen innerhalb von Projekten sind nicht eindeutig:\n" +
+                            doubleIDs + "\n"
+                }
+                result = [deleted: [], updated: [], new: [], err: err]
+        }
+        result
+    }
+
+    @CompileDynamic
+    def readUpdatesFromUpdateFolder() {
+
+
+        // read from file
+        def readFromFile = DataReader.get_UPDATE_TASK_FILE_NAME()
+        String text = FileSupport.getTextOrEmpty(readFromFile)
+
+        // parse tasks and find the projects, that will be affected
+        def tasks
+        try {
+            tasks = DataReader.readTasks(text, false)
+            if (capaAvailable) {
+                check(tasks)
+                //calcAndInsertMonthlyCapaAvailable(capaAvailable)
+            }
+
+        } catch (Exception e) {
+            def err = e.getMessage()
+            return [deleted: [], updated: [], new: [], err: err]
+        }
+
+        def result = readUpdatesFromTasks(tasks)
+        if (!result.err) {
+            //DataReader.dropUpdateFilesToDoneFolder()
+            reCalcCapaAvailableIfNeeded()
+            fireUpdate()
+        }
+        result
+    }
+
+    static List<TaskInProject> checkForTasksWithoutIDs(List<TaskInProject> taskInProjects) {
+        def withoutID = taskInProjects.findAll { !it.description?.startsWith("ID:") }
+        withoutID
+    }
+
+    static List<String> checkForDoubleIDs(List<TaskInProject> taskInProjects) {
+        def nonUniqueElements = { List<String> list ->
+            list.findAll { a -> list.findAll { b -> b == a }.size() > 1 }.unique()
+        }
+        def allIDs = taskInProjects.collect { it.project + ", " + it.description }
+        def doubleIDs = nonUniqueElements allIDs
+        doubleIDs
+    }
+/*
+    void deleteProjectDuringUpdate(String projectToDelete) {
+        taskList.removeIf {
+            it.project == projectToDelete
+        }
+
+
+        if (pipelineElements) {
+            pipelineElements.removeIf {
+                it.project == projectToDelete
+            }
+        }
+
+        //projectSequence.remove(projectToDelete)
+        //deliveryDates.remove(projectToDelete)
+        //projectComments.remove(projectToDelete)
+
+    }*/
+
+    void deleteAllWithoutID() {
+        def allWithoutID = checkForTasksWithoutIDs(taskList)
+        allWithoutID.forEach {
+            assert taskList.remove(it)
+        }
+
+        // if there are projects which are "empty", delete them completely
+        /*
+        List<String> projectsToRemove = []
+        projectSequence.each {
+            def tasks = getProject(it)
+            if(!tasks) {
+                projectsToRemove.add(it)
+            }
+        }
+        projectsToRemove.each {
+            deleteProjectDuringUpdate(it)
+        }*/
+    }
+
+
+    void overwriteOrCreate(TaskInProject taskInProject) {
+        def found = taskList.findAll { taskInProject.sameID(it) }
+        if (found.size() == 0) {
+            taskList.add(taskInProject)
+
+            /*
+            def pAvail = getProject(taskInProject.project)
+            println pAvail
+            if (! pAvail) {
+                projectSequence.add(taskInProject.project)
+                println "added: " + taskInProject.project
+            }*/
+        } else if (found.size() == 1) {
+            found[0].copyFrom(taskInProject)
+        } else {
+            assert found.size() <= 1
+        }
     }
 }

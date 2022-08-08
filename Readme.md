@@ -3,7 +3,9 @@
 
 Das V&S-Pipeline-Werkzeug macht ein Projekt-Portfolio    
 sichtbar. Wie das geht? Siehe Teaser-Video.   
+
 [Alle Featueres auf einen Blick - das offizielle Teaser-Video](https://loom.com/share/folder/098a2ada42f647bfbbcc89e4d0e4a202)  
+
 
 V-pipe liest einfache Daten-Dateien mit Projekt-Daten  
 und Abteilungskapazitäten ein und erzeugt eine  
@@ -162,7 +164,54 @@ Enthält beispielsweise:
      }
     }
 
+JSON ist möglich. YAML ist ebenfalls möglich:
 
+```
+  Feiertage:
+  - "1.1.2020"
+  - "10.04.2020"
+  - "13.04.2020"
+  - "1.5.2020"
+  - "21.5.2020"
+  - "1.6.2020"
+  - "3.10.2020"
+  - "25.12.2020"
+  Kapa_Profil:
+    "2020-W21": 50
+    "2020-W22": 50
+Kapa_Abteilungen:
+  M-Kon:
+    Kapa:
+      gelb: 200
+      rot: 400
+    Kapa_Profil:
+      "2020-W01": 100
+      "2020-W02": 100
+      "2020-W34":
+        gelb: 120
+        rot: 150
+      "2020-W35":
+        gelb: 200
+        rot: 400
+  E-Kon:
+    Kapa:
+      gelb: 160
+      rot: 200
+    Kapa_Profil: {}
+  SW:
+    Kapa:
+      gelb: 340
+      rot: 460
+  Mon:
+    Kapa:
+      gelb: 160
+      rot: 400
+  IBN:
+    Kapa:
+      gelb: 100
+      rot: 200
+
+```
 
 **Bedeutung:** der Abschnitt `Kapa_Gesamt` beinhaltet Feiertage und ein Kapa_Profil  
 in Prozent. Die Prozent-Angaben gelten jeweils genau für diese eine Woche und alle Abteilungen.  
@@ -228,10 +277,6 @@ Der 14.8.2020 wird für pKopie duch `-12` zum 2.7.2020
 Die Verschiebung durch `Projekt-Verschiebung.txt` wird  
 zuerst angewandt. Erst dann kommt diese hier dazu!
 
-
-
-
-
 ### Backup - kein Überschreiben von Dateien beim Speichern  
 Dateien werden nie einfach überschrieben.  
 Wann immer eine Datei schon existiert,  
@@ -242,6 +287,11 @@ Dorthin werden die aktuellen Dateien verschoben,
 die beim Speichern 'überschrieben' werden.   
 
 ### kein Undo - aber AutoSave und Backup
+Es gibt kein Undo. Allerdings gibt es im Datei-Menü eine Autosave-Option.
+Alle 10 Sekunden wird überprüft, ob das Modell sich verändert hat.   
+Falls ja, wird es gespeichert.  
+Bei jedem Auto-Save wird im backup-Ordner eine Sicherung angelegt,  
+die einfach wie jedes andere Modell geöffnet werden kann.
 
 
 ### Terminfester 
@@ -259,12 +309,96 @@ D.h. Das erste Intervall besteht aus den ganzen Tagen:
 Beide Intervalle hintereinander umfassen 10 kontinuierliche Tage.  
 Der 20.10. gehört dazu. Der 30.10. nicht!
 
+## Update des Modells auf Basis von Update-Daten
+Projekte verändern sich im Laufe der Zeit.  
+Zeitschätzungen werden korrigiert.  
+Tasks kommen hinzu oder werden abgearbeitet.  
+Ein v-pipe Modell kann "auf Basis von Daten aktuell gehalten werden".
+Dafür gibt es das Menü "Werkzeug->Aktualisierung für Projekte einlesen".
+Damit nun Daten eingelesen werden, muss im Unterordner read-updates-from-here  
+des aktuellen Verzeichnisses folgende Datei liegen: Update-Projekt-Start-End-Abt-Kapa.txt  
+Also so:  
+`current-folder/read-updates-from-here/Update-Projekt-Start-End-Abt-Kapa.txt`    
+Wird diese Datei erfolgreich gelesen, dann landet sie  
+mit Zeitstempel im 'done'-Verzeichnis:  
+`current-folder/read-updates-from-here/**done**/Update-Projekt-Start-End-Abt-Kapa-2022-04-17 18.16.10.097.txt`
+
+### Plugin zur Transformation der Update-Daten vor dem Einlesen
+Angenommen, die Update-Daten liegen als Excel-Datei vor.
+Aus den Excel-Daten müssen vor jedem Update die Daten in die Textdatei  
+Update-Projekt-Start-End-Abt-Kapa.txt  
+überführt werden. Um das zu automatisieren kann im Unterordner  
+`current-folder/read-updates-from-here/plugin/import.groovy`  
+Wird diese Datei gefunden, dann wird der Inhalt als groovy-script ausgeführt.
+Ein Beispiel findet sich Ordner  
+`bsp-daten/bsp-10-updates-plugin`
+Falls ein Plugin mit dem Namen import.groovy existiert,  
+dann wird es vor jedem Einlesen der Updates durchgeführt.
+Vorsicht: Das Plugin muss dann ggf. die Original-Daten ins `done`  
+Verzeichnis schieben und im Fehlerfalle eine Meldung ausgeben. 
+
+### ganze Projekte aktualisieren
+Wenn die Datei `Update-Projekt-Start-End-Abt-Kapa.txt`  
+keine Identifikation / Kennzeichnung  
+(das Kommentarfeld beginnt mit nicht mit ID:)  
+am Ende jeder Zeile enthält,
+dann werden die Projekte im Modell vor dem Update vollständig
+gelöscht. D.h. die Strategie des Updates lautet:
+1. Stelle sicher, dass kein Task-Kommentar-Feld in den Update-Daten mit ID: beginnt.
+2. Stelle sicher, dass kein Task-Kommentar-Feld im Modell mit ID: beginnt.
+3. lese alle Projekte in den Update-Dateien
+4. lösche alle Projekte im Modell, die in den Update-Daten gefunden wurde.
+5. Ersetzte die gelöschten Projekte vollständig durch die Update-Daten.
+
+### einzelne Tasks aktualisieren
+
+Jeder Task innerhalb eines Projektes lässt sich mit Hilfe des  
+Kommentar-Feldes am Ende der Daten in  
+`Projekt-Start-End-Abt-Kapa.txt` eindeutig kennzeichnen.
+(das Kommentarfeld beginnt dann mit ID:).  
+
+Liegt diese Form der eindeutigen Kennzeichnung in der Update-Datei  
+`Update-Projekt-Start-End-Abt-Kapa.txt` vor, dann  
+werden die 'passenden' Tasks im Modell überschrieben.  
+Falls im Update Kennzeichnungen vorhanden sind, die  
+im Modell nicht vorliegen, werden diese Tasks neu angelegt.  
+Falls im Modell Tasks vorliegen, die **nicht** gekennzeichnet  
+sind, werden diese gelöscht.
+Das Löschen gekennzeichneter Tasks ist nicht vorgesehen.  
+Der Weg: Das setzen des Kapa-Bedarfes auf 0.  
+D.h. die Strategie des Updates lautet:
+1. Stelle sicher, dass ALLE Task-Kommentar-Feld in den Update-Daten mit ID: beginnt.
+2. lese alle Tasks in den Update-Dateien
+3. finde die zugehörigen Tasks in den Projekten und ersetze sie.
+4. falls in den gefunden Projekten Tasks exisiteren, die keine Kennzeichnung tragen: lösche alle. 
+5. falls Tasks im Update eine Kennzeichnung tragen, die es im Projekt nicht gibt, lege sie an.
+6. falls es Tasks mit Projekt-Namen im Update gibt, für die es kein Projekt im Modell gibt: lege das Projekt an.
+
+## mit Vorlagen arbeiten
+Eine Vorlage besteht aus Tasks. Auch für die Integrationsphasen kann  
+es Vorlagen geben - muss aber nicht.
+Vorlagen sind ganz ähnlich wie Projekte. Der einzige Unterschied:  
+Sie haben keinen Liefertermin. Erst wenn aus einer Vorlage ein  
+Projekt erzeugt wird, erhält das Projekt einen Liefertermin und  
+wird 'dorthin geschoben'.
+
+Damit Vorlagen im Editor von den existierenden Projekten  
+abgeleitet werden können, gibt es einen einfachen Kniff:
+Vorlagen und Projekte lassen sich "tauschen".
+Jetzt erscheinen alle Vorlagen als Projekte und alle Projekte als Vorlagen.
+Wenn jetzt also ein "Projekt" verändert wird, dann ändert man eigentlich eine Vorlage.
+Wenn jetzt eine Projekt aus einer Vorlage erzeugt, dann erzeugt man eigentlich eine Vorlage aus einem Projekt.
+Wenn schließlich alle Vorlagen bearbeitet sind, dann wechselt man wieder.
+Während des "Vorlagen-Modus" kann man das Modell nicht speichern.
+D.h. der AutoSave-Modus wird automatisch deaktiviert.
+
+
 ## Release History
 
 ###2022-08-12 `2.2.0-win-osx-linux-err-checker-excel`
 - release and starter for win, linux and macos
-- error checking mode - work on the data-files and see error messages in realtime
-- plugin for getting data out of excel, when reading 
+- error checking mode - work on the data-files and see error messages in realtime in  gui
+- plugin for getting data transformed (e.g out of excel), when reading delta-data 
 
 ###2022-04-17 `2.1.0-copy-and-update`
 - have a directory scanned for delta-data in order to update the model.
@@ -423,6 +557,7 @@ Nützlichkeit in absteigender Reihenfolge:
 - Finanz-Zahlen und damit Durchsatz-Kennzahlen
 - adapter elegantly import project data
 - backlog of department for X weeks (in order to simulate "additional work")
+- AutoSave bei jedem "setDirty - in eigenem Thread auf einer Kopie des Modells" - damit gäbe es ein UNDO.
 
 ### bekannte BUGS
 - MACOS: Schließen mit dem System-Menu oder Command-Q ohne Abfrage nach Speichern.  

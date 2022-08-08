@@ -107,7 +107,7 @@ class ProjectDetailsPanel {
                         label('  Start')
                         label('  Ende')
                         label('  Last')
-                        label('  Info')
+                        label('  Info/ID:')
                         label("  löschen    ") // for button cut
                         label("  duplizieren  ", constraints: 'wrap') // for button copy
                         def idx = 0

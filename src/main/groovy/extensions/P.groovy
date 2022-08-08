@@ -36,6 +36,11 @@ class P {
      */
     static PMap pMap(Map map) { HashTreePMap.from(map) }
 
+    /**
+     * helper for recursive calls to p - at the leaves, just return leaves.
+     * @param v
+     * @return
+     */
     static Object p(Object v) {v}
 
     /**
@@ -234,7 +239,7 @@ class P {
                 //notifyWatches(v, newv);
                 return next;
             } else {
-                collisions.andIncrement
+                collisions.getAndIncrement()
                 //println "collision: " + collisions.get()
             }
         }

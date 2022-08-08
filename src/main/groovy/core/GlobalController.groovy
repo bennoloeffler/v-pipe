@@ -258,7 +258,9 @@ class GlobalController {
             def updatedStr = "\nneue Projekte:\n" +
                     (updates.new ? updates.new.join("\n") : "keine") +
                     "\n\naktualisierte Projekte:\n" +
-                    (updates.updated ? updates.updated.join("\n") : "keine")
+                    (updates.updated ? updates.updated.join("\n") : "keine") +
+                    "\n\ngelöschte Projekte:\n" +
+                    (updates.deleted ? updates.deleted.join("\n") : "keine")
             if (updates.err) {
                 // this is a stupid workaround: the error message contains the wrong filename
                 if (updates.err.contains("enthält keine Daten")) updates.err = "Datei enthält keine Daten.\n"
