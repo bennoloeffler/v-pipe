@@ -398,7 +398,8 @@ D.h. der AutoSave-Modus wird automatisch deaktiviert.
 ###2022-08-12 `2.2.0-win-osx-linux-err-checker-excel`
 - release and starter for win, linux and macos
 - error checking mode - work on the data-files and see error messages in realtime in  gui
-- plugin for getting data transformed (e.g out of excel), when reading delta-data 
+- plugin for getting data transformed (e.g out of excel), when reading delta-data
+- merging updates based on ID: tags residing in comment field of tasks
 
 ###2022-04-17 `2.1.0-copy-and-update`
 - have a directory scanned for delta-data in order to update the model.
