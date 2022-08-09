@@ -26,18 +26,20 @@ Ja, gibt's: Bitte hier lang...(https://loom.com/share/folder/098a2ada42f647bfbbc
 
 
 ## Installation
-Die Distribution ist ein Ordner mit dem Namen: `v-pipe-major.minor.bugfix-ReleaseName`.    
-Beispiel: v-pipe-win/v-pipe-1.5.0-average-load
-Diesen Ordner kopieren - z. B. in das lokale Verzeichnis:  
+Die Distribution ist ein Ordner mit dem Namen: `v-pipe-OS/v-pipe-major.minor.bugfix-ReleaseName`.    
+Beispiel: v-pipe-macos/v-pipe-1.5.0-average-load
+Diesen **Ordner einfach komplett kopieren** - z. B. in das lokale Verzeichnis:  
 `c:\v-pipe-1.5.0-average-load`. Aber auch gerne auf einen Memory-Stick oder ins eigene Home.  
 Oder nach `Programme` (als admin). Tut auch.  
+
+Releases finden sich alle dort: [v-pipe Releases](https://www.dropbox.com/sh/btckprl3qltik44/AADreLW3KN7YS7q1OaHFVBKXa?dl=0)
 
 [Video-Anleitung 'Installation', Bitte hier lang...(https://loom.com/share/folder/098a2ada42f647bfbbcc89e4d0e4a202)]: #
 
 Dort (also z.B. in C:\v-pipe-x.y.z-release) liegen die Verzeichnisse und Dateien:
 
 - `Readme.md` (diese Betriebsanleitung als Markdown - falls offline)  
-- `v-pipe-macos.sh.command` (MACOS-Starter - Doppelklick)
+- `v-pipe-macos.sh.command` (macOS-Starter - Doppelklick)
 - `v-pipe-linux.sh` (Linux-Starter - Doppelklick)
 - `v-pipe-win.bat` (Windows-Starter - Doppelclick)
 - `lib` (ein paar Java-Bibliotheken. Finger weg ;-))  
