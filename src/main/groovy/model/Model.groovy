@@ -237,10 +237,10 @@ class Model {
 
     static PipelineElement createPipelineForProject(List<TaskInProject> project) {
 
-        // exactly ONE element in a newly created project!
         assert project
         assert project[0]
-        assert project.size() == 1
+        // NOT exactly ONE element in a newly created project!
+        //assert project.size() == 1
 
         PipelineElement pe = new PipelineElement(
                 project: project[0].project,
@@ -1166,11 +1166,13 @@ class Model {
 
         } catch (Exception e) {
             def err = e.getMessage()
+            println err
             return [deleted: [], updated: [], new: [], err: err]
         }
 
         def result = readUpdatesFromTasks(tasks)
         if (!result.err) {
+            println result
             //DataReader.dropUpdateFilesToDoneFolder()
             reCalcCapaAvailableIfNeeded()
             fireUpdate()
