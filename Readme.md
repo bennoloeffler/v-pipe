@@ -4,7 +4,7 @@
 Das V&S-Pipeline-Werkzeug macht ein Projekt-Portfolio    
 sichtbar. Wie das geht? Siehe Teaser-Video.   
 
-[Alle Featueres auf einen Blick - das offizielle Teaser-Video](https://loom.com/share/folder/098a2ada42f647bfbbcc89e4d0e4a202)  
+[Alle Featueres auf einen Blick - die veraltete Intro-Video-Serie](https://loom.com/share/folder/098a2ada42f647bfbbcc89e4d0e4a202)  
 
 
 V-pipe liest einfache Daten-Dateien mit Projekt-Daten  
@@ -14,8 +14,10 @@ Es gibt die Möglichkeit, Projekte per Pfeiltasten
 wochenweise zu verschieben und die Auswirkungen  
 in Echtzeit zu sehen.  
 
+```{toggle}
 Quickstart-Videos zu allen Features?  
 Ja, gibt's: [Bitte hier lang...](https://loom.com/share/folder/098a2ada42f647bfbbcc89e4d0e4a202)
+```
 
 ## Installation
 Die Distribution ist ein Ordner mit dem Namen: `v-pipe-major.minor.bugfix-ReleaseName`.    
@@ -23,7 +25,10 @@ Beispiel: v-pipe-win/v-pipe-1.5.0-average-load
 Diesen Ordner kopieren - z. B. in das lokale Verzeichnis:  
 `c:\v-pipe-1.5.0-average-load`. Aber auch gerne auf einen Memory-Stick oder ins eigene Home.  
 Oder nach `Programme` (als admin). Tut auch.  
-[Video-Anleitung 'Installation', Bitte hier lang...](https://loom.com/share/folder/098a2ada42f647bfbbcc89e4d0e4a202)
+
+
+[ [Video-Anleitung 'Installation', Bitte hier lang...](https://loom.com/share/folder/098a2ada42f647bfbbcc89e4d0e4a202) ]: #
+
 
 Dort (also z.B. in C:\v-pipe-x.y.z-release) liegen die Verzeichnisse und Dateien:
 
@@ -565,7 +570,13 @@ Nützlichkeit in absteigender Reihenfolge:
 - AutoSave bei jedem "setDirty - in eigenem Thread auf einer Kopie des Modells" - damit gäbe es ein UNDO.
 
 ### bekannte BUGS
-- MACOS: Schließen mit dem System-Menu oder Command-Q ohne Abfrage nach Speichern.  
+**noch nicht gefixt**
+- macOS: Schließen mit dem System-Menu oder Command-Q ohne Abfrage nach Speichern. May be fixed [with this hint](https://alvinalexander.com/java/java-mac-osx-about-preferences-quit-application-adapter/)  
+- macOS: two finger zoom and scroll does not work. [maybe this helps](https://github.com/mcourteaux/MultiTouch-Gestures-Java)  
+  
+**gefixt**
+- macOS: two-finger-zoom lead to java.lang.NoSuchMethodError: handleGestureFromNative  
+Fix: used java11.0.15
 
 ## Feedback
 an: benno.loeffler AT gmx.de

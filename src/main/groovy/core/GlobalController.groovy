@@ -60,6 +60,8 @@ class GlobalController {
 
         // Help
         view.swing.helpAction.closure = helpActionPerformed
+        view.swing.aboutAction.closure = aboutActionPerformed
+
         view.swing.printPerformanceAction.closure = printPerformanceActionPerformed
     }
 
@@ -329,9 +331,14 @@ class GlobalController {
         MainGui.openBrowserWithHelp()
     }
 
+    def aboutActionPerformed = { ActionEvent e ->
+        openAboutPanel()
+    }
+
     def printPerformanceActionPerformed = { ActionEvent e ->
         println(SystemInfo.getSystemInfoTable())
         println(RunTimer.getResultTable())
+        view.showLog()
     }
 
     /*
@@ -498,5 +505,13 @@ class GlobalController {
         a.setEnabled(true)
         a = view.swing.toggleContinouosSaveAsAction
         a.setEnabled(true)
+    }
+
+    void openAboutPanel() {
+        JOptionPane.showMessageDialog(null,
+                "\n\nRelease:  v-pipe-" + MainGui.VERSION_STRING + "       \n\n" +
+                        "Author:    Benno Löffler       \n\nE-Mail:    benno.loeffler@gmx.de       \n\n",
+                "about v-pipe",
+                JOptionPane.INFORMATION_MESSAGE)
     }
 }

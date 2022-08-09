@@ -326,6 +326,14 @@ class View {
                     shortDescription: 'zeige die aktuellste Hilfe-Datei im Internet.'
             )
 
+            action(id: 'aboutAction',
+                    name: "About...",
+                    //mnemonic: 'p',
+                    closure: { println "aboutAction not connected to application..." },
+                    //accelerator: shortcut('P'),
+                    shortDescription: 'zeige Infos zur Software v-pipe.'
+            )
+
             action(id: 'printPerformanceAction',
                     name: "Performance messen",
                     //mnemonic: 'p',
@@ -377,6 +385,7 @@ class View {
 
                     menu(text: 'Hilfe', mnemonic: 'H') {
                         menuItem(helpAction)
+                        menuItem(aboutAction)
                         menuItem(printPerformanceAction)
                     }
                 }
