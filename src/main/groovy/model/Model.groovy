@@ -1049,14 +1049,14 @@ class Model {
     Map readUpdatesFromIDs(List<TaskInProject> changedTasks) {
         def changedProjects = (changedTasks*.project).unique()
         def existingProjects = _getAllProjects()
-        changedTasks.forEach { overwriteOrCreate(it)}
+        changedTasks.forEach { overwriteOrCreate(it) }
         deleteAllWithoutID()
         def existingProjectsAfter = _getAllProjects()
         def deletedProjects = existingProjects - existingProjectsAfter
         def newProjects = existingProjectsAfter - existingProjects
         def updatedProjects = changedProjects - deletedProjects - newProjects
         addNewProjects(newProjects)
-        deletedProjects.each{p -> cleanUpProjectAfterUpdate(p)}
+        deletedProjects.each { p -> cleanUpProjectAfterUpdate(p) }
         return [deleted: deletedProjects, new: newProjects, updated: updatedProjects, err: null]
     }
 
@@ -1108,7 +1108,7 @@ class Model {
      * While err: is a string, the others are Lists of Strings which represent
      * names of projects...
      */
-    @CompileDynamic
+    //@CompileDynamic
     Map readUpdatesFromTasks(List<TaskInProject> tasks) {
 
         // strategy - which?
@@ -1121,7 +1121,7 @@ class Model {
             updateStrategy = UpdateStrategy.NO_IDs_REPLACE_PROJECTS
         }
 
-        Map result =[:]
+        Map result = [:]
         weekify(tasks)
         switch (updateStrategy) {
             case UpdateStrategy.ALL_IDs_UPDATE_TASKS:
@@ -1147,9 +1147,8 @@ class Model {
         result
     }
 
-    @CompileDynamic
+    //@CompileDynamic
     def readUpdatesFromUpdateFolder() {
-
 
         // read from file
         def readFromFile = DataReader.get_UPDATE_TASK_FILE_NAME()
@@ -1173,7 +1172,7 @@ class Model {
         def result = readUpdatesFromTasks(tasks)
         if (!result.err) {
             println result
-            //DataReader.dropUpdateFilesToDoneFolder()
+            DataReader.dropUpdateFilesToDoneFolder()
             reCalcCapaAvailableIfNeeded()
             fireUpdate()
         }
@@ -1193,62 +1192,25 @@ class Model {
         def doubleIDs = nonUniqueElements allIDs
         doubleIDs
     }
-/*
-    void deleteProjectDuringUpdate(String projectToDelete) {
-        taskList.removeIf {
-            it.project == projectToDelete
-        }
-
-
-        if (pipelineElements) {
-            pipelineElements.removeIf {
-                it.project == projectToDelete
-            }
-        }
-
-        //projectSequence.remove(projectToDelete)
-        //deliveryDates.remove(projectToDelete)
-        //projectComments.remove(projectToDelete)
-
-    }*/
 
     void deleteAllWithoutID() {
         def allWithoutID = checkForTasksWithoutIDs(taskList)
         allWithoutID.forEach {
             assert taskList.remove(it)
         }
-
-        // if there are projects which are "empty", delete them completely
-        /*
-        List<String> projectsToRemove = []
-        projectSequence.each {
-            def tasks = getProject(it)
-            if(!tasks) {
-                projectsToRemove.add(it)
-            }
-        }
-        projectsToRemove.each {
-            deleteProjectDuringUpdate(it)
-        }*/
     }
-
 
     void overwriteOrCreate(TaskInProject taskInProject) {
         def found = taskList.findAll { taskInProject.sameID(it) }
-        if (found.size() == 0) {
+        if (found.size() == 0 && taskInProject.capacityNeeded > 0) {
             taskList.add(taskInProject)
-
-            /*
-            def pAvail = getProject(taskInProject.project)
-            println pAvail
-            if (! pAvail) {
-                projectSequence.add(taskInProject.project)
-                println "added: " + taskInProject.project
-            }*/
         } else if (found.size() == 1) {
-            found[0].copyFrom(taskInProject)
-        } else {
-            assert found.size() <= 1
+            if (taskInProject.capacityNeeded > 0) {
+                found[0].copyFrom(taskInProject)
+            } else { // TODO: DONT REMOVE, just color different?
+                def del = taskList.remove(found[0])
+                assert del
+            }
         }
     }
 }

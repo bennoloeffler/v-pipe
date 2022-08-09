@@ -355,24 +355,28 @@ gelöscht. D.h. die Strategie des Updates lautet:
 Jeder Task innerhalb eines Projektes lässt sich mit Hilfe des  
 Kommentar-Feldes am Ende der Daten in  
 `Projekt-Start-End-Abt-Kapa.txt` eindeutig kennzeichnen.
-(das Kommentarfeld beginnt dann mit ID:).  
+(das Kommentarfeld beginnt dann mit ID:, die Kennzeichnung
+schießt sich ohne Leerzeichen an, z.B.: ID:4711).  
 
 Liegt diese Form der eindeutigen Kennzeichnung in der Update-Datei  
 `Update-Projekt-Start-End-Abt-Kapa.txt` vor, dann  
 werden die 'passenden' Tasks im Modell überschrieben.  
 Falls im Update Kennzeichnungen vorhanden sind, die  
 im Modell nicht vorliegen, werden diese Tasks neu angelegt.  
-Falls im Modell Tasks vorliegen, die **nicht** gekennzeichnet  
-sind, werden diese gelöscht.
-Das Löschen gekennzeichneter Tasks ist nicht vorgesehen.  
-Der Weg: Das setzen des Kapa-Bedarfes auf 0.  
+Falls im Modell Tasks vorliegen, die **nicht** mit einer ID:  
+gekennzeichnet sind, werden diese **gelöscht**.
+Zum Löschen gekennzeichneter Tasks durch die Update-Daten  
+ist das Feld Kapa-Bedarf auf 0 zu setzen.  
 D.h. die Strategie des Updates lautet:
-1. Stelle sicher, dass ALLE Task-Kommentar-Feld in den Update-Daten mit ID: beginnt.
+1. Nur wenn ALLE Task-Kommentar-Felder in den Update-Daten mit ID: beginnen, dann...
 2. lese alle Tasks in den Update-Dateien
 3. finde die zugehörigen Tasks in den Projekten und ersetze sie.
-4. falls in den gefunden Projekten Tasks exisiteren, die keine Kennzeichnung tragen: lösche alle. 
-5. falls Tasks im Update eine Kennzeichnung tragen, die es im Projekt nicht gibt, lege sie an.
-6. falls es Tasks mit Projekt-Namen im Update gibt, für die es kein Projekt im Modell gibt: lege das Projekt an.
+4. falls in den Update-Daten der Kapa-Bedarf auf 0 gesetzt wurde: Lösche den Projekttask (oder ignoriere die Update-Daten, falls sich keiner findet)
+5. falls in den Projekten Tasks existieren, die keine Kennzeichnung tragen: lösche alle.
+6. falls Projekte dann keine Tasks mehr haben, lösche die kompletten Projekte.
+7. falls Tasks im Update eine Kennzeichnung tragen, die es im Projekt nicht gibt, lege sie an.
+8. falls es Tasks mit Projekt-Namen im Update gibt, für die es kein Projekt im Modell gibt: lege das Projekt an.
+9. für Projekte, die verschoben werden, bleibt IP und Liefertermin stabil! 
 
 ## mit Vorlagen arbeiten
 Eine Vorlage besteht aus Tasks. Auch für die Integrationsphasen kann  
@@ -395,139 +399,139 @@ D.h. der AutoSave-Modus wird automatisch deaktiviert.
 
 ## Release History
 
-###2022-08-12 `2.2.0-win-osx-linux-err-checker-excel`
+### 2022-08-12 `2.2.0-win-osx-linux-err-checker-excel`
 - release and starter for win, linux and macos
 - error checking mode - work on the data-files and see error messages in realtime in  gui
 - plugin for getting data transformed (e.g out of excel), when reading delta-data
 - merging updates based on ID: tags residing in comment field of tasks
 
-###2022-04-17 `2.1.0-copy-and-update`
+### 2022-04-17 `2.1.0-copy-and-update`
 - have a directory scanned for delta-data in order to update the model.
 - copy a project (not from template - just plain copy)
 
-###2022-04-16 `2.0.0-all-in-gui`
+### 2022-04-16 `2.0.0-all-in-gui`
 - linux, windows and mac
 - month load
 - project comments/history
 
-###2022-03-16 `1.9.0-tidy-code`
+### 2022-03-16 `1.9.0-tidy-code`
 - moved and renamed many classes / packages for more clarity
 
-###2022-03-14 `1.8.0-beta-all-gui`
+### 2022-03-14 `1.8.0-beta-all-gui`
 - everything can be changed in gui 
 
-###2022-03-12 `1.7.0-ip-in-gui`
+### 2022-03-12 `1.7.0-ip-in-gui`
 - pipeline (integration phases) can be created / deleted / hidden
 
-###2022-03-12 `1.6.0-ipco-pax-edition`
+### 2022-03-12 `1.6.0-ipco-pax-edition`
 - can only open valid data folders
 - simplified creation of capacity model
 - can create new model from GUI
 
-###2022-02-27 `1.5.0-average-load`
+### 2022-02-27 `1.5.0-average-load`
 - show load average (5 weeks moving average) by pressing 'a'
 - created starter for dropbox
 
-###2022-02-13 `1.4.4-delivery-date-macos`
+### 2022-02-13 `1.4.4-delivery-date-macos`
 - create delivery date from last task, if not available
 - save, change and visualize delivery date 
 
-###2021-08-26 `1.3.0-Create-Project`
+### 2021-08-26 `1.3.0-Create-Project`
 - create new Project from "nothing"
 - show task description in project tooltip
 
-###2021-02-07 `1.2.0-Szenario-Templates`
+### 2021-02-07 `1.2.0-Szenario-Templates`
 - can model and use templates (Vorlagen)
 - delete projects in Detail-View (delete-Button)
 - vpipeGui does not open current working directory at startup any more 
 - fixed bug: caching problem with recalc of week-patterns and capa-model after model reloading fixed 
 
-###2020-11-03 `1.1.0-Szenario-Differenzen`
+### 2020-11-03 `1.1.0-Szenario-Differenzen`
 - compare files
 
-###2020-10-30 `1.0.3-Details-Editor-Bugfixes`
+### 2020-10-30 `1.0.3-Details-Editor-Bugfixes`
 - increase / decrease tasks with CTRL-arrow (--> = inc, <-- = dec)
 
-###2020-10-20 `1.0.2-Details-Editor-Bugfixes`
+### 2020-10-20 `1.0.2-Details-Editor-Bugfixes`
 - Datenkonsistenz-Prüfung Abteilungen geht wieder
 
-###2020-10-19 `1.0.1-Details-Editor-Bugfixes`
+### 2020-10-19 `1.0.1-Details-Editor-Bugfixes`
 - duplizieren
 - Änderungen annehmen
 - CTRL-Pfeil vergrößert / verkleinert die Projekt-Tasks
 - Löschen des letzten Task in Detailansicht nicht möglich
 
-###2020-10-19 `1.0.0-RELEASE-Projekt-Editor`
+### 2020-10-19 `1.0.0-RELEASE-Projekt-Editor`
 - Editor für Projekt-Daten (Alle Felder bearbeiten, Copy und Cut von Tasks)
 - Reihenfolge der Tasks in der Projektansicht wie in Abteilungs-Kapa-Angebot, falls vorhanden  
 
-###2020-09-16 `0.9.13-Beta-3-Bugfixes`  
+### 2020-09-16 `0.9.13-Beta-3-Bugfixes`  
 - Reihenfolge der Projekttasks nach End-Termin
 - Reihenfolge der Auslastung wie in Abteilungs-Kapa-Angebot, falls vorhanden  
 - alle Angaben in Auslastungs-Tooltip auf eine Stelle nach Komma runden
 
-###2020-09-15 `0.9.12-Beta-2-Bugfixes`
+### 2020-09-15 `0.9.12-Beta-2-Bugfixes`
 - Kapabedarf der Tasks und Projekte sichtbar  
 
-###2020-08-30 `0.9.11-Beta-1-Bugfixes`
+### 2020-08-30 `0.9.11-Beta-1-Bugfixes`
 - Cursor sprang 
 
-###2020-08-29 `0.9.10-LoadSomeDetails`
+### 2020-08-29 `0.9.10-LoadSomeDetails`
 - drei Modi der Tooltips im Auslastungsfenster: no, some, details
 - vollständige Synchronistation der Scrollbars (Staffelung - Auslastung)
 - Cursor mit Fadenkreuz in der Staffelung und Projektsicht
  
-###2020-08-07 `0.9.7-ScrollCenter`
+### 2020-08-07 `0.9.7-ScrollCenter`
 - zentrieren beim Scrollen mit Maus: Element des Mouse-Cursors bleibt sichtbar
 - zentrieren beim Scrollen mit +/-: Tasten-Cursor bleibt sichtbar
 
-###2020-08-07 `0.9.6-ScrollNice`
+### 2020-08-07 `0.9.6-ScrollNice`
 - Scrollt zu 'jetzt' beim öffnen
 - sprint nicht mehr beim umschalten der Detail-Tooltips
 - Bug bei Anzeige der Skalierung der Kapa-Belastung gefixt
 - mit 'n' kann man den Cursor zu 'jetzt' fahren (_n_ow)
 
-###2020-07-09 `0.9.5-BetaPhase-Bug`
+### 2020-07-09 `0.9.5-BetaPhase-Bug`
 - Sort ToolTip + 2-Stellen-Jahres-Bug raus
 
-###2020-07-08 `0.9.4-BetaPhaseNice`
+### 2020-07-08 `0.9.4-BetaPhaseNice`
 - Markierungen, Doku
 
-###2020-07-06 `0.9.3-BetaPhase`
+### 2020-07-06 `0.9.3-BetaPhase`
 - minor changes like examples, docu, marker, fucus by tab and mouse, mouse-cursor, tooltips (d)
  
-###2020-06-30 `0.9.1-TePiLoSa`
+### 2020-06-30 `0.9.1-TePiLoSa`
 - Pipeline-View: Verschieben auch ohne piplining Daten crasht nicht mehr
 
-###2020-06-30 `0.9.0-TePiLoSa`
+### 2020-06-30 `0.9.0-TePiLoSa`
 - visuelles Pipelining
 
-###2020-06-21 `0.8.0-LoadSave-Template`
+### 2020-06-21 `0.8.0-LoadSave-Template`
 - Speichern der Daten (in eigenem Daten-Ordner) - öffnen von Datenordnern
 - Szeanrien im Portfolio auf Basis von Templates
 
-###2020-06-14 `0.7.0-GUI-Project-Editor`
+### 2020-06-14 `0.7.0-GUI-Project-Editor`
 - Tasks eines Projektes auch verschieben.
 
-###2020-06-01 `0.6.0-GUI-Project-View`
+### 2020-06-01 `0.6.0-GUI-Project-View`
 - Tasks eines Projektes visualisieren (noch nicht verschieben).
 
-###2020-05-25 `0.5.0-GUI-Project`
+### 2020-05-25 `0.5.0-GUI-Project`
 - Belastung durch ein Projekt visualisieren.
 
-###2020-05-23 `0.4.0-GUI-Pipeliner`
+### 2020-05-23 `0.4.0-GUI-Pipeliner`
 - Pipeline visualisieren, editieren.
 
-###2020-05-13 `0.3.1-Pipeliner`
+### 2020-05-13 `0.3.1-Pipeliner`
 - Performance besser beim schreiben  
  (größer 40s --> deutlich kleiner 10s mit Ruhlamat-Daten)
 
-###2020-05-10 `0.3.0-Pipeliner`
+### 2020-05-10 `0.3.0-Pipeliner`
 - Pipeliner - lesen von Integrations-Phasen.txt
 - Browser mit Hilfe nur beim ersten Start
 - Beispiel-Daten in Ordner bsp-daten, damit Update keine Daten zerstört
 
-###2020-05-07 `0.2.0-Monats-Belastung`
+### 2020-05-07 `0.2.0-Monats-Belastung`
 - Option -s startet im Single-Modus = kein Deamon.  
 Nur ein Durchlauf.
 - Option -m startet im Multi-Instance-Modus.  
@@ -539,13 +543,13 @@ Das ist nur vernünftig in verschiedenen Verzeichnissen!
 - Abteilungs-Kapazitäts-Belastung.txt enthält immer die aktuelle Ergebnisse.  
  Falls Überschreiben droht wird vor dem Überschreiben eine Backup-Datei erzeugt.
 
-###2020-05-06 `0.1.0-Vor-Ruhlamat`  
+### 2020-05-06 `0.1.0-Vor-Ruhlamat`  
 - Readme.md :-)
 - Beispiel-Dateien.
 - Lesen von Projekt-Verschiebung.txt  
 - Automatisches Neu-Generieren der Ergebnisse, wenn Datendateien sich ändern.   
 
-###2020-04-25 `0.0`
+### 2020-04-25 `0.0`
 - Lesen von Projekt-Start-End-Abt-Kapa.txt   
 - Schreiben von Department-Load-Result.txt
 
