@@ -27,7 +27,7 @@ Diesen Ordner kopieren - z. B. in das lokale Verzeichnis:
 Oder nach `Programme` (als admin). Tut auch.  
 
 
-[ [Video-Anleitung 'Installation', Bitte hier lang...](https://loom.com/share/folder/098a2ada42f647bfbbcc89e4d0e4a202) ]: #
+[//]: # ([Video-Anleitung 'Installation', Bitte hier lang...](https://loom.com/share/folder/098a2ada42f647bfbbcc89e4d0e4a202))
 
 
 Dort (also z.B. in C:\v-pipe-x.y.z-release) liegen die Verzeichnisse und Dateien:
