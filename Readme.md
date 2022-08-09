@@ -12,12 +12,18 @@ und Abteilungskapazitäten ein und erzeugt eine
 Übersicht der Belastung aller beteiligten Abteilungen.  
 Es gibt die Möglichkeit, Projekte per Pfeiltasten  
 wochenweise zu verschieben und die Auswirkungen  
-in Echtzeit zu sehen.  
+in Echtzeit zu sehen. Alle Tasten-Kürzel  
+sind in der Kopfzeile von v-pipe zu sehen.
+Z. B. 
+- n = now 
+- d = Details 
+- Pfeil = Cursor bewegen
+- Shift-Pfeil = Projekt bewegen
 
-```{toggle}
-Quickstart-Videos zu allen Features?  
-Ja, gibt's: [Bitte hier lang...](https://loom.com/share/folder/098a2ada42f647bfbbcc89e4d0e4a202)
-```
+
+[Quickstart-Videos zu allen Features?  
+Ja, gibt's: Bitte hier lang...(https://loom.com/share/folder/098a2ada42f647bfbbcc89e4d0e4a202)]: #
+
 
 ## Installation
 Die Distribution ist ein Ordner mit dem Namen: `v-pipe-major.minor.bugfix-ReleaseName`.    
@@ -26,9 +32,7 @@ Diesen Ordner kopieren - z. B. in das lokale Verzeichnis:
 `c:\v-pipe-1.5.0-average-load`. Aber auch gerne auf einen Memory-Stick oder ins eigene Home.  
 Oder nach `Programme` (als admin). Tut auch.  
 
-
-[//]: # ([Video-Anleitung 'Installation', Bitte hier lang...](https://loom.com/share/folder/098a2ada42f647bfbbcc89e4d0e4a202))
-
+[Video-Anleitung 'Installation', Bitte hier lang...(https://loom.com/share/folder/098a2ada42f647bfbbcc89e4d0e4a202)]: #
 
 Dort (also z.B. in C:\v-pipe-x.y.z-release) liegen die Verzeichnisse und Dateien:
 
@@ -62,7 +66,8 @@ Die Funktion "Speichern unter..." macht es notwendig, ein neues Datenverzeichnis
 mit dem neuen Namen zu erstellen.
 Warum ist das so? Alle Dateien sind Text-Dateien und können auch von Hand  
 bearbeitet werden.  
-['Erste Schritte', Video-Anleitung, Bitte hier lang...](https://loom.com/share/folder/098a2ada42f647bfbbcc89e4d0e4a202)
+
+['Erste Schritte', Video-Anleitung, Bitte hier lang...(https://loom.com/share/folder/098a2ada42f647bfbbcc89e4d0e4a202)]: #
 
 
 ### Start von v-pipe, wenn die Daten fehlerhaft sind
@@ -71,7 +76,8 @@ Jetzt kann das Fenster zur Seite geschoben werden.
 Wann immer die Grunddaten neu erzeugt, verändert oder  
 gelöscht werden, rechnet v-pipe und erzeugt  
 die Ergebnis-Dateien neu - oder zeigt Datenfehler an.  
-['fehlerhafte Daten', Video-Anleitung, Bitte hier lang...](https://loom.com/share/folder/098a2ada42f647bfbbcc89e4d0e4a202)
+
+['fehlerhafte Daten', Video-Anleitung, Bitte hier lang...(https://loom.com/share/folder/098a2ada42f647bfbbcc89e4d0e4a202)]: #
 
 
 
@@ -99,7 +105,8 @@ notwendige Kapazität als 'Komma-Zahl mit PUNKT' - z.B.: 14.2
 Komma, Strichpunkt, Tab, Leerzeichen sind Trennzeichen.  
 KEINE Leerzeichen in den Projekt- und Abteilungs-Bezeichnungen.  
 Falls dort welche sind: Ersetzen mit Unterstrich = _.  
-['Projekt-Start-End-Abt-Kapa.txt', Video-Anleitung, Bitte hier lang...](https://loom.com/share/folder/098a2ada42f647bfbbcc89e4d0e4a202)
+
+['Projekt-Start-End-Abt-Kapa.txt', Video-Anleitung, Bitte hier lang...(https://loom.com/share/folder/098a2ada42f647bfbbcc89e4d0e4a202)]: #
 
 
 
@@ -114,7 +121,8 @@ in der Integrationsphase dar. Die Integrationsphasen der Projekte p1, p2 etc. si
 untereinander aufgeführt. Die Zahl am Ende jeder Zeile ist der Bedarf an Slots.  
 Dieser ist in der Regel 1 und maximal gleich der Anzahl der verfügbaren Slots -   
 im Beispiel sind das 6.  
-['Integrations-Phasen.txt', Video-Anleitung, Bitte hier lang...](https://loom.com/share/folder/098a2ada42f647bfbbcc89e4d0e4a202)
+
+['Integrations-Phasen.txt', Video-Anleitung, Bitte hier lang...(https://loom.com/share/folder/098a2ada42f647bfbbcc89e4d0e4a202)]: #
 
 ## `Abteilungs-Kapazitäts-Angebot.txt`
 **Grunddaten (optional):** Kapazitäts-Angebot aller Abteilungen für Auswertung  
