@@ -56,9 +56,10 @@ class DataWriter {
                                           DataReader.SCENARIO_FILE_NAME,
                                           DataReader.SEQUENCE_FILE_NAME,
                                           DataReader.PROJECT_TEMPLATE_FILE_NAME,
-                                          DataReader.PROJECT_TEMPLATE_FILE_NAME,
+                                          DataReader.TEMPLATE_PIPELINE_FILE_NAME,
                                           DataReader.PROJECT_DELIVERY_DATE_FILE_NAME,
-                                          DataReader.PROJECT_COMMENTS_FILE_NAME]
+                                          DataReader.PROJECT_COMMENTS_FILE_NAME,
+                                          DataReader.TEMPLATE_SEQUENCE_FILE_NAME]
 
     static def backup() {
         def bDir = FileSupport.backupDirName(DataReader.currentDir)

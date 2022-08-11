@@ -32,11 +32,13 @@ Diesen **Ordner einfach komplett kopieren** - z. B. in das lokale Verzeichnis:
 `c:\v-pipe-1.5.0-average-load`. Aber auch gerne auf einen Memory-Stick oder ins eigene Home.  
 Oder nach `Programme` (als admin). Tut auch.  
 
-Releases finden sich alle dort: [v-pipe Releases](https://www.dropbox.com/sh/btckprl3qltik44/AADreLW3KN7YS7q1OaHFVBKXa?dl=0)
+Releases finden sich alle dort: [v-pipe Releases](https://www.dropbox.com/sh/btckprl3qltik44/AADreLW3KN7YS7q1OaHFVBKXa?dl=0)  
 
 [Video-Anleitung 'Installation', Bitte hier lang...(https://loom.com/share/folder/098a2ada42f647bfbbcc89e4d0e4a202)]: #
 
-Dort (also z.B. in C:\v-pipe-x.y.z-release) liegen die Verzeichnisse und Dateien:
+Wenn die Dateien kopiert sind, befinden sich in ihrem Installationsverzeichnis  
+auf ihrem Rechner (also z.B. in C:\v-pipe-2.2.0-update-by-id)  
+folgende Verzeichnisse und Dateien:
 
 - `Readme.md` (diese Betriebsanleitung als Markdown - falls offline)  
 - `v-pipe-macos.sh.command` (macOS-Starter - Doppelklick)
@@ -414,7 +416,7 @@ D.h. der AutoSave-Modus wird automatisch deaktiviert.
 
 ## Release History
 
-### 2022-08-12 `2.2.0-win-osx-linux-err-checker-excel`
+### 2022-08-12 `2.2.0-update-by-id`
 - release and starter for win, linux and macos
 - error checking mode - work on the data-files and see error messages in realtime in  gui
 - plugin for getting data transformed (e.g out of excel), when reading delta-data

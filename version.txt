@@ -1,1 +1,1 @@
-2.2.0-plugin-win-osx-linux
+2.2.0-update-by-id

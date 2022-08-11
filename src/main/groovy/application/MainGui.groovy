@@ -46,15 +46,15 @@ import static model.DataReader.isValidModelFolder
 //  ok - build osx, win, linux with java11 jre
 //  ok - describe "read updates" in documentation
 //  ok - describe in doc "Plugin to read Excel while reading updates"
-//  ok remove all starters, e.g. v-pipe.exe in distribution
+//  ok - remove all starters, e.g. v-pipe.exe in distribution
 //  ok - SWITCH to "correction mode" when error during opening occurs. OPEN FILES IN EDITOR!
 //  ok - bat file for win start
 //  NO - three different jre for windows/linux/macos into ONE distro
 //  ok - deployment from every computer for linux, macos and windows
 //  ok - make updates based on IDs in comments of tasks: Project-Name and comment may be the "ID"
-//  - rename release to update-by-id
+//  ok - rename release to update-by-id
 //  - example 10 bsp-daten with plugin and ID: update
-// - put realease download page in markdown (link to dropbox)
+//  - put release download page in markdown (link to dropbox)
 
 // TODO 2.3 shadow-export-id
 // - shadow tasks (tasks that are not saved - but shown as shadow of the original)
