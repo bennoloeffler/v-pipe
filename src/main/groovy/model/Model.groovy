@@ -521,111 +521,115 @@ class Model {
 
     @CompileStatic(TypeCheckingMode.SKIP)
     Map<String, Map<String, YellowRedLimit>> calcCapa(def yamlSlurp, boolean withFileNameInErrorMessage = true) {
-        Map<String, Map<String, YellowRedLimit>> result = [:]
-        RunTimer.getTimerAndStart('calcCapa').withCloseable {
-            this.capaFileRawYamlSlurp = yamlSlurp
-            if (withFileNameInErrorMessage) {
-                fileErr = { "Fehler beim Lesen der Datei ${DataReader.get_CAPA_FILE_NAME()}\n" }
-            } else {
-                fileErr = { "" } as Closure<GString>
-            }
-            def timeKeys = getFullSeriesOfTimeKeys(WEEK)
-            //println ("calcCapa von ${timeKeys[0]} to ${timeKeys[timeKeys.size()-1]}")
-
-            // get the public holiday of that week and create a percentage based on 5 days (5-h)/5 (ph)
-            //if (!yamlSlurp.Kapa_Gesamt) {
-            //    throw new VpipeDataException("${fileErr()}Eintrag 'Kapa_Gesamt' fehlt.")
-            //}
-            //if (!yamlSlurp.Kapa_Gesamt.Feiertage) {
-            //    throw new VpipeDataException("${fileErr()}Eintrag 'Feiertage' in 'Kapa_Gesamt' fehlt.")
-            //}
-            List publicHolidays = []
-            if (yamlSlurp.Kapa_Gesamt?.Feiertage) {
-                publicHolidays = yamlSlurp.Kapa_Gesamt.Feiertage
-            }
-            // get the company percentage profile from holidayPercentProfile (ch)
-            //if (!yamlSlurp.Kapa_Gesamt.Kapa_Profil) {
-            //    throw new VpipeDataException("${fileErr()}Eintrag 'Kapa_Profil' in 'Kapa_Gesamt' fehlt.")
-            //}
-
-            Map percentProfile = [:]
-            if (yamlSlurp.Kapa_Gesamt?.Kapa_Profil) {
-                percentProfile = yamlSlurp.Kapa_Gesamt.Kapa_Profil
-                percentProfile.keySet().each {
-                    checkWeekPattern(it as String)
+        try {
+            Map<String, Map<String, YellowRedLimit>> result = [:]
+            RunTimer.getTimerAndStart('calcCapa').withCloseable {
+                this.capaFileRawYamlSlurp = yamlSlurp
+                if (withFileNameInErrorMessage) {
+                    fileErr = { "Fehler beim Lesen der Datei ${DataReader.get_CAPA_FILE_NAME()}\n" }
+                } else {
+                    fileErr = { "" } as Closure<GString>
                 }
-            }
+                def timeKeys = getFullSeriesOfTimeKeys(WEEK)
+                //println ("calcCapa von ${timeKeys[0]} to ${timeKeys[timeKeys.size()-1]}")
 
-            // create a map of year-week-strings with a percentage based
-            // percentOverall = profilePercentLeft * pubHolPercentLeft
-            Map<String, Double> overallPercentageProfile = [:]
-            for (week in timeKeys) {
-                Double percentagePubHol = percentageLeftAfterPublicHoliday(week, publicHolidays)
-                Double percentageProfile = (Double) (percentProfile[week] == null ? 1.0 : (Double) (percentProfile[week] / 100))
-                overallPercentageProfile[week] = percentagePubHol * percentageProfile
-            }
-            Map departments = yamlSlurp.Kapa_Abteilungen
-            if (!departments) {
-                throw new VpipeDataException("${fileErr()}Kein Abschnitt 'Kapa_Abteilungen' definiert")
-            }
-            for (dep in departments) {
+                // get the public holiday of that week and create a percentage based on 5 days (5-h)/5 (ph)
+                //if (!yamlSlurp.Kapa_Gesamt) {
+                //    throw new VpipeDataException("${fileErr()}Eintrag 'Kapa_Gesamt' fehlt.")
+                //}
+                //if (!yamlSlurp.Kapa_Gesamt.Feiertage) {
+                //    throw new VpipeDataException("${fileErr()}Eintrag 'Feiertage' in 'Kapa_Gesamt' fehlt.")
+                //}
+                List publicHolidays = []
+                if (yamlSlurp.Kapa_Gesamt?.Feiertage) {
+                    publicHolidays = yamlSlurp.Kapa_Gesamt.Feiertage
+                }
+                // get the company percentage profile from holidayPercentProfile (ch)
+                //if (!yamlSlurp.Kapa_Gesamt.Kapa_Profil) {
+                //    throw new VpipeDataException("${fileErr()}Eintrag 'Kapa_Profil' in 'Kapa_Gesamt' fehlt.")
+                //}
 
-                Map<String, YellowRedLimit> capaMap = [:]
-                // get the red and green limit
-                if (!dep.value['Kapa']) {
-                    throw new VpipeDataException("${fileErr()}Kein Abschnitt 'Kapa' in Abteilung '$dep.key' definiert")
-                }
-                if (!dep.value['Kapa'].rot) {
-                    throw new VpipeDataException("${fileErr()}Kein Abschnitt 'rot' in 'Kapa' der Abteilung '$dep.key' definiert")
-                }
-                if (!dep.value['Kapa'].gelb) {
-                    throw new VpipeDataException("${fileErr()}Kein Abschnitt 'gelb' in 'Kapa' der Abteilung '$dep.key' definiert")
-                }
-                Double norm_red = dep.value['Kapa'].rot as Double
-                Double norm_yellow = dep.value['Kapa'].gelb as Double
-                //println("Norm-Kapa $dep.key yellow: $norm_yellow red: $norm_red")
-                for (timeKey in timeKeys) {
-                    /*
-                "Kapa_Profil": {
-                    "2020-23": { "gelb": 140, "rot": 250 },
-                    "2020-24": 100,
-                    "2020-25": 80,
-                    "2020-26": 100
-                   }
-                */
-                    def p = 1.0
-                    if (dep.value['Kapa_Profil']) {
-                        dep.value['Kapa_Profil'].keySet().each {
-                            checkWeekPattern(it)
-                        }
+                Map percentProfile = [:]
+                if (yamlSlurp.Kapa_Gesamt?.Kapa_Profil) {
+                    percentProfile = yamlSlurp.Kapa_Gesamt.Kapa_Profil
+                    percentProfile.keySet().each {
+                        checkWeekPattern(it as String)
                     }
-                    // is a entry in the local Kapa_Profil. No? Then look for a cp --> value p other than 1
-                    //if(! dep.value['Kapa_Profil']) {throw new VpipeDataException("${fileErr()}Kein Abschnitt 'Kapa_Profil' in Abteilung '$dep.key' definiert")}
-                    def entry = dep.value['Kapa_Profil']?."$timeKey"
-                    if (entry) {
-                        if (entry instanceof Number) {
-                            p = entry / 100
+                }
+
+                // create a map of year-week-strings with a percentage based
+                // percentOverall = profilePercentLeft * pubHolPercentLeft
+                Map<String, Double> overallPercentageProfile = [:]
+                for (week in timeKeys) {
+                    Double percentagePubHol = percentageLeftAfterPublicHoliday(week, publicHolidays)
+                    Double percentageProfile = (Double) (percentProfile[week] == null ? 1.0 : (Double) (percentProfile[week] / 100))
+                    overallPercentageProfile[week] = percentagePubHol * percentageProfile
+                }
+                Map departments = yamlSlurp.Kapa_Abteilungen
+                if (!departments) {
+                    throw new VpipeDataException("${fileErr()}Kein Abschnitt 'Kapa_Abteilungen' definiert")
+                }
+                for (dep in departments) {
+
+                    Map<String, YellowRedLimit> capaMap = [:]
+                    // get the red and green limit
+                    if (!dep.value['Kapa']) {
+                        throw new VpipeDataException("${fileErr()}Kein Abschnitt 'Kapa' in Abteilung '$dep.key' definiert")
+                    }
+                    if (!dep.value['Kapa'].rot) {
+                        throw new VpipeDataException("${fileErr()}Kein Abschnitt 'rot' in 'Kapa' der Abteilung '$dep.key' definiert")
+                    }
+                    if (!dep.value['Kapa'].gelb) {
+                        throw new VpipeDataException("${fileErr()}Kein Abschnitt 'gelb' in 'Kapa' der Abteilung '$dep.key' definiert")
+                    }
+                    Double norm_red = dep.value['Kapa'].rot as Double
+                    Double norm_yellow = dep.value['Kapa'].gelb as Double
+                    //println("Norm-Kapa $dep.key yellow: $norm_yellow red: $norm_red")
+                    for (timeKey in timeKeys) {
+                        /*
+                    "Kapa_Profil": {
+                        "2020-23": { "gelb": 140, "rot": 250 },
+                        "2020-24": 100,
+                        "2020-25": 80,
+                        "2020-26": 100
+                       }
+                    */
+                        def p = 1.0
+                        if (dep.value['Kapa_Profil']) {
+                            dep.value['Kapa_Profil'].keySet().each {
+                                checkWeekPattern(it)
+                            }
+                        }
+                        // is a entry in the local Kapa_Profil. No? Then look for a cp --> value p other than 1
+                        //if(! dep.value['Kapa_Profil']) {throw new VpipeDataException("${fileErr()}Kein Abschnitt 'Kapa_Profil' in Abteilung '$dep.key' definiert")}
+                        def entry = dep.value['Kapa_Profil']?."$timeKey"
+                        if (entry) {
+                            if (entry instanceof Number) {
+                                p = entry / 100
+                            } else {
+                                // if there is a "increase or decreas of normal capa (gelb!=null) --> set new normal capa
+                                if (!entry?.rot) {
+                                    throw new VpipeDataException("${fileErr()}Kein Abschnitt 'rot' in 'Kapa_Profil'[$timeKey] der Abteilung '$dep.key' definiert")
+                                }
+                                if (!entry?.gelb) {
+                                    throw new VpipeDataException("${fileErr()}Kein Abschnitt 'gelb' in 'Kapa_Profil'[$timeKey] der Abteilung '$dep.key' definiert")
+                                }
+                                norm_red = entry.rot
+                                norm_yellow = entry.gelb
+                            }
                         } else {
-                            // if there is a "increase or decreas of normal capa (gelb!=null) --> set new normal capa
-                            if (!entry?.rot) {
-                                throw new VpipeDataException("${fileErr()}Kein Abschnitt 'rot' in 'Kapa_Profil'[$timeKey] der Abteilung '$dep.key' definiert")
-                            }
-                            if (!entry?.gelb) {
-                                throw new VpipeDataException("${fileErr()}Kein Abschnitt 'gelb' in 'Kapa_Profil'[$timeKey] der Abteilung '$dep.key' definiert")
-                            }
-                            norm_red = entry.rot
-                            norm_yellow = entry.gelb
+                            p = overallPercentageProfile[timeKey]
                         }
-                    } else {
-                        p = overallPercentageProfile[timeKey]
-                    }
 
-                    // set yellow and red to p * normal
-                    capaMap[timeKey] = new YellowRedLimit(yellow: norm_yellow * p, red: norm_red * p)
+                        // set yellow and red to p * normal
+                        capaMap[timeKey] = new YellowRedLimit(yellow: norm_yellow * p, red: norm_red * p)
+                    }
+                    //println("$dep.key $capaMap")
+                    result[(String) (dep.key)] = capaMap
                 }
-                //println("$dep.key $capaMap")
-                result[(String) (dep.key)] = capaMap
             }
+        } catch (Exception e1) {
+            throw new VpipeDataException("${fileErr()} \nProblem beim Lesen der Yaml-Struktur:\n ${e1.getMessage()}")
         }
         //calcAndInsertMonthlyCapaAvailable(result)
         result
