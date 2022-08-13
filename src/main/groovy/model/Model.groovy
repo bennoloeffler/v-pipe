@@ -35,6 +35,7 @@ class Model {
     @Bindable
     boolean updateToggle
 
+    @SuppressWarnings('unused')
     @Bindable
     List<TaskInProject> projectChanged
 
@@ -334,6 +335,7 @@ class Model {
         Math.abs(d2 - d1) > years20.toDays()
     }
 
+    @SuppressWarnings('unused')
     @CompileDynamic
     static boolean isMoreThan20Y(Date d) {
         isMoreThan20Y(new Date(), d)
