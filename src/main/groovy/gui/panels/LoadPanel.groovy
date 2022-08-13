@@ -1,3 +1,4 @@
+//file:noinspection GroovyAccessibility
 package gui.panels
 
 import groovy.beans.Bindable
@@ -43,13 +44,14 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
     @Bindable int gridWidth
 
     @Bindable int cursorX = -1
-    //int gridHeigth
+    //int gridHeight
     //int nameWidth
 
     @Bindable ToolTipDetails detailsToolTip = ToolTipDetails.no
 
     ShowAverageValue showAverageValue = ShowAverageValue.no
 
+    @SuppressWarnings('unused')
     @Bindable hScrollBarValueZoomingSync
 
     int mouseX
@@ -328,7 +330,7 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
                         //    drawGridElement(g, element.load, gridX, gridY)
                         //} else {
                         if (element.load > 0) {
-                            drawGridElementYelloRed(g,
+                            drawGridElementYellowRed(g,
                                     element.load,
                                     element.loadProject,
                                     maxValAndRed,
@@ -471,7 +473,7 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
 
 
     /**
-     * @return size as dimonsion based on model-size
+     * @return size as dimension based on model-size
      */
     @Override
     Dimension getPreferredSize() {
@@ -482,7 +484,7 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
     }
 
     @CompileStatic
-    def drawGridElementYelloRed(Graphics2D g,  Double val, Double valProject, Double max, Double yellow, Double red, Double avg, int x, int y) {
+    def drawGridElementYellowRed(Graphics2D g, Double val, Double valProject, Double max, Double yellow, Double red, Double avg, int x, int y) {
 
         RunTimer.getTimerAndStart("${this.name} NewLoadPanel::drawGridElementYelloRed").withCloseable {
 
@@ -503,7 +505,7 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
             //g.fillRoundRect(x + offset, y + percentShift + offset, sizeX - 4, (int) (percent * (sizeY - 4)), round, round)
 
             //
-            // color and bar accordig to load...
+            // color and bar according to load...
             //
             //
             //g.setColor(Color.GRAY)
@@ -581,7 +583,7 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
 
 
                 //g.setColor(Color.WHITE)
-                //g.drawString(p, x + 4, y + gridHeigth - (int) fontSize)
+                //g.drawString(p, x + 4, y + gridHeight - (int) fontSize)
 
                 //if(val > red) {g.setColor(Color.WHITE)}else{g.setColor(Color.BLACK)}
                 g.setColor(Color.BLACK)
@@ -594,7 +596,7 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
     }
 
     @Memoized
-    Font getFont(Graphics2D g, float fontSize) {
+    static Font getFont(Graphics2D g, float fontSize) {
         g.getFont().deriveFont((float) fontSize)
     }
 
@@ -602,14 +604,16 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
     Color lightRed = makeLighter(Color.RED,30)
     Color lightYellow = makeLighter(Color.YELLOW,30)
 
-    Color makeDarker(Color c, int darker) {
+    /*
+    static Color makeDarker(Color c, int darker) {
         int r = c.getRed()
         int g = c.getGreen()
         int b = c.getBlue()
         new Color(r>darker?r-darker:0, g>darker?g-darker:0, b>darker?b-darker:0)
     }
+     */
 
-    Color makeLighter(Color c, int lighter) {
+    static Color makeLighter(Color c, int lighter) {
         int r = c.getRed()
         int g = c.getGreen()
         int b = c.getBlue()
@@ -642,7 +646,7 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
             }
             def department = model.getYNames()[gridY]
             def timeStr = model.getXNames()[gridX]
-            def yellowRed = element.yellow >=0 ? "(${element.yellow.round(1)}, ${element.red.round(1)})":""
+            //def yellowRed = element.yellow >=0 ? "(${element.yellow.round(1)}, ${element.red.round(1)})":""
             def yellow = element.yellow >= 0 ? "${element.yellow.round(1)}" : "keine Daten"
             def red = element.red >= 0 ? "${element.red.round(1)}" : "keine Daten"
             def percentTotal = element.yellow > 0 ? ((double)(element.load / element.yellow)*100).round(1) : -1
@@ -650,6 +654,7 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
             def percentStr = percentTotal >=0 ? "$percentTotal% (von gelb)  (rot bei: $percentRed%)<br/>": ""
             // <br/>$element.fromToDateString
             String details = ""
+            //noinspection GroovyUnusedAssignment
             String choosenProject =""
             if(detailsToolTip == ToolTipDetails.details) {
                 List<String> data = element.projectDetails.sort {-it.projectCapaNeed }

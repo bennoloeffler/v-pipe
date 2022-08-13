@@ -6,7 +6,6 @@ import groovy.transform.TypeCheckingMode
 import groovyx.gpars.GParsPool
 import gui.models.GridElement
 import gui.models.GridModel
-import gui.panels.PanelBasics
 import utils.RunTimer
 
 import javax.swing.*
@@ -29,7 +28,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
 
     GridModel model
 
-    @Bindable String hightlightLinePattern
+    @Bindable String highlightLinePattern
 
     @Bindable String nowString
 
@@ -226,6 +225,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
     @CompileStatic(TypeCheckingMode.SKIP)
     void mouseEntered(MouseEvent e) {
         requestFocusInWindow()
+        //noinspection GroovyAccessibility
         ToolTipManager.sharedInstance().hideTipWindow()
     }
 
@@ -239,6 +239,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
     @Override
     void keyTyped(KeyEvent e) {}
 
+    @SuppressWarnings('GroovyAccessibility')
     @Override
     @CompileStatic(TypeCheckingMode.SKIP)
     void keyPressed(KeyEvent e){
@@ -505,7 +506,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
         } as PropertyChangeListener
         model.addPropertyChangeListener('updateToggle', l)
         addPropertyChangeListener('cursorX', cursorXChanged as PropertyChangeListener)
-        addPropertyChangeListener('hightlightLinePattern', l)
+        addPropertyChangeListener('highlightLinePattern', l)
         addPropertyChangeListener('hScrollBarValueZoomingSync', sbs)
         addPropertyChangeListener("showIntegrationPhase", l)
 
@@ -646,14 +647,14 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
                 model.getLineNames().each { String projectName ->
                     int gridY = borderWidth + y * gridWidth
                     try {
-                        if (hightlightLinePattern && projectName =~ hightlightLinePattern) {
+                        if (highlightLinePattern && projectName =~ highlightLinePattern) {
                             g.setColor(cursorColor) //new Color(150,255,255,100))
                             g.fillRoundRect(borderWidth, (int) (gridY + gridWidth / 2) - 2, nameWidth + borderWidth + gridWidth * model.sizeX, 4, round, round)
                         } else {
                             g.setColor(Color.WHITE)
                         }
                     } catch (Exception e) {
-                        println "problem with regex: " + hightlightLinePattern + "\n" + e
+                        println "problem with regex: " + highlightLinePattern + "\n" + e
                     }
                     g.fillRoundRect(borderWidth, gridY, nameWidth - 4, gridWidth - 4, round, round)
 

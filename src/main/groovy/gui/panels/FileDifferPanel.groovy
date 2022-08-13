@@ -12,7 +12,7 @@ class FileDifferPanel {
     String fileB
 
     SwingBuilder swing
-    Color fg = UIManager.getLookAndFeelDefaults().get("TextField.foreground") as Color
+    //Color fg = UIManager.getLookAndFeelDefaults().get("TextField.foreground") as Color
 
     FileDifferPanel(SwingBuilder swing) {
         this.swing = swing // shortcut
@@ -23,6 +23,7 @@ class FileDifferPanel {
         JFileChooser fc = new JFileChooser(currentDir)
         fc.setDialogTitle("Datei auswählen")
         fc.setFileSelectionMode(JFileChooser.FILES_ONLY)
+        //noinspection GroovyAssignabilityCheck
         int returnVal = fc.showOpenDialog(swing.differPanel)
 
         if (returnVal == JFileChooser.APPROVE_OPTION) {

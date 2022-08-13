@@ -42,7 +42,7 @@ class GlobalController {
         view.swing.openAction.closure = openActionPerformed
         view.swing.saveAction.closure = saveActionPerformed
         view.swing.saveAsAction.closure = saveAsActionPerformed
-        view.swing.toggleContinouosSaveAsAction.closure = toggleContinuosSaveAsActionPerformed
+        view.swing.toggleContinuosSaveAsAction.closure = toggleContinuosSaveAsActionPerformed
         view.swing.exitAction.closure = exitActionPerformed
 
         // Tool
@@ -221,7 +221,7 @@ class GlobalController {
         a.setEnabled(how)
         a = view.swing.openAction
         a.setEnabled(how)
-        a = view.swing.toggleContinouosSaveAsAction
+        a = view.swing.toggleContinuosSaveAsAction
         a.setEnabled(how)
         JMenu m = view.swing.recentMenuItem
         m.setEnabled(how)
@@ -494,7 +494,7 @@ class GlobalController {
         a.setEnabled(false)
         a = view.swing.saveAsAction
         a.setEnabled(false)
-        a = view.swing.toggleContinouosSaveAsAction
+        a = view.swing.toggleContinuosSaveAsAction
         a.setEnabled(false)
     }
 
@@ -509,7 +509,7 @@ class GlobalController {
         a.setEnabled(true)
         a = view.swing.saveAsAction
         a.setEnabled(true)
-        a = view.swing.toggleContinouosSaveAsAction
+        a = view.swing.toggleContinuosSaveAsAction
         a.setEnabled(true)
     }
 

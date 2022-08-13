@@ -1,3 +1,5 @@
+//file:noinspection GrReassignedInClosureLocalVar
+//file:noinspection GroovyAssignabilityCheck
 package model
 
 import groovy.io.FileType
@@ -384,10 +386,7 @@ class DataReader {
                     if (!start.before(end)) {
                         throw new VpipeDataException(errMsg() + "\nStart liegt nicht vor Ende.")
                     }
-                    /*
-                    if(line[3].toInteger() > maxPipelineSlots) {
-                        throw new VpipeDataException(errMsg() +"\nerforderliche Pipeline-Slots (${line[3].toInteger()}) größer als Maximum($maxPipelineSlots)")
-                    }*/
+
                     def pe = new PipelineElement(
                             project: line[0],
                             startDate: start,
@@ -428,7 +427,6 @@ class DataReader {
 
     static Map<String, Integer> parseDateShift(List<List<String>> splitLines) {
         Map<String, Integer> projectDayShift = [:]
-        //List<String[]> lines = FileSupport.getDataLinesSplitTrimmed(DataReader.DATESHIFT_FILE_NAME)
         splitLines.each { line ->
             def errMsg = { "Parsen von Datei ${get_DATESHIFT_FILE_NAME()} fehlgeschlagen.\nDatensatz: ${line}" }
             if (line?.size() != 2) {
@@ -522,7 +520,7 @@ class DataReader {
             if (words.size() != 3) {
                 throw new VpipeDataException("${errMsg()}Es müssen 3 Daten-Felder sein")
             }
-            def days = 0
+            def days
             try {
                 days = words[2].toInteger()
             } catch (Exception ignored) {

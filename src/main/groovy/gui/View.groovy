@@ -1,3 +1,4 @@
+//file:noinspection GroovyAssignabilityCheck
 package gui
 
 import com.formdev.flatlaf.FlatLightLaf
@@ -21,10 +22,10 @@ import static java.awt.Color.RED
  *
  * MVC with swing. BELs interpretation:
  * Model knows nothing - its observed and firing changes to an interface
- * View knows Model - but only to "bind". Holds swings actions. Holds the adaper-models (like JTableModel).
- * Controller knows Model and View. It connedts swings actions to real code that works on model.
+ * View knows Model - but only to "bind". Holds swings actions. Holds the adapter-models (like JTableModel).
+ * Controller knows Model and View. It connects swings actions to real code that works on model.
  *  GINA p.247 http://index-of.es/Java/Groovy%20in%20Action.pdf
- *  OLD docu SwingBuilder https://web.archive.org/web/20140702234352/http://groovy.codehaus.org/Swing+Builder
+ *  OLD documentation SwingBuilder https://web.archive.org/web/20140702234352/http://groovy.codehaus.org/Swing+Builder
  *  SLIDES https://de.slideshare.net/aalmiray/javaone-ts5098-groovy-swingbuilder?qid=58967b6f-7007-4c0a-9dc2-148194f618c8&v=&b=&from_search=2
  *  OLD article 1 https://uberconf.com/blog/andres_almiray/2009/11/building_rich_swing_applications_with_groovy__part_i
  *  OLD article 2 https://uberconf.com/blog/andres_almiray/2009/11/building_rich_swing_applications_with_groovy__part_iI
@@ -72,7 +73,7 @@ class View {
     View(Model model) {
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize()
-        scaleX = screenSize.getWidth() / 1000.0 // 1000 as virt size => xSize = 1000 * scaleX
+        scaleX = screenSize.getWidth() / 1000.0 // 1000 as virtual size => xSize = 1000 * scaleX
         scaleY = screenSize.getHeight() / 1000.0
 
         def ttm = ToolTipManager.sharedInstance()
@@ -114,7 +115,7 @@ class View {
     void build() {
 
         // https://iconarchive.com/show/outline-icons-by-iconsmind.html
-        // DONT DO '-' in ressource file names... wont work.
+        // DON'T DO '-' in ressource file names... wont work.
         //def url = new URL("https://icons.iconarchive.com/icons/iconsmind/outline/24/Bulleted-List-icon.png")
         //def url = getClass().getResource("/icons/open.png")
         //recentImageIcon =  scaleIcon(new ImageIcon(url), 0.5 * MainGui.scaleY)
@@ -172,7 +173,7 @@ class View {
                     closure: { println "openAction not connected to application..." },
                     accelerator: shortcut('O'),
                     smallIcon: i("/icons/open.png"),
-                    shortDescription: 'Verzeichnis mit Daten-Datein öffnen - alle Dateien darin'
+                    shortDescription: 'Verzeichnis mit Daten-Dateien öffnen - alle Dateien darin'
             )
 
             action(id: 'saveAction',
@@ -192,10 +193,10 @@ class View {
                     shortDescription: 'anderes Daten-Verzeichnis wählen und Dateien speichern'
             )
 
-            action(id: 'toggleContinouosSaveAsAction',
+            action(id: 'toggleContinuosSaveAsAction',
                     name: "kontinuierlich speichern",
                     //mnemonic: 's',
-                    closure: { println "toggleContinouosSaveAsAction not connected to application..." },
+                    closure: { println "toggleContinuosSaveAsAction not connected to application..." },
                     smallIcon: i("/icons/save-cont.png", 0.6),
                     shortDescription: 'alle 10 sec speichern'
             )
@@ -360,7 +361,7 @@ class View {
                         menu(id: "recentMenuItem", "Letzte öffnen", icon: i("/icons/recent.png"))
                         menuItem(saveAction)
                         menuItem(saveAsAction)
-                        checkBoxMenuItem(id: "checkBoxMenuContSaving", toggleContinouosSaveAsAction)
+                        checkBoxMenuItem(id: "checkBoxMenuContSaving", toggleContinuosSaveAsAction)
                         menuItem(exitAction)
                     }
 
@@ -511,7 +512,7 @@ class View {
             bind(target: pipelineView, targetProperty: 'cursorX', source: pipelineLoadView, sourceProperty: 'cursorX')
 
             // sync indicators in tools and status line
-            bind(target: pipelineView, targetProperty: 'hightlightLinePattern', source: searchTextField, sourceProperty: 'text')
+            bind(target: pipelineView, targetProperty: 'highlightLinePattern', source: searchTextField, sourceProperty: 'text')
             bind(target: timeLabel, targetProperty: 'text', source: pipelineView, sourceProperty: 'nowString')
             bind(target: projectLabel, targetProperty: 'text', source: gridPipelineModel, sourceProperty: 'selectedProject')
             bind(target: depLabel, targetProperty: 'text', source: gridProjectModel, sourceProperty: 'departmentName')
@@ -530,17 +531,19 @@ class View {
 
     }
 
-
+/*
     def setFullSize(JFrame f) {
         //f.setSize((int)(screenDimension.width), (int)(screenDimension.height - 50))
         //f.setLocation(0, 0)
     }
 
+ */
+
 
     def start(Closure initModelAndNotifyView) {
         swing.edt {
             initModelAndNotifyView()
-            setFullSize(swing.frame)
+            //setFullSize(swing.frame)
         }
     }
 
@@ -630,11 +633,13 @@ class View {
         gridPipelineModel.setSelectedProject(null)
     }
 
+    /*
     def showLog() {
         JTabbedPane tp = swing.tabs
         JScrollPane log = swing.log
         tp.setSelectedComponent(log)
     }
+     */
 
     String getSelectedProject() {
         gridPipelineModel.selectedProject
