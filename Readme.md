@@ -32,7 +32,7 @@ Diesen **Ordner einfach komplett kopieren** - z. B. in das lokale Verzeichnis:
 `c:\v-pipe-1.5.0-average-load`. Aber auch gerne auf einen Memory-Stick oder ins eigene Home.  
 Oder nach `Programme` (als admin). Tut auch.  
 
-Releases finden sich alle dort: [v-pipe Releases](https://www.dropbox.com/sh/btckprl3qltik44/AADreLW3KN7YS7q1OaHFVBKXa?dl=0)  
+Releases finden sich alle dort: [v-pipe Releases](https://www.dropbox.com/sh/0ns0bkkz7g2dua2/AABMMgMW0crOoZYfQcOEu30Sa?dl=0)  
 
 [Video-Anleitung 'Installation', Bitte hier lang...(https://loom.com/share/folder/098a2ada42f647bfbbcc89e4d0e4a202)]: #
 
@@ -332,30 +332,17 @@ Zeitschätzungen werden korrigiert.
 Tasks kommen hinzu oder werden abgearbeitet.  
 Ein v-pipe Modell kann "auf Basis von Daten aktuell gehalten werden".
 Dafür gibt es das Menü "Werkzeug->Aktualisierung für Projekte einlesen".
-Damit nun Daten eingelesen werden, muss im Unterordner read-updates-from-here  
-des aktuellen Verzeichnisses folgende Datei liegen: Update-Projekt-Start-End-Abt-Kapa.txt  
+Damit Daten eingelesen werden, muss im Unterordner `read-updates-from-here`  
+des aktuellen Modell-Verzeichnisses folgende Datei liegen: 
+`Update__Projekt-Start-End-Abt-Kapa.txt`  
 Also so:  
-`current-folder/read-updates-from-here/Update-Projekt-Start-End-Abt-Kapa.txt`    
+`current-folder/read-updates-from-here/Update__Projekt-Start-End-Abt-Kapa.txt`    
 Wird diese Datei erfolgreich gelesen, dann landet sie  
 mit Zeitstempel im 'done'-Verzeichnis:  
-`current-folder/read-updates-from-here/**done**/Update-Projekt-Start-End-Abt-Kapa-2022-04-17 18.16.10.097.txt`
-
-### Plugin zur Transformation der Update-Daten vor dem Einlesen
-Angenommen, die Update-Daten liegen als Excel-Datei vor.
-Aus den Excel-Daten müssen vor jedem Update die Daten in die Textdatei  
-Update-Projekt-Start-End-Abt-Kapa.txt  
-überführt werden. Um das zu automatisieren kann im Unterordner  
-`current-folder/read-updates-from-here/plugin/import.groovy`  
-Wird diese Datei gefunden, dann wird der Inhalt als groovy-script ausgeführt.
-Ein Beispiel findet sich Ordner  
-`bsp-daten/bsp-10-updates-plugin`
-Falls ein Plugin mit dem Namen import.groovy existiert,  
-dann wird es vor jedem Einlesen der Updates durchgeführt.
-Vorsicht: Das Plugin muss dann ggf. die Original-Daten ins `done`  
-Verzeichnis schieben und im Fehlerfalle eine Meldung ausgeben. 
+`current-folder/read-updates-from-here/**done**/Update__Projekt-Start-End-Abt-Kapa-2022-04-17 18.16.10.097.txt`
 
 ### ganze Projekte aktualisieren
-Wenn die Datei `Update-Projekt-Start-End-Abt-Kapa.txt`  
+Wenn die Datei `Update__Projekt-Start-End-Abt-Kapa.txt`  
 keine Identifikation / Kennzeichnung  
 (das Kommentarfeld beginnt mit nicht mit ID:)  
 am Ende jeder Zeile enthält,
@@ -376,7 +363,7 @@ Kommentar-Feldes am Ende der Daten in
 schießt sich ohne Leerzeichen an, z.B.: ID:4711).  
 
 Liegt diese Form der eindeutigen Kennzeichnung in der Update-Datei  
-`Update-Projekt-Start-End-Abt-Kapa.txt` vor, dann  
+`Update__Projekt-Start-End-Abt-Kapa.txt` vor, dann  
 werden die 'passenden' Tasks im Modell überschrieben.  
 Falls im Update Kennzeichnungen vorhanden sind, die  
 im Modell nicht vorliegen, werden diese Tasks neu angelegt.  
@@ -394,6 +381,23 @@ D.h. die Strategie des Updates lautet:
 7. falls Tasks im Update eine Kennzeichnung tragen, die es im Projekt nicht gibt, lege sie an.
 8. falls es Tasks mit Projekt-Namen im Update gibt, für die es kein Projekt im Modell gibt: lege das Projekt an.
 9. für Projekte, die verschoben werden, bleibt IP und Liefertermin stabil! 
+
+### Plugin zur Transformation der Update-Daten vor dem Einlesen
+Angenommen, die Update-Daten liegen als Excel-Datei vor.
+Aus den Excel-Daten müssen vor jedem Update die Daten in die Textdatei  
+`Update__Projekt-Start-End-Abt-Kapa.txt`  
+überführt werden. Um das zu automatisieren gibt es ein Skript:  
+`current-folder/read-updates-from-here/plugin/import.groovy`  
+Wird diese Datei gefunden, dann wird der Inhalt als groovy-script ausgeführt.
+Ein Beispiel findet sich Ordner  
+`bsp-daten/bsp-11-update-with-plugin`  
+Falls ein Plugin mit dem Namen import.groovy existiert,  
+dann wird es vor jedem Einlesen der Updates durchgeführt.  
+Vorsicht: **alle** Dateien aus dem Ordner `current-folder/read-updates-from-here/`  
+werden verschoben nach `done`.  
+Vor dem Import also alle offenen Dateien schließen,  
+sonst gibt es eine (je nach macOS, win, linux) eine Fehlermeldung  
+oder die offene Datei wird nach dem Update aus z.B. Excel versehentlich nochmal gespeichert.
 
 ## mit Vorlagen arbeiten
 Eine Vorlage besteht aus Tasks. Auch für die Integrationsphasen kann  

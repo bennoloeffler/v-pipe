@@ -521,8 +521,8 @@ class Model {
 
     @CompileStatic(TypeCheckingMode.SKIP)
     Map<String, Map<String, YellowRedLimit>> calcCapa(def yamlSlurp, boolean withFileNameInErrorMessage = true) {
+        Map<String, Map<String, YellowRedLimit>> result = [:]
         try {
-            Map<String, Map<String, YellowRedLimit>> result = [:]
             RunTimer.getTimerAndStart('calcCapa').withCloseable {
                 this.capaFileRawYamlSlurp = yamlSlurp
                 if (withFileNameInErrorMessage) {
@@ -1175,7 +1175,6 @@ class Model {
 
         def result = readUpdatesFromTasks(tasks)
         if (!result.err) {
-            println result
             DataReader.dropUpdateFilesToDoneFolder()
             reCalcCapaAvailableIfNeeded()
             fireUpdate()

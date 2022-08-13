@@ -1,5 +1,6 @@
 package model
 
+import groovy.io.FileType
 import groovy.json.JsonSlurper
 import groovy.time.TimeCategory
 import groovy.yaml.YamlBuilder
@@ -45,7 +46,7 @@ class DataReader {
     }
 
     static boolean isDataInUpdateFolder() {
-       new File( get_UPDATE_TASK_FILE_NAME()).exists()
+        new File(get_UPDATE_TASK_FILE_NAME()).exists()
     }
 
     static String updateDir() {
@@ -57,14 +58,26 @@ class DataReader {
     }
 
     static String updatePath(String fileName) {
-        updateDir() + "/Update-" + fileName
+        updateDir() + "/" + fileName
     }
+
     static String updateDonePath(String fileName) {
+        def posPoint = fileName.lastIndexOf(".")
+        def lenOfSuffix = posPoint - fileName.length()
+        def beforeSuffix
+        def afterSuffix
+        if (posPoint < 0) {
+            beforeSuffix = fileName[0..-1]
+            afterSuffix = ""
+        } else {
+            beforeSuffix = fileName[0..lenOfSuffix - 1]
+            afterSuffix = fileName[lenOfSuffix..-1]
+        }
         updateDoneDir() +
-                "/Update-" +
-                fileName[0.. -5] + // name
-                "-" + new DateTime().toString("yyyy-MM-dd HH.mm.ss.SSS") + // date + timestamp
-                fileName[-4..-1] // .txt
+                "/" +
+                beforeSuffix + // name
+                "__" + new DateTime().toString("yyyy-MM-dd__HH.mm.ss.SSS") + // date + timestamp
+                afterSuffix // .txt
     }
 
     static String get_PROJECT_TEMPLATE_FILE_NAME() {
@@ -80,7 +93,7 @@ class DataReader {
     }
 
     static String get_UPDATE_TASK_FILE_NAME() {
-        updatePath TASK_FILE_NAME
+        updatePath("Update__" + TASK_FILE_NAME)
     }
 
     static String get_PIPELINING_FILE_NAME() {
@@ -247,17 +260,26 @@ class DataReader {
     static void dropUpdateFilesToDoneFolder() {
         def doneDir = new File(updateDoneDir())
         doneDir.mkdirs()
-        if(doneDir.exists() && doneDir.isDirectory()) {
-            ALL_UPDATE_DATA_FILES.each { fileName ->
+        if (doneDir.exists() && doneDir.isDirectory()) {
+            def files = []
+            new File(updateDir()).eachFile(FileType.FILES) {
+                files << it.name
+            }
+            files.remove(".DS_Store") // macOS hack... Don't move that. Is an Equivalent to Desktop.ini
+            //println files
+            files.each { String fileName ->
+                println "Verschiebe Datei: " + fileName
                 File from = new File(updatePath(fileName))
                 File to = new File(updateDonePath(fileName))
-                from.renameTo(to) // move without exception, if file is missing - but also ignore fails...
+                println "von hier: " + from.absolutePath
+                println "nach hier: " + to.absolutePath
+                def success = from.renameTo(to) // move without exception, if file is missing - but also ignore fails...
+                success ? println ("...erfolgreich verschoben.") : println ("verschieben fehlgeschlagen. Vermutlich ist die Datei geöffnet!")
             }
         } else {
             throw new RuntimeException("could not create folder: " + doneDir.getAbsolutePath())
         }
     }
-
 
 
     /**
@@ -287,7 +309,7 @@ class DataReader {
                 if (maxPipelineSlots == 0) {
                     println("WARNUNG: In ${get_PIPELINING_FILE_NAME()} ist unbegrenzte Kapazität eingestellt (0 = kein Slot = unbegrenzt)...\n Pipelining wird ignoriert!")
                 }
-            } catch (Exception e) {
+            } catch (Exception ignored) {
                 throw new VpipeDataException("Fehler beim Lesen von ${get_PIPELINING_FILE_NAME()}.\nErste Zeile muss exakt eine Ganzzahl sein: Slots der Pipeline.")
             }
         }
@@ -503,7 +525,7 @@ class DataReader {
             def days = 0
             try {
                 days = words[2].toInteger()
-            } catch (Exception e) {
+            } catch (Exception ignored) {
                 throw new VpipeDataException("${errMsg()}Umwandeln in Ganzahl gescheitert. Das ist keine: ${words[2]}")
             }
             if (days > 20 * 365) {
@@ -546,7 +568,7 @@ class DataReader {
         result
     }
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         def templates = readProjectTemplates()
         println templates
     }

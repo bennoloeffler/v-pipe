@@ -242,7 +242,12 @@ class GlobalController {
         view.deselectProject()
 
         // Start plugin to transform data to input format
-        GroovyShell shell = new GroovyShell()
+        ClassLoader mcl = MainGui.instance.class.classLoader
+        def binding = new Binding()
+        binding.pathToUpdateDir = DataReader.updateDir()
+        //binding.pathToUpdateDoneDir = DataReader.updateDoneDir()
+
+        GroovyShell shell = new GroovyShell(mcl, binding)
 
         File plugin = new File(DataReader.get_UPDATE_PLUGIN_FILE_NAME())
         try {
@@ -254,6 +259,7 @@ class GlobalController {
         } catch (Exception e) {
             println "**** ERROR IN PLUGIN **** \n $e.message"
             JOptionPane.showMessageDialog(null, "Datei:\n" + plugin + "\n" + e.message, "Fehler im Import-Plugin!", JOptionPane.ERROR_MESSAGE)
+            return // stop import process
         }
         if (DataReader.isDataInUpdateFolder()) {
             def updates = model.readUpdatesFromUpdateFolder()
@@ -507,7 +513,7 @@ class GlobalController {
         a.setEnabled(true)
     }
 
-    void openAboutPanel() {
+    static void openAboutPanel() {
         JOptionPane.showMessageDialog(null,
                 "\n\nRelease:  v-pipe-" + MainGui.VERSION_STRING + "       \n\n" +
                         "Author:    Benno Löffler       \n\nE-Mail:    benno.loeffler@gmx.de       \n\n",

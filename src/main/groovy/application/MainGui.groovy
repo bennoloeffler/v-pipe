@@ -55,8 +55,8 @@ import static model.DataReader.isValidModelFolder
 //  ok - rename release to update-by-id
 //  - example 10 bsp-daten with plugin and ID: update
 //  - put release download page in markdown (link to dropbox)
-//  - put release download page in markdown (link to dropbox)
 //  - automatic open of file-error-correction-mode is interupted because of savety hint (save...)
+//  - move ALL files in update foler to /done - make sure to move also files with file extension .xlsx (4 instead of 3 .txt)
 
 // TODO 2.3 shadow-export-id
 // - shadow tasks (tasks that are not saved - but shown as shadow of the original)
