@@ -589,7 +589,8 @@ Nützlichkeit in absteigender Reihenfolge:
 **noch nicht gefixt**
 - macOS: Schließen mit dem System-Menu oder Command-Q ohne Abfrage nach Speichern. May be fixed [with this hint](https://alvinalexander.com/java/java-mac-osx-about-preferences-quit-application-adapter/)  
 - macOS: two finger zoom and scroll does not work. [maybe this helps](https://github.com/mcourteaux/MultiTouch-Gestures-Java)  
-  
+- beim Öffnen eines fehlerhaften Modells bricht der Korrektur-Modus ab und verlangt speichern
+
 **gefixt**
 - macOS: two-finger-zoom lead to java.lang.NoSuchMethodError: handleGestureFromNative  
 Fix: used java11.0.15
