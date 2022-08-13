@@ -63,6 +63,7 @@ import static model.DataReader.isValidModelFolder
 // TODO 2.3.0 better-help
 //  - automatic open of file-error-correction-mode is interupted because of savety hint (save...)
 //  - add filmes to loom and links to readme
+//  - put .zips AND folders in release folder. Place a README.txt there explaining
 
 // 2.4 shadow-export-zero-id
 // - shadow tasks (tasks that are not saved - but shown as shadow of the original)
