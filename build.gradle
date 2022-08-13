@@ -41,7 +41,7 @@ dependencies {
     implementation name: 'miglayout-4.0-swing' //ADD LOCAL LIB... it does not download...
     implementation group: 'org.codehaus.gpars', name: 'gpars', version: '1.2.1'
     implementation 'org.pcollections:pcollections:3.1.4'
-    implementation group: 'org.yaml', name: 'snakeyaml', version: '1.23'
+    implementation group: 'org.yaml', name: 'snakeyaml', version: '1.30'
 
 
     testImplementation 'junit:junit:4.13.2'
