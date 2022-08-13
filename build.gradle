@@ -32,9 +32,9 @@ tasks.withType(JavaCompile) {
 dependencies {
     implementation 'org.apache.ivy:ivy:2.5.0' // for plugins apache excel adapter
     implementation 'joda-time:joda-time:2.10.14'
-    implementation 'org.codehaus.groovy:groovy-all:3.0.11'
-    implementation group: 'org.codehaus.groovy', name: 'groovy-dateutil', version: '3.0.8'
-    implementation group: 'org.codehaus.groovy', name: 'groovy-yaml', version: '3.0.8'
+    implementation 'org.codehaus.groovy:groovy-all:3.0.12'
+    implementation group: 'org.codehaus.groovy', name: 'groovy-dateutil', version: '3.0.12'
+    implementation group: 'org.codehaus.groovy', name: 'groovy-yaml', version: '3.0.12'
     implementation 'org.tinylog:tinylog-impl:2.4.1'
     implementation 'org.tinylog:tinylog-api:2.4.1'
     implementation name: 'flatlaf-0.37'
