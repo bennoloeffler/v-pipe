@@ -69,7 +69,12 @@ class Weekifyer {
 
     static final Map<Integer, CalWeekAbsWeek> dateAbsWeekMap = calcAbsWeekMap(calcCalWeeksMap())
 
-    static def weekify(List<TaskInProject> tasks) {
+    // DO NOT USE FOR THE MOMENT!
+    // FAILS for strange reasons... only when build with shadowJar
+    // Caused by: org.codehaus.groovy.runtime.metaclass.MissingMethodExceptionNoStack: No signature of method: java.time.LocalDate.next() is applicable for argument types: ()
+    static void weekify(List<TaskInProject> tasks) {
+        println "start weekify"
+        return
         tasks.each { task ->
             task.startingWeek = dateAbsWeekMap[absDay(convertToLocalDateViaMilisecond(task.starting))].absWeek
             task.endingWeek = dateAbsWeekMap[absDay(convertToLocalDateViaMilisecond(task.ending))].absWeek

@@ -1,6 +1,7 @@
 package application
 
 import core.GlobalController
+import groovy.swing.SwingBuilder
 import gui.View
 import model.Model
 import model.VpipeDataException
@@ -85,18 +86,54 @@ class MainGui {
     static MainGui instance
 
 
+    SwingBuilder swing
+
+    def build() {
+
+        swing = new SwingBuilder()
+
+        swing.build {
+            action(id: 'helpAction',
+                    name: "Hilfe...",
+                    closure: { println "helpPerformanceAction not connected to application..." })
+            frame(title: "This is just a test",
+                    size: [200, 200],
+                    defaultCloseOperation: JFrame.EXIT_ON_CLOSE,
+                    show: true) {
+                label("Projekt suchen: ", foreground: Color.GRAY)
+                menuBar(id: 'menuBar') {
+                    menu(text: 'Help', mnemonic: 'H' ) {
+                        menuItem(helpAction)
+                    }
+                }
+            }
+        }
+
+    }
+
+
     static void main(String[] args) {
+/*
+        println "started 3"
+        new MainGui().build()
+        println "gui launched"
+
+ */
         // ExamplesFromWebpage.main()
         // flatlaf: goto lib and start flatlaf-demo-2.4.jar
         // for sourcecode see: https://www.formdev.com/flatlaf
 
         // AWT event dispatch thread: get the exceptions.
+
+
         Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler())
         System.setProperty("sun.awt.exception.handler",
                 ExceptionHandler.class.getName())
         checkFirstStartAndHelp()
         instance = new MainGui()
         instance.glueAndStart()
+
+
     }
 
 
@@ -119,10 +156,7 @@ class MainGui {
                 println "\nD A T E N - F E H L E R :\n" + thrown.getMessage() ?: ''
             } else {
                 File f = new File(FileSupport.instantErrorLogFileName)
-                println "\n\nABSTURZ!   " +
-                        "Fehler:\n${thrown.getMessage() ?: ''}\n" +
-                        "Thread-Name: $threadName\n" +
-                        "Log-File: ${f.getAbsolutePath()}"
+                println "\n\nABSTURZ!   " + "Fehler:\n${thrown.getMessage() ?: ''}\n" + "Thread-Name: $threadName\n" + "Log-File:\n${f.getAbsolutePath()}"
 
                 StringWriter sw = new StringWriter()
                 PrintWriter pw = new PrintWriter(sw)
@@ -187,7 +221,9 @@ class MainGui {
             String dirToOpen = "$home/v-pipe-data"
             //String dirToOpen = "./bsp-daten"
             def recent = UserSettingsStore.instance.recentOpenedDataFolders
-            if(recent) {dirToOpen =recent.last()}
+            if (recent) {
+                dirToOpen = recent.last()
+            }
 
             // DEV!
             /*
@@ -199,7 +235,7 @@ class MainGui {
 
             boolean vpipeDataExists = isValidModelFolder(dirToOpen)
 
-            if(vpipeDataExists) {
+            if (vpipeDataExists) {
                 controller.openDir(dirToOpen)
             } else {
                 model.setCurrentDir(home)
@@ -210,7 +246,7 @@ class MainGui {
 
     static void checkFirstStartAndHelp() {
         def fs = new File("ersterStart.md")
-        if(fs.exists()) {
+        if (fs.exists()) {
             println fs.getAbsolutePath()
             openBrowserWithHelp()
             fs.delete()

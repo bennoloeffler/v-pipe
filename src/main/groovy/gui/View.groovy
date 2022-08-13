@@ -148,11 +148,15 @@ class View {
         //MigLayout ml = new MigLayout()
         swing.registerBeanFactory('migLayout', MigLayout)
 
+
+
         swing.build {
 
             def i = { String iconPath, double scale = 0.5 ->
                 scaleIcon(imageIcon(resource: iconPath), scale * scaleY)
             }
+
+
 
             // https://stackoverflow.com/questions/42833424/java-key-bindings-using-groovy-swing-builder/42834255
             // https://stackoverflow.com/questions/9370326/default-action-button-icons-in-java
@@ -227,6 +231,8 @@ class View {
                     accelerator: shortcut('P'),
                     shortDescription: 'Staffelung sortieren dem spätesten End-Termin des letzten Tasks des Projektes'
             )
+
+
 
             /*
             action(id: 'insertInPhaseAction',
@@ -344,18 +350,22 @@ class View {
             )
 
 
-            JFrame f = frame(id: 'frame',
+
+
+            frame(id: 'frame',
                     size: [(int) (screenDimension.width), (int) (screenDimension.height - 50)],
-                    location: [0,0],
+                    location: [0, 0],
                     iconImage: frameIcon,
                     title: 'v-pipe:  +/- = Zoom  |  Pfeile = Cursor bewegen  |  Shift+Pfeile = Projekt bewegen  |  d = Details an/aus  |  n = now  |  Strg+Pfeile = Tasks vergr./verkl.  |  m = Mittelwert',
                     locationRelativeTo: null,
                     show: true,
                     defaultCloseOperation: JFrame.DO_NOTHING_ON_CLOSE) {
+                label("    Zeit: ", foreground: GRAY)
+
 
                 menuBar(id: 'menuBar') {
 
-                    menu(text: 'Datei', mnemonic: 'D') {
+                    menu(text: 'Datei', mnemonic: 'D' as char) {
                         menuItem(newModelAction)
                         menuItem(openAction)
                         menu(id: "recentMenuItem", "Letzte öffnen", icon: i("/icons/recent.png"))
@@ -365,7 +375,8 @@ class View {
                         menuItem(exitAction)
                     }
 
-                    menu(text: 'Werkzeug', mnemonic: 'W') {
+
+                    menu(text: 'Werkzeug') {
                         menuItem(sortPipelineAction)
                         //menuItem(insertInPhaseAction)
                         //menuItem(removeInPhaseAction)
@@ -375,7 +386,7 @@ class View {
 
                     }
 
-                    menu(text: 'Ansicht', mnemonic: 'A') {
+                    menu(text: 'Ansicht') {
                         menuItem(toggleViewInPhaseAction)
                         menuItem(pipelineViewAction)
                         menuItem(loadViewAction)
@@ -384,7 +395,7 @@ class View {
                         menuItem(monthViewAction)
                     }
 
-                    menu(text: 'Hilfe', mnemonic: 'H') {
+                    menu(text: 'Hilfe') {
                         menuItem(helpAction)
                         menuItem(aboutAction)
                         menuItem(printPerformanceAction)
@@ -406,7 +417,6 @@ class View {
                 button('öffnen', actionPerformed: ModelReaderMessagePanel.openFolder)
                 label(id: 'saveIndicator', "*", foreground: GRAY)
                 label(id: 'currentPath', constraints: 'wrap')
-
 
 
                 // left | right
@@ -472,8 +482,13 @@ class View {
 
                         }
                     }
+
+
                 }
+
+
             }
+
             bind(target: currentPath, targetProperty: 'text', source: model, sourceProperty: "currentDir", converter: { String v ->
                 JLabel cp = currentPath
                 cp.setToolTipText(v)
@@ -489,7 +504,7 @@ class View {
                 v ? RED : GRAY
             })
             bind(target: swapped, targetProperty: 'text', source: model, sourceProperty: "projectsAndTemplatesSwapped", converter: { v ->
-                f.validate() // to layout upmost panel and make "VORLAGEN-MOODUS" visible
+                swing.frame.validate() // to layout upmost panel and make "VORLAGEN-MOODUS" visible
                 v ? "VORLAGEN-MODUS" : ""
             })
 
@@ -527,6 +542,9 @@ class View {
 
         }
         ((JScrollPane) (swing.projectDetailsScrollPane)).verticalScrollBar.setUnitIncrement(10)
+
+
+
 
 
     }

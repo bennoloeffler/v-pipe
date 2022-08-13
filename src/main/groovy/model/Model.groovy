@@ -761,16 +761,22 @@ class Model {
 
         def t = RunTimer.getTimerAndStart('Model::readAllData')
         try {
+            def i = 0
+            println (++i)
 
             emptyTheModel()
+            println (++i)
 
             //
             // ordinary tasks
             //
             taskList = DataReader.readTasks()
-            weekify(taskList)
+            println (++i)
+            //weekify(taskList)
+            println (++i)
 
             deliveryDates = DataReader.readPromisedDeliveryDates()
+            println (++i)
 
 
             //
@@ -781,6 +787,7 @@ class Model {
             pipelineElements = pr.elements
             checkPipelineInProject()
 
+            println (++i)
 
             //
             // FIRST move projects - if needed

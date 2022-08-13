@@ -8,13 +8,13 @@
  * and delete the exe files finally.
  */
 
-import edu.sc.seis.launch4j.tasks.Launch4jLibraryTask
+//import edu.sc.seis.launch4j.tasks.Launch4jLibraryTask
 
 plugins {
     id 'idea'
     id 'groovy'
-    id 'edu.sc.seis.launch4j' version '2.4.6'
-    //id 'com.github.johnrengelman.shadow' version '4.0.4'
+    //id 'edu.sc.seis.launch4j' version '2.4.6'
+    id 'com.github.johnrengelman.shadow' version '4.0.4'
 
 }
 
@@ -44,11 +44,11 @@ dependencies {
     implementation group: 'org.yaml', name: 'snakeyaml', version: '1.23'
 
 
-    testCompile 'junit:junit:4.13.2'
-    testCompile group: 'org.spockframework', name: 'spock-core', version: '2.0-groovy-3.0'
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation group: 'org.spockframework', name: 'spock-core', version: '2.0-groovy-3.0'
 }
 
-
+/*
 
 launch4j {
     mainClassName = 'application.GuiMain'
@@ -61,6 +61,8 @@ task createGui(type: Launch4jLibraryTask) {
     outfile = 'v-pipe-gui.exe'
     mainClassName = 'application.MainGui'
 }
+
+ */
 
 
 /**
@@ -89,47 +91,45 @@ static def getOsName() {
 
 if (getOsName() == "linux") {
     // Consider Linux.
-    //jrePath ="/home/benno/.jdks/corretto-1.8.0_322" // Linux
     jrePath ="/home/benno/.sdkman/candidates/java/11.0.12-open"
     println "jre for linux: " + jrePath
 } else if (getOsName() == "windows") {
     // Consider Windows.
-    //jrePath = "C:\\Program Files\\Java\\jre1.8.0_172" // WIN11
     jrePath = "C:\\Program Files\\Java\\jdk-11.0.12"// WIN11
     println "jre for WIN: " + jrePath
 } else if (getOsName() == "macos") {
     // Consider OS X.
-    //jrePath = "/Users/benno/Library/Java/JavaVirtualMachines/liberica-1.8.0_322" // macos
     jrePath = "/Users/benno/.sdkman/candidates/java/11.0.15-librca" // macos
     println "jre for macos: " + jrePath
 } else {
     // Unknown OS.
-    println "ERROR... *********  Unknown OS  *********"
+    println "ERROR... *********  Unknown or wrong OS  *********"
+    println getOsName()
     Thread.sleep(10000)
 }
 
 
-//def jrePath = "C:\\Program Files\\Java\\jre1.8.0_172" // WIN11
-//def jrePath = "C:\\Program Files\\Java\\jre-9.0.4" // does not scale so fine in the Grid-Panel...
-//def jrePath = "/Users/benno/Library/Java/JavaVirtualMachines/liberica-1.8.0_322" // macos
+
 def version = rootProject.file('version.txt').text.trim()
 println "VERSION: " + version
-def tempDist = "$buildDir/dist/v-pipe-" + version
-def exampleDir = "$tempDist/bsp-daten"
-def newModelDir = "$tempDist/new-model"
+def distDir = "$buildDir/dist"
+def releaseDir = "$distDir/v-pipe-" + version
+def exampleDir = "$releaseDir/bsp-daten"
+def newModelDir = "$releaseDir/new-model"
 
 task copyExeLibsJRE {
-    dependsOn createExe, createGui
+    //dependsOn createExe, createGui
     dependsOn test
-    //dependsOn shadowJar
+    dependsOn shadowJar
 
-    description "copies jre, exe and lib to $tempDist"
+    description "copies jre, exe and lib to $releaseDir"
     group "v-pipe"
 
     doFirst {
 
-        delete tempDist
-        mkdir tempDist
+        delete distDir
+        delete releaseDir
+        mkdir releaseDir
 
         def fs = new File("ersterStart.md")
         fs.delete()
@@ -137,10 +137,11 @@ task copyExeLibsJRE {
         fs << "ein Hinweis für v-pipe, dass der erste Start noch bevorsteht"
     }
     doLast {
+        /*
         copy {
             from "$buildDir/launch4j"
-            into tempDist
-        }
+            into releaseDir
+        }*/
 
         copy {
             from "bsp-daten"
@@ -175,26 +176,26 @@ task copyExeLibsJRE {
 */
         copy {
             from "version.txt"
-            into tempDist
+            into releaseDir
         }
         copy {
             from "Readme.md"
-            into tempDist
+            into releaseDir
         }
 
         copy {
             from "dock-icon.png"
-            into tempDist
+            into releaseDir
         }
 
         copy {
             from "Readme.html.url"
-            into tempDist
+            into releaseDir
         }
 
         copy {
             from "Referenz.html"
-            into tempDist
+            into releaseDir
         }
 /*
         copy {
@@ -204,53 +205,54 @@ task copyExeLibsJRE {
 */
         copy {
             from "ersterStart.md"
-            into tempDist
+            into releaseDir
         }
 
         copy {
             from "v-pipe-macos.sh.command"
-            into tempDist
+            into releaseDir
         }
 
         copy {
             from "v-pipe-linux.sh"
-            into tempDist
+            into releaseDir
         }
 
         copy {
             from "v-pipe-win.bat"
-            into tempDist
+            into releaseDir
         }
 
         //if(!new File("$buildDir/dist/v-pipe/$jre").exists()) {
         copy {
             println"copy JRE... may take a while ($jrePath)"
-            println"to ($tempDist)"
+            println"to ($releaseDir)"
             from jrePath
-            into "$tempDist/$jre"
+            into "$releaseDir/$jre"
         }
 
-        delete "$tempDist/v-pipe.exe"
-        delete "$tempDist/v-pipe-gui.exe"
+        //delete "$releaseDir/v-pipe.exe"
+        //delete "$releaseDir/v-pipe-gui.exe"
 
-        /*
+
         // tried with FAT JAR... (shadowJar)
         copy {
             from "build/libs/v-pipe.jar"
-            into "$tempDist/lib/"
-        }*/
+            into "$releaseDir/lib/"
+        }
 
         //}
     }
 }
 
-/*
+
 task createDistribution(type: Zip) {
+    archiveName 'v-pipe-' +version+ '.zip' // will be named archiveFileName in future releases
     description 'creates the v-pipe zip distribution'
     group "v-pipe"
     dependsOn copyExeLibsJRE
-    from "$buildDir/dist"
-}*/
+    from "$buildDir/dist/v-pipe-$version"
+}
 
 
 jar {
