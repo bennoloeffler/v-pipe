@@ -16,7 +16,7 @@ import static model.DataReader.isValidModelFolder
 
 // HERE is the place for all TODO s (TODO = release, todo = remainder)
 // related with the next release
-// TODO practice clean code. https://issuu.com/softhouse/docs/cleancode_5minutes_120523/16
+// practice clean code. https://issuu.com/softhouse/docs/cleancode_5minutes_120523/16
 
 // RELEASE 2.0 do all in Gui (MIK edition) with video starting from help
 // ok 1.6 new Model, new Project, rename Project, templates and pipelines in GUI --> YOU DON'T NEED THE FILES.
@@ -40,7 +40,7 @@ import static model.DataReader.isValidModelFolder
 //   each: read tasks, delete projects old, put tasks in model
 //  Copy Project
 //
-// TODO 2.2.0-win-osx-linux-err-checker-excel
+// noTODO 2.2.0
 //  ok - fix bug with "saving wrong date format"
 //  ok - commit update commit from all: surfux, belmac and pux
 //  ok - build osx, win, linux with java11 jre
@@ -53,12 +53,18 @@ import static model.DataReader.isValidModelFolder
 //  ok - deployment from every computer for linux, macos and windows
 //  ok - make updates based on IDs in comments of tasks: Project-Name and comment may be the "ID"
 //  ok - rename release to update-by-id
-//  - example 10 bsp-daten with plugin and ID: update
-//  - put release download page in markdown (link to dropbox)
-//  - automatic open of file-error-correction-mode is interupted because of savety hint (save...)
-//  - move ALL files in update foler to /done - make sure to move also files with file extension .xlsx (4 instead of 3 .txt)
+//  ok - example 10 bsp-daten with plugin and ID: update
+//  ok - put release download page in markdown (link to dropbox)
+//  ok - move ALL files in update foler to /done - make sure to move also files with file extension .xlsx (4 instead of 3 .txt)
 
-// TODO 2.3 shadow-export-id
+
+// NEXT RELEASES
+
+// TODO 2.3.0 better-help
+//  - automatic open of file-error-correction-mode is interupted because of savety hint (save...)
+//  - add filmes to loom and links to readme
+
+// 2.4 shadow-export-zero-id
 // - shadow tasks (tasks that are not saved - but shown as shadow of the original)
 // - export results (weekly, monthly, Details) to excel or csv
 // - mark tasks with "zero capa" in a different color

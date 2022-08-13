@@ -417,7 +417,6 @@ Wenn schließlich alle Vorlagen bearbeitet sind, dann wechselt man wieder.
 Während des "Vorlagen-Modus" kann man das Modell nicht speichern.
 D.h. der AutoSave-Modus wird automatisch deaktiviert.
 
-
 ## Release History
 
 ### 2022-08-12 `2.2.0-update-by-id`
