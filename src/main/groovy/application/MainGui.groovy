@@ -61,10 +61,14 @@ import static model.DataReader.isValidModelFolder
 
 // NEXT RELEASES
 
-// TODO 2.3.0 better-help
+// TODO 2.3.0-good-help
 //  - automatic open of file-error-correction-mode is interupted because of savety hint (save...)
+//  - add the example models to the v-pipe home folder and make them appear in history
 //  - add filmes to loom and links to readme
-//  - put .zips AND folders in release folder. Place a README.txt there explaining
+//  - put .zips in release folder. Place a README.txt there explaining the installation
+//  - put a runnable folder for macOS somewhere for V&S
+//  - create a script to create a RELEASE
+//  - create a SNAPSHOT
 
 // 2.4 shadow-export-zero-id
 // - shadow tasks (tasks that are not saved - but shown as shadow of the original)

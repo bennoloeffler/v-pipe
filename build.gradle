@@ -251,7 +251,7 @@ task createDistribution(type: Zip) {
     description 'creates the v-pipe zip distribution'
     group "v-pipe"
     dependsOn copyExeLibsJRE
-    from "$buildDir/dist/v-pipe-$version"
+    from "$distDir/v-pipe-$version"
 }
 
 
