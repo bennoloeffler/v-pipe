@@ -254,7 +254,7 @@ class GlobalController {
             if (plugin.exists()) {
                 shell.evaluate(plugin)
             } else {
-                println "kein plugin file für den Daten-Import gefunden. Wird übersprungen...\n $plugin"
+                println "kein plugin/import.groovy file für Transformation beim Daten-Import gefunden. Wird übersprungen...\n$plugin"
             }
         } catch (Exception e) {
             println "**** ERROR IN PLUGIN **** \n $e.message"

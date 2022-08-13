@@ -1151,7 +1151,6 @@ class Model {
         result
     }
 
-    //@CompileDynamic
     def readUpdatesFromUpdateFolder() {
 
         // read from file
