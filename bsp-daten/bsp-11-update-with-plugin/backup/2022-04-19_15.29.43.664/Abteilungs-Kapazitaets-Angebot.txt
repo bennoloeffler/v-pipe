@@ -1,0 +1,32 @@
+---
+Kapa_Abteilungen:
+  M-Kon:
+    Kapa:
+      gelb: 200
+      rot: 400
+    Kapa_Profil:
+      "2020-W01": 100
+      "2020-W02": 100
+      "2020-W34":
+        gelb: 120
+        rot: 150
+      "2020-W35":
+        gelb: 200
+        rot: 400
+  E-Kon:
+    Kapa:
+      gelb: 160
+      rot: 200
+    Kapa_Profil: {}
+  SW:
+    Kapa:
+      gelb: 340
+      rot: 460
+  Mon:
+    Kapa:
+      gelb: 160
+      rot: 400
+  IBN:
+    Kapa:
+      gelb: 100
+      rot: 200
