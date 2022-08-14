@@ -70,6 +70,7 @@ import static model.DataReader.isValidModelFolder
 //  - create a script to create a RELEASE
 //  - create a SNAPSHOT
 //  - a bug when opening bsp-00: empty yaml behaves differently
+//  - data-path is centered in gui. should be left
 
 // 2.4 shadow-export-zero-id
 // - shadow tasks (tasks that are not saved - but shown as shadow of the original)

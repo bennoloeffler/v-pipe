@@ -24,6 +24,7 @@ import java.util.HashMap;
  *  This class was designed to be used as a component added to the row header
  *  of a JScrollPane.
  */
+@SuppressWarnings("deprecation")
 public class TextLineNumber extends JPanel
         implements CaretListener, DocumentListener, PropertyChangeListener
 {
@@ -176,7 +177,6 @@ public class TextLineNumber extends JPanel
      *  <li>TextLineNumber.CENTER
      *  <li>TextLineNumber.RIGHT (default)
      *	</ul>
-     *  @param currentLineForeground  the Color used to render the current line
      */
     public void setDigitAlignment(float digitAlignment)
     {
@@ -425,6 +425,7 @@ public class TextLineNumber extends JPanel
 
         SwingUtilities.invokeLater(new Runnable()
         {
+            @SuppressWarnings("deprecation")
             @Override
             public void run()
             {

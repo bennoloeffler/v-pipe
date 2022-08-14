@@ -762,21 +762,16 @@ class Model {
         def t = RunTimer.getTimerAndStart('Model::readAllData')
         try {
             def i = 0
-            println (++i)
 
             emptyTheModel()
-            println (++i)
 
             //
             // ordinary tasks
             //
             taskList = DataReader.readTasks()
-            println (++i)
-            //weekify(taskList)
-            println (++i)
+            //weekify(taskList) // does not RUN with FAT JAR???
 
             deliveryDates = DataReader.readPromisedDeliveryDates()
-            println (++i)
 
 
             //

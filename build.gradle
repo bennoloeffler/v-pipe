@@ -1,21 +1,8 @@
-/*
- * User guide available at https://docs.gradle.org/4.0/userguide/tutorial_groovy_projects.html
- */
-
-/*
- * fat jar: does not work.
- * so _instead_: create dist with Launch4J
- * and delete the exe files finally.
- */
-
-//import edu.sc.seis.launch4j.tasks.Launch4jLibraryTask
 
 plugins {
     id 'idea'
     id 'groovy'
-    //id 'edu.sc.seis.launch4j' version '2.4.6'
     id 'com.github.johnrengelman.shadow' version '4.0.4'
-
 }
 
 repositories {
@@ -43,27 +30,12 @@ dependencies {
     implementation 'org.pcollections:pcollections:3.1.4'
     implementation group: 'org.yaml', name: 'snakeyaml', version: '1.30'
 
-
     testImplementation 'junit:junit:4.13.2'
     testImplementation group: 'org.spockframework', name: 'spock-core', version: '2.1-groovy-3.0'
 }
 
-/*
 
-launch4j {
-    mainClassName = 'application.GuiMain'
-    headerType='console'
-    bundledJrePath='jre'
-}
-
-
-task createGui(type: Launch4jLibraryTask) {
-    outfile = 'v-pipe-gui.exe'
-    mainClassName = 'application.MainGui'
-}
-
- */
-
+println "Running gradle version: $gradle.gradleVersion"
 
 /**
  * set that to local copy
@@ -108,17 +80,16 @@ if (getOsName() == "linux") {
     Thread.sleep(10000)
 }
 
-
-
 def version = rootProject.file('version.txt').text.trim()
-println "VERSION: " + version
-def distDir = "$buildDir/dist"
-def releaseDir = "$distDir/v-pipe-" + version
-def exampleDir = "$releaseDir/bsp-daten"
-def newModelDir = "$releaseDir/new-model"
+println "building RELEASE: " + version
 
-task copyExeLibsJRE {
-    //dependsOn createExe, createGui
+String distDir = "$buildDir/dist"
+String distributionsDir = "$buildDir/distributions"
+String releaseDir = "$distDir/v-pipe-" + version
+String exampleDir = "$releaseDir/bsp-daten"
+String newModelDir = "$releaseDir/new-model"
+
+task copyLibsJRE {
     dependsOn test
     dependsOn shadowJar
 
@@ -127,6 +98,7 @@ task copyExeLibsJRE {
 
     doFirst {
 
+        delete distributionsDir
         delete distDir
         delete releaseDir
         mkdir releaseDir
@@ -136,12 +108,8 @@ task copyExeLibsJRE {
         fs.createNewFile()
         fs << "ein Hinweis für v-pipe, dass der erste Start noch bevorsteht"
     }
+
     doLast {
-        /*
-        copy {
-            from "$buildDir/launch4j"
-            into releaseDir
-        }*/
 
         copy {
             from "bsp-daten"
@@ -153,31 +121,11 @@ task copyExeLibsJRE {
             into newModelDir
         }
 
-/*
-        copy {
-            from "bsp-daten/Projekt-Start-End-Abt-Kapa.txt"
-            into exampleDir
-        }
-
-        copy {
-            from "bsp-daten/Projekt-Verschiebung.txt"
-            into exampleDir
-        }
-
-        copy {
-            from "bsp-daten/Integrations-Phasen.txt"
-            into exampleDir
-        }
-
-        copy {
-            from "bsp-daten/v-pipe-Auswertung.xlsx"
-            into exampleDir
-        }
-*/
         copy {
             from "version.txt"
             into releaseDir
         }
+
         copy {
             from "Readme.md"
             into releaseDir
@@ -197,12 +145,7 @@ task copyExeLibsJRE {
             from "Referenz.html"
             into releaseDir
         }
-/*
-        copy {
-            from "bsp-daten/v-pipe-Auswertung.xlsx"
-            into exampleDir
-        }
-*/
+
         copy {
             from "ersterStart.md"
             into releaseDir
@@ -225,32 +168,29 @@ task copyExeLibsJRE {
 
         //if(!new File("$buildDir/dist/v-pipe/$jre").exists()) {
         copy {
-            println"copy JRE... may take a while ($jrePath)"
-            println"to ($releaseDir)"
+            //println"copy JRE... may take a while ($jrePath)"
+            //println"to ($releaseDir)"
             from jrePath
             into "$releaseDir/$jre"
         }
 
-        //delete "$releaseDir/v-pipe.exe"
-        //delete "$releaseDir/v-pipe-gui.exe"
-
-
-        // tried with FAT JAR... (shadowJar)
+        // FAT JAR built with shadowJar
         copy {
             from "build/libs/v-pipe.jar"
             into "$releaseDir/lib/"
         }
 
-        //}
     }
 }
 
 
 task createDistribution(type: Zip) {
-    archiveName 'v-pipe-' +version+ '.zip' // will be named archiveFileName in future releases
+    // property archiveFileName with gradle 8, but does not yet work???
+    setArchiveFileName( "v-pipe-${version}.zip")
+    into("v-pipe-${version}")
     description 'creates the v-pipe zip distribution'
     group "v-pipe"
-    dependsOn copyExeLibsJRE
+    dependsOn copyLibsJRE
     from "$distDir/v-pipe-$version"
 }
 
@@ -260,6 +200,7 @@ jar {
         attributes 'Main-Class': 'application.MainGui'
     }
 }
+
 
 // EXPERIMENTAL
 task buildNativeImage(type: Exec) {
