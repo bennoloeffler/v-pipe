@@ -56,13 +56,13 @@ import static model.DataReader.isValidModelFolder
 //  ok - rename release to update-by-id
 //  ok - example 10 bsp-daten with plugin and ID: update
 //  ok - put release download page in markdown (link to dropbox)
-//  ok - move ALL files in update foler to /done - make sure to move also files with file extension .xlsx (4 instead of 3 .txt)
+//  ok - move ALL files in update folder to /done - make sure to move also files with file extension .xlsx (4 instead of 3 .txt)
 
 
 // NEXT RELEASES
 
 // TODO 2.3.0-good-help
-//  - automatic open of file-error-correction-mode is interupted because of savety hint (save...)
+//  ok - automatic open of file-error-correction-mode is interrupted because of safety hint (save...)
 //  - add the example models to the v-pipe home folder and make them appear in history
 //  - add filmes to loom and links to readme
 //  - put .zips in release folder. Place a README.txt there explaining the installation
@@ -70,7 +70,7 @@ import static model.DataReader.isValidModelFolder
 //  - create a script to create a RELEASE
 //  - create a SNAPSHOT
 //  - a bug when opening bsp-00: empty yaml behaves differently
-//  - data-path is centered in gui. should be left
+//  ok - data-path is centered in gui. should be left
 
 // 2.4 shadow-export-zero-id
 // - shadow tasks (tasks that are not saved - but shown as shadow of the original)
@@ -91,46 +91,15 @@ class MainGui {
     GlobalController controller
     static MainGui instance
 
-
     SwingBuilder swing
 
-    def build() {
-
-        swing = new SwingBuilder()
-
-        swing.build {
-            action(id: 'helpAction',
-                    name: "Hilfe...",
-                    closure: { println "helpPerformanceAction not connected to application..." })
-            frame(title: "This is just a test",
-                    size: [200, 200],
-                    defaultCloseOperation: JFrame.EXIT_ON_CLOSE,
-                    show: true) {
-                label("Projekt suchen: ", foreground: Color.GRAY)
-                menuBar(id: 'menuBar') {
-                    menu(text: 'Help', mnemonic: 'H' ) {
-                        menuItem(helpAction)
-                    }
-                }
-            }
-        }
-
-    }
-
-
     static void main(String[] args) {
-/*
-        println "started 3"
-        new MainGui().build()
-        println "gui launched"
 
- */
         // ExamplesFromWebpage.main()
         // flatlaf: goto lib and start flatlaf-demo-2.4.jar
         // for sourcecode see: https://www.formdev.com/flatlaf
 
         // AWT event dispatch thread: get the exceptions.
-
 
         Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler())
         System.setProperty("sun.awt.exception.handler",

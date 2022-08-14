@@ -360,8 +360,6 @@ class View {
                     locationRelativeTo: null,
                     show: true,
                     defaultCloseOperation: JFrame.DO_NOTHING_ON_CLOSE) {
-                label("    Zeit: ", foreground: GRAY)
-
 
                 menuBar(id: 'menuBar') {
 
@@ -402,7 +400,7 @@ class View {
                     }
                 }
 
-                migLayout(layoutConstraints: "fill", columnConstraints: "[][][][][][][][][][][][][grow]", rowConstraints: "[][grow]")
+                migLayout(layoutConstraints: "fill", columnConstraints: "[][][][][][][][][][][][][][grow]", rowConstraints: "[][grow]")
 
                 label("Projekt suchen: ", foreground: GRAY)
                 textField(id: 'searchTextField', toolTipText: 'Tutorial & Experimente: regex101.com', constraints: 'width 100')
@@ -414,10 +412,10 @@ class View {
                 label("    Abt: ", foreground: GRAY)
                 label("", id: 'depLabel', foreground: highlightColor)
                 label(" Pfad: ", foreground: GRAY)
-                button('öffnen', actionPerformed: ModelReaderMessagePanel.openFolder)
                 label(id: 'saveIndicator', "*", foreground: GRAY)
-                label(id: 'currentPath', constraints: 'wrap')
-
+                label(id: 'currentPath', constraints: 'growx')
+                button('öffnen', actionPerformed: ModelReaderMessagePanel.openFolder)
+                label(id: 'filler', constraints: 'growx, wrap')
 
                 // left | right
                 splitPane(id: 'spH', orientation: JSplitPane.HORIZONTAL_SPLIT, continuousLayout: true, dividerLocation: (int) (500 * scaleX), constraints: 'grow, span') {

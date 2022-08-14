@@ -475,7 +475,6 @@ class GlobalController {
                     vde.message,
                     "DATEN-FEHLER beim Start",
                     JOptionPane.WARNING_MESSAGE)
-            setSaveForEmptyModel()
             correctProjectFilesActionPerformed()
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null,
@@ -484,7 +483,6 @@ class GlobalController {
                     JOptionPane.ERROR_MESSAGE)
             setEmptyModel()
             setSaveForEmptyModel()
-
             throw e // to produce stacktrace on console...
         }
     }

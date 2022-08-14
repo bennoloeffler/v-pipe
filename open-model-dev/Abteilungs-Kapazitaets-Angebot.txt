@@ -15,7 +15,7 @@ Kapa_Gesamt:
 Kapa_Abteilungen:
   M-Kon:
     Kapa:
-      gelb: 3 50
+      gelb:  50
       rot: 100
     Kapa_Profil:
       "2020-W01": 100 
@@ -28,7 +28,7 @@ Kapa_Abteilungen:
         rot: 400
   E-Kon:
     Kapa:
-      gelb: 160
+      gelb: c 160
       rot: 200
     Kapa_Profil: {}
   SW:

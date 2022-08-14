@@ -842,12 +842,12 @@ class Model {
 
         } catch (Exception e) {
             emptyTheModel()
-            //setVPipeHomeDir() removed here with implemenation of FileErrorChecker
+            setDirty(false) // remove this?
             throw e
         } finally {
-            setDirty(false)
             fireUpdate()
             t.stop()
+            setDirty(false)
         }
     }
 
