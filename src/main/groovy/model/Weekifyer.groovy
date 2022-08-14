@@ -38,7 +38,15 @@ class Weekifyer {
     }
 
     private static List<List> calcCalWeeksMap() {
-        (startOfDates..endOfDates).collect { LocalDate d -> return [d, _getCalWeek(d)] }
+        List<LocalDate> dates = []
+        for (LocalDate date = startOfDates; date.isBefore(endOfDates); date = date.plusDays(1)) {
+            dates << date
+        }
+        dates.collect { LocalDate d -> return [d, _getCalWeek(d)] }
+
+        // THIS causes trouble with fatJar: fails when class loading...
+        //  java.time.LocalDate.next() seems to be missing.
+        //(startOfDates..endOfDates).collect { LocalDate d -> return [d, _getCalWeek(d)] }
     }
 
     private static Map<Integer, CalWeekAbsWeek> calcAbsWeekMap(List<List> allDays) {
@@ -73,8 +81,6 @@ class Weekifyer {
     // FAILS for strange reasons... only when build with shadowJar
     // Caused by: org.codehaus.groovy.runtime.metaclass.MissingMethodExceptionNoStack: No signature of method: java.time.LocalDate.next() is applicable for argument types: ()
     static void weekify(List<TaskInProject> tasks) {
-        println "start weekify"
-        return
         tasks.each { task ->
             task.startingWeek = dateAbsWeekMap[absDay(convertToLocalDateViaMilisecond(task.starting))].absWeek
             task.endingWeek = dateAbsWeekMap[absDay(convertToLocalDateViaMilisecond(task.ending))].absWeek

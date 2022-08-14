@@ -769,7 +769,7 @@ class Model {
             // ordinary tasks
             //
             taskList = DataReader.readTasks()
-            //weekify(taskList) // does not RUN with FAT JAR???
+            weekify(taskList) // does not RUN with FAT JAR???
 
             deliveryDates = DataReader.readPromisedDeliveryDates()
 
@@ -781,8 +781,6 @@ class Model {
             maxPipelineSlots = pr.maxPipelineSlots
             pipelineElements = pr.elements
             checkPipelineInProject()
-
-            println (++i)
 
             //
             // FIRST move projects - if needed
