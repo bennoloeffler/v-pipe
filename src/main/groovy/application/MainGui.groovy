@@ -69,7 +69,7 @@ import static model.DataReader.isValidModelFolder
 //  - put a runnable folder for macOS somewhere for V&S
 //  - create a script to create a RELEASE
 //  - create a SNAPSHOT
-//  - a bug when opening bsp-00: empty yaml behaves differently
+//  ok - a bug when opening bsp-00: empty yaml behaves differently
 //  ok - data-path is centered in gui. should be left
 
 // 2.4 shadow-export-zero-id

@@ -188,10 +188,14 @@ Kapa_Abteilungen:
         JButton byc = swing.yamlCreateButton
         byc.setEnabled(true)
 
+        def slurper = "slurper"
+        def result = "parsing"
+        def capaMap = [:]
+
         try {
-            def slurper = new YamlSlurper()
-            def result = slurper.parseText(ta.text)
-            def capaMap = model.calcCapa(result, false)
+            slurper = new YamlSlurper()
+            result = slurper.parseText(ta.text)
+            capaMap = model.calcCapa(result, false)
             //model.check()
             def renameDepartmentsErr = checkDepartments(capaMap)
             if (renameDepartmentsErr) {
@@ -212,9 +216,15 @@ Kapa_Abteilungen:
                 }
             }
         } catch (Throwable e) {
-            ta.setForeground(Color.RED)
-            tf.text = e.getMessage()
-            return false
+            if(ta.text != "") {
+                ta.setForeground(Color.RED)
+                tf.text = e.getMessage()
+                return false
+            } else {
+                ta.setForeground(Color.BLACK)
+                tf.text = "Keine Daten... :-(\naber ok..."
+                return true
+            }
             //ta.invalidate()
             //tf.invalidate()
         }
@@ -225,29 +235,29 @@ Kapa_Abteilungen:
     def buildPanel() {
         swing.build {
             panel(id: "manageResourcesPanel", name: 'Ressosurcen & Kapa') {
-                migLayout(layoutConstraints: "", rowConstraints: "[][]", columnConstraints: "[]")
-                panel(border: titledBorder('Ressourcen bearbeiten'), constraints: 'wrap') {
-                    migLayout(layoutConstraints: "fill", columnConstraints: "[][][][]", rowConstraints: "[]")
+                migLayout(layoutConstraints: "fill", rowConstraints: "", columnConstraints: "[grow]")
+                panel(border: titledBorder('Ressourcen bearbeiten'), constraints: 'growx, wrap') {
+                    migLayout(layoutConstraints: "fill", columnConstraints: "[fill][fill]")
                     //button("kopieren", actionPerformed: createResource, constraints: "")
                     //button("umbenennen", actionPerformed: renameResource, constraints: "")
-                    label("Hier alles bis auf Ressourcen-Namen editieren", constraints: '')
-                    label("Gibt's Fehler?", constraints: 'wrap')
+                    label("Hier alles bis auf Ressourcen-Namen editieren", constraints: 'growx')
+                    label("Gibt's Fehler?", constraints: 'growx, wrap')
 
                     //scrollPane(constraints: "span 2, grow") {
                     //list(id: 'resourcesList', constraints: "grow")
                     //}
 
-                    scrollPane(id: 'capaTextFileScrollPane', constraints: "h ${(int) (150 * View.scaleY)}!, w ${(int) (300 * View.scaleY)}!, growx, growy".toString()) {
+                    scrollPane(id: 'capaTextFileScrollPane', constraints: "growx, growy") {
                         textPane(id: 'capaTextFile', model.capaFileRawYamlSlurp, font: new Font(Font.MONOSPACED, Font.PLAIN, (int)(12 * View.scaleY)))
                     }
-                    scrollPane(constraints: "w ${(int) (250 * View.scaleY)}!, growy, growx, wrap".toString()) {
+                    scrollPane(constraints: "growy, growx, wrap") {
                         textArea(id: "errorMessageCapaEdit")
                     }
                     button(id: "yamlSaveButton", "speichern", actionPerformed: saveRessources, constraints: "span, grow, wrap")
                     button(id: "yamlCreateButton", "Kapa-Profil neu erstellen", actionPerformed: createNewCapaModel, constraints: "span, grow, wrap")
 
                 }
-                panel(border: titledBorder('neue Ressource anlegen'), constraints: 'wrap') {
+                panel(border: titledBorder('neue Ressource anlegen'), constraints: 'growx, wrap') {
                     migLayout(layoutConstraints: "fill", columnConstraints: "[][][][][]", rowConstraints: "[][]")
                     label("Name", constraints: '')
                     textField(id: "resourceName", "hier_ein_eindeutiger_Name_ohne_Space", constraints: 'growx, wrap, span')

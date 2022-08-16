@@ -414,7 +414,7 @@ class View {
                 label(" Pfad: ", foreground: GRAY)
                 label(id: 'saveIndicator', "*", foreground: GRAY)
                 label(id: 'currentPath', constraints: 'growx')
-                button('öffnen', actionPerformed: ModelReaderMessagePanel.openFolder)
+                button('öffnen', actionPerformed: ModelReaderMessagePanel.openFolder, toolTipText: 'öffnet das Datenverzeichnis im Datei-Manager',)
                 label(id: 'filler', constraints: 'growx, wrap')
 
                 // left | right
