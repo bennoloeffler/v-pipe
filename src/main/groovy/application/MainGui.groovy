@@ -71,10 +71,11 @@ import static model.DataReader.isValidModelFolder
 //  ok Place a README.txt there explaining the installation
 //  - put a runnable folder for macOS somewhere for V&S
 //  NO - create a script to create a RELEASE
-//  - copy all JDKs to a local JDK-cache, and create all releases in on shot (additional target: create-release-win, create-release-linux, create-release
+//  ok - copy all JDKs to a local JDK-cache, and create all releases in on shot (additional target: create-release-win, create-release-linux, create-release
 //  NO - create a SNAPSHOT
 //  ok - a bug when opening bsp-00: empty yaml behaves differently
 //  ok - data-path is centered in gui. should be left
+//  - performance messen: gui.View.showLog()
 
 // 2.4 shadow-export-zero-id
 // - shadow tasks (tasks that are not saved - but shown as shadow of the original)
@@ -87,8 +88,7 @@ import static model.DataReader.isValidModelFolder
 // 4.2 watch files (inside v-pipe in a text area, so that scenarios and shifts can be realized)
 
 class MainGui {
-
-    static VERSION_STRING = new File('version.txt').text
+    static VERSION_STRING // init from ressources
 
     Model model
     View view
@@ -161,6 +161,11 @@ class MainGui {
 
 
     def glueAndStart() {
+        //def bis = new BufferedInputStream( getClass().getResource("/version.txt"))
+        //def txt = bis.text
+        //println txt
+        InputStream is = Model.class.getClassLoader().getResourceAsStream("version.txt")
+        VERSION_STRING = is.text
 
         System.setProperty("apple.laf.useScreenMenuBar", "true")
         // todo: add macos gestures for zooming windows:

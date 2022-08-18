@@ -1,4 +1,3 @@
-
 plugins {
     id 'idea'
     id 'groovy'
@@ -24,7 +23,7 @@ dependencies {
     implementation group: 'org.codehaus.groovy', name: 'groovy-yaml', version: '3.0.12'
     implementation 'org.tinylog:tinylog-impl:2.4.1'
     implementation 'org.tinylog:tinylog-api:2.4.1'
-    implementation group: 'com.formdev', name: 'flatlaf', version:'2.4'
+    implementation group: 'com.formdev', name: 'flatlaf', version: '2.4'
     implementation 'com.miglayout:miglayout-swing:11.0'
     implementation group: 'org.codehaus.gpars', name: 'gpars', version: '1.2.1'
     implementation 'org.pcollections:pcollections:3.1.4'
@@ -41,7 +40,7 @@ println "Running gradle version: $gradle.gradleVersion"
  * set that to local copy
  */
 def jre = "jre"
-def jrePath ="NOT SET YET"
+def jrePath = "NOT SET YET"
 
 println "native os.name = " + System.getProperty("os.name").toLowerCase()
 
@@ -63,7 +62,7 @@ static def getOsName() {
 
 if (getOsName() == "linux") {
     // Consider Linux.
-    jrePath ="/home/benno/.sdkman/candidates/java/11.0.12-open"
+    jrePath = "/home/benno/.sdkman/candidates/java/11.0.12-open"
     println "jre for linux: " + jrePath
 } else if (getOsName() == "windows") {
     // Consider Windows.
@@ -80,7 +79,7 @@ if (getOsName() == "linux") {
     Thread.sleep(10000)
 }
 
-def version = rootProject.file('version.txt').text.trim()
+String version = rootProject.file('src/main/resources/version.txt').text.trim()
 println "building RELEASE: " + version
 
 String distDir = "$buildDir/dist"
@@ -93,7 +92,7 @@ task copyLibsJRE {
     dependsOn test
     dependsOn shadowJar
 
-    description "copies jre, exe and lib to $releaseDir"
+    description "copies ONE jre and lib for current platform ${getOsName()} to $releaseDir"
     group "v-pipe"
 
     doFirst {
@@ -121,19 +120,22 @@ task copyLibsJRE {
             into newModelDir
         }
 
+        /*
         copy {
             from "version.txt"
             into releaseDir
-        }
+        }*/
 
         copy {
             from "Readme.md"
             into releaseDir
         }
 
-        copy {
-            from "dock-icon.png"
-            into releaseDir
+        if (getOsName() == "macos") {
+            copy {
+                from "dock-icon.png"
+                into releaseDir
+            }
         }
 
         copy {
@@ -151,25 +153,29 @@ task copyLibsJRE {
             into releaseDir
         }
 
-        copy {
-            from "v-pipe-macos.sh.command"
-            into releaseDir
+        if (getOsName() == "macos") {
+            copy {
+                from "v-pipe-macos.sh.command"
+                into releaseDir
+            }
+        }
+
+
+        if (getOsName() == "linux") {
+            copy {
+                from "v-pipe-linux.sh"
+                into releaseDir
+            }
+        }
+
+        if (getOsName() == "windows") {
+            copy {
+                from "v-pipe-win.bat"
+                into releaseDir
+            }
         }
 
         copy {
-            from "v-pipe-linux.sh"
-            into releaseDir
-        }
-
-        copy {
-            from "v-pipe-win.bat"
-            into releaseDir
-        }
-
-        //if(!new File("$buildDir/dist/v-pipe/$jre").exists()) {
-        copy {
-            //println"copy JRE... may take a while ($jrePath)"
-            //println"to ($releaseDir)"
             from jrePath
             into "$releaseDir/$jre"
         }
@@ -183,10 +189,157 @@ task copyLibsJRE {
     }
 }
 
+def copyLibsTask(os){
+    return tasks.create("copyLibsJRE_${os}"){
+
+        def version = rootProject.file('src/main/resources/version.txt').text.trim()
+        String distDir = "$buildDir/dist/$os"
+        String distributionsDir = "$buildDir/distributions/$os"
+        String releaseDir = "$distDir/v-pipe-" + version
+        String exampleDir = "$releaseDir/bsp-daten"
+        String newModelDir = "$releaseDir/new-model"
+
+        dependsOn test
+        dependsOn shadowJar
+
+        description "copies $os jre and v-pipe-lib to $releaseDir"
+        group "v-pipe"
+
+
+
+        doFirst {
+
+            delete distributionsDir
+            delete distDir
+            delete releaseDir
+            mkdir releaseDir
+
+            def fs = new File("ersterStart.md")
+            fs.delete()
+            fs.createNewFile()
+            fs << "ein Hinweis für v-pipe, dass der erste Start noch bevorsteht"
+        }
+
+        doLast {
+
+            copy {
+                from "bsp-daten"
+                into exampleDir
+            }
+
+            copy {
+                from "new-model"
+                into newModelDir
+            }
+
+            /*
+            copy {
+                from "version.txt"
+                into releaseDir
+            }*/
+
+            copy {
+                from "Readme.md"
+                into releaseDir
+            }
+
+            if (os == "macos") {
+                copy {
+                    from "dock-icon.png"
+                    into releaseDir
+                }
+            }
+
+            copy {
+                from "Readme.html.url"
+                into releaseDir
+            }
+
+            copy {
+                from "Referenz.html"
+                into releaseDir
+            }
+
+            copy {
+                from "ersterStart.md"
+                into releaseDir
+            }
+
+            if (os == "macos") {
+                copy {
+                    from "v-pipe-macos.sh.command"
+                    into releaseDir
+                }
+            }
+
+
+            if (os == "linux") {
+                copy {
+                    from "v-pipe-linux.sh"
+                    into releaseDir
+                }
+            }
+
+            if (os == "windows") {
+                copy {
+                    from "v-pipe-win.bat"
+                    into releaseDir
+                }
+            }
+
+            copy {
+                def jrePath = ""
+                if(os == "windows") {jrePath = "JDKs/windows/jdk-11.0.12"}
+                else if (os == "macos") {jrePath = "JDKs/macos/11.0.15-librca"}
+                else if (os == "linux") {jrePath = "JDKs/linux/11.0.12-open"}
+                else {println "ERROR: no JDK for os $os"}
+                if(!new File(jrePath).exists()) {
+                    println "ERROR: jre does not exist: $jrePath"
+                }
+                //println"copy JRE... may take a while ($jrePath)"
+                //println"to ($releaseDir)"
+                from jrePath
+                into "$releaseDir/jre"
+            }
+
+            // FAT JAR built with shadowJar
+            copy {
+                from "build/libs/v-pipe.jar"
+                into "$releaseDir/lib/"
+            }
+        }
+
+    }
+}
+
+task copyLibsJRE_ALL {
+    description "copies all jre and v-pipe-lib to their releaseDirs"
+    dependsOn copyLibsTask("linux"), copyLibsTask("windows"), copyLibsTask("macos")
+    group "v-pipe"
+}
+
+def createDistribution(os){
+    return tasks.create("createDistribution_${os}", Zip) {
+        String version = rootProject.file('src/main/resources/version.txt').text.trim()
+        setArchiveFileName("v-pipe-${version}-${os}.zip")
+        into("v-pipe-${version}")
+        description os+ ': creates the v-pipe zip distribution'
+        group "v-pipe"
+        dependsOn "copyLibsJRE_${os}"
+        String distDir = "$buildDir/dist/$os"
+        from "$distDir/v-pipe-$version"
+    }
+}
+
+task createDistribution_ALL {
+    description "creates all .zip distributions for win, linux and macos"
+    dependsOn createDistribution("windows"), createDistribution("macos"),createDistribution("linux")
+    group "v-pipe"
+}
 
 task createDistribution(type: Zip) {
     // property archiveFileName with gradle 8, but does not yet work???
-    setArchiveFileName( "v-pipe-${version}.zip")
+    setArchiveFileName("v-pipe-${version}.zip")
     into("v-pipe-${version}")
     description 'creates the v-pipe zip distribution'
     group "v-pipe"

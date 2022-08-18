@@ -1,4 +1,6 @@
 # Project exclude paths
-/.gradle/
-/build/
+.gradle/**
+build/**
 .DS_Store
+out/**
+
