@@ -1,10 +1,12 @@
 package application
 
 import core.GlobalController
+import groovy.io.FileType
 import groovy.swing.SwingBuilder
 import gui.View
 import model.Model
 import model.VpipeDataException
+import org.apache.commons.io.FileUtils
 import utils.FileSupport
 import utils.UserSettingsStore
 
@@ -15,7 +17,7 @@ import java.awt.event.WindowEvent
 
 import static model.DataReader.isValidModelFolder
 
-// HERE is the place for all TODO s (TODO = release, todo = remainder)
+// HERE is the place for all _TODO s (_TODO = release, _todo = remainder)
 // related with the next release
 // practice clean code. https://issuu.com/softhouse/docs/cleancode_5minutes_120523/16
 
@@ -110,7 +112,6 @@ class MainGui {
 
 
     }
-
 
     static class ExceptionHandler implements Thread.UncaughtExceptionHandler {
 
@@ -219,11 +220,38 @@ class MainGui {
         }
     }
 
+
+    static void copyExamplesToHome() {
+        String home = System.getProperty("user.home")
+        def src = new File("bsp-daten")
+        def dest = new File("$home/v-pipe-data/bsp-daten")
+        try {
+            FileUtils.copyDirectory(src,dest)
+        } catch (IOException e) {
+            e.printStackTrace()
+        }
+        if (dest.exists() && dest.isDirectory()) {
+            java.util.List<String> dirs = [] // collides with awt list
+            dest.eachFile(FileType.DIRECTORIES) {
+                dirs << it.absolutePath
+            }
+            println dirs
+            dirs.reverse()
+            dirs.each { String dir  ->
+                println "add to 'recently opened'" + dir
+                UserSettingsStore.instance.addLastOpenedDataFolder(dir)
+            }
+        } else {
+            throw new RuntimeException("could not create folder: " + dest.getAbsolutePath())
+        }
+    }
+
     static void checkFirstStartAndHelp() {
         def fs = new File("ersterStart.md")
         if (fs.exists()) {
             println fs.getAbsolutePath()
             openBrowserWithHelp()
+            copyExamplesToHome()
             fs.delete()
         }
     }

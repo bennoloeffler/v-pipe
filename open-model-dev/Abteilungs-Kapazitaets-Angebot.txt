@@ -28,7 +28,7 @@ Kapa_Abteilungen:
         rot: 400
   E-Kon:
     Kapa:
-      gelb: c 160
+      gelb:  160
       rot: 200
     Kapa_Profil: {}
   SW:
