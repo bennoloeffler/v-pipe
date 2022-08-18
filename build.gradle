@@ -2,7 +2,7 @@
 plugins {
     id 'idea'
     id 'groovy'
-    id 'com.github.johnrengelman.shadow' version '4.0.4'
+    id 'com.github.johnrengelman.shadow' version '4.0.4' // fat jar
 }
 
 repositories {
@@ -24,8 +24,8 @@ dependencies {
     implementation group: 'org.codehaus.groovy', name: 'groovy-yaml', version: '3.0.12'
     implementation 'org.tinylog:tinylog-impl:2.4.1'
     implementation 'org.tinylog:tinylog-api:2.4.1'
-    implementation name: 'flatlaf-0.37'
-    implementation name: 'miglayout-4.0-swing' //ADD LOCAL LIB... it does not download...
+    implementation group: 'com.formdev', name: 'flatlaf', version:'2.4'
+    implementation 'com.miglayout:miglayout-swing:11.0'
     implementation group: 'org.codehaus.gpars', name: 'gpars', version: '1.2.1'
     implementation 'org.pcollections:pcollections:3.1.4'
     implementation group: 'org.yaml', name: 'snakeyaml', version: '1.30'

@@ -65,12 +65,14 @@ import static model.DataReader.isValidModelFolder
 
 // TODO 2.3.0-good-help
 //  ok - automatic open of file-error-correction-mode is interrupted because of safety hint (save...)
-//  - add the example models to the v-pipe home folder and make them appear in history
-//  - add filmes to loom and links to readme
-//  - put .zips in release folder. Place a README.txt there explaining the installation
+//  ok - add the example models to the v-pipe home folder and make them appear in history
+//  - add filmes to youtube and links to README.md
+//  - put .zips in release folder.
+//  ok Place a README.txt there explaining the installation
 //  - put a runnable folder for macOS somewhere for V&S
-//  - create a script to create a RELEASE
-//  - create a SNAPSHOT
+//  NO - create a script to create a RELEASE
+//  - copy all JDKs to a local JDK-cache, and create all releases in on shot (additional target: create-release-win, create-release-linux, create-release
+//  NO - create a SNAPSHOT
 //  ok - a bug when opening bsp-00: empty yaml behaves differently
 //  ok - data-path is centered in gui. should be left
 
@@ -98,7 +100,7 @@ class MainGui {
     static void main(String[] args) {
 
         // ExamplesFromWebpage.main()
-        // flatlaf: goto lib and start flatlaf-demo-2.4.jar
+        // flatlaf: goto folder flatlaf-demo and start flatlaf-demo-2.4.jar
         // for sourcecode see: https://www.formdev.com/flatlaf
 
         // AWT event dispatch thread: get the exceptions.
