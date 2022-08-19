@@ -16,7 +16,6 @@ import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 
 import static model.DataReader.isValidModelFolder
-
 // HERE is the place for all _TODO s (_TODO = release, _todo = remainder)
 // related with the next release
 // practice clean code. https://issuu.com/softhouse/docs/cleancode_5minutes_120523/16
@@ -75,7 +74,7 @@ import static model.DataReader.isValidModelFolder
 //  NO - create a SNAPSHOT
 //  ok - a bug when opening bsp-00: empty yaml behaves differently
 //  ok - data-path is centered in gui. should be left
-//  - performance messen: gui.View.showLog()
+//  ok - performance messen: gui.View.showLog()
 
 // 2.4 shadow-export-zero-id
 // - shadow tasks (tasks that are not saved - but shown as shadow of the original)
@@ -200,6 +199,8 @@ class MainGui {
         // start EDT and init model
         //
         view.start {
+            def d = getResourceDirectory("bsp-daten")
+            println d
             String home = System.getProperty("user.home")
             String dirToOpen = "$home/v-pipe-data"
             //String dirToOpen = "./bsp-daten"
@@ -228,8 +229,36 @@ class MainGui {
     }
 
 
+    // todo: whenever dirs out of jars are needed... Does not work for dirs in dirs...
+    /*
+    static File getResourceDirectory(String resource) {
+        ClassLoader classLoader = Model.class.getClassLoader()
+        URL res = classLoader.getResource(resource)
+        File fileDirectory
+        if ("jar".equals(res.getProtocol())) {
+            InputStream input = classLoader.getResourceAsStream(resource);
+            fileDirectory = Files.createTempDirectory("tmp").toFile()
+            java.util.List<String> fileNames = IOUtils.readLines(input, StandardCharsets.UTF_8);
+            fileNames.forEach(name -> {
+                String fileResourceName = resource + File.separator + name;
+                println "reading: " + fileResourceName
+                File tempFile = new File(fileDirectory.getPath() + File.pathSeparator + name);
+                InputStream fileInput = classLoader.getResourceAsStream(fileResourceName);
+                FileUtils.copyInputStreamToFile(fileInput, tempFile);
+            });
+            fileDirectory.deleteOnExit();
+        } else {
+            fileDirectory = new File(res.getFile());
+        }
+        return fileDirectory;
+    }
+    */
+
     static void copyExamplesToHome() {
         String home = System.getProperty("user.home")
+
+        //String srcInResource = Model.class.getClassLoader().getResource("bsp-daten/bsp-00-nur-tasks/Projekt-Start-End-Abt-Kapa.txt").toExternalForm()
+        //def src = new File(srcInResource)
         def src = new File("bsp-daten")
         def dest = new File("$home/v-pipe-data/bsp-daten")
         try {
@@ -242,10 +271,10 @@ class MainGui {
             dest.eachFile(FileType.DIRECTORIES) {
                 dirs << it.absolutePath
             }
-            println dirs
-            dirs.reverse()
+            dirs.sort()
+            dirs = dirs.reverse()
             dirs.each { String dir  ->
-                println "add to 'recently opened'" + dir
+                //println "add to 'recently opened'" + dir
                 UserSettingsStore.instance.addLastOpenedDataFolder(dir)
             }
         } else {

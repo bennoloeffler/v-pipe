@@ -649,13 +649,11 @@ class View {
         gridPipelineModel.setSelectedProject(null)
     }
 
-    /*
     def showLog() {
         JTabbedPane tp = swing.tabs
         JScrollPane log = swing.log
         tp.setSelectedComponent(log)
     }
-     */
 
     String getSelectedProject() {
         gridPipelineModel.selectedProject
