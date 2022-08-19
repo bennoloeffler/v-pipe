@@ -207,6 +207,8 @@ jar {
     }
 }
 
+// maybe useful for getting git checkout done...
+// https://docs.gradle.org/current/dsl/org.gradle.api.tasks.Exec.html
 
 // EXPERIMENTAL
 task buildNativeImage(type: Exec) {
