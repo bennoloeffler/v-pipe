@@ -7,7 +7,7 @@ plugins {
 repositories {
     mavenCentral()
     flatDir {
-        dirs 'lib'
+        dirs 'lib' // not needed any more
     }
 }
 
@@ -33,17 +33,6 @@ dependencies {
     testImplementation group: 'org.spockframework', name: 'spock-core', version: '2.1-groovy-3.0'
 }
 
-
-println "Running gradle version: $gradle.gradleVersion"
-
-/**
- * set that to local copy
- */
-def jre = "jre"
-def jrePath = "NOT SET YET"
-
-println "native os.name = " + System.getProperty("os.name").toLowerCase()
-
 static def getOsName() {
     String osName = System.getProperty("os.name").toLowerCase()
     if (osName.contains("linux")) {
@@ -60,134 +49,19 @@ static def getOsName() {
     return ("unix")
 }
 
-if (getOsName() == "linux") {
-    // Consider Linux.
-    jrePath = "/home/benno/.sdkman/candidates/java/11.0.12-open"
-    println "jre for linux: " + jrePath
-} else if (getOsName() == "windows") {
-    // Consider Windows.
-    jrePath = "C:\\Program Files\\Java\\jdk-11.0.12"// WIN11
-    println "jre for WIN: " + jrePath
-} else if (getOsName() == "macos") {
-    // Consider OS X.
-    jrePath = "/Users/benno/.sdkman/candidates/java/11.0.15-librca" // macos
-    println "jre for macos: " + jrePath
-} else {
-    // Unknown OS.
-    println "ERROR... *********  Unknown or wrong OS  *********"
-    println getOsName()
-    Thread.sleep(10000)
+
+ext.VIPE_RELEASE = null
+
+String vPipeRelease() {
+    if (ext.VIPE_RELEASE == null) {
+        ext.VIPE_RELEASE = rootProject.file('src/main/resources/version.txt').text.trim()
+    }
+    ext.VIPE_RELEASE
 }
 
-String version = rootProject.file('src/main/resources/version.txt').text.trim()
-println "building RELEASE: " + version
-
-String distDir = "$buildDir/dist"
-String distributionsDir = "$buildDir/distributions"
-String releaseDir = "$distDir/v-pipe-" + version
-String exampleDir = "$releaseDir/bsp-daten"
-String newModelDir = "$releaseDir/new-model"
-
-task copyLibsJRE {
-    dependsOn test
-    dependsOn shadowJar
-
-    description "copies ONE jre and lib for current platform ${getOsName()} to $releaseDir"
-    group "v-pipe"
-
-    doFirst {
-
-        delete distributionsDir
-        delete distDir
-        delete releaseDir
-        mkdir releaseDir
-
-        def fs = new File("ersterStart.md")
-        fs.delete()
-        fs.createNewFile()
-        fs << "ein Hinweis für v-pipe, dass der erste Start noch bevorsteht"
-    }
-
-    doLast {
-
-        copy {
-            from "bsp-daten"
-            into exampleDir
-        }
-
-        copy {
-            from "new-model"
-            into newModelDir
-        }
-
-        /*
-        copy {
-            from "version.txt"
-            into releaseDir
-        }*/
-
-        copy {
-            from "Readme.md"
-            into releaseDir
-        }
-
-        if (getOsName() == "macos") {
-            copy {
-                from "dock-icon.png"
-                into releaseDir
-            }
-        }
-
-        copy {
-            from "Readme.html.url"
-            into releaseDir
-        }
-
-        copy {
-            from "Referenz.html"
-            into releaseDir
-        }
-
-        copy {
-            from "ersterStart.md"
-            into releaseDir
-        }
-
-        if (getOsName() == "macos") {
-            copy {
-                from "v-pipe-macos.sh.command"
-                into releaseDir
-            }
-        }
-
-
-        if (getOsName() == "linux") {
-            copy {
-                from "v-pipe-linux.sh"
-                into releaseDir
-            }
-        }
-
-        if (getOsName() == "windows") {
-            copy {
-                from "v-pipe-win.bat"
-                into releaseDir
-            }
-        }
-
-        copy {
-            from jrePath
-            into "$releaseDir/$jre"
-        }
-
-        // FAT JAR built with shadowJar
-        copy {
-            from "build/libs/v-pipe.jar"
-            into "$releaseDir/lib/"
-        }
-
-    }
-}
+println "Running gradle version: $gradle.gradleVersion"
+println "native os.name = " + System.getProperty("os.name").toLowerCase()
+println "building RELEASE: " + vPipeRelease()
 
 def copyLibsTask(os){
     return tasks.create("copyLibsJRE_${os}"){
@@ -204,8 +78,6 @@ def copyLibsTask(os){
 
         description "copies $os jre and v-pipe-lib to $releaseDir"
         group "v-pipe"
-
-
 
         doFirst {
 
@@ -231,12 +103,6 @@ def copyLibsTask(os){
                 from "new-model"
                 into newModelDir
             }
-
-            /*
-            copy {
-                from "version.txt"
-                into releaseDir
-            }*/
 
             copy {
                 from "Readme.md"
@@ -308,7 +174,6 @@ def copyLibsTask(os){
                 into "$releaseDir/lib/"
             }
         }
-
     }
 }
 
@@ -320,14 +185,13 @@ task copyLibsJRE_ALL {
 
 def createDistribution(os){
     return tasks.create("createDistribution_${os}", Zip) {
-        String version = rootProject.file('src/main/resources/version.txt').text.trim()
-        setArchiveFileName("v-pipe-${version}-${os}.zip")
-        into("v-pipe-${version}")
+        setArchiveFileName("v-pipe-${vPipeRelease()}-${os}.zip")
+        into("v-pipe-${vPipeRelease()}")
         description os+ ': creates the v-pipe zip distribution'
         group "v-pipe"
         dependsOn "copyLibsJRE_${os}"
         String distDir = "$buildDir/dist/$os"
-        from "$distDir/v-pipe-$version"
+        from "$distDir/v-pipe-${vPipeRelease()}"
     }
 }
 
@@ -336,17 +200,6 @@ task createDistribution_ALL {
     dependsOn createDistribution("windows"), createDistribution("macos"),createDistribution("linux")
     group "v-pipe"
 }
-
-task createDistribution(type: Zip) {
-    // property archiveFileName with gradle 8, but does not yet work???
-    setArchiveFileName("v-pipe-${version}.zip")
-    into("v-pipe-${version}")
-    description 'creates the v-pipe zip distribution'
-    group "v-pipe"
-    dependsOn copyLibsJRE
-    from "$distDir/v-pipe-$version"
-}
-
 
 jar {
     manifest {
