@@ -201,6 +201,22 @@ task createDistribution_ALL {
     group "v-pipe"
 }
 
+task __deployToDropbox {
+    group "v-pipe"
+    description "DEPLOY RELEASES! make sure to adapt dropbox path in task."
+
+    dependsOn createDistribution_ALL
+    doLast {
+        copy {
+            String dropboxPath = "/Users/benno/Dropbox (VundS)/VundS/A_Leistungsteams/A_02_Leistungserstellung/A_0205_Produkte/01_CCPM/06_V-Pipe/v-pipe-releases"
+            String distributionsDir = "$buildDir/distributions/"
+            from distributionsDir
+            into dropboxPath
+        }
+    }
+
+}
+
 jar {
     manifest {
         attributes 'Main-Class': 'application.MainGui'

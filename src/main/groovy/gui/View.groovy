@@ -262,7 +262,7 @@ class View {
 
 
             action(id: 'correctProjectFilesAction',
-                    name: "Datendateien lesen und korrigieren",
+                    name: "Daten-Datei-Reiniger...",
                     //mnemonic: 'p',
                     closure: { println "correctProjectFilesAction not connected to application..." },
                     //accelerator: shortcut('P'),

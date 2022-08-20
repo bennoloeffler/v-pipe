@@ -16,6 +16,7 @@ import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 
 import static model.DataReader.isValidModelFolder
+
 // HERE is the place for all _TODO s (_TODO = release, _todo = remainder)
 // related with the next release
 // practice clean code. https://issuu.com/softhouse/docs/cleancode_5minutes_120523/16
@@ -66,6 +67,21 @@ import static model.DataReader.isValidModelFolder
 //  ok - automatic open of file-error-correction-mode is interrupted because of safety hint (save...)
 //  ok - add the example models to the v-pipe home folder and make them appear in history
 //  - add filmes to youtube and links to README.md
+//  - teaser: cool features
+//  - installation
+//  - erstes model öffnen und speichern, das log-fenster, backup, continous backup
+//  - data driven: daten-reiniger
+//  - Nur projekt. Speichern: alle Dateien. Reihenfolge und Liefertermine.
+//  - ein neues, leeres Modell anlegen und Projekte erzeugen (Details)
+//  - Kapaziät der Ressourcen.
+//  - Integrations-Phasen.
+//  - Vorlagen
+//  - Szenarien (schnell und einfach per Daten)
+//  - Ansichten und Details der Bedienung
+//  - Aktualisierung von Projekten (ganzes Projekt oder ID:)
+//  - Import-Skript
+//  -
+
 //  - put .zips in release folder.
 //  ok Place a README.txt there explaining the installation
 //  - put a runnable folder for macOS somewhere for V&S
@@ -160,9 +176,7 @@ class MainGui {
 
 
     def glueAndStart() {
-        //def bis = new BufferedInputStream( getClass().getResource("/version.txt"))
-        //def txt = bis.text
-        //println txt
+
         InputStream is = Model.class.getClassLoader().getResourceAsStream("version.txt")
         VERSION_STRING = is.text
 
@@ -199,8 +213,6 @@ class MainGui {
         // start EDT and init model
         //
         view.start {
-            def d = getResourceDirectory("bsp-daten")
-            println d
             String home = System.getProperty("user.home")
             String dirToOpen = "$home/v-pipe-data"
             //String dirToOpen = "./bsp-daten"
@@ -217,6 +229,7 @@ class MainGui {
                 dirToOpen = "./open-model-dev"
             }*/
 
+            //dirToOpen = "$home/v-pipe-data" // TODO remove
             boolean vpipeDataExists = isValidModelFolder(dirToOpen)
 
             if (vpipeDataExists) {
@@ -230,6 +243,8 @@ class MainGui {
 
 
     // todo: whenever dirs out of jars are needed... Does not work for dirs in dirs...
+    //def d = getResourceDirectory("bsp-daten")
+    //println d
     /*
     static File getResourceDirectory(String resource) {
         ClassLoader classLoader = Model.class.getClassLoader()
