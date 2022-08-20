@@ -161,6 +161,7 @@ def copyLibsTask(os){
                 else {println "ERROR: no JDK for os $os"}
                 if(!new File(jrePath).exists()) {
                     println "ERROR: jre does not exist: $jrePath"
+                    println "link or copy, so that JDKs folder will be found in project v-pipe"
                 }
                 //println"copy JRE... may take a while ($jrePath)"
                 //println"to ($releaseDir)"
@@ -214,8 +215,11 @@ task __deployToDropbox {
                 case "macos":
                     dropboxPath = "/Users/benno/Dropbox (VundS)/VundS/A_Leistungsteams/A_02_Leistungserstellung/A_0205_Produkte/01_CCPM/06_V-Pipe/v-pipe-releases"
                     break
+                case "windows":
+                    dropboxPath = "C:\\Users\\loeff\\Dropbox (VundS)\\VundS/A_Leistungsteams/A_02_Leistungserstellung/A_0205_Produkte/01_CCPM/06_V-Pipe/v-pipe-releases"
+                    break
                 default:
-                    dropboxPath = "INVALID! $osName: DONT DEPLOY FROM HERE. Deploy on mac!"
+                    dropboxPath = "INVALID! $osName: DONT DEPLOY FROM HERE."
             }
             if (! dropboxPath.startsWith("INVALID")) {
                 String distributionsDir = "$buildDir/distributions/"
