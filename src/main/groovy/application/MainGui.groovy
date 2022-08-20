@@ -180,8 +180,6 @@ class MainGui {
         InputStream is = Model.class.getClassLoader().getResourceAsStream("version.txt")
         VERSION_STRING = is.text
 
-        println "other"
-
         System.setProperty("apple.laf.useScreenMenuBar", "true")
         // todo: add macos gestures for zooming windows:
         // https://stackoverflow.com/questions/48535595/what-replaces-gestureutilities-in-java-9

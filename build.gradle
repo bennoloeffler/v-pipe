@@ -206,6 +206,8 @@ task createDistribution_ALL {
 
 // gradle __deployToDropbox --continuous
 // gradlew.bat __deployToDropbox --continuous
+// git pull (from time to time)
+// OR in one script:
 // groovy git_pull_continously.groovy
 
 task __deployToDropbox {
