@@ -1,3 +1,4 @@
+import java.util.concurrent.TimeUnit
 
 while (true) {
     def gitText = "git pull".execute().text.trim()
@@ -7,7 +8,9 @@ while (true) {
         Thread.sleep(1 * 60 * 1000)
     } else {
         println gitText
-        def gradleText = "gradle __deployToDropbox".execute().text.trim()
+        def proc = "gradle __deployToDropbox".execute()
+        proc.waitFor(5, TimeUnit.MINUTES)
+        def gradleText = proc.text.trim()
         println gradleText
 
     }
