@@ -204,6 +204,7 @@ task createDistribution_ALL {
 
 
 // gradle __deployToDropbox --continuous
+// gradlew.bat __deployToDropbox --continuous
 task __deployToDropbox {
     group "v-pipe"
     description "DEPLOY RELEASES! make sure to adapt dropbox path in task."
