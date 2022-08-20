@@ -1,16 +1,23 @@
 import java.util.concurrent.TimeUnit
 
+println "INIT: doing initial pull"
+println pull()
+println "INIT: now build and deploy initially"
+println deploy()
+
 while (true) {
-    def gitText = "git pull".execute().text.trim()
+    def gitText = pull()
     println "Pulled last time at: " + new Date()
-    println deploy()
+    println gitText
     if (gitText == "Already up to date.") {
-        println gitText
         Thread.sleep(30 * 1000)
     } else {
-        println gitText
         println deploy()
     }
+}
+
+String pull() {
+    "git pull".execute().text.trim()
 }
 
 String deploy() {
