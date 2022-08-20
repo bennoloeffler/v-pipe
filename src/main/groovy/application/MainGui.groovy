@@ -82,7 +82,7 @@ import static model.DataReader.isValidModelFolder
 //  - Import-Skript
 //  -
 
-//  - put .zips in release folder.
+//  ok - put .zips in release folder.
 //  ok Place a README.txt there explaining the installation
 //  - put a runnable folder for macOS somewhere for V&S
 //  NO - create a script to create a RELEASE
