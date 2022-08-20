@@ -62,7 +62,6 @@ String vPipeRelease() {
 println "Running gradle version: $gradle.gradleVersion"
 println "native os.name = " + System.getProperty("os.name").toLowerCase()
 println "building RELEASE: " + vPipeRelease()
-println "updated"
 
 def copyLibsTask(os){
     return tasks.create("copyLibsJRE_${os}"){
@@ -206,6 +205,8 @@ task createDistribution_ALL {
 
 // gradle __deployToDropbox --continuous
 // gradlew.bat __deployToDropbox --continuous
+// groovy git_pull_continously.groovy
+
 task __deployToDropbox {
     group "v-pipe"
     description "DEPLOY RELEASES! make sure to adapt dropbox path in task."
