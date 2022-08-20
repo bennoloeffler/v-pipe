@@ -62,6 +62,7 @@ String vPipeRelease() {
 println "Running gradle version: $gradle.gradleVersion"
 println "native os.name = " + System.getProperty("os.name").toLowerCase()
 println "building RELEASE: " + vPipeRelease()
+println "updated 2"
 
 def copyLibsTask(os){
     return tasks.create("copyLibsJRE_${os}"){
