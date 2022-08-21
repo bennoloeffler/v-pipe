@@ -28,6 +28,7 @@ dependencies {
     implementation group: 'org.codehaus.gpars', name: 'gpars', version: '1.2.1'
     implementation 'org.pcollections:pcollections:3.1.4'
     implementation group: 'org.yaml', name: 'snakeyaml', version: '1.30'
+    implementation group: 'com.diogonunes', name: 'JColor', version: '5.5.1'
     implementation 'commons-io:commons-io:2.11.0'
     testImplementation 'junit:junit:4.13.2'
     testImplementation group: 'org.spockframework', name: 'spock-core', version: '2.1-groovy-3.0'
@@ -206,9 +207,9 @@ task createDistribution_ALL {
 // gradle __deployToDropbox --continuous
 // gradlew.bat __deployToDropbox --continuous
 // git pull (from time to time)
-// OR in one script:
-// groovy git_pull_continously.groovy
 
+// OR, see groovy-script:
+// groovy git_pull_continuously.groovy
 
 task __deployToDropbox {
     group "v-pipe"
