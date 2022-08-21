@@ -1,7 +1,12 @@
 package utils
 
-class FileSupportTest extends GroovyTestCase {
 
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
+
+class FileSupportTest extends Assertions {
+
+    @Test
     void testReadFileLines() {
 
         def fn = 'lines.txt'
@@ -56,6 +61,7 @@ class FileSupportTest extends GroovyTestCase {
 
     }
 
+    @Test
     void testBackupFileName() {
         def fn = "T 3.3.2020.txt"
 
@@ -70,22 +76,27 @@ class FileSupportTest extends GroovyTestCase {
 
     }
 
+    @Test
     void testBackupFileNameFail() {
         def fn = "T 3.3.2020.txtT" // to long
 
-        shouldFail {
+        def exception = assertThrows(Throwable.class)  {
             FileSupport.backupFileName(fn)
         }
 
         fn = "T 3.3.2020.tx" // to short
 
-        shouldFail {
+        exception = assertThrows(Throwable.class) {
             FileSupport.backupFileName(fn)
         }
+        /*
+        shouldFail {
+            FileSupport.backupFileName(fn)
+        }*/
 
         fn = ".txt" // ?
 
-        shouldFail {
+        exception = assertThrows(Throwable.class) {
             FileSupport.backupFileName(fn)
         }
 

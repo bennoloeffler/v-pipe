@@ -1,5 +1,7 @@
 import model.DataReader
 import model.TaskInProject
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.Test
 import utils.FileSupport
 
 /**
@@ -7,7 +9,7 @@ import utils.FileSupport
  */
 class ProjectDataReaderTest extends GroovyTestCase {
 
-    def f = new File(DataReader.get_TASK_FILE_NAME())
+    static def f = new File(DataReader.get_TASK_FILE_NAME())
 
     void createDataFile(String data) {
         f.with {
@@ -16,10 +18,12 @@ class ProjectDataReaderTest extends GroovyTestCase {
         }
     }
 
-    void tearDown() {
+    @AfterAll
+    static void tearDown() {
         f.delete()
     }
 
+    @Test
     void testGetDataFromFile() {
         createDataFile("""
             p1 01.01.2020 20.01.2020 d1 20\n
@@ -34,6 +38,7 @@ class ProjectDataReaderTest extends GroovyTestCase {
         assert data[4].department == "d1"
     }
 
+    @Test
     void testSemicolonSeparator() {
         createDataFile("""
             p2 01.01.2020 20.01.2020 d1 20\n
@@ -44,6 +49,7 @@ class ProjectDataReaderTest extends GroovyTestCase {
         assert data?.size() == 3
     }
 
+    @Test
     void testFailCommaCapa() {
         createDataFile("""
             p1 01.01.2020 20.01.2020 d1 20.5\n
@@ -56,6 +62,7 @@ class ProjectDataReaderTest extends GroovyTestCase {
         assert msg.contains("Keine 5 bzw. 6 Daten-Felder gefunden mit Regex-SEPARATOR")
     }
 
+    @Test
     void testSpacesAndTabs() {
         createDataFile("""
             p1 01.01.2020\t20.01.2020;\t\t d1 20.5\n
@@ -68,6 +75,7 @@ class ProjectDataReaderTest extends GroovyTestCase {
     /**
      * SWITCH TO SEMICOLON AND COMMA - in order to enable whitespace in Names (project, department)
      */
+    @Test
     void testSpacesInData() {
         createDataFile("""
             p1, 01.01.2020,\t20.01.2020;\t\t d1, 20.5\n

@@ -1,15 +1,18 @@
 import model.TaskInProject
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
 import testdata.TestDataHelper
 
 import static model.WeekOrMonth.WEEK
 
-class TaskInProjectTest extends GroovyTestCase {
+class TaskInProjectTest {
 
     // CUT
-    TaskInProject t1, t2, t3, t4
+    static TaskInProject t1, t2, t3, t4
 
-    void setUp() {
-        super.setUp()
+    @BeforeAll
+    static void setUp() {
+        //super.setUp()
         t1 = TestDataHelper.t("p1", "5.1.2020", "10.1.2020", "d1", 20.0)
         t2 = TestDataHelper.t("p1", "29.1.2020", "3.2.2020", "d1", 20.0)
     }
@@ -17,6 +20,7 @@ class TaskInProjectTest extends GroovyTestCase {
     void tearDown() {
     }
 
+    @Test
     void testGetDaysOverlap() {
         long overlap = t1.getDaysOverlap("3.1.2020", "6.1.2020")
         assert overlap == 1
@@ -46,10 +50,12 @@ class TaskInProjectTest extends GroovyTestCase {
         assert overlap == 3
     }
 
+    @Test
     void testCapacityPerDay() {
         assert 20 / 5 == t1.capaPerDay
     }
 
+    @Test
     void testGetCapaNeeded() {
 
         // 20 capa per 5 days (5th inclusive, 10th exclusive) equals 4 capa per day
@@ -59,6 +65,7 @@ class TaskInProjectTest extends GroovyTestCase {
         assert t1.getCapaNeeded("6.1.2020".toDate(), "9.1.2020".toDate()) == capaExpected
     }
 
+    @Test
     void testGetCapaMap () {
         Map<String, Double> map = t1.getCapaDemandSplitIn(WEEK)
         // t1 = ("p1", "5.1.2020", "10.1.2020", "d1", 20.0)

@@ -1,10 +1,12 @@
 import core.LoadCalculator
+import org.junit.jupiter.api.Test
 import testdata.TestDataHelper
 
 import static model.WeekOrMonth.*
 
-class ProjectDataWriterTest extends GroovyTestCase {
+class ProjectDataWriterTest  {
 
+    @Test
     void testWriteToFileWeek() {
 
         def tr = TestDataHelper.getPopulatedCalculator()
@@ -20,6 +22,7 @@ class ProjectDataWriterTest extends GroovyTestCase {
         data.delete()
     }
 
+    @Test
     void testWriteToFileMonth() {
 
         def tr = TestDataHelper.getPopulatedCalculator()
@@ -35,6 +38,7 @@ class ProjectDataWriterTest extends GroovyTestCase {
     }
 
 
+    @Test
     void testWriteToExistingFileBackup() {
 
         File data = new File(LoadCalculator.FILE_NAME_WEEK)

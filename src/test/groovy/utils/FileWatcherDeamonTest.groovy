@@ -1,6 +1,8 @@
 package utils
 
-class FileWatcherDeamonTest extends GroovyTestCase {
+import org.junit.jupiter.api.Test
+
+class FileWatcherDeamonTest {
 
     def TEST_PATH = 'data\\test'
     def TEST_FILE = 'test.txt'
@@ -8,10 +10,11 @@ class FileWatcherDeamonTest extends GroovyTestCase {
     static def FAST_TEST = true
     static {
         if(FAST_TEST) {
-            println(FAST_TEST ? "\n\nV O R S I C H T: FileWatcherDeamonTest is off \n\n" : "")
+            //println(FAST_TEST ? "\n\nV O R S I C H T: FileWatcherDeamonTest is off \n\n" : "")
         }
     }
 
+    @Test
     void testCreateDirAndGetPath() {
         if(FAST_TEST) {return}
 
@@ -38,6 +41,7 @@ class FileWatcherDeamonTest extends GroovyTestCase {
 
     }
 
+    @Test
     void testStartReceivingEventsAndIsRunning() {
         if(FAST_TEST) {return}
 
@@ -50,6 +54,7 @@ class FileWatcherDeamonTest extends GroovyTestCase {
 
     }
 
+    @Test
     void testExtractEvents() {
         if(FAST_TEST) {return}
 
@@ -82,6 +87,7 @@ class FileWatcherDeamonTest extends GroovyTestCase {
         new File("$TEST_PATH/$num$TEST_FILE")
     }
 
+    @Test
     void testLiveCycle() {
         if(FAST_TEST) {return}
 
@@ -149,6 +155,7 @@ class FileWatcherDeamonTest extends GroovyTestCase {
     /**
      * only get two notifications - ignore everything else...
      */
+    @Test
     void testSetFilter() {
         if(FAST_TEST) {return}
 

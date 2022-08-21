@@ -81,7 +81,7 @@ class UpdateModelTest extends Specification {
 
         when:
         def result = m.readUpdatesFromTasks(changedTasks)
-        println result
+        //println result
 
         then:
         result.err == null
@@ -103,7 +103,7 @@ class UpdateModelTest extends Specification {
 
         when:
         def result = m.readUpdatesFromTasks(changedTasks)
-        println result
+        //println result
 
         then:
         result.err.contains("Einige Tasks haben keine ID:-Kennzeichnung")
@@ -124,7 +124,7 @@ class UpdateModelTest extends Specification {
 
         when:
         def result = m.readUpdatesFromTasks(changedTasks)
-        println result
+        //println result
 
         then:
         result.err.contains("sind nicht eindeutig:")

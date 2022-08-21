@@ -5,16 +5,19 @@ import model.TaskInProject
 import testdata.TestDataHelper
 import transform.DateShiftTransformer
 
-import static model.WeekOrMonth.*
+import static model.WeekOrMonth.MONTH
+import static model.WeekOrMonth.WEEK
 
-class ProjectDataToLoadCalculatorTest extends GroovyTestCase {
+// TODO delete
+class ProjectDataToLoadCalculatorTest  {
 
-    LoadCalculator tr
-    TaskInProject t1p1, t2p1, t1p2, t2p2, t3p1
+    static LoadCalculator tr
+    static TaskInProject t1p1, t2p1, t1p2, t2p2, t3p1
 
-    void setUp() {
+    //@BeforeAll
+    static void setUp() {
         TestDataHelper.cleanAllDataFiles()
-        super.setUp()
+        //super.setUp()
         tr = new LoadCalculator()
         t1p1 = TestDataHelper.t("p1", "5.1.2020", "10.1.2020", "d1", 20.0)
         t2p1 = TestDataHelper.t("p1", "8.1.2020", "9.1.2020", "d2", 20.0)
@@ -26,6 +29,7 @@ class ProjectDataToLoadCalculatorTest extends GroovyTestCase {
 
     //void tearDown() {}
 
+    //@Test
     void testGetProject() {
         def p1 = tr.model.getProject("p1")
         def p2 = tr.model.getProject("p2")
@@ -33,19 +37,23 @@ class ProjectDataToLoadCalculatorTest extends GroovyTestCase {
         assert p2 == [t1p2, t2p2]
     }
 
+    //@Test
     void testGetAllProjects() {
         def pList = tr.model._getAllProjects()
         assert pList == ["p1", "p2", "p3"] || pList == ["p2", "p1", "p3"] // sequence?
     }
 
+    //@Test
     void testGetStartOfTasks() {
         assert tr.model.startOfTasks == '5.1.2020'.toDate()
     }
 
+    //@Test
     void testGetEndOfTasks() {
         assert tr.model.endOfTasks == '9.2.2020'.toDate()
     }
 
+    //@Test
     void testCalcDepartmentWeekLoad() {
 
         // date    5  6  7  8  9  10
@@ -61,6 +69,7 @@ class ProjectDataToLoadCalculatorTest extends GroovyTestCase {
         assert load['d2']['2020-W02'] == 40
     }
 
+    //@Test
     void testCalcDepartmentMonthLoad() {
 
         // date    5  6  7  8  9  10
@@ -86,6 +95,8 @@ class ProjectDataToLoadCalculatorTest extends GroovyTestCase {
 
 
     }
+
+    //@Test
     void testCalcDepartmentWeekLoadSparse() {
 
         // date    5  6  7  8  9  10       9.2
@@ -108,6 +119,7 @@ class ProjectDataToLoadCalculatorTest extends GroovyTestCase {
         assert timeKeys[5] == "2020-W06"
     }
 
+    //@Test
     void testUpdateConfiguration() {
 
 
@@ -137,6 +149,7 @@ class ProjectDataToLoadCalculatorTest extends GroovyTestCase {
     }
 
 
+    //@Test
     void testUpdateConfigurationWithNoDateShiftTransformerData() {
 
 
