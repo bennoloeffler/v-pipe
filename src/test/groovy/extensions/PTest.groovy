@@ -195,7 +195,7 @@ class PTest extends Specification {
         swap(a, { updateIn(a.get(), ["e"], { it.minus("g") }) })
         swap(a, { removeIn(a.get(), ["e", "i", "l"]) })
         swap(a, { a.get().plus("a", "something else") })
-        def threads = (0..999).collect {
+        def threads = (0..99).collect {
             Thread.start {
                 swap(a, { updateIn(a.get() as PMap, ["e", "h", "k"], { n -> n + 2 }) })
             }
@@ -203,7 +203,7 @@ class PTest extends Specification {
         threads.each { it.join() }
 
         then:
-        a.get()["e"]["h"]["k"] == 2000
+        a.get()["e"]["h"]["k"] == 200
         a.get()["a"] == "something else"
         a.get()["e"]["f"] == 4
         a.get()["e"]["g"] == null
