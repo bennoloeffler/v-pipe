@@ -3,8 +3,12 @@ package model
 import groovy.transform.Canonical
 import modelNew.DayIntervalCalculator
 import modelNew.StartEndInterval
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
-class DayIntervalCalculatorTest extends GroovyTestCase {
+class DayIntervalCalculatorTest extends Assertions {
 
     @Canonical
     class StartEndTester implements StartEndInterval {}
@@ -15,12 +19,13 @@ class DayIntervalCalculatorTest extends GroovyTestCase {
 
     DayIntervalCalculator dic
 
-    @Override
+    @BeforeEach
     void setUp() throws Exception {
-        super.setUp()
+        //super.setUp()
         dic = new DayIntervalCalculator()
     }
 
+    @Test
     void testAdaptMinMaxDateOnlyOne() {
         def startEndIntervals = [ci("1.1.1970", "4.7.2018")]
         dic.expandMinMaxDate(startEndIntervals)
@@ -28,11 +33,13 @@ class DayIntervalCalculatorTest extends GroovyTestCase {
         assert dic.maxDate == "4.7.2018".toDate()
     }
 
+    @Test
     void testAdaptMinMaxDateNone() {
-        shouldFail {dic.expandMinMaxDate([])}
-        shouldFail {dic.expandMinMaxDate(null)}
+        assertThrows(Throwable.class) {dic.expandMinMaxDate([])}
+        assertThrows(Throwable) {dic.expandMinMaxDate(null)}
     }
 
+    @Test
     void testAdaptMinMaxDateMany() {
         def startEndIntervals = [
                 ci("1.1.1970", "4.7.2018"),
@@ -42,6 +49,7 @@ class DayIntervalCalculatorTest extends GroovyTestCase {
         assert dic.maxDate == "4.7.2019".toDate()
     }
 
+    @Test
     void testAdaptMinMaxReturnValue() {
         def startEndIntervals = [
                 ci("1.1.1970", "4.7.2018"),
@@ -51,6 +59,7 @@ class DayIntervalCalculatorTest extends GroovyTestCase {
         assert interval.end == "4.7.2019".toDate()
     }
 
+    @Test
     void testAdaptMinMaxAdaptServeralTimes() {
         def startEndIntervals = [
                 ci("1.1.1970", "4.7.2018"),

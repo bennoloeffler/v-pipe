@@ -1,34 +1,31 @@
 package transform
 
 import model.PipelineElement
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 
 import static testdata.TestDataHelper.pe
 
 
-class PipelineTest extends GroovyTestCase {
+class PipelineTest extends Assertions {
 
-
-
-
+    @Test
     void testNextSlot() {
-
         Pipeline p = new Pipeline(1)
-
         List<PipelineElement> l = [pe('p1', '22.4.2020'.toDate(),'23.4.2020'.toDate(), 1),
                                    pe('p2', '22.4.2020'.toDate(),'23.4.2020'.toDate(), 1)]
         l.each {
             p.addNext(it)
         }
-
         assert p.pipeline[0]*.startDateCalc == ['22.04.2020'.toDate(), '23.04.2020'.toDate()]
         assert p.pipeline[0]*.endDateCalc == ['23.04.2020'.toDate(), '24.04.2020'.toDate()]
-
     }
 
 
     /**
      * p2 should be moved one day...
      */
+    @Test
     void testGetProjectShift() {
         Pipeline p = new Pipeline(1)
         PipelineElement poe = pe('p1', '22.4.2020'.toDate(),'22.4.2020'.toDate(), 1)
@@ -47,10 +44,9 @@ class PipelineTest extends GroovyTestCase {
     /**
      * more than one slot and succcessive filling of those
      */
+    @Test
     void testMultipleSlots() {
-
         Pipeline p = new Pipeline(2)
-
         List<PipelineElement> l = [pe('p1', '22.4.2020'.toDate(),'23.4.2020'.toDate(), 1),
                                    pe('p2', '22.4.2020'.toDate(),'25.4.2020'.toDate(), 1),
                                    pe('p3', '22.4.2020'.toDate(),'23.4.2020'.toDate(), 1),
@@ -58,7 +54,6 @@ class PipelineTest extends GroovyTestCase {
         l.each {
             p.addNext(it)
         }
-
         def ce = p.pipeline[0][0]
         assert ce.startDateCalc.toString() == '22.04.2020'
         assert ce.endDateCalc.toString() == '23.04.2020'
@@ -79,7 +74,6 @@ class PipelineTest extends GroovyTestCase {
         assert ce.endDateCalc.toString() == '25.04.2020'
         assert ce.originalElement.project == 'p4'
 
-
         def ps = p.projectShift
         assert ps.p1 == 0
         assert ps.p2 == 0
@@ -90,6 +84,7 @@ class PipelineTest extends GroovyTestCase {
     /**
      *
      */
+    @Test
     void testSplit() {
         // date 1       2       3       4       5       6
         // slot
@@ -129,7 +124,6 @@ class PipelineTest extends GroovyTestCase {
         assert ce.endDateCalc.toString() == '05.04.2020'
         assert ce.originalElement.project == 'p3' // p3.2
 
-
         ce = p.pipeline[0][2]
         assert ce.startDateCalc.toString() == '04.04.2020'
         assert ce.endDateCalc.toString() == '06.04.2020'
@@ -145,6 +139,7 @@ class PipelineTest extends GroovyTestCase {
     /**
      *
      */
+    @Test
     void testSplitHighValue() {
         // date 1       2       3       4       5       6
         // slot

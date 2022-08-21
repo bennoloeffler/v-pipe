@@ -69,7 +69,7 @@ class RunTimer implements Closeable{
 
     }
 
-    RunTimer(boolean silent = false) {
+    RunTimer(boolean silent = true) {
         start()
         this.silent = silent
     }

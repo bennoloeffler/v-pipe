@@ -5,11 +5,14 @@ import model.Model
 import model.VpipeDataException
 import core.VpipeException
 import groovy.json.JsonSlurper
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 
 import static testdata.TestDataHelper.*
 
-class CapaTransformerTest extends GroovyTestCase {
+class CapaTransformerTest extends Assertions {
 
+    @Test
     void testSlurper() {
         def slurper = new JsonSlurper()
         def result = slurper.parseText('{"person":{"name":"Guillaume","age":33,"pets":["dog","cat"]}}')
@@ -20,6 +23,7 @@ class CapaTransformerTest extends GroovyTestCase {
         assert result.person.pets[1] == "cat"
     }
 
+    @Test
     void testSlurperCapaFormat() {
         def text =
         """
@@ -94,11 +98,9 @@ class CapaTransformerTest extends GroovyTestCase {
         assert capa['Montage']['2020-W03'].yellow == 240
         assert capa['Montage']['2020-W04'].yellow == 240
         assert capa['Montage']['2020-W05'].yellow == 240
-
-
-
     }
 
+    @Test
     void testSlurperFormatErrors() {
         String text ="""
                 {
@@ -145,18 +147,18 @@ class CapaTransformerTest extends GroovyTestCase {
                 }        
         """
 
-        def msg = shouldFail (VpipeException) {
+        def e = assertThrows (VpipeException) {
             def capa = slurpTextAndCalc(text)
             println(capa)
         }
-        assert msg.contains("unexpected character x")
+        assert e.message.contains("unexpected character x")
 
         text = ""
-        msg = shouldFail (VpipeException) {
+        e = assertThrows (VpipeException) {
             def capa = slurpTextAndCalc(text)
             println(capa)
         }
-        assert msg.contains("Text must not be null or empty")
+        assert e.message.contains("Text must not be null or empty")
 
 
 
@@ -170,18 +172,13 @@ class CapaTransformerTest extends GroovyTestCase {
                  }
                  }
                 """
-        msg = shouldFail (VpipeException) {
+        e = assertThrows (VpipeException) {
             def capa = slurpTextAndCalc(text)
             println(capa)
         }
-        assert msg.contains ("Kein Abschnitt 'Kapa_Abteilungen' definiert")
-
-
-
-
+        assert e.message.contains ("Kein Abschnitt 'Kapa_Abteilungen' definiert")
     }
 
-    //  move out of test code?
     def slurpTextAndCalc(String text) {
         Model m = populatedModel
         //def ct = new CapaTransformer(m)
@@ -202,18 +199,21 @@ class CapaTransformerTest extends GroovyTestCase {
         } catch (Exception e) {
             throw new VpipeDataException("Problem in JSON-Format von Datei ${DataReader.get_CAPA_FILE_NAME()}:\n${e.getMessage()}")
         }
-        null
+
     }
 
+    @Test
     void testEmpty() {
         def text = "{}"
-        def msg = shouldFail (VpipeDataException) {
+        def e = assertThrows (VpipeDataException) {
             def capa = slurpTextAndCalc(text)
-            println(capa)
+            //println(capa)
         }
+        //println e.message
         //assert msg.contains("Eintrag 'Kapa_Gesamt' fehlt.")
     }
 
+    @Test
     void testMissingDepatments() {
         def text = """{
                     "Kapa_Gesamt": {
@@ -238,11 +238,11 @@ class CapaTransformerTest extends GroovyTestCase {
                     }
                  }
                 """
-        def msg = shouldFail (VpipeDataException) {
+        def e = assertThrows (VpipeDataException) {
             def capa = slurpTextAndCalc(text)
-            println(capa)
+            //println(capa)
         }
-        assert msg.contains("Kapa definiert: [d1, d2]")
+        assert e.message.contains("Kapa definiert: [d1, d2]")
 
     }
 }

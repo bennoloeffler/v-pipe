@@ -3,11 +3,14 @@ package transform
 import core.VpipeException
 import model.Model
 import model.VpipeDataException
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 import testdata.TestDataHelper
 import transform.DateShiftTransformer
 
-class DateShiftTransformerTest extends GroovyTestCase {
+class DateShiftTransformerTest extends Assertions {
 
+    @Test
     void testTransform() {
         Model m = TestDataHelper.getPopulatedModel()
         DateShiftTransformer dst = new DateShiftTransformer(m)
@@ -38,15 +41,16 @@ class DateShiftTransformerTest extends GroovyTestCase {
 
     }
 
+    @Test
     void testFailProjectNotFound() {
         Model m = TestDataHelper.getPopulatedModel()
         DateShiftTransformer dst = new DateShiftTransformer(m)
         m.projectDayShift = [p1: 2, p2: -1, p3: 5]
 
-        def msg = shouldFail VpipeDataException, {
+        def e = assertThrows VpipeDataException, {
             def list = dst.transform()
         }
-        assert msg.contains ("Es gibt keine Projektdaten,\n"+
+        assert e.message.contains ("Es gibt keine Projektdaten,\n"+
                         "um das Projekt p3 zu verschieben.\n")
 
     }

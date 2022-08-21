@@ -2,8 +2,10 @@ package model
 
 import groovy.transform.Canonical
 import modelNew.StartEndInterval
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 
-class StartEndIntervalTest extends GroovyTestCase {
+class StartEndIntervalTest extends Assertions {
 
     @Canonical
     class StartStopMock implements StartEndInterval {}
@@ -17,6 +19,7 @@ class StartEndIntervalTest extends GroovyTestCase {
         assert i2.getOverlapInDays(i1) == expectedOverlap
     }
 
+    @Test
     void testGetOverlapInside() {
         testOverlap(
                 ci("1.2.2020", "10.2.2020"),
@@ -24,6 +27,7 @@ class StartEndIntervalTest extends GroovyTestCase {
                 1)
     }
 
+    @Test
     void testGetOverlapEnd() {
         testOverlap(
                 ci("1.2.2020", "10.2.2020"),
@@ -31,6 +35,7 @@ class StartEndIntervalTest extends GroovyTestCase {
                 2)
     }
 
+    @Test
     void testGetOverlapIdentical() {
         testOverlap(
                 ci("1.2.2020", "10.2.2020"),
@@ -38,6 +43,7 @@ class StartEndIntervalTest extends GroovyTestCase {
                 9)
     }
 
+    @Test
     void testGetOverlapNoOverlapNoGap() {
         testOverlap(
                 ci("1.2.2020", "10.2.2020"),
@@ -45,6 +51,7 @@ class StartEndIntervalTest extends GroovyTestCase {
                 0)
     }
 
+    @Test
     void testGetOverlapDistantZero() {
         testOverlap(
                 ci("1.2.2020", "1.2.2020"),
@@ -52,6 +59,7 @@ class StartEndIntervalTest extends GroovyTestCase {
                 0)
     }
 
+    @Test
     void testGetOverlapIdenticalZero() {
         testOverlap(
                 ci("1.2.2020", "1.2.2020"),
@@ -59,6 +67,7 @@ class StartEndIntervalTest extends GroovyTestCase {
                 0)
     }
 
+    @Test
     void testGetOverlapLongLeapSecondsProblem() {
         testOverlap(
                 ci("1.1.1970", "1.1.1975"),

@@ -759,7 +759,7 @@ class Model {
     @CompileStatic(TypeCheckingMode.SKIP)
     def readAllData() {
 
-        def t = RunTimer.getTimerAndStart('Model::readAllData')
+        //def t = RunTimer.getTimerAndStart('Model::readAllData', true)
         try {
             def i = 0
 
@@ -846,7 +846,7 @@ class Model {
             throw e
         } finally {
             fireUpdate()
-            t.stop()
+            //t.stop()
             setDirty(false)
         }
     }

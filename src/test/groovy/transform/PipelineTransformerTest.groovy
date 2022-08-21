@@ -5,17 +5,22 @@ import core.VpipeException
 import model.DataReader
 import model.Model
 import model.PipelineElement
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import testdata.TestDataHelper
 
 import static testdata.TestDataHelper.pe
 import static testdata.TestDataHelper.t
 
 
-class PipelineTransformerTest extends GroovyTestCase {
+class PipelineTransformerTest extends Assertions {
 
     File f
     List<PipelineElement> listOfPOEs
 
+    @BeforeEach
     void setUp() {
         f = new File(DataReader.get_PIPELINING_FILE_NAME())
         f.delete()
@@ -25,8 +30,10 @@ class PipelineTransformerTest extends GroovyTestCase {
                       pe('p2', '7.1.2020'.toDate(), '9.2.2020'.toDate(), 1)]
     }
 
+    @AfterEach
     void tearDown() { f.delete() }
 
+    @Test
     void testTransform() {
         Model m = TestDataHelper.getPopulatedModel()
         /*
@@ -46,6 +53,7 @@ class PipelineTransformerTest extends GroovyTestCase {
 
     }
 
+    @Test
     void testFailBecauseOfMismatchingProjects() {
 
         //
@@ -55,10 +63,10 @@ class PipelineTransformerTest extends GroovyTestCase {
         def pt = new PipelineTransformer(m)
         pt.pipelineElements = listOfPOEs
         pt.maxPipelineSlots = 1
-        String msg = shouldFail {
+        def e = assertThrows(Throwable) {
             m.taskList = pt.transform()
         }
-        assert msg.contains('Staffelungs-Element braucht mehr Slots')
+        assert e.message.contains('Staffelungs-Element braucht mehr Slots')
 
 
         //
@@ -70,10 +78,10 @@ class PipelineTransformerTest extends GroovyTestCase {
         pt = new PipelineTransformer(m)
         pt.pipelineElements = listOfPOEs
         pt.maxPipelineSlots = 2
-        msg = shouldFail {
+        e = assertThrows Throwable, {
             m.taskList = pt.transform()
         }
-        assert msg.contains('Integrations-Phasen.txt enthält Projekte,\ndie nicht in den Grunddaten sind: p1')
+        assert e.message.contains('Integrations-Phasen.txt enthält Projekte,\ndie nicht in den Grunddaten sind: p1')
 
         //
         // mismatch: lesser POEs than in projects (or typo)
@@ -84,16 +92,16 @@ class PipelineTransformerTest extends GroovyTestCase {
         pt.pipelineElements.remove(0) // p1 raus
 
         pt.maxPipelineSlots = 2
-        msg = shouldFail {
+        e = assertThrows Throwable, {
             m.taskList = pt.transform()
         }
-        assert msg.contains('Integrations-Phasen.txt aufgeführt sind: p1')
+        assert e.message.contains('Integrations-Phasen.txt aufgeführt sind: p1')
 
 
     }
 
 
-
+    @Test
     void testUpdateConfiguration() {
 
         f << """
@@ -122,7 +130,7 @@ class PipelineTransformerTest extends GroovyTestCase {
     }
 
 
-
+    @Test
     def readShouldFail(String content, String errorMsgContains) {
 
         f.delete()
@@ -132,41 +140,38 @@ class PipelineTransformerTest extends GroovyTestCase {
         //LoadCalculator plc = new LoadCalculator()
         //def pt = new PipelineTransformer(plc)
 
-        def msg = shouldFail VpipeException, {
+        def e = assertThrows VpipeException, {
             DataReader.readPipelining()
         }
-        assert msg.contains(errorMsgContains)
+        assert e.message.contains(errorMsgContains)
 
     }
 
 
+    @Test
     void testFailDataProblems() {
 
 
-        readShouldFail(
-                """
+        readShouldFail("""
                         p1 20.2.2020 20.3.2020 2
                         """,
                 'Fehler beim Lesen von')
 
 
-        readShouldFail(
-                """
+        readShouldFail("""
                         5
                         p1 20.2.2020 20.2.2020 2
                         """,
                 'Start liegt nicht vor Ende')
 
 
-        readShouldFail(
-                """
+        readShouldFail("""
                         5
                         p1 20.2.2020 21.2.2020 2b
                         """,
                 'Vermutung:')
 
-        readShouldFail(
-                """
+        readShouldFail("""
                         5
                         p1 20.2.2020 21.2.2ß20 2
                         """,
@@ -174,6 +179,7 @@ class PipelineTransformerTest extends GroovyTestCase {
     }
 
 
+    @Test
     void testFail2ProjectsSame() {
 
         f << """
@@ -187,10 +193,10 @@ class PipelineTransformerTest extends GroovyTestCase {
             """
 
 
-        def msg = shouldFail {
+        def e = assertThrows(Throwable) {
             DataReader.readPipelining()
         }
-        assert msg.contains("[p2=2]")
+        assert e.message.contains("[p2=2]")
     }
 
-    }
+}

@@ -2,20 +2,21 @@ import core.LoadCalculator
 import model.DataReader
 import model.Model
 import model.TaskInProject
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import testdata.TestDataHelper
 import transform.DateShiftTransformer
 
 import static model.WeekOrMonth.MONTH
 import static model.WeekOrMonth.WEEK
 
-// TODO delete
 class ProjectDataToLoadCalculatorTest  {
 
     static LoadCalculator tr
     static TaskInProject t1p1, t2p1, t1p2, t2p2, t3p1
 
-    //@BeforeAll
-    static void setUp() {
+    @BeforeEach
+    void setUp() {
         TestDataHelper.cleanAllDataFiles()
         //super.setUp()
         tr = new LoadCalculator()
@@ -29,7 +30,7 @@ class ProjectDataToLoadCalculatorTest  {
 
     //void tearDown() {}
 
-    //@Test
+    @Test
     void testGetProject() {
         def p1 = tr.model.getProject("p1")
         def p2 = tr.model.getProject("p2")
@@ -37,23 +38,23 @@ class ProjectDataToLoadCalculatorTest  {
         assert p2 == [t1p2, t2p2]
     }
 
-    //@Test
+    @Test
     void testGetAllProjects() {
         def pList = tr.model._getAllProjects()
         assert pList == ["p1", "p2", "p3"] || pList == ["p2", "p1", "p3"] // sequence?
     }
 
-    //@Test
+    @Test
     void testGetStartOfTasks() {
         assert tr.model.startOfTasks == '5.1.2020'.toDate()
     }
 
-    //@Test
+    @Test
     void testGetEndOfTasks() {
         assert tr.model.endOfTasks == '9.2.2020'.toDate()
     }
 
-    //@Test
+    @Test
     void testCalcDepartmentWeekLoad() {
 
         // date    5  6  7  8  9  10
@@ -69,7 +70,7 @@ class ProjectDataToLoadCalculatorTest  {
         assert load['d2']['2020-W02'] == 40
     }
 
-    //@Test
+    @Test
     void testCalcDepartmentMonthLoad() {
 
         // date    5  6  7  8  9  10
@@ -96,7 +97,7 @@ class ProjectDataToLoadCalculatorTest  {
 
     }
 
-    //@Test
+    @Test
     void testCalcDepartmentWeekLoadSparse() {
 
         // date    5  6  7  8  9  10       9.2
@@ -119,7 +120,7 @@ class ProjectDataToLoadCalculatorTest  {
         assert timeKeys[5] == "2020-W06"
     }
 
-    //@Test
+    @Test
     void testUpdateConfiguration() {
 
 
@@ -149,7 +150,7 @@ class ProjectDataToLoadCalculatorTest  {
     }
 
 
-    //@Test
+    @Test
     void testUpdateConfigurationWithNoDateShiftTransformerData() {
 
 

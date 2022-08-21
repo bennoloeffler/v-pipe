@@ -1,5 +1,6 @@
 import model.TaskInProject
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import testdata.TestDataHelper
 
@@ -8,16 +9,13 @@ import static model.WeekOrMonth.WEEK
 class TaskInProjectTest {
 
     // CUT
-    static TaskInProject t1, t2, t3, t4
+    TaskInProject t1, t2, t3, t4
 
-    @BeforeAll
-    static void setUp() {
+    @BeforeEach
+    void setUp() {
         //super.setUp()
         t1 = TestDataHelper.t("p1", "5.1.2020", "10.1.2020", "d1", 20.0)
         t2 = TestDataHelper.t("p1", "29.1.2020", "3.2.2020", "d1", 20.0)
-    }
-
-    void tearDown() {
     }
 
     @Test

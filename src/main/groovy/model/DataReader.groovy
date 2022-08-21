@@ -167,7 +167,7 @@ class DataReader {
 
     static List<TaskInProject> parseTasks(List<List<String>> splitLines, boolean templates) {
         List<TaskInProject> taskList = []
-        new RunTimer(true).withCloseable {
+        //new RunTimer(true).withCloseable {
             def i = 0 // count the lines
 
             SILENT ?: println("\nstart parsing data file:   " + (templates ? get_PROJECT_TEMPLATE_FILE_NAME() : get_TASK_FILE_NAME()))
@@ -220,7 +220,7 @@ class DataReader {
                     throw new VpipeDataException(errMsg() + "\nVermutlich Fehler beim parsen von \nDatum (--> 22.4.2020) oder Kommazahl (--> 4.5 Punkt statt Komma!)\n Grund: ${e.getMessage()}")
                 }
             }
-        }//t.stop("parsing file ${(templates ? get_PROJECT_TEMPLATE_FILE_NAME(): get_TASK_FILE_NAME())}")
+        //}//t.stop("parsing file ${(templates ? get_PROJECT_TEMPLATE_FILE_NAME(): get_TASK_FILE_NAME())}")
         if (!templates && !taskList) {
             throw new VpipeDataException("${get_TASK_FILE_NAME()} enthält keine Daten")
         }

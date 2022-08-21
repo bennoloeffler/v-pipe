@@ -136,12 +136,12 @@ class LoadCalculator {
      */
     Map<String, Map<String, Double>> calcDepartmentLoad(WeekOrMonth weekOrMonth) {
 
-        def t = new RunTimer(true)
+        //def t = new RunTimer(true)
         //transformers.each {
         //    model = it.transform()
         //}
-        t.stop("Transformers")
-        t.start()
+        //t.stop("Transformers")
+        //t.start()
 
         Map<String, Map<String, Double>> load = [:]
         model.taskList.each { TaskInProject it ->
@@ -162,7 +162,7 @@ class LoadCalculator {
 
             }
         }
-        t.stop("calcDepartmentLoad ($weekOrMonth)")
+        //t.stop("calcDepartmentLoad ($weekOrMonth)")
         load as Map<String, Map<String, Double>>
     }
 
