@@ -232,6 +232,9 @@ task __deployToDropbox {
                 case "windows":
                     dropboxPath = "C:\\Users\\loeff\\Dropbox (VundS)\\VundS/A_Leistungsteams/A_02_Leistungserstellung/A_0205_Produkte/01_CCPM/06_V-Pipe/v-pipe-releases"
                     break
+                case "linux":
+                    dropboxPath = "/media/paux-data/Dropbox-vunds/VundS/A_Leistungsteams/A_02_Leistungserstellung/A_0205_Produkte/01_CCPM/06_V-Pipe/v-pipe-releases"
+                    break
                 default:
                     dropboxPath = "INVALID! $osName: DONT DEPLOY FROM HERE."
             }
