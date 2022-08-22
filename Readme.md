@@ -42,8 +42,8 @@ folgende Verzeichnisse und Dateien:
 
 - `Readme.md` (diese Betriebsanleitung als Markdown - falls offline)  
 - `v-pipe-macos.sh.command` (macOS-Starter - Doppelklick)
-- `v-pipe-linux.sh` (Linux-Starter - Doppelklick)
-- `v-pipe-win.bat` (Windows-Starter - Doppelclick)
+- `v-pipe-linux.sh` (Linux-Starter - in Terminal starten)
+- `v-pipe-win.bat` (Windows-Starter - Doppelklick)
 - `lib` (ein paar Java-Bibliotheken. Finger weg ;-))  
 - `jre` (eine Java-Laufzeit-Umgebung. Nicht anfassen...)
 - `bsp-daten` (Unterordner sind gefüllt mit Daten-Dateien als funktionierende Beispiele)
@@ -133,52 +133,44 @@ im Beispiel sind das 6.
 Enthält beispielsweise:  
 
      {
-     "Kapa_Gesamt": {
-    
-       "Feiertage": ["1.1.2020", "1.6.2020"],
-       
-       "Kapa_Profil": {
-          "2020-23": 80, // in Prozent!
-          "2020-24": 60,
-          "2020-25": 80
-       }
-       
-     },
-   
-     "Abteilungen": {   
-      
-      "Konstruktion": {
-
-          "Kapa": {
-             "gelb": 140,
-             "rot": 190
-          },
-
-          "Kapa_Profil": {
-             "2020-23": 100,
-             "2020-24": { "gelb": 170, "rot": 250 },
-             "2020-40": { "gelb": 150, "rot": 200 },
-          }
-      },
-
-      "Montage": {
-
-         "Kapa": {
-            "gelb": 240,
-            "rot": 490
-         },
-
+       "Kapa_Gesamt": {
+         "Feiertage": ["1.1.2020", "1.6.2020"],
          "Kapa_Profil": {
+            "2020-23": 80, // in Prozent!
+            "2020-24": 60,
+            "2020-25": 80
          }
-      },
+       },
+   
+       "Abteilungen": {
+        
+         "Konstruktion": {
+            "Kapa": {
+               "gelb": 140,
+               "rot": 190
+            },
+            "Kapa_Profil": {
+               "2020-23": 100,
+               "2020-24": { "gelb": 170, "rot": 250 },
+               "2020-40": { "gelb": 150, "rot": 200 },
+            }
+        },
 
-      "IBN": {
-         "Kapa": {
-            "gelb": 340,
-            "rot": 500
-         }
-      }
-     }
+        "Montage": {
+           "Kapa": {
+              "gelb": 240,
+              "rot": 490
+           },
+           "Kapa_Profil": {
+           }
+        },
+
+        "IBN": {
+           "Kapa": {
+              "gelb": 340,
+              "rot": 500
+           }
+        }
     }
 
 JSON ist möglich. YAML ist ebenfalls möglich:
@@ -248,7 +240,7 @@ Sie werden "multipliziert" mit den Gesamt-Prozent-Wochen-Werten - falls es diese
 Wenn es Abteilungs-spezifische Prozent-Wochen-Werte gibt, dann werden die globalen 
 Prozent-Werte dieser Wochen ignoriert.  
 Das Kapa_Profil ist optional.  
-Die Syntax der Datei ist JSON.  
+Die Syntax der Datei ist JSON oder Yaml.  
 
 ## Vorlagen
 ## `Vorlagen-Projekt-Start-End-Abt-Kapa.txt`

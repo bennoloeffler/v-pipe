@@ -14,11 +14,12 @@ import java.util.concurrent.atomic.AtomicReference
  *   update-in ("set new element down a associative key paths down to the element")
  *   swap (e.g. for atomic change to a PCollection-tree by a closure)
  *
- * @see PTests.groovy* @see https://github.com/hrldcpr/pcollections
- * @see Collections https://docs.oracle.com/javase/8/docs/technotes/guides/collections/overview.html
- * @see Collections https://www.falkhausen.de/Java-8/java.util/Collection-Hierarchy.html
- * @see atomic without locking https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/atomic/package-summary.html
- * @see clojure swap https://github.com/clojure/clojure/blob/master/src/jvm/clojure/lang/Atom.java#L33
+ * @see
+ *  class PTest @see https://github.com/hrldcpr/pcollections
+ *  Collections https://docs.oracle.com/javase/8/docs/technotes/guides/collections/overview.html
+ *  Collections https://www.falkhausen.de/Java-8/java.util/Collection-Hierarchy.html
+ *  atomic without locking https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/atomic/package-summary.html
+ *  clojure swap https://github.com/clojure/clojure/blob/master/src/jvm/clojure/lang/Atom.java#L33
  */
 class P {
 

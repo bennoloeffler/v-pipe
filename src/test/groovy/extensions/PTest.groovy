@@ -3,6 +3,7 @@ package extensions
 import groovy.transform.Immutable
 import org.pcollections.PMap
 import org.pcollections.PVector
+import org.pcollections.TreePVector
 import spock.lang.Specification
 
 import java.util.concurrent.atomic.AtomicReference
@@ -10,6 +11,18 @@ import java.util.concurrent.atomic.AtomicReference
 import static extensions.P.*
 
 class PTest extends Specification {
+
+    def "create structure"(){
+        when:
+        def tree = p ([a: [1,2,3], b: [4,5,6], c: [7,8,9]])
+
+        then:
+        println tree.getClass()
+        println tree.a.class
+        tree instanceof PMap<?, ?>
+        // DOES NOT WORK??? tree.a.class instanceof PVector<?>
+        tree.a.class == TreePVector
+    }
 
     def "updateIn vec"() {
 
@@ -288,6 +301,7 @@ class PTest extends Specification {
         given:
         def m = new ReactiveModel()
 
+
         when:
         m.init()
         m.addChildlessPersonIfMissing("Sabine")
@@ -323,13 +337,23 @@ class PTest extends Specification {
         result instanceof PVector
     }
 
-    def "test reactive"(){
+    def "test functional deeper"(){
         given:
-        1
+        PVector v1 = p(1..5)
+
         when:
-        1
+        PVector v2 = v1.minus(1).plus(15)
+        PVector v3 = v1.minusAll([1])
+
         then:
-        1
+
+        v1 == [1,2,3,4,5]
+
+        // minus removes IDX, because idx = Integer = Object
+        v2 == [1,3,4,5,15]
+
+        // but this works
+        v3 == [2,3,4,5]
     }
 
 }
