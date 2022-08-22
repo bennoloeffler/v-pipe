@@ -215,6 +215,13 @@ task createDistribution_ALL {
 
 // OR, see groovy-script:
 // groovy git_pull_continuously.groovy
+// TODOs before:
+// link JDKs from private dropbox into project folder
+// make dropboxPath available for RELEASE
+// on paux, dropbox is mounted to /media/paux-data/Dropbox-vunds from //pux/Dropbox (VundS)
+// on pux and bux, there is a link to the paux share in home:
+// /home/benno/Dropbox-vunds
+// deployment from WIN results in error on macos: ^M in start script ???
 
 task __deployToDropbox {
     group "v-pipe"
@@ -233,7 +240,7 @@ task __deployToDropbox {
                     dropboxPath = "C:\\Users\\loeff\\Dropbox (VundS)\\VundS/A_Leistungsteams/A_02_Leistungserstellung/A_0205_Produkte/01_CCPM/06_V-Pipe/v-pipe-releases"
                     break
                 case "linux":
-                    dropboxPath = "/media/paux-data/Dropbox-vunds/VundS/A_Leistungsteams/A_02_Leistungserstellung/A_0205_Produkte/01_CCPM/06_V-Pipe/v-pipe-releases"
+                    dropboxPath = "/home/benno/Dropbox-vunds/VundS/A_Leistungsteams/A_02_Leistungserstellung/A_0205_Produkte/01_CCPM/06_V-Pipe/v-pipe-releases"
                     break
                 default:
                     dropboxPath = "INVALID! $osName: DONT DEPLOY FROM HERE."
