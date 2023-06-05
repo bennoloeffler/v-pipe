@@ -77,7 +77,10 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
 
     @Override
     void focusGained(FocusEvent e) {
-
+        // register listeners for redraw during scroll, for always showing the rows names (e.g. project name)
+        SwingUtilities.invokeLater{
+            registerScrollBarListener()
+        }
     }
 
     @Override
@@ -457,6 +460,7 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
             spv = hsb.value
         }
         sethScrollBarValueZoomingSync(spv)
+        //xxx
     }
 
     def printZoomInfo() {
@@ -503,6 +507,9 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
         } as PropertyChangeListener
         PropertyChangeListener sbs = { PropertyChangeEvent e ->
             //println "hScrollBarValueZoomingSync changed: $e.oldValue to $e.newValue"
+            SwingUtilities.invokeLater {
+                invalidateAndRepaint(this)
+            }
         } as PropertyChangeListener
         model.addPropertyChangeListener('updateToggle', l)
         addPropertyChangeListener('cursorX', cursorXChanged as PropertyChangeListener)
@@ -643,39 +650,40 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
             //
             if (gridWidth > 0) {
                 int y = 0
+                int xx = (int) (getVisibleRect().x)
+
                 model.getLineNames()
                 model.getLineNames().each { String projectName ->
                     int gridY = borderWidth + y * gridWidth
                     try {
                         if (highlightLinePattern && projectName =~ highlightLinePattern) {
                             g.setColor(cursorColor) //new Color(150,255,255,100))
-                            g.fillRoundRect(borderWidth, (int) (gridY + gridWidth / 2) - 2, nameWidth + borderWidth + gridWidth * model.sizeX, 4, round, round)
+                            g.fillRoundRect(xx + borderWidth, (int) (gridY + gridWidth / 2) - 2, nameWidth + borderWidth + gridWidth * model.sizeX, 4, round, round)
                         } else {
                             g.setColor(Color.WHITE)
                         }
                     } catch (Exception e) {
                         println "problem with regex: " + highlightLinePattern + "\n" + e
                     }
-                    g.fillRoundRect(borderWidth, gridY, nameWidth - 4, gridWidth - 4, round, round)
+                    g.fillRoundRect(xx + borderWidth, gridY, nameWidth - 4, gridWidth - 4, round, round)
 
                     if (gridWidth > 0) {
                         // write (with shadow) some info
                         float fontSize = gridWidth / 2
                         g.getClipBounds(rBackup)
-                        Rectangle newClip = new Rectangle(borderWidth, gridY, nameWidth - 6, gridWidth - 6)
-                        g.setClip(newClip.intersection(rBackup))
+                        Rectangle newClip = new Rectangle(xx + borderWidth, gridY, nameWidth - 6, gridWidth - 6)
+                        //g.setClip(newClip.intersection(rBackup))
                         g.setFont(g.getFont().deriveFont((float) fontSize))
                         g.setColor(Color.WHITE)
-                        g.drawString(projectName, borderWidth + (int) (gridWidth * 0.2), gridY + (int) (gridWidth * 2 / 3))
+                        g.drawString(projectName, borderWidth + xx + (int) (gridWidth * 0.2), gridY + (int) (gridWidth * 2 / 3))
                         g.setColor(Color.BLACK)
-                        g.drawString(projectName, borderWidth + (int) (gridWidth * 0.2) - 1, gridY + (int) (gridWidth * 2 / 3) - 1)
-                        g.setClip(rBackup)
+                        g.drawString(projectName, borderWidth + xx +  (int) (gridWidth * 0.2) - 1, gridY + (int) (gridWidth * 2 / 3) - 1)
+                        //g.setClip(rBackup)
                     }
 
                     y++
                 }
 
-                g.drawImage(frameIcon, (int) borderWidth, (int) (borderWidth + y * gridWidth), nameWidth - 4, nameWidth - 4, null)
 
                 //
                 // draw the row names
@@ -717,6 +725,9 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
                     }
                     x++
                 }
+
+                g.drawImage(frameIcon, xx + (int) borderWidth, (int) (borderWidth + y * gridWidth), nameWidth - 4, nameWidth - 4, null)
+
             }
         }
     }

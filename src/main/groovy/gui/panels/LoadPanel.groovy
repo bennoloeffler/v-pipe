@@ -18,6 +18,8 @@ import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.Point
 import java.awt.Rectangle
+import java.awt.event.AdjustmentEvent
+import java.awt.event.AdjustmentListener
 import java.awt.event.FocusEvent
 import java.awt.event.FocusListener
 import java.awt.event.KeyEvent
@@ -94,14 +96,26 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
         addFocusListener(this)
     }
 
+    Closure scrollBarAdjListener = { AdjustmentEvent e ->
+        invalidateAndRepaint(this)
+    }
 
+
+    def registerScrollBarListener() {
+        def hsb = getScrollPane(this)?.getHorizontalScrollBar()
+        if (hsb) {
+            if(! hsb.adjustmentListeners.contains(scrollBarAdjListener)) {
+                hsb.addAdjustmentListener(scrollBarAdjListener as AdjustmentListener)
+            }
+        }
+    }
     //
     // Focus Listener
     //
 
     @Override
     void focusGained(FocusEvent e) {
-
+        registerScrollBarListener();
     }
 
     @Override
@@ -408,19 +422,21 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
 
 
             int y = 0
+            int xx = (int) (getVisibleRect().x)
+
             model.getYNames().each { String yNames ->
                 g.setColor(Color.WHITE)
                 int gridY = borderWidth + y * gridHeigth
-                g.fillRoundRect(borderWidth, gridY, nameWidth - 4, gridHeigth - 4, round * 3, round * 3)
+                g.fillRoundRect(xx + borderWidth, gridY, nameWidth - 4, gridHeigth - 4, round * 3, round * 3)
 
                 float fontSize = gridWidth / 2
                 g.getClipBounds(rBackup)
-                g.setClip(borderWidth, gridY, nameWidth - 6, gridHeigth - 6)
+                g.setClip(xx + borderWidth, gridY, nameWidth - 6, gridHeigth - 6)
                 g.setFont(g.getFont().deriveFont((float) fontSize))
                 g.setColor(Color.WHITE)
-                g.drawString(yNames, borderWidth + (int) (gridWidth * 0.2), gridY + (int) (gridWidth * 2 / 3))
+                g.drawString(yNames, xx + borderWidth + (int) (gridWidth * 0.2), gridY + (int) (gridWidth * 2 / 3))
                 g.setColor(Color.BLACK)
-                g.drawString(yNames, borderWidth + (int) (gridWidth * 0.2) - 2, gridY + (int) (gridWidth * 2 / 3) - 2)
+                g.drawString(yNames, xx + borderWidth + (int) (gridWidth * 0.2) - 2, gridY + (int) (gridWidth * 2 / 3) - 2)
                 g.setClip(rBackup)
                 y++
             }
@@ -462,7 +478,7 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
                 x++
             }
 
-            g.drawImage(frameIcon, (int) borderWidth, (int) (borderWidth + y * gridHeigth), nameWidth - 4, nameWidth - 4, null)
+            g.drawImage(frameIcon, xx + (int) borderWidth, (int) (borderWidth + y * gridHeigth), nameWidth - 4, nameWidth - 4, null)
 
         }
 

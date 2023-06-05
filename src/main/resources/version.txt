@@ -1,1 +1,1 @@
-2.2.1-update-by-id
+2.2.2-show-project-string-always
