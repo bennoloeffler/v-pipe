@@ -30,6 +30,9 @@ import java.awt.event.MouseMotionListener
 import java.awt.event.MouseWheelEvent
 import java.awt.event.MouseWheelListener
 import java.beans.PropertyChangeEvent
+import java.util.Timer
+import java.util.TimerTask
+
 
 enum ToolTipDetails {
     no, some, details
@@ -96,19 +99,44 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
         addFocusListener(this)
     }
 
+    //long lastRepaint = System.currentTimeMillis()
     Closure scrollBarAdjListener = { AdjustmentEvent e ->
-        invalidateAndRepaint(this)
+        //long now = System.currentTimeMillis()
+        //long drawnBefore = now - lastRepaint
+        //if (drawnBefore > 200) {
+            invalidateAndRepaint(this)
+        //}
     }
+
+    static def debounce(Closure task, long delay) {
+        Timer timer = null
+        return { AdjustmentEvent e ->
+            if (timer != null) {
+                timer.cancel()
+            }
+            timer = new Timer()
+            timer.schedule(new TimerTask() {
+                @Override
+                void run() {
+                    task.call()
+                }
+            }, delay)
+        }
+    }
+
+    def debouncedScrollBarAdjListener = debounce(scrollBarAdjListener, 50)
 
 
     def registerScrollBarListener() {
         def hsb = getScrollPane(this)?.getHorizontalScrollBar()
         if (hsb) {
             if(! hsb.adjustmentListeners.contains(scrollBarAdjListener)) {
-                hsb.addAdjustmentListener(scrollBarAdjListener as AdjustmentListener)
+                hsb.addAdjustmentListener(debouncedScrollBarAdjListener as AdjustmentListener)
             }
         }
     }
+
+
     //
     // Focus Listener
     //
