@@ -16,6 +16,8 @@ tasks.withType(JavaCompile) {
 }
 
 dependencies {
+    implementation 'org.jfree:org.jfree.pdf:2.0.1' // create PDF from Graphics2D
+    //implementation 'com.orsonpdf:orsonpdf:1.9'
     implementation 'org.apache.ivy:ivy:2.5.0' // for plugins apache excel adapter
     implementation 'joda-time:joda-time:2.10.14'
     implementation 'org.codehaus.groovy:groovy-all:3.0.12'

@@ -84,6 +84,10 @@ class TaskInProject {
         "Task:( $project ${_dToS(starting)} ${_dToS(ending)} $department $capacityNeeded $description)"
     }
 
+    String toCSV() {
+        "$project, ${_dToS(starting)}, ${_dToS(ending)}, $capacityNeeded, $description"
+    }
+
     /**
      * returns the number of days, the external interval overlaps with this task.
      * The end days of the intervals are excluded.

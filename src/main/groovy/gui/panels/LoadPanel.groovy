@@ -7,29 +7,14 @@ import groovy.transform.Memoized
 import groovy.transform.TypeCheckingMode
 import gui.models.AbstractGridLoadModel
 import gui.models.GridLoadElement
+import pdf.PDFExport
 import utils.RunTimer
 
-import javax.swing.JPanel
-import javax.swing.ToolTipManager
-import java.awt.Color
-import java.awt.Dimension
-import java.awt.Font
-import java.awt.Graphics
-import java.awt.Graphics2D
-import java.awt.Point
-import java.awt.Rectangle
-import java.awt.event.AdjustmentEvent
-import java.awt.event.AdjustmentListener
-import java.awt.event.FocusEvent
-import java.awt.event.FocusListener
-import java.awt.event.KeyEvent
-import java.awt.event.KeyListener
-import java.awt.event.MouseEvent
-import java.awt.event.MouseListener
-import java.awt.event.MouseMotionListener
-import java.awt.event.MouseWheelEvent
-import java.awt.event.MouseWheelListener
+import javax.swing.*
+import java.awt.*
+import java.awt.event.*
 import java.beans.PropertyChangeEvent
+import java.util.List
 
 enum ToolTipDetails {
     no, some, details
@@ -41,6 +26,7 @@ enum ShowAverageValue {
 @CompileStatic
 class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, FocusListener, PanelBasics {
 
+    String pdfTitle;
     //Color nowBarShadowColor = new Color(50, 50, 50, 30)
 
     @Bindable int gridWidth
@@ -78,10 +64,11 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
         //println "scrollBarChange: $e.newValue"
     }
 
-    LoadPanel(int gridWidth, AbstractGridLoadModel model) {
+    LoadPanel(int gridWidth, AbstractGridLoadModel model, String pdfTitle) {
         //setDoubleBuffered(false)
         setFocusable(true)
         this.model = model
+        this.pdfTitle = pdfTitle
         setGridWidth(gridWidth)
         updateOthersFromGridWidth(gridWidth, this)
 
@@ -222,6 +209,21 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
     void keyPressed(KeyEvent e){
 
         int keyCode = e.getExtendedKeyCode()
+
+        if(KeyEvent.VK_E == keyCode) {
+            File f = new File("export")
+            if(!f.exists()) {
+                f.mkdir()
+            }
+            String fileName = "export/" + pdfTitle
+            File pdf = new File(fileName)
+            String path = pdf.getAbsolutePath()
+            int result = JOptionPane.showConfirmDialog(null, "Daten-Export nach:\n" + path + ".pdf und .txt")
+            if (result == JOptionPane.YES_OPTION) {
+                PDFExport.saveToFile(this, fileName+".pdf", pdfTitle)
+                PDFExport.saveToFileData(model, fileName+".txt", pdfTitle)
+            }
+        }
 
         if(KeyEvent.VK_M == keyCode) {
             setShowAverageValue(showAverageValue.next())

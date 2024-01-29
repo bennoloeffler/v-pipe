@@ -92,8 +92,8 @@ class View {
 
         pipelineView = new GridPanel(10 * scaleX as int, gridPipelineModel)
         projectView = new GridPanel(10 * scaleX as int, gridProjectModel)
-        loadView = new LoadPanel(10 * scaleX as int, gridLoadModel)
-        pipelineLoadView = new LoadPanel(10 * scaleX as int, gridPipelineLoadModel)
+        loadView = new LoadPanel(10 * scaleX as int, gridLoadModel, "LoadOfResources")
+        pipelineLoadView = new LoadPanel(10 * scaleX as int, gridPipelineLoadModel, "LoadOfIP")
 
         fileDifferPanel = new FileDifferPanel(swing)
         projectTemplates = new ProjectTemplatesPanel(this)
@@ -356,7 +356,7 @@ class View {
                     size: [(int) (screenDimension.width), (int) (screenDimension.height - 50)],
                     location: [0, 0],
                     iconImage: frameIcon,
-                    title: 'v-pipe:  +/- = Zoom  |  Pfeile = Cursor bewegen  |  Shift+Pfeile = Projekt bewegen  |  d = Details an/aus  |  n = now  |  Strg+Pfeile = Tasks vergr./verkl.  |  m = Mittelwert',
+                    title: 'v-pipe:  +/- = Zoom  |  Pfeile = Cursor bewegen  |  Shift+Pfeile = Projekt bewegen  |  d = Details an/aus  |  n = now  |  Strg+Pfeile = Tasks vergr./verkl.  |  m = Mittelwert |  e = export',
                     locationRelativeTo: null,
                     show: true,
                     defaultCloseOperation: JFrame.DO_NOTHING_ON_CLOSE) {
