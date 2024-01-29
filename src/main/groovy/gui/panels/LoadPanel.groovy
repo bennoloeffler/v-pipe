@@ -65,7 +65,7 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
         //println "scrollBarChange: $e.newValue"
     }
 
-    LoadPanel(int gridWidth, AbstractGridLoadModel model) {
+    LoadPanel(int gridWidth, AbstractGridLoadModel model, String pdfTitle) {
         //setDoubleBuffered(false)
         setFocusable(true)
         this.model = model
