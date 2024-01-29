@@ -14,6 +14,7 @@ import javax.swing.*
 import java.awt.*
 import java.awt.event.*
 import java.beans.PropertyChangeEvent
+import java.util.Timer
 import java.util.List
 
 enum ToolTipDetails {
@@ -64,7 +65,7 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
         //println "scrollBarChange: $e.newValue"
     }
 
-    LoadPanel(int gridWidth, AbstractGridLoadModel model, String pdfTitle) {
+    LoadPanel(int gridWidth, AbstractGridLoadModel model) {
         //setDoubleBuffered(false)
         setFocusable(true)
         this.model = model
@@ -87,15 +88,35 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
         invalidateAndRepaint(this)
     }
 
+    static def debounce(Closure task, long delay) {
+        Timer timer = null
+        return { AdjustmentEvent e ->
+            if (timer != null) {
+                timer.cancel()
+            }
+            timer = new Timer()
+            timer.schedule(new TimerTask() {
+                @Override
+                void run() {
+                    task.call()
+                }
+            }, delay)
+        }
+    }
+
+    def debouncedScrollBarAdjListener = debounce(scrollBarAdjListener, 50)
+
 
     def registerScrollBarListener() {
         def hsb = getScrollPane(this)?.getHorizontalScrollBar()
         if (hsb) {
             if(! hsb.adjustmentListeners.contains(scrollBarAdjListener)) {
-                hsb.addAdjustmentListener(scrollBarAdjListener as AdjustmentListener)
+                hsb.addAdjustmentListener(debouncedScrollBarAdjListener as AdjustmentListener)
             }
         }
     }
+
+
     //
     // Focus Listener
     //
