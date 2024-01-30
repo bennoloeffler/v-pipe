@@ -90,16 +90,19 @@ class ProjectModel extends GridModel {
             if (w <= now && now < w + 7) {
                 nowXRowCache = row
             }
-            row++
-            boolean isDeliveryDate = deliveryDate >= w && deliveryDate < w + 7
+            if (model.inFilter(w)) {
 
-            if (w >= startOfTask && w < endOfTask) {
-                gridElements << new GridElement(projectTask.project, projectTask.department, fromToDateString, false, isDeliveryDate)
-            } else {
-                if (isDeliveryDate) {
+                row++
+                boolean isDeliveryDate = deliveryDate >= w && deliveryDate < w + 7
+
+                if (w >= startOfTask && w < endOfTask) {
                     gridElements << new GridElement(projectTask.project, projectTask.department, fromToDateString, false, isDeliveryDate)
                 } else {
-                    gridElements << GridElement.nullElement
+                    if (isDeliveryDate) {
+                        gridElements << new GridElement(projectTask.project, projectTask.department, fromToDateString, false, isDeliveryDate)
+                    } else {
+                        gridElements << GridElement.nullElement
+                    }
                 }
             }
         }
@@ -108,7 +111,7 @@ class ProjectModel extends GridModel {
         return gridElements
     }
 
-    static List<GridElement> fromPipelineElement(PipelineElement element, Date startOfGrid, Date endOfGrid) {
+      List<GridElement> fromPipelineElement(PipelineElement element, Date startOfGrid, Date endOfGrid) {
         assert element
         List<GridElement> gridElements = []
 
@@ -118,10 +121,12 @@ class ProjectModel extends GridModel {
         def fromToDateString = "${_dToS(startOfTask)} - ${_dToS(endOfTask)}"
 
         for (Date w = startOfGrid; w < endOfGrid; w += 7) {
-            if (w >= startOfTask && w < endOfTask) {
-                gridElements << new GridElement(element.project, 'IP', fromToDateString, true)
-            } else {
-                gridElements << GridElement.nullElement
+            if (model.inFilter(w)) {
+                if (w >= startOfTask && w < endOfTask) {
+                    gridElements << new GridElement(element.project, 'IP', fromToDateString, true)
+                } else {
+                    gridElements << GridElement.nullElement
+                }
             }
         }
 

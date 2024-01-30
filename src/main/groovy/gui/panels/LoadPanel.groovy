@@ -104,13 +104,14 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
         }
     }
 
-    def debouncedScrollBarAdjListener = debounce(scrollBarAdjListener, 50)
+    def debouncedScrollBarAdjListener = debounce(scrollBarAdjListener, 250)
 
 
     def registerScrollBarListener() {
         def hsb = getScrollPane(this)?.getHorizontalScrollBar()
         if (hsb) {
             if(! hsb.adjustmentListeners.contains(scrollBarAdjListener)) {
+                //hsb.addAdjustmentListener(scrollBarAdjListener)
                 hsb.addAdjustmentListener(debouncedScrollBarAdjListener as AdjustmentListener)
             }
         }
@@ -356,6 +357,7 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
             //println("total: ${model.sizeX * model.sizeY}")
             for (int y = 0; y < model.sizeY; y++) {
                 def maxValAndRed = model.getMaxValAndRed(y)
+
                 for (int x = 0; x < model.sizeX; x++) {
                     int gridX = nameWidth + borderWidth + x * gridWidth
                     int gridY = borderWidth + y * gridHeigth

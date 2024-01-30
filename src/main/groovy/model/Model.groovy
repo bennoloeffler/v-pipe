@@ -24,6 +24,24 @@ import static model.Weekifyer.weekify
 @CompileStatic
 class Model {
 
+    Date filterFrom = null
+    Date filterTo = null
+
+    boolean inFilter(Date date) {
+        (filterFrom == null || date >= filterFrom) && (filterTo == null || date <= filterTo)
+    }
+
+    //XXXXXX
+    def setFilter(Date from, Date to) {
+        filterFrom = from
+        filterTo = to
+    }
+
+    /* just for testing initial week filters
+    Model() {
+        setFilter(StringExtension.toDateFromYearWeek("2020-W26"), StringExtension.toDateFromYearWeek("2020-W40"))
+    }*/
+
     @Bindable
     boolean projectsAndTemplatesSwapped = false
 
@@ -346,7 +364,17 @@ class Model {
      */
     List<String> getFullSeriesOfTimeKeys(WeekOrMonth weekOrMonth) {
         Date s = getStartOfProjects()
+        if (filterFrom) {
+            if (filterFrom >= s) {
+                s = filterFrom
+            }
+        }
         Date e = getEndOfProjects()
+        if (filterTo) {
+            if (filterTo <= e) {
+                e = filterTo
+            }
+        }
         getFullSeriesOfTimeKeysInternal(weekOrMonth, s, e)
     }
 
@@ -435,6 +463,16 @@ class Model {
             cachedEndOfTasks = currentEnd
         }
     }
+
+    def forceReCalc() {
+            def currentStart = getStartOfProjects()
+            def currentEnd = getEndOfProjects()
+            capaAvailable = calcCapa(capaFileRawYamlSlurp)
+            calcAndInsertMonthlyCapaAvailable(capaAvailable)
+            cachedStartOfTasks = currentStart
+            cachedEndOfTasks = currentEnd
+    }
+
 
 
     void calcAndInsertMonthlyCapaAvailable(Map<String, Map<String, YellowRedLimit>> capaAvailable) {

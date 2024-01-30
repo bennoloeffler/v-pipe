@@ -28,6 +28,10 @@ class StringExtension {
         return DateHelperFunctions._wToD(s)
     }
 
+    static boolean isYearWeek(String s) {
+        return DateHelperFunctions._isYearWeek(s)
+    }
+
     /*
     static LocalDate toLocalDateFromYearWeek(String s) {
         return DateHelperFunctions._wToLD(s)

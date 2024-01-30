@@ -1,6 +1,8 @@
 package core
 
 import application.MainGui
+import extensions.DateHelperFunctions
+import extensions.StringExtension
 import gui.View
 import gui.panels.ModelReaderMessagePanel
 import model.DataReader
@@ -13,9 +15,9 @@ import utils.UserSettingsStore
 
 import javax.swing.*
 import javax.swing.filechooser.FileFilter
-import java.awt.event.ActionEvent
-import java.awt.event.WindowAdapter
-import java.awt.event.WindowEvent
+import java.awt.*
+import java.awt.event.*
+import java.text.SimpleDateFormat
 
 import static model.DataReader.TASK_FILE_NAME
 import static model.DataReader.isValidModelFolder
@@ -50,6 +52,7 @@ class GlobalController {
         view.swing.swapTemplatesAndProjectsAction.closure = swapTemplatesAndProjectsActionPerformed
         view.swing.readProjectUpdatesAction.closure = readProjectUpdatesActionPerformed
         view.swing.correctProjectFilesAction.closure = correctProjectFilesActionPerformed
+        view.swing.startEndFilterAction.closure = startEndFilterActionPerformed
 
         // View
         view.swing.toggleViewInPhaseAction.closure = toggleViewInPhaseActionPerformed
@@ -284,6 +287,98 @@ class GlobalController {
     static JDialog d
     ModelReaderMessagePanel modelReaderMessagePanel
     boolean reactiveAutoSave
+
+    SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
+
+    private Date[] showDateRangeDialog() {
+        def filterFrom = model.getFilterFrom()
+        if (filterFrom) {
+            filterFrom = DateHelperFunctions._getWeekYearStr(filterFrom)
+        }
+        def filterTo = model.getFilterTo()
+        if (filterTo) {
+            filterTo = DateHelperFunctions._getWeekYearStr(filterTo)
+        }
+
+        def checkDateActionListener = { KeyEvent e ->
+            JTextField tf = (JTextField) (e.getSource())
+            String text = tf.getText()
+            if (text) {
+                if (StringExtension.isYearWeek(text)) {
+                    try {
+                        Date d = StringExtension.toDateFromYearWeek(text)
+                        tf.setForeground(Color.BLACK)
+                    } catch (Exception ex) {
+                        tf.setForeground(Color.RED)
+                    }
+                } else {
+                    try {
+                        Date d = formatter.parse(text)
+                        tf.setForeground(Color.BLACK)
+                    } catch (Exception ex) {
+                        tf.setForeground(Color.RED)
+                    }
+                }
+            }
+        }
+        JTextField startField = new JTextField(filterFrom, 10);
+        startField.addKeyListener(checkDateActionListener as KeyListener)
+        JTextField endField = new JTextField(filterTo, 10);
+        endField.addKeyListener(checkDateActionListener as KeyListener)
+
+        JPanel panel = new JPanel(new GridLayout(5, 2));
+        panel.add(new JLabel("Beispiel-Formate:"));
+        panel.add(new JLabel(""));
+        panel.add(new JLabel("Datum:"));
+        panel.add(new JLabel("03.12.2020"));
+        panel.add(new JLabel("KW:"));
+        panel.add(new JLabel("2022-w03"));
+
+        panel.add(new JLabel("Start:"));
+        panel.add(startField);
+        panel.add(new JLabel("Ende:"));
+        panel.add(endField);
+
+        int result = JOptionPane.showConfirmDialog(null, panel,
+                "Datum eingrenzen", JOptionPane.OK_CANCEL_OPTION);
+
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                Date startDate = null
+                if (startField.getText()) {
+                    if (StringExtension.isYearWeek(startField.getText())) {
+                        startDate = StringExtension.toDateFromYearWeek(startField.getText())
+                    } else {
+                        startDate formatter.parse(startField.getText());
+                    }
+                }
+                Date endDate = null
+                if(endField.getText()) {
+                    if (StringExtension.isYearWeek(endField.getText())) {
+                        endDate = StringExtension.toDateFromYearWeek(endField.getText())
+                    } else {
+                        endDate formatter.parse(endField.getText());
+                    }
+                }
+                return new Date[]{startDate, endDate};
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "Ungültiges Datum.");
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+
+    def startEndFilterActionPerformed = {
+        Date[] dates = showDateRangeDialog();
+        if(dates) {
+            model.setFilter(null, null)
+            model.forceReCalc()
+            model.setFilter(dates[0], dates[1])
+            model.fireUpdate()
+        }
+    }
 
     def correctProjectFilesActionPerformed = {
         if (model.isDirty()) {

@@ -182,6 +182,11 @@ class DateHelperFunctions {
         _getStartOfWeek(cal.getTime())
     }
 
+    static boolean _isYearWeek(String s) {
+        assert s != null
+        s.matches("\\d{4}-[Ww]\\d{2}")
+    }
+
 }
 
 

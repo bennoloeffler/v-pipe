@@ -1,5 +1,6 @@
 package gui.models
 
+
 import groovy.beans.Bindable
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
@@ -13,7 +14,8 @@ import utils.RunTimer
 import java.beans.PropertyChangeEvent
 import java.beans.PropertyChangeListener
 
-import static extensions.DateHelperFunctions.*
+import static extensions.DateHelperFunctions._dToS
+import static extensions.DateHelperFunctions._getStartOfWeek
 
 @CompileStatic
 class PipelineModel extends GridModel {
@@ -97,25 +99,19 @@ class PipelineModel extends GridModel {
                 if(w <= now && now < w + 7) {
                     nowXRowCache = row
                 }
-                row ++
-                if (w >= startOfProject && w <= endOfProject) {
-                    boolean integrationPhase = false
-                    if(model.pipelineElements) {
-                        PipelineElement element = model.getPipelineElement(projectTasks[0].project)
-                        long overlap = element.getDaysOverlap(w, w+7)
-                        if(overlap){ integrationPhase = true }
-                    }
-                    boolean isDeliveryDate = deliveryDate >= w && deliveryDate < w+7
-                    if (w >= startOfTasks && w < endOfTasks) {
-                        gridElements << new GridElement(
-                                project: projectTasks[0].project,
-                                department: '',
-                                timeString: fromToDateString,
-                                integrationPhase: integrationPhase,
-                                deliveryDate: isDeliveryDate
-                        )
-                    } else {
-                        if (isDeliveryDate || integrationPhase) {
+                if (model.inFilter(w)) {
+                    row++
+                    if (w >= startOfProject && w <= endOfProject) {
+                        boolean integrationPhase = false
+                        if (model.pipelineElements) {
+                            PipelineElement element = model.getPipelineElement(projectTasks[0].project)
+                            long overlap = element.getDaysOverlap(w, w + 7)
+                            if (overlap) {
+                                integrationPhase = true
+                            }
+                        }
+                        boolean isDeliveryDate = deliveryDate >= w && deliveryDate < w + 7
+                        if (w >= startOfTasks && w < endOfTasks) {
                             gridElements << new GridElement(
                                     project: projectTasks[0].project,
                                     department: '',
@@ -124,11 +120,21 @@ class PipelineModel extends GridModel {
                                     deliveryDate: isDeliveryDate
                             )
                         } else {
-                            gridElements << GridElement.nullElement
+                            if (isDeliveryDate || integrationPhase) {
+                                gridElements << new GridElement(
+                                        project: projectTasks[0].project,
+                                        department: '',
+                                        timeString: fromToDateString,
+                                        integrationPhase: integrationPhase,
+                                        deliveryDate: isDeliveryDate
+                                )
+                            } else {
+                                gridElements << GridElement.nullElement
+                            }
                         }
+                    } else {
+                        gridElements << GridElement.nullElement
                     }
-                } else {
-                    gridElements << GridElement.nullElement
                 }
             }
         } catch (Exception e) {

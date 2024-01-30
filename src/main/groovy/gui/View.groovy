@@ -269,6 +269,13 @@ class View {
                     shortDescription: "alle Datendateien bei Veränderung lesen und ggf. Fehlermeldungen anzeigen"
             )
 
+            action(id: 'startEndFilterAction',
+                    name: "Wochen eingrenzen...",
+                    //mnemonic: 'p',
+                    closure: { println "startEndFilterAction not connected to application..." },
+                    //accelerator: shortcut('P'),
+                    shortDescription: "Pipeline, Projekt und Belastungs-Visualisierung werden auf Start bis Ende beschränkt"
+            )
 
             // view
 
@@ -381,6 +388,7 @@ class View {
                         menuItem(swapTemplatesAndProjectsAction)
                         menuItem(readProjectUpdatesAction)
                         menuItem(correctProjectFilesAction)
+                        menuItem(startEndFilterAction)
 
                     }
 
@@ -583,7 +591,7 @@ class View {
     }
 
     def openLoadWindow() {
-        def newLoadView = new LoadPanel(10 * scaleX as int, gridLoadModel)
+        def newLoadView = new LoadPanel(10 * scaleX as int, gridLoadModel, "LoadOfResourcesWeekly")
         swing.edt {
             frame(id: "frameLoad+${i++}", iconImage: frameIcon,
                     title: "v-pipe: Abt.-Belastung", locationRelativeTo: null, show: true, pack: true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {
@@ -597,7 +605,7 @@ class View {
     }
 
     def openMonthlyLoadWindow() {
-        def newLoadView = new LoadPanel(10 * scaleX as int, gridLoadMonthModel)
+        def newLoadView = new LoadPanel(10 * scaleX as int, gridLoadMonthModel,"LoadOfResourcesMonthly")
 
         newLoadView.setCursorToNow()
 
@@ -616,7 +624,7 @@ class View {
 
 
     def openPipelineLoadWindow() {
-        def newLoadView = new LoadPanel(10 * scaleX as int, gridPipelineLoadModel)
+        def newLoadView = new LoadPanel(10 * scaleX as int, gridPipelineLoadModel, "LoadOfIP")
         swing.edt {
             frame(id: "framePipelineLoad+${i++}", iconImage: frameIcon,
                     title: "v-pipe: IP-Belastung", locationRelativeTo: null, show: true, pack: true, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE) {

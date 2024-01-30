@@ -3,6 +3,7 @@ package gui.models
 import core.AbsoluteLoadCalculator
 import core.CapaNeedDetails
 import core.MovingAverage
+import extensions.StringExtension
 import groovy.beans.Bindable
 import groovy.time.TimeCategory
 import groovy.transform.CompileDynamic
@@ -51,6 +52,7 @@ class GridLoadProjectsModel extends AbstractGridLoadModel {
         model.addPropertyChangeListener('updateToggle', updateCallback)
         this.addPropertyChangeListener('selectedProject', updateCallbackCurrentProject)
         updateAllFromModelData()
+
     }
 
     void updateAllFromModelData() {
@@ -70,42 +72,45 @@ class GridLoadProjectsModel extends AbstractGridLoadModel {
             model.getAllDepartments().each { String department ->
                 gridElements[department] = [:] as Map<String, GridLoadElement>
                 model.getFullSeriesOfTimeKeys(weekOrMonth).each { String timeStr ->
-                    Double yellowAbs = -1
-                    Double redAbs = -1
-                    CapaNeedDetails capaNeedDetailsAbsolut = absoluteLoadCalculator.getCapaNeeded(department, timeStr)
 
-                    Double projectLoad = 0
-                    capaNeedDetailsAbsolut.projects.each {
-                        if (it.originalTask.project == selectedProject) {
-                            projectLoad += it.projectCapaNeed
+                    if (model.inFilter(StringExtension.toDateFromYearWeek(timeStr))) {
+                        Double yellowAbs = -1
+                        Double redAbs = -1
+                        CapaNeedDetails capaNeedDetailsAbsolut = absoluteLoadCalculator.getCapaNeeded(department, timeStr)
+
+                        Double projectLoad = 0
+                        capaNeedDetailsAbsolut.projects.each {
+                            if (it.originalTask.project == selectedProject) {
+                                projectLoad += it.projectCapaNeed
+                            }
                         }
-                    }
-                    if (!selectedProject) {
-                        projectLoad = -1
-                    }
+                        if (!selectedProject) {
+                            projectLoad = -1
+                        }
 
-                    if (model.capaAvailable.size()) {
-                        //println department + "   " + timeStr
-                        assert model.capaAvailable[department][timeStr]
-                        yellowAbs = model.capaAvailable[department][timeStr].yellow
-                        redAbs = model.capaAvailable[department][timeStr].red
-                    } else {
-                        //projectLoad /= maxAbsolute
-                        //capaNeedDetailsAbsolut.totalCapaNeed /= maxAbsolute
-                    }
+                        if (model.capaAvailable.size()) {
+                            //println department + "   " + timeStr
+                            assert model.capaAvailable[department][timeStr]
+                            yellowAbs = model.capaAvailable[department][timeStr].yellow
+                            redAbs = model.capaAvailable[department][timeStr].red
+                        } else {
+                            //projectLoad /= maxAbsolute
+                            //capaNeedDetailsAbsolut.totalCapaNeed /= maxAbsolute
+                        }
 
-                    def avail = oldElements[department]?.get(timeStr)
-                    if (avail) {
-                        avail.department = department
-                        avail.timeString = timeStr
-                        avail.load = capaNeedDetailsAbsolut.totalCapaNeed
-                        avail.loadProject = projectLoad
-                        avail.yellow = yellowAbs
-                        avail.red = redAbs
-                        avail.projectDetails = capaNeedDetailsAbsolut.projects
-                        gridElements[department][timeStr] = avail
-                    } else {
-                        gridElements[department][timeStr] = new GridLoadElement(department, timeStr, capaNeedDetailsAbsolut.totalCapaNeed, projectLoad, yellowAbs, redAbs, capaNeedDetailsAbsolut.projects)
+                        def avail = oldElements[department]?.get(timeStr)
+                        if (avail) {
+                            avail.department = department
+                            avail.timeString = timeStr
+                            avail.load = capaNeedDetailsAbsolut.totalCapaNeed
+                            avail.loadProject = projectLoad
+                            avail.yellow = yellowAbs
+                            avail.red = redAbs
+                            avail.projectDetails = capaNeedDetailsAbsolut.projects
+                            gridElements[department][timeStr] = avail
+                        } else {
+                            gridElements[department][timeStr] = new GridLoadElement(department, timeStr, capaNeedDetailsAbsolut.totalCapaNeed, projectLoad, yellowAbs, redAbs, capaNeedDetailsAbsolut.projects)
+                        }
                     }
 
                 }
@@ -189,6 +194,7 @@ class GridLoadProjectsModel extends AbstractGridLoadModel {
     List<String> getXNames() {
         return model.getFullSeriesOfTimeKeys(weekOrMonth)
     }
+
 
     void calcAverageValues() {
         model.getAllDepartments().each { String department ->
