@@ -187,6 +187,11 @@ class DateHelperFunctions {
         s.matches("\\d{4}-[Ww]\\d{2}")
     }
 
+    static boolean _isGermanDate(String s) {
+        assert s != null
+        s.matches("\\d{1,2}\\.\\d{1,2}\\.\\d{4}")
+    }
+
 }
 
 

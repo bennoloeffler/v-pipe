@@ -32,6 +32,10 @@ class StringExtension {
         return DateHelperFunctions._isYearWeek(s)
     }
 
+    static boolean isGermanDate(String s) {
+        return DateHelperFunctions._isGermanDate(s)
+    }
+
     /*
     static LocalDate toLocalDateFromYearWeek(String s) {
         return DateHelperFunctions._wToLD(s)

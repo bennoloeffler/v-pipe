@@ -289,7 +289,7 @@ class GlobalController {
     ModelReaderMessagePanel modelReaderMessagePanel
     boolean reactiveAutoSave
 
-    SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
+    SimpleDateFormat formatter = new SimpleDateFormat("d.M.yyyy");
 
     private Date[] showDateRangeDialog() {
         def filterFrom = model.getFilterFrom()
@@ -301,9 +301,16 @@ class GlobalController {
             filterTo = DateHelperFunctions._getWeekYearStr(filterTo)
         }
 
-        def checkDateActionListener = { KeyEvent e ->
+        def checkDateKeyListener = { KeyEvent e ->
             JTextField tf = (JTextField) (e.getSource())
             String text = tf.getText()
+            if(text && (StringExtension.isGermanDate(text) || StringExtension.isYearWeek(text))) {
+                tf.setForeground(Color.BLACK)
+            } else {
+                tf.setForeground(Color.RED)
+            }
+
+            /*
             if (text) {
                 if (StringExtension.isYearWeek(text)) {
                     try {
@@ -320,20 +327,20 @@ class GlobalController {
                         tf.setForeground(Color.RED)
                     }
                 }
-            }
+            }*/
         }
         JTextField startField = new JTextField(filterFrom, 10);
-        startField.addKeyListener(checkDateActionListener as KeyListener)
+        startField.addKeyListener(checkDateKeyListener as KeyListener)
         JTextField endField = new JTextField(filterTo, 10);
-        endField.addKeyListener(checkDateActionListener as KeyListener)
+        endField.addKeyListener(checkDateKeyListener as KeyListener)
 
         JPanel panel = new JPanel(new GridLayout(5, 2));
         panel.add(new JLabel("Beispiel-Formate:"));
         panel.add(new JLabel(""));
-        panel.add(new JLabel("Datum:"));
-        panel.add(new JLabel("03.12.2020"));
         panel.add(new JLabel("KW:"));
+        panel.add(new JLabel("Datum:"));
         panel.add(new JLabel("2022-w03"));
+        panel.add(new JLabel("3.12.2020"));
 
         panel.add(new JLabel("Start:"));
         panel.add(startField);
@@ -344,28 +351,35 @@ class GlobalController {
                 "Datum eingrenzen", JOptionPane.OK_CANCEL_OPTION);
 
         if (result == JOptionPane.OK_OPTION) {
+            Date startDate = null
+            Date endDate = null
             try {
-                Date startDate = null
                 if (startField.getText()) {
                     if (StringExtension.isYearWeek(startField.getText())) {
                         startDate = StringExtension.toDateFromYearWeek(startField.getText())
                     } else {
-                        startDate formatter.parse(startField.getText());
+                        startDate = formatter.parse(startField.getText());
                     }
                 }
-                Date endDate = null
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "Ungültiges Start-Datum: " + startField.getText());
+                return null;
+            }
+            try {
                 if(endField.getText()) {
                     if (StringExtension.isYearWeek(endField.getText())) {
                         endDate = StringExtension.toDateFromYearWeek(endField.getText())
                     } else {
-                        endDate formatter.parse(endField.getText());
+                        endDate = formatter.parse(endField.getText());
                     }
                 }
-                return new Date[]{startDate, endDate};
             } catch (Exception e) {
-                JOptionPane.showMessageDialog(null, "Ungültiges Datum.");
+                JOptionPane.showMessageDialog(null, "Ungültiges End-Datum: " + endField.getText());
                 return null;
             }
+
+            return new Date[]{startDate, endDate};
+
         } else {
             return null;
         }

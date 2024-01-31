@@ -410,6 +410,9 @@ Während des "Vorlagen-Modus" kann man das Modell nicht speichern.
 D.h. der AutoSave-Modus wird automatisch deaktiviert.
 
 ## Release History
+### 2024-01-31 `2.3.2-filter-and-export`
+- export load view as pdf and data into an folder called "export"
+- filter the visual view and export data by shrinking the range of aktive calendar weeks 
 
 ### 2022-08-12 `2.2.0-update-by-id`
 - release and starter for win, linux and macos
