@@ -277,6 +277,14 @@ class View {
                     shortDescription: "Pipeline, Projekt und Belastungs-Visualisierung werden auf Start bis Ende beschränkt"
             )
 
+            action(id: 'deleteFilterAction',
+                    name: "Wochen-Eingrenzung abschalten", // Eingrenzung entfernen.
+                    //mnemonic: 'p',
+                    closure: { println "deleteFilterAction not connected to application..." },
+                    //accelerator: shortcut('P'),
+                    shortDescription: 'die zeitliche Eingrenzung der Visualisierung entfernen.'
+            )
+
             // view
 
             action(id: 'toggleViewInPhaseAction',
@@ -359,6 +367,8 @@ class View {
 
 
 
+
+
             frame(id: 'frame',
                     size: [(int) (screenDimension.width), (int) (screenDimension.height - 50)],
                     location: [0, 0],
@@ -389,7 +399,7 @@ class View {
                         menuItem(readProjectUpdatesAction)
                         menuItem(correctProjectFilesAction)
                         menuItem(startEndFilterAction)
-
+                        menuItem(deleteFilterAction)
                     }
 
                     menu(text: 'Ansicht') {
@@ -412,7 +422,9 @@ class View {
 
                 label("Projekt suchen: ", foreground: GRAY)
                 textField(id: 'searchTextField', toolTipText: 'Tutorial & Experimente: regex101.com', constraints: 'width 100')
-                label(id: "swapped", foreground: RED, toolTipText: "speichern, laden, etc erst nach Beendigung des Vorlagen-Modus möglich.")
+                label(id: "swapped",  foreground: RED, toolTipText: "speichern, laden, etc erst nach Beendigung des Vorlagen-Modus möglich.")
+                label(id: "filteredStartEnd", foreground: RED)
+
                 label("    Zeit: ", foreground: GRAY)
                 label("", id: 'timeLabel', foreground: highlightColor)
                 label("    Projekt: ", foreground: GRAY)
@@ -485,14 +497,9 @@ class View {
                             }
 
                             fileDifferPanel.buildPanel()
-
                         }
                     }
-
-
                 }
-
-
             }
 
             bind(target: currentPath, targetProperty: 'text', source: model, sourceProperty: "currentDir", converter: { String v ->
@@ -513,7 +520,10 @@ class View {
                 swing.frame.validate() // to layout upmost panel and make "VORLAGEN-MOODUS" visible
                 v ? "VORLAGEN-MODUS" : ""
             })
-
+            bind(target: filteredStartEnd, targetProperty: 'text', source: model, sourceProperty: "filterString", converter: { v ->
+                swing.frame.validate() // to layout upmost panel and make filterString visible
+                v ? v : ""
+            })
 
             // sync pipelineView with loadView and projectView (details of witch project?)
             bind(target: gridLoadModel, targetProperty: 'selectedProject', source: gridPipelineModel, sourceProperty: 'selectedProject')

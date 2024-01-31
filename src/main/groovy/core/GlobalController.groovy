@@ -66,6 +66,7 @@ class GlobalController {
         view.swing.aboutAction.closure = aboutActionPerformed
 
         view.swing.printPerformanceAction.closure = printPerformanceActionPerformed
+        view.swing.deleteFilterAction.closure = deleteFilterActionPerformed
     }
 
     def addLastDirsToRecentMenu() {
@@ -379,6 +380,12 @@ class GlobalController {
             model.fireUpdate()
         }
     }
+
+    def deleteFilterActionPerformed = {
+        model.setFilter(null, null)
+        model.fireUpdate()
+    }
+
 
     def correctProjectFilesActionPerformed = {
         if (model.isDirty()) {

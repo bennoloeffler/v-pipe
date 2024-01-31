@@ -1,6 +1,7 @@
 package model
 
 import extensions.DateExtension
+import extensions.DateHelperFunctions
 import extensions.StringExtension
 import groovy.beans.Bindable
 import groovy.transform.CompileDynamic
@@ -13,6 +14,7 @@ import transform.ScenarioTransformer
 import utils.FileSupport
 import utils.RunTimer
 
+import java.beans.PropertyChangeSupport
 import java.time.Duration
 import java.time.temporal.ChronoUnit
 import java.util.stream.Collectors
@@ -31,15 +33,40 @@ class Model {
         (filterFrom == null || date >= filterFrom) && (filterTo == null || date <= filterTo)
     }
 
-    //XXXXXX
+    @Bindable
+    def filterString = null
+
+    String getFilterString() {
+        def fromStr = "<-"
+        def toStr = "->"
+
+        if (filterFrom) {
+            fromStr = _getWeekYearStr(filterFrom) + " "
+        }
+        if (filterTo) {
+            toStr = " " +_getWeekYearStr(filterTo)
+        }
+        if (filterTo || filterFrom) {
+            "FILTER: " + fromStr + "-" + toStr
+        } else {
+            null
+        }
+    }
+
     def setFilter(Date from, Date to) {
         filterFrom = from
         filterTo = to
+        //setProperty("filterString", getFilterString())
+        setFilterString(getFilterString())
+        //firePropertyChange('filterString', null, getFilterString())
     }
 
-    /* just for testing initial week filters
+    /*private PropertyChangeSupport propertyChangeSupport
+
     Model() {
-        setFilter(StringExtension.toDateFromYearWeek("2020-W26"), StringExtension.toDateFromYearWeek("2020-W40"))
+        propertyChangeSupport = new PropertyChangeSupport(this)
+
+        //setFilter(StringExtension.toDateFromYearWeek("2020-W26"), StringExtension.toDateFromYearWeek("2020-W40"))
     }*/
 
     @Bindable
@@ -467,8 +494,10 @@ class Model {
     def forceReCalc() {
             def currentStart = getStartOfProjects()
             def currentEnd = getEndOfProjects()
-            capaAvailable = calcCapa(capaFileRawYamlSlurp)
-            calcAndInsertMonthlyCapaAvailable(capaAvailable)
+            if(capaFileRawYamlSlurp) {
+                capaAvailable = calcCapa(capaFileRawYamlSlurp)
+                calcAndInsertMonthlyCapaAvailable(capaAvailable)
+            }
             cachedStartOfTasks = currentStart
             cachedEndOfTasks = currentEnd
     }
