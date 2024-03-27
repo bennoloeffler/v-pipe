@@ -295,10 +295,14 @@ class GlobalController {
         def filterFrom = model.getFilterFrom()
         if (filterFrom) {
             filterFrom = DateHelperFunctions._getWeekYearStr(filterFrom)
+        } else {
+            filterFrom = DateHelperFunctions._getWeekYearStr(model.getStartOfProjects())
         }
         def filterTo = model.getFilterTo()
         if (filterTo) {
             filterTo = DateHelperFunctions._getWeekYearStr(filterTo)
+        } else {
+            filterTo = DateHelperFunctions._getWeekYearStr(model.getEndOfProjects())
         }
 
         def checkDateKeyListener = { KeyEvent e ->
