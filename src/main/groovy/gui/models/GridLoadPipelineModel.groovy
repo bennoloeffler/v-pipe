@@ -143,7 +143,7 @@ class GridLoadPipelineModel extends AbstractGridLoadModel {
         def ma = {
             gridElements.values()*.load
         } as MovingAverage
-        ma.howMany = 5
+        ma.avgWindow = 5
         def maList = ma.getAverageValues()
         def i = 0
         gridElements.each {

@@ -11,22 +11,42 @@ package core
 //@CompileStatic //tests fail
 trait MovingAverage {
 
-    int howMany = 3
+    int avgWindow = 3
 
     abstract List<Double> getBaseValues()
 
     List<Double> getAverageValues() {
-        assert howMany > 1, "howMany should be bigger than 1"
-        def result = []
-        def allVals = getBaseValues()
-        def s = allVals?.size()?:0
-        if(s) {
-            for (idx in 0..s - 1) {
-                def subVals = allVals.subList(idx, Math.min(idx + howMany, s))
-                result << subVals.sum() / subVals.size()
-            }
+        assert avgWindow >= 1, "avgWindow should be 1 or bigger"
+
+        //assert getBaseValues()?.size() >= 0, "baseValues should exist"
+        if( ! getBaseValues()) return []
+
+        def startVal = 0.0
+        def endVal = 0.0
+        if (getBaseValues().size() > 0) {
+            startVal = getBaseValues().get(0)
+            endVal = getBaseValues().get(getBaseValues().size() - 1)
         }
-        result as List<Double>
+
+        // add the starting number howMany times
+        def startArray = new double[avgWindow]
+        Arrays.fill(startArray, startVal)
+        def startVals = startArray.toList();
+
+        // add the ending number howMany times
+        def endArray = new double[avgWindow]
+        Arrays.fill(endArray, endVal)
+        def endVals = endArray.toList()
+
+        def allVals = [startVals, getBaseValues(), endVals].flatten()
+
+
+        def result = new double[0].toList()
+        for (idx in avgWindow..allVals.size() - 1 - avgWindow) {
+            def subVals = allVals.subList(idx-avgWindow, idx + avgWindow + 1)
+            result << subVals.sum() / subVals.size()
+        }
+        result
     }
 }
 

@@ -28,8 +28,6 @@ class GridLoadProjectsModel extends AbstractGridLoadModel {
 
     int nowXRowCache = -1
 
-    @Bindable
-    String selectedProject = ""
 
     WeekOrMonth weekOrMonth = WeekOrMonth.WEEK
 
@@ -199,7 +197,7 @@ class GridLoadProjectsModel extends AbstractGridLoadModel {
     void calcAverageValues() {
         model.getAllDepartments().each { String department ->
             def ma = { gridElements[department].values()*.load } as MovingAverage
-            ma.howMany = 5
+            ma.avgWindow = 2
             def maList = ma.getAverageValues()
             def i = 0
             gridElements[department].each {

@@ -349,7 +349,8 @@ class GridPanel extends JPanel implements MouseWheelListener, MouseMotionListene
     }
 
     void scrollToCursorXY() {
-        scrollRectToVisible(new Rectangle(nameWidth + cursorX * gridWidth - 2*gridWidth, cursorY * gridWidth - 2*gridWidth, 4 * gridWidth, 4 * gridWidth))
+        scrollRectToVisible(new Rectangle(/*nameWidth +*/ cursorX * gridWidth - gridWidth, (int)(getVisibleRect().getY()),  10* gridWidth, 3 * gridWidth))
+        //scrollRectToVisible(new Rectangle(nameWidth + cursorX * gridWidth - 2*gridWidth, cursorY * gridWidth - 2*gridWidth, 4 * gridWidth, 4 * gridWidth))
     }
 
     @Override

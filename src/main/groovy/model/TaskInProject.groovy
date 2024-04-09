@@ -84,6 +84,12 @@ class TaskInProject {
         "Task:( $project ${_dToS(starting)} ${_dToS(ending)} $department $capacityNeeded $description)"
     }
 
+
+    String toDetails() {
+        def descr = description?", "+description:""
+        "$project, ${_dToS(starting)} - ${_dToS(ending)}, $department, $capacityNeeded$descr"
+    }
+
     String toCSV() {
         "$project, ${_dToS(starting)}, ${_dToS(ending)}, $capacityNeeded, $description"
     }

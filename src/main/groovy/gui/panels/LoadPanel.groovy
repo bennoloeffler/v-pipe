@@ -88,16 +88,22 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
         invalidateAndRepaint(this)
     }
 
-    static def debounce(Closure task, long delay) {
+
+    var paintNow = true
+
+    def debounce(Closure task, long delay) {
         Timer timer = null
         return { AdjustmentEvent e ->
             if (timer != null) {
                 timer.cancel()
+                paintNow = false
             }
+
             timer = new Timer()
             timer.schedule(new TimerTask() {
                 @Override
                 void run() {
+                    paintNow = true
                     task.call()
                 }
             }, delay)
@@ -330,7 +336,7 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
     }
 
     void scrollToCursorX() {
-        scrollRectToVisible(new Rectangle(nameWidth + cursorX * gridWidth - gridWidth, (int)(getVisibleRect().getY()), 3 * gridWidth, 3 * gridWidth))
+        scrollRectToVisible(new Rectangle(/*nameWidth +*/ cursorX * gridWidth - gridWidth, (int)(getVisibleRect().getY()),  10* gridWidth, 3 * gridWidth))
     }
 
 
@@ -449,21 +455,23 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
             int y = 0
             int xx = (int) (getVisibleRect().x)
 
-            model.getYNames().each { String yNames ->
-                g.setColor(Color.WHITE)
-                int gridY = borderWidth + y * gridHeigth
-                g.fillRoundRect(xx + borderWidth, gridY, nameWidth - 4, gridHeigth - 4, round * 3, round * 3)
+            if (paintNow) {
+                model.getYNames().each { String yNames ->
+                    g.setColor(Color.WHITE)
+                    int gridY = borderWidth + y * gridHeigth
+                    g.fillRoundRect(xx + borderWidth, gridY, nameWidth - 4, gridHeigth - 4, round * 3, round * 3)
 
-                float fontSize = gridWidth / 2
-                g.getClipBounds(rBackup)
-                g.setClip(xx + borderWidth, gridY, nameWidth - 6, gridHeigth - 6)
-                g.setFont(g.getFont().deriveFont((float) fontSize))
-                g.setColor(Color.WHITE)
-                g.drawString(yNames, xx + borderWidth + (int) (gridWidth * 0.2), gridY + (int) (gridWidth * 2 / 3))
-                g.setColor(Color.BLACK)
-                g.drawString(yNames, xx + borderWidth + (int) (gridWidth * 0.2) - 2, gridY + (int) (gridWidth * 2 / 3) - 2)
-                g.setClip(rBackup)
-                y++
+                    float fontSize = gridWidth / 2
+                    g.getClipBounds(rBackup)
+                    g.setClip(xx + borderWidth, gridY, nameWidth - 6, gridHeigth - 6)
+                    g.setFont(g.getFont().deriveFont((float) fontSize))
+                    g.setColor(Color.WHITE)
+                    g.drawString(yNames, xx + borderWidth + (int) (gridWidth * 0.2), gridY + (int) (gridWidth * 2 / 3))
+                    g.setColor(Color.BLACK)
+                    g.drawString(yNames, xx + borderWidth + (int) (gridWidth * 0.2) - 2, gridY + (int) (gridWidth * 2 / 3) - 2)
+                    g.setClip(rBackup)
+                    y++
+                }
             }
 
             int x = 0
@@ -503,8 +511,9 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
                 x++
             }
 
-            g.drawImage(frameIcon, xx + (int) borderWidth, (int) (borderWidth + y * gridHeigth), nameWidth - 4, nameWidth - 4, null)
-
+            if (paintNow) {
+                g.drawImage(frameIcon, xx + (int) borderWidth, (int) (borderWidth + y * gridHeigth), nameWidth - 4, nameWidth - 4, null)
+            }
         }
 
     }
@@ -583,7 +592,7 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
             if(showAverageValue == ShowAverageValue.yes) {
                 Double percentAvg = (Double) (avg / max)
                 percentShift = (int) ((sizeY - 4) - percentAvg * (sizeY - 4))
-                g.setColor(Color.CYAN)
+                g.setColor(Color.BLUE)
                 g.drawLine(x, y + percentShift, x + sizeX - 4, y + percentShift)
                 //g.setColor(Color.BLUE)
                 g.drawLine(x, y + 1 + percentShift, x + sizeX - 4, y + 1 + percentShift)
@@ -690,28 +699,33 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
             //def yellowRed = element.yellow >=0 ? "(${element.yellow.round(1)}, ${element.red.round(1)})":""
             def yellow = element.yellow >= 0 ? "${element.yellow.round(1)}" : "keine Daten"
             def red = element.red >= 0 ? "${element.red.round(1)}" : "keine Daten"
-            def percentTotal = element.yellow > 0 ? ((double)(element.load / element.yellow)*100).round(1) : -1
-            def percentRed = element.yellow > 0 ? ((double)(element.red / element.yellow)*100).round(1) : -1
-            def percentStr = percentTotal >=0 ? "$percentTotal% (von gelb)  (rot bei: $percentRed%)<br/>": ""
+            def percentTotalYellow = element.yellow > 0 ? ((double)(element.load / element.yellow)*100).round(1) : -1
+            def percentTotalRed = element.red > 0 ? ((double)(element.load / element.red)*100).round(1) : -1
+            //def percentRed = element.yellow > 0 ? ((double)(element.red / element.yellow)*100).round(1) : -1
+            def percentStr = "" //percentTotal >=0 ? "$percentTotal% (von gelb)  (rot bei: $percentRed%)<br/>": ""
             // <br/>$element.fromToDateString
             String details = ""
             //noinspection GroovyUnusedAssignment
             String choosenProject =""
             if(detailsToolTip == ToolTipDetails.details) {
-                List<String> data = element.projectDetails.sort {-it.projectCapaNeed }
+                // TODO? could be done as html table?
+                List<String> data = element.projectDetails
+                        .sort {-it.projectCapaNeed }
                         .collect {
                             def start = ""
                             if (element.yellow > 0) {
-                                start = ((double) (it.projectCapaNeed / element.yellow) * 100).round(1) + '% = '
+                                start = ((double) (it.projectCapaNeed / element.load /*element.yellow*/) * 100).round(1) + '% = '
                             }
-                            start + it.projectCapaNeed.round(1) + " : " + it.originalTask.toString() + "<br/>"
+                            def bold = (model.selectedProject == it.originalTask.project)? "<b>":""
+                            def boldOff = bold? "</b>":""
+                            bold + start + it.projectCapaNeed.round(1) + " aus " + it.originalTask.toDetails() + boldOff + "<br/>"
                         } as List<String>
 
-
-                //details = "Details: <br/> ${(element.projectDetails.sort { -it.projectCapaNeed }.collect { it.projectCapaNeed.round(1) + " : " + it.originalTask.toString() + "<br/>" } as List<String>).join('')}"
-                details = data?"Details: <br/> " + data.join(''):""
+                details = data?"<hr>" + data.join(''):""
             }
-            choosenProject = element.loadProject>=0?"Gewähltes Projekt: ${element.yellow>0?((double)(element.loadProject / element.yellow)*100).round(1) + '% = ':''} ${element.loadProject.round(1)} <br/>":""
+            def yellowRedString = element.red >= 0 ? "gelb: $yellow ($percentTotalYellow%)<br>rot: $red ($percentTotalRed%)<br/>" : ""
+            //choosenProject = element.loadProject>=0?"Projekt: $model.selectedProject, $element.department: ${element.yellow>0?((double)(element.loadProject / element.yellow)*100).round(1) + '% = ':''} ${element.loadProject.round(1)} <br/>":""
+
             //html =  "Gesamtbelastung: $element.load\nGelb: $element.percentageYellow, Rot: $element.percentageYellow)\nGewähltes Projekt:$element.loadProject"
             html  =      """<html><head><style>
                                 h1 { color: #8ac5f8; font-family: verdana; font-size: 100%; }
@@ -720,8 +734,8 @@ class LoadPanel extends JPanel implements MouseListener, MouseMotionListener, Mo
                                 <body>
                                     <h1>$department $timeStr</h1>
                                     <p>
-                                        Gesamtbelastung: ${percentTotal>=0?percentTotal.round(1)+ '% = ':''}${element.load.round(1)}<br/>
-                                        Grenze gelb: $yellow, rot: $red<br/>
+                                        Gesamtbelastung: ${element.load.round(1)}<br/>
+                                        $yellowRedString
                                         $percentStr
                                         $choosenProject
                                         $details

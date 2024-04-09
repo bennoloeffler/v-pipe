@@ -25,7 +25,7 @@ dependencies {
     implementation group: 'org.codehaus.groovy', name: 'groovy-yaml', version: '3.0.12'
     implementation 'org.tinylog:tinylog-impl:2.4.1'
     implementation 'org.tinylog:tinylog-api:2.4.1'
-    implementation group: 'com.formdev', name: 'flatlaf', version: '2.4'
+    implementation group: 'com.formdev', name: 'flatlaf', version: '3.4.1'//'2.4'
     implementation 'com.miglayout:miglayout-swing:11.0'
     implementation group: 'org.codehaus.gpars', name: 'gpars', version: '1.2.1'
     implementation 'org.pcollections:pcollections:3.1.4'

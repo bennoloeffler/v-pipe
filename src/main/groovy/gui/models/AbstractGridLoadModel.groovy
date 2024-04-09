@@ -45,6 +45,10 @@ class GridLoadElement {
 abstract class AbstractGridLoadModel {
 
     @Bindable
+    String selectedProject = ""
+
+
+    @Bindable
     boolean updateToggle
 
 
