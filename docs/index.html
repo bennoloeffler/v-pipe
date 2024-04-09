@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>v-pipe</title>
+    <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/1.0.0/css/bulma.min.css"
+        integrity="sha512-+oEiKVGJRHutsibRYkkTIfjI0kspDtgJtkIlyPCNTCFCdhy+nSe25nvrCw7UpHPwNbdmNw9AkgGA+ptQxcjPug=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap"
+        rel="stylesheet">
+    <style>
+        .ti {
+            font-family: "Titillium Web", sans-serif;
+            font-weight: 300;
+            font-style: normal;
+        }
+        body { font-size: 120%; }
+
+    </style>-->
+    <link rel="stylesheet" href="simple.css">
+    <link rel="icon" href="v-pipe-logo-small.png">
+
+
+</head>
+
+<body>
+
+    <header>
+        <h2>v-pipe</h2>
+        <p> Einfache Kapa-Planung für Projekt-Organisationen.
+            <br>Gemeinsam im Führungs-Team in Echtzeit.
+            <br><br> <i>Ein Prototyp für die Praxis</i>
+        </p>
+        <img src="v-pipe-logo-invers-transparent.png" alt="" style="width: 10%;">
+    </header>
+
+    <main>
+
+        <h4>In 5 Minuten das Wesentliche verstehen:</h4>
+        <div style="position: relative; padding-bottom: 61.57354618015963%; height: 0;"><iframe
+                src="https://www.loom.com/embed/7440e29a4efa4a4fa7d2fee451dbef32?sid=df6a7d74-3cf9-46a6-98af-7367abe7a423"
+                frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen
+                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe></div>
+        <br>
+        <h4>Für wen?</h4>
+        <p>v-pipe ist für</p>
+        <ol>
+            <li>kleine Organisationen bis 250 Mitarbeitenden,</li>
+            <li>die Projekte machen, und zwar</li>
+            <li>bis zu ca. 50 Projekte parallel</li>
+            <li>Laufzeiten von 6 Monaten bis 2 Jahre pro Projekt</li>
+        </ol>
+
+        <br>
+        <h4>Warum?</h4>
+        <p>Warum gibt es v-pipe? <br><br>
+
+            Ich bin einer der Gründer, Partner und Geschäftsführer bei der Firma <a href="https://v-und-s.de">V&S</a>.
+            Wir beraten unsere mittelständischen Kunden in Sachen Wettbewerbsfähigkeit.
+            Dabei geht es nicht selten um Durchsatz und Liefertermintreue.
+
+            Die typische mittelständische "Projekt-Firma" funktioniert so:<br>
+            Bei einer nennenswert ernsten Projekt-Anfrage ermittelt jeder Abteilungsleiter auf Basis einer
+            lokalen Excel-Abteilungs-Kapa-Planung, ob und wann er das angefragte Projekt machen kann.
+            Daraus wird dann der grobe Projektplan und ein angebotener Liefertermin.
+            Und weil das selten gut funktioniert, rufen alle nach einer besseren Planung:
+            Genauer. Integrierter. "Eine GROOOOOSE Software brauchen wir!"<br><br>'NEEEIIIIIN!' Dachte ich jedes mal
+            aufs Neue...<br><br>
+            Ich wollte gerne etwas "kleines, schnelles, einfaches", um eine ausreichend gute GEMEINSAME
+            Sicht auf die Kapazitäts-Situation zu bekommen, um gemeinsam mit Szenarien spielen zu können
+            und so die Reflektion im Führungsteam drastisch zu verbessern.
+            Ich wollte, das das Management-Team erleben kann, wie sich die Situation schnell verbessert,
+            wenn man grober plant - aber gemeinsam und in Echtzeit.<br>
+            Dafür ist v-pipe gemacht.<br><br>
+            Und der Name? V&S-Projekt-Pipline-Tool. Kurz: v-pipe.
+        </p>
+
+        <br>
+        <h4>Download und Installation</h4>
+        <p>Die Installation geschieht aus einem Zip-File.<br>
+            Es gibt Versionen für Windows, MacOS und Linux. <br>
+            Erkennbar am Deteinamen.<br>
+            Einfach das richtige runterladen und auspacken. Fertig.<br>
+            <a href="https://www.dropbox.com/sh/0ns0bkkz7g2dua2/AABMMgMW0crOoZYfQcOEu30Sa?dl=0">
+                Bitte hier entlang zum Download.</a>
+        </p>
+        <p>Download, Zip-File auspacken und der erste Start von v-pipe<br>
+            <a target="_blank"
+                href="https://www.loom.com/share/2aa6e20f9b66409289892f498f97f548?sid=bbe673f8-b129-4161-ad73-8b63b95d03b5">
+                Installations-Tutorial</a>
+        </p>
+        <p><b>Hinweis für die IT, falls es Probleme gibt</b><br>
+            Die Software v-pipe wird per Skript gestartet:<br>
+            windows: <code>v-pipe-win.bat</code><br>
+            macOS: <code>v-pipe-macos.sh.command</code><br>
+            linux: <code>v-pipe-linux.sh</code><br>
+            v-pipe läuft in einem eigenen JRE:<br>
+            <code>openjdk version "11.0.15" 2022-04-19 LTS</code><br>
+            Diese JRE wird mitgeliefert und liegt im Ordner <code>jre</code>.
+            Dort gibt es die JVM unter <code>jre/bin/java</code>.
+            Weder das Start-Skript noch die JVM werden als vertrauenswürdig eingestuft und daher wird die Ausführung
+            verhindert.
+            Es ist also mit ein paar Sicherheits-Hürden zu rechnen.<br>
+            Sowohl das Start-Skript als auch <code>jre/bin/java</code><br>
+            brauchen die EXLIZITE ERLAUBNIS, dass sie ausgeführt werden dürfen.
+        <p>Starten klappt nicht?<br>
+            <a target="_blank"
+                href="https://www.loom.com/share/2aa6e20f9b66409289892f498f97f548?sid=bbe673f8-b129-4161-ad73-8b63b95d03b5">
+                Nochmal anschauen: Start-Erlaubnis auf MacOS, ab Minute 1:16 bis 3:50</a><br>
+            Das müsste auf Windows ganz analog funktionieren...
+        </p>
+
+        </p>
+
+        <br>
+        <h4>Tutorial</h4>
+        </p>
+        <ol>
+            <li><b>v-pipe starten</b><br>
+                Da v-pipe ohne Signatur als rohes Installations-Verzeichnis vorliegt, könnte es ein paar Hürden geben...
+                <a target="_blank"
+                    href="https://www.loom.com/share/198432ea91dd4420870c4d739917c8dd?sid=02d7e16a-032e-4fee-ac10-ed8347fb172e">Video</a>
+                <p></p>
+            </li>
+            <li><b>Bedienung mit Tasten und wenig Maus!</b><br>
+                Tasten sind schnell. Deshalb geht vieles mit ein paar einfachen Tastendrücken:<br>
+                <table>
+                    <tr>
+                        <td>+/- </td>
+                        <td><b>Zoomen</b> - in allen Ansichten, die sich zoomen lassen.</td>
+                    </tr>
+                    <tr>
+                        <td>Pfeile</td>
+                        <td><b>Cursor bewegen</b> - in allen Ansichten, die einen Cursor haben.</td>
+                    </tr>
+                    <tr>
+                        <td>SHIFT + Pfeile</td>
+                        <td><b>Projekte/Tasks bewegen</b> - in allen Ansichten, die verschiebbare Elemente haben: Tasks
+                            oder Projekte.</td>
+                    </tr>
+                    <tr>
+                        <td>SHIFT + CONTROL + Pfeile</td>
+                        <td><b>Tasks verlängern/verkürzen</b> in der Task-Ansicht.</td>
+                    </tr>
+                    <tr>
+                        <td>n</td>
+                        <td><b>Now</b> = alle Ansichten zur aktuellen Woche bewegen.</td>
+                    </tr>
+                    <tr>
+                        <td>d</td>
+                        <td><b>Details</b> = Details an/aus. Element mit der Maus auswählen.</td>
+                    </tr>
+                    <tr>
+                        <td>m</td>
+                        <td><b>Mittelwert</b> = gleitende Mittelwerte über 5 Wochen in der Belastungs-Sicht einblenden.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Mouse/Dragpad</td>
+                        <td><b>Fokus</b> = ohne Klicken Fokus für die Tasten verschieben (blauer Rahmen)</td>
+                    </tr>
+                </table>
+                <b>Das muss man kurz üben - aber dann ist man sauschnell!</b><br>
+                Alle Tastenkürzel stehen nochmal oben in der Fenster-Leiste des Hauptfensters.<br>
+                <a target="_blank"
+                    href="https://www.loom.com/share/ac891e0edae644fa889402511f0a6ef2?sid=22db3027-66bd-4e22-875b-ca6fe9db2e0d">Video</a>
+                <p></p>
+            <li><b>Ein viel zu einfaches Beispiel...</b></li>
+            <ul>
+                <li><code>bsp-00-nur-tasks</code> heißt der Ordner<br>
+                    Die einfachste Form eines Modells. Es gibt nur Projekte bestehend aus sog. Tasks. Ein Projekt besteht aus vielen Tasks (Zeilen). Ein Task - also eine Zeile im Datenfile - sieht so aus: <br>
+                    <pre>Projekt, Start, Ende, Abteilung, Kapa-Bedarf, Kommentar</pre> 
+                    Ein <b>Task</b> gehört also zu einem <code>Projekt</code>, beginnt an einem <code>Start-Datum</code>,  endet an einem <code>End-Datum</code> und verursacht in einer <code>Abteilung</code> in diesem Zeitraum einen <code>Kapa-bedarf</code>.
+                    Keine Abhängikeiten. Keine Vorgänger-Nachfolger-Beziehungen. Nix Kompliziertes.
+                    Reduced to the max: Grobe Abschätzungen, von wann bis wann das Projekt in welcher Abteilung landet und wieviel Kapa
+                    es braucht. Ein Beispiel mit zwei Projekten: <code>p1</code> und <code>proj-2</code>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Projekt-Name</th>
+                                <th>Datum-von</th>
+                                <th>Datum-bis</th>
+                                <th>Abteilungs-Name</th>
+                                <th>Kapa-Bedarf</th>
+                                <th>Kommentar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>p1</td>
+                                <td>22.07.2021</td>
+                                <td>13.09.2021</td>
+                                <td>Montage</td>
+                                <td>250</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>p1</td>
+                                <td>26.08.2021</td>
+                                <td>18.12.2021</td>
+                                <td>Inbetriebnahme</td>
+                                <td>500</td>
+                                <td>Aufwand wegen Leihkräften vor Ort</td>
+                            </tr>
+                            <tr>
+                                <td>Proj-2</td>
+                                <td>13.05.2021</td>
+                                <td>15.07.2021</td>
+                                <td>Konstruktion</td>
+                                <td>350</td>
+                                <td>Fremdvergabe von E-Kon. Vorsicht!</td>
+                            </tr>
+                            <tr>
+                                <td>Proj-2</td>
+                                <td>23.06.2021</td>
+                                <td>25.07.2021</td>
+                                <td>Einkauf</td>
+                                <td>50</td>
+                                <td>LL schon ca. 1.6.!</td>
+                            </tr>
+                            <tr>
+                                <td>Proj-2</td>
+                                <td>13.09.2021</td>
+                                <td>15.10.2021</td>
+                                <td>Montage</td>
+                                <td>250</td>
+                                <td>Vorsicht! IBN durch Kunden vor Ort.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    Was man dann sehen kann? Das schauen wir uns mal an:<br>
+                    <a target="_blank"
+                        href="https://www.loom.com/share/f3244db10e854dd9a0fd6bf4d64cfc2f?sid=5f148626-62e4-45db-8bcd-89b4dcaeac09">Video</a>
+                    <p></p>
+                </li>
+            </ul>
+            <li><b>Modell neu, Modell öffnen und speichern</b><br>
+                DIE Besonderheit: v-pipe-modelle bestehen aus Verzeichnissen, in denen mehrere Dateien liegen.
+                Die blauen Ordner werden geöffnet und gespeichert. Nicht einzelne Dateien. Je nach gewählten Optionen
+                werden unterschiedliche Dateien gespeichert. Hier sind vier Beispiele, aus was ein Modell bestehen
+                kann:<br>
+                <img src="v-pipe-daten-folder.png"><br>
+                Alles andere im
+                <a target="_blank"
+                    href="https://www.loom.com/share/ac891e0edae644fa889402511f0a6ef2?sid=22db3027-66bd-4e22-875b-ca6fe9db2e0d">Video</a>
+                <p></p>
+            </li>
+
+            <br>
+            <br>
+            <hr>
+            <p>Ab hier: Baustelle... Falls Sie Interesse an dem Thema haben:
+                Wenden Sie sich an Frau Nicole Tietz: 
+                <a target="_blank"
+                    href="mailto:tietz@v-und-s.de">tietz@v-und-s.de</a>
+            </p>
+            <hr>
+            <br>
+            <br>
+            <li><b>Praktische Projekte: Abteilungs-Kapazitäten, Tasks und fixe Liefertermine</b><br>
+                <ul>
+                    <li>Projekte verschieben</li>
+                    <li>Tasks bearbeiten</li>
+                    <li>Daten detailliert bearbeiten</li>
+                    <li>Projekte duplizieren und löschen</li>
+                    <li>Auslastung analysieren</li>
+                </ul>
+                <p></p>
+            </li>
+
+
+            <li>Modell speichern, kontinuierliche Backups und Szenarien
+                <ul><li>Szeanarienprojekte ein- und ausblenden</li></ul>
+            </li>
+            <li>Vorlagen</li>
+            <li>Datendateien verstehen 
+                <ul>
+                    <li>Szenarien schnell modellieren </li>
+                    <li>der Import-Assistent </li>        
+                </ul>
+            </li>
+            <li>Updates aus Live-Daten importieren 
+                <ul>
+                    <li>IDs oder Projekte überschreiben </li>
+                </ul>
+            </li>
+            <li>Pipeline - wozu? </li>
+            <li>Export als PDF </li>
+            <li>Alles gleichzeitig sehen: Multi-Views </li>
+            <li>Wo legt v-pipe seine Einstellungen ab?</li>
+        </ul>
+
+    </main>
+
+
+    <footer>
+        <p>Benno Löffler, 2020 - 2024</p>
+        <a href="https://v-und-s.de/impressum/">Impressum</p>
+            <img src="v-pipe-logo-invers-transparent.png" alt="" style="width: 10%;">
+    </footer>
+
+
+
+
+
+</body>
+
+</html>
