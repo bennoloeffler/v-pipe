@@ -2,9 +2,13 @@
 # v-pipe
 
 Das V&S-Pipeline-Werkzeug macht ein Projekt-Portfolio    
-sichtbar. Und zwar in Echtzeit - also beim Tippen sozusagen.  
-Wie das geht? Siehe Teaser-Video:
-[Alle Featueres auf einen Blick](https://loom.com/share/folder/098a2ada42f647bfbbcc89e4d0e4a202)
+sichtbar. Und zwar in Echtzeit - also beim Tippen sozusagen.
+So können Führungsteams oder Projekt-Manager gemeinsam sehen,
+was wirklich los ist, schnelle Szenarien durchspielen und
+gemeinsam entscheiden.
+
+Wie das geht? Siehe Teaser-Video und Tutorial:
+[Alle Featueres auf einen Blick](https://bennoloeffler.github.io/v-pipe/)
 
 v-pipe liest einfache Text-Dateien mit Projekt-Daten  
 und Abteilungs-Kapazitäten ein und erzeugt eine  
@@ -13,15 +17,6 @@ Es gibt die Möglichkeit, Projekte per Pfeiltasten
 wochenweise zu verschieben und die Auswirkungen  
 in Echtzeit zu sehen. Alle Tasten-Kürzel  
 sind in der Kopfzeile von v-pipe zu sehen.
-Z. B. 
-- n = now 
-- d = Details 
-- Pfeil = Cursor bewegen
-- Shift-Pfeil = Projekt bewegen
-
-
-[Quickstart-Videos zu allen Features?](https://loom.com/share/folder/098a2ada42f647bfbbcc89e4d0e4a202)
-
 
 ## Installation
 
@@ -38,8 +33,6 @@ Die Distribution ist ein Zip-File mit dem Namen:
 Aktuelles **zip-file runterladen und entpacken** - z. B. in das lokale Verzeichnis:  
 `c:\v-pipe-1.5.0-average-load`. Aber auch gerne auf einen Memory-Stick oder ins eigene Home.  
 Oder nach `Programme` (als admin). Tut auch.  
-
-[Video-Anleitung 'Installation', Bitte hier lang...](bla)
 
 Wenn die Dateien kopiert sind, befinden sich in ihrem Installationsverzeichnis  
 auf ihrem Rechner (also z.B. in C:\v-pipe-2.2.0-update-by-id)  
@@ -63,34 +56,14 @@ folgende Verzeichnisse und Dateien:
     - Szenarien        
         - `Projekt-Verschiebung.txt` (OPTIONAL: Projekte schieben)
         - `Szenario-Kopie-Original-Verschiebung.txt` (OPTIONAL: Projekte kopieren+schieben)
-  
-## arbeiten mit v-pipe
-
-### Bedienung mit Tasten!
-### Starten
-### Modell neu
-### Modell öffnen
-#### Beispiele
-### Modell bearbeiten
-#### Projekte verschieben
-#### Tasks bearbeiten
-#### Details bearbeiten 
-#### Projekte duplizieren
-### Modell speichern
-### Auslastungs-Details verstehen
-### Abteilungs-Kapazitäten
-### Vorlagen
-### Datendateien verstehen
-#### Szenarien schnell modellieren
-#### der Import-Assistent
-### Updates aus Live-Daten importieren
-#### IDs oder Projekte überschreiben
-### Pipeline - wozu?
-### Export als PDF
-### Alles gleichzeitig sehen: Multi-Views
 
 
 ## Release History
+
+### 2024-04-09 `2.4.0-better-details`
+- make details in load more understandable
+- fix bug in average load calculation 
+
 ### 2024-01-31 `2.3.2-filter-and-export`
 - export load view as pdf and data into an folder called "export"
 - filter the visual view and export data by shrinking the range of aktive calendar weeks 
