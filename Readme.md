@@ -223,10 +223,22 @@ Das ist nur vernünftig in verschiedenen Verzeichnissen!
 - Schreiben von Department-Load-Result.txt
 
 ## Ideen und zukünftige Features 
-Das hier ist keine Roadmap, sondern eine Ideen-Sammlung.  
-Nützlichkeit in absteigender Reihenfolge:
+Das hier ist keine Roadmap, sondern eine Ideen-Sammlung. Nützlichkeit in absteigender Reihenfolge:
+
+### Usability
+- Projekt Neu raus aus Vorlagen und eigener Reiter für Projekte
+- Projekte kopieren, löschen und neu anlegen in das GUI - oder eigener Reiter in neben Details - ggf. Fokus dort hin springen bei Menu.
+- Standard-Tastenkürzel für alle Funktionen (COMMAND-N für neues Modell, COMMAND-SHIFT-S für Speichern unter, ...)
+- Vorlagen-MODUS: Die Strings in Vorlagen/Menus anpassen, sonst versteht das kein Mensch.
+- neues Modell als TEMPLATE speichern.
+- neues Modell in "jetzt" schieben.
+- neues Modell hat EINEN Task und Zwei Abteilung - und eine Analoge Vorlage.
+
+
+### echte Features
 - Automatisches Pipelining (entweder an der Pipeline oder an einer Abteilung)
 - Monte-Carlo Simulation für "wenns gut läuft / wenns schlecht läuft"
+- Dreipunkt-Schätzungen für Tasks: best real worst
 - settings file für user: aktuelles Verzeichnis, details, offene Fenster, Window-Size, Splitter, ...
 - Finanz-Zahlen und damit Durchsatz-Kennzahlen
 - adapter elegantly import project data
